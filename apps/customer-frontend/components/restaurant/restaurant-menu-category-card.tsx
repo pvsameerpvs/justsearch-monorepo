@@ -2,13 +2,16 @@ import { Sparkles } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
 import type { MenuCategory } from '@/lib/restaurant-types';
 import { RestaurantMenuSubcategorySection } from './restaurant-menu-subcategory-section';
+import type { ViewMode } from './restaurant-menu-showcase';
 
 type RestaurantMenuCategoryCardProps = {
   category: MenuCategory;
+  viewMode: ViewMode;
 };
 
 export function RestaurantMenuCategoryCard({
   category,
+  viewMode,
 }: RestaurantMenuCategoryCardProps) {
   const groupedItems = Object.entries(
     category.items.reduce<Record<string, typeof category.items>>((groups, item) => {
@@ -56,6 +59,7 @@ export function RestaurantMenuCategoryCard({
               key={title}
               title={title}
               items={items}
+              viewMode={viewMode}
             />
           ))}
         </div>

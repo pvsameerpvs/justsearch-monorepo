@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from 'react';
+import { LayoutGrid, List } from 'lucide-react';
 import { Container } from '@/components/shared/container';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantMenuCategoryCard } from './restaurant-menu-category-card';
@@ -7,9 +11,13 @@ type RestaurantMenuShowcaseProps = {
   restaurant: Restaurant;
 };
 
+export type ViewMode = 'grid' | 'list';
+
 export function RestaurantMenuShowcase({
   restaurant,
 }: RestaurantMenuShowcaseProps) {
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+
   const allItems = restaurant.menu.flatMap((category) => category.items);
   const availableItems = allItems.filter((item) => item.isAvailable);
   const priceValues = allItems.map((item) => item.price);
@@ -34,15 +42,48 @@ export function RestaurantMenuShowcase({
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[rgb(var(--brand))]">
                   Menu Selection
                 </p>
-                <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-[rgb(var(--ink))]">
-                  Explore Categories
-                </h2>
+                <div className="mt-1 flex items-center gap-4">
+                  <h2 className="font-display text-2xl font-bold tracking-tight text-[rgb(var(--ink))]">
+                    Explore Categories
+                  </h2>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                  {availableItems.length} Available for order
-                </span>
+
+              <div className="flex flex-wrap items-center gap-4">
+                {/* View Mode Toggle */}
+                <div className="flex items-center rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
+                      viewMode === 'grid'
+                        ? 'bg-[rgb(var(--brand))] text-white shadow-md'
+                        : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                    title="Grid View"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
+                      viewMode === 'list'
+                        ? 'bg-[rgb(var(--brand))] text-white shadow-md'
+                        : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                    title="List View"
+                  >
+                    <List className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="h-4 w-px bg-slate-200" />
+
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                    {availableItems.length} Available for order
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -64,7 +105,7 @@ export function RestaurantMenuShowcase({
           <div className="space-y-16 sm:space-y-24">
             {restaurant.menu.map((category) => (
               <div key={category.id} id={category.id} className="scroll-mt-32">
-                <RestaurantMenuCategoryCard category={category} />
+                <RestaurantMenuCategoryCard category={category} viewMode={viewMode} />
               </div>
             ))}
           </div>
