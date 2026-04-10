@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { LayoutGrid, List, Sparkles } from 'lucide-react';
+import { LayoutGrid, List, Sparkles, UtensilsCrossed } from 'lucide-react';
 import { Container } from '@/components/shared/container';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantMenuCategoryCard } from './restaurant-menu-category-card';
@@ -36,14 +36,14 @@ export function RestaurantMenuShowcase({
       <section className="relative -mt-12 pb-20 sm:pb-24 lg:pb-32">
         <Container>
           {/* Premium Category Navigation Bar */}
-          <div className="sticky top-6 z-40 mb-16 rounded-t-[40px] rounded-b-[2px] border border-white/40 bg-white/70 p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all sm:p-3">
-            <div className="flex flex-col gap-4 overflow-hidden rounded-t-[32px] rounded-b-[2px] bg-white/40 p-4 sm:p-5">
+          <div className="sticky top-6 z-40 mb-16 rounded-[14px] border border-white/40 bg-white/70 p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all sm:p-3">
+            <div className="flex flex-col gap-4 overflow-hidden rounded-[14px] bg-white/40 p-4 sm:p-5">
               
               {/* Header section with Stats and View Toggle */}
               <div className="flex flex-col justify-between gap-5 border-b border-slate-200/60 pb-5 sm:flex-row sm:items-center">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgb(var(--brand))] text-white shadow-lg shadow-[rgb(var(--brand)/0.2)]">
-                    <Sparkles className="h-6 w-6" />
+                    <UtensilsCrossed className="h-6 w-6" />
                   </div>
                   <div>
                     <h2 className="font-display text-xl font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl">
@@ -88,16 +88,19 @@ export function RestaurantMenuShowcase({
               </div>
 
               {/* Scrollable Categories Section */}
-              <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto py-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+              <div className="scrollbar-hide flex items-center gap-3 overflow-x-auto py-2 -mx-4 px-4 sm:mx-0 sm:px-0">
                 {restaurant.menu.map((category) => (
                   <a
                     key={category.id}
                     href={`#${category.id}`}
-                    className="group relative flex shrink-0 items-center gap-3 rounded-[2px] border border-slate-200 bg-white px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-700 transition-all hover:border-[rgb(var(--brand))] hover:bg-slate-50 hover:text-[rgb(var(--brand))] active:scale-95 sm:text-sm sm:px-5 sm:py-3 sm:normal-case sm:tracking-normal"
+                    className="group relative flex shrink-0 items-center gap-3 rounded-[12px] border border-slate-200/50 bg-white px-6 py-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--brand))] hover:shadow-[0_8px_20px_-6px_rgba(var(--brand),0.15)] active:scale-95 sm:px-5 sm:py-3"
                   >
-                    <span className="text-xl transition-transform group-hover:scale-110">{category.emoji}</span>
-                    <span className="whitespace-nowrap">{category.title}</span>
-                    <div className="absolute -bottom-px left-0 h-[2px] w-0 bg-[rgb(var(--brand))] transition-all group-hover:w-full" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 transition-colors group-hover:bg-[rgb(var(--brand)/0.1)]">
+                      <span className="text-xl transition-transform duration-300 group-hover:scale-110">{category.emoji}</span>
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-[0.15em] text-slate-700 transition-colors group-hover:text-[rgb(var(--brand))] sm:text-sm sm:normal-case sm:tracking-normal">
+                      {category.title}
+                    </span>
                   </a>
                 ))}
               </div>
