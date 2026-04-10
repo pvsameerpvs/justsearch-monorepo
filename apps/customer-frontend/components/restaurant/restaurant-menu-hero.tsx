@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Sparkles, UtensilsCrossed, Calendar, Tag } from 'lucide-react';
+import { ArrowLeft, Sparkles, UtensilsCrossed, Calendar, Tag, User } from 'lucide-react';
 import { ButtonLink } from '@/components/shared/button-link';
 import { Container } from '@/components/shared/container';
 import { formatCurrency } from '@/lib/format';
@@ -41,13 +41,19 @@ export function RestaurantMenuHero({
       </div>
 
       <Container className="relative z-10 flex flex-col items-center justify-center py-10 sm:py-14 lg:py-16">
-        {/* Absolute Back Button */}
-        <div className="absolute left-4 top-6 z-50 sm:left-6 sm:top-8">
+        {/* Top Header Actions */}
+        <div className="absolute inset-x-0 top-6 z-50 flex items-center justify-between px-4 sm:top-8 sm:px-6">
           <button
             onClick={() => window.history.back()}
             className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20 active:scale-95 shadow-lg"
           >
             <ArrowLeft className="h-4 w-4" />
+          </button>
+          
+          <button
+            className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20 active:scale-95 shadow-lg"
+          >
+            <User className="h-4 w-4" />
           </button>
         </div>
 

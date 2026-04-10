@@ -19,7 +19,7 @@ export function RestaurantMenuItemCard({
     : 'linear-gradient(135deg, rgba(var(--brand-soft), 0.96), rgba(var(--accent-soft), 0.88))';
 
   return (
-    <article className={`overflow-hidden rounded-[24px] border border-[rgba(var(--border),0.7)] bg-[rgba(var(--card-surface-muted),0.92)] shadow-[0_12px_32px_rgba(15,23,42,0.04)] transition-all hover:shadow-[0_18px_44px_rgba(15,23,42,0.06)] ${
+    <article className={`overflow-hidden rounded-[14px] border border-[rgba(var(--border),0.7)] bg-[rgba(var(--card-surface-muted),0.92)] shadow-[0_12px_32px_rgba(15,23,42,0.04)] transition-all hover:shadow-[0_18px_44px_rgba(15,23,42,0.06)] ${
       isList ? 'flex flex-row' : 'flex flex-col'
     }`}>
       {/* Image Section */}

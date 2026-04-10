@@ -1,6 +1,7 @@
 import './globals.css';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { AppShell } from '@/components/layout/app-shell';
+import { RestaurantLayoutManager } from '@/components/layout/restaurant-layout-manager';
 import type { ReactNode } from 'react';
 
 const inter = Inter({
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className={inter.className}>
-        <AppShell>{children}</AppShell>
+        <AppShell>
+          <RestaurantLayoutManager>{children}</RestaurantLayoutManager>
+        </AppShell>
       </body>
     </html>
   );

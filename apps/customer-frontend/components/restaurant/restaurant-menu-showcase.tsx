@@ -6,6 +6,7 @@ import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantMenuCategoryCard } from './restaurant-menu-category-card';
 import { RestaurantMenuHero } from './restaurant-menu-hero';
 import { RestaurantMenuNavigation } from './restaurant-menu-navigation';
+import { RestaurantMobileNav } from './restaurant-mobile-nav';
 
 type RestaurantMenuShowcaseProps = {
   restaurant: Restaurant;
@@ -16,7 +17,7 @@ export type ViewMode = 'grid' | 'list';
 export function RestaurantMenuShowcase({
   restaurant,
 }: RestaurantMenuShowcaseProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   // Derived menu metrics
   const allItems = restaurant.menu.flatMap((category) => category.items);
@@ -27,6 +28,7 @@ export function RestaurantMenuShowcase({
 
   return (
     <>
+      <RestaurantMobileNav />
       <RestaurantMenuHero
         restaurant={restaurant}
         itemCount={allItems.length}
@@ -34,7 +36,7 @@ export function RestaurantMenuShowcase({
         currency={currency}
       />
 
-      <section className="relative -mt-12 pb-20 sm:pb-24 lg:pb-32">
+      <section className="relative -mt-12 pb-36 sm:pb-32 lg:pb-32">
         <Container>
           <RestaurantMenuNavigation
             restaurant={restaurant}
