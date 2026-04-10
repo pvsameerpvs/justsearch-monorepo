@@ -39,94 +39,64 @@ export function RestaurantMenuHero({
         />
       </div>
 
-      <Container className="relative z-10 py-12 sm:py-20 lg:py-28">
+      <Container className="relative z-10 flex flex-col items-center justify-center py-10 sm:py-14 lg:py-16">
         {/* Absolute Back Button */}
-        <div className="absolute left-4 top-8 z-50 sm:left-8 sm:top-10 lg:left-12">
+        <div className="absolute left-4 top-6 z-50 sm:left-6 sm:top-8">
           <button
             onClick={() => window.history.back()}
-            className="group flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-110 hover:bg-white/20 active:scale-95 shadow-lg"
+            className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20 active:scale-95 shadow-lg"
           >
-            <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+            <ArrowLeft className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-          {/* Left Column: Branding & Title */}
-          <div className="space-y-8">
-            
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+        {/* Centered Content Row */}
+        <div className="flex w-full flex-col items-center text-center">
+          <div className="space-y-6">
+            <div className="flex flex-col items-center gap-4">
               <RestaurantLogoBadge
                 restaurant={restaurant}
                 size="lg"
-                className="shadow-[0_20px_60px_rgba(0,0,0,0.4)]"
+                className="h-20 w-20 shadow-[0_15px_40px_rgba(0,0,0,0.3)]"
               />
               <div className="space-y-2">
-                <p className="text-sm font-bold uppercase tracking-widest text-[rgb(var(--brand))]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[rgb(var(--brand))]">
                   {restaurant.category}
                 </p>
-                <h1 className="font-display text-5xl font-bold tracking-tight text-white sm:text-7xl">
+                <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
                   {restaurant.name}
                 </h1>
-                <p className="text-lg text-white/80 max-w-lg">
+                <p className="mx-auto max-w-lg text-sm text-white/80 sm:text-base font-medium">
                   {restaurant.tagline}
                 </p>
               </div>
             </div>
 
-            <h2 className="font-display text-3xl font-medium leading-tight text-white/90 sm:text-5xl lg:max-w-xl">
-              Discover a culinary journey crafted with passion and precision.
+            <h2 className="mx-auto font-display text-xl font-medium leading-relaxed text-white/90 sm:text-2xl lg:max-w-2xl">
+              Signature dishes, thoughtful plating, and a menu that feels great on every screen.
             </h2>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap justify-center gap-2">
               {restaurant.cuisine.map((cuisine) => (
                 <span
                   key={cuisine}
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white/70"
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/60"
                 >
                   {cuisine}
                 </span>
               ))}
             </div>
-          </div>
 
-          {/* Right Column: Experience Cards */}
-          <div className="grid gap-4 sm:grid-cols-1">
-            <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/5 p-8 text-white backdrop-blur-xl transition-all hover:bg-white/10">
-              <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[rgb(var(--brand))] opacity-10 blur-3xl" />
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Menu Stats</p>
-                  <div className="mt-4 flex items-baseline gap-2">
-                    <span className="font-display text-5xl font-bold">{itemCount}</span>
-                    <span className="text-sm text-white/60 font-medium">Unique Dishes</span>
-                  </div>
+            {/* Integrated Opening Today Timing */}
+            <div className="flex justify-center py-5">
+              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 pr-6 text-white backdrop-blur-xl transition-all hover:bg-white/10">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[rgb(var(--brand)/0.2)] text-[rgb(var(--brand))]">
+                  <Calendar className="h-4 w-4" />
                 </div>
-                <UtensilsCrossed className="h-8 w-8 text-[rgb(var(--brand))]" />
-              </div>
-            </div>
-
-            <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/5 p-8 text-white backdrop-blur-xl transition-all hover:bg-white/10">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Starting From</p>
-                  <div className="mt-4 flex items-baseline gap-2">
-                    <span className="font-display text-5xl font-bold">{formatCurrency(lowestPrice, currency)}</span>
-                    <span className="text-sm text-white/60 font-medium">per dish</span>
-                  </div>
+                <div className="text-left">
+                  <p className="text-[9px] font-bold  uppercase tracking-widest text-white/40">Opening Today</p>
+                  <p className="font-display text-sm font-bold">{todayHours}</p>
                 </div>
-                <Tag className="h-8 w-8 text-amber-400" />
-              </div>
-            </div>
-
-            <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/5 p-8 text-white backdrop-blur-xl transition-all hover:bg-white/10">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Opening Today</p>
-                  <div className="mt-4 flex items-baseline gap-2">
-                    <span className="font-display text-3xl font-bold">{todayHours}</span>
-                  </div>
-                </div>
-                <Calendar className="h-8 w-8 text-[rgb(var(--brand))]" />
               </div>
             </div>
           </div>
