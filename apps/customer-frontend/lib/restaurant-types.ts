@@ -61,6 +61,8 @@ export type Game = {
   prize: string;
   accessLevel: 'public' | 'login_required' | 'session_required';
   isAvailable: boolean;
+  tag?: 'HOT' | 'TOP RATED' | 'NEW' | 'PRO';
+  embedId?: string;
 };
 
 export type GoogleReview = {
