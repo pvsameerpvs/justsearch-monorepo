@@ -34,3 +34,14 @@ a {
   background: rgba(15, 118, 110, 0.22);
   color: rgb(15 23 42);
 }
+
+@layer utilities {
+  .animate-subtle-zoom {
+    animation: subtle-zoom 30s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes subtle-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/cn';
-import { getRestaurantInitials } from '@/lib/restaurant-resolver';
+import { getRestaurantInitials } from '@/lib/restaurant-utils';
 import type { Restaurant } from '@/lib/restaurant-types';
 
 type RestaurantLogoBadgeProps = {

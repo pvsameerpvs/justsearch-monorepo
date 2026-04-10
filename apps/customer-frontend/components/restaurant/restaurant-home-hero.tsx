@@ -1,6 +1,6 @@
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
-import { getRestaurantDomain } from '@/lib/restaurant-resolver';
+import { getRestaurantDomain } from '@/lib/restaurant-utils';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantLogoBadge } from './restaurant-logo-badge';
 

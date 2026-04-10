@@ -6,11 +6,9 @@ export default async function Home() {
   const restaurant = await getCurrentRestaurant();
 
   return (
-    <div className="min-h-screen lg:h-[100svh] lg:overflow-hidden">
-      <div className="flex min-h-screen flex-col justify-center lg:h-full">
-        <RestaurantHomeHero restaurant={restaurant} />
-        <RestaurantFeatureGrid />
-      </div>
+    <div className="min-h-screen">
+      <RestaurantHomeHero restaurant={restaurant} />
+      <RestaurantFeatureGrid />
     </div>
   );
 }
