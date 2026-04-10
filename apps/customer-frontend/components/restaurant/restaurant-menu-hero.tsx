@@ -31,12 +31,13 @@ export function RestaurantMenuHero({
   return (
     <section className="relative w-full overflow-hidden">
       {/* Immersive Full-Width Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <img
           src={backgroundImage}
           alt="Menu Hero Background"
-          className="h-full w-full object-cover brightness-50 animate-subtle-zoom"
+          className="h-full w-full object-cover brightness-[0.45] animate-subtle-zoom"
         />
+        <div className="absolute inset-0 bg-black/40" />
       </div>
 
       <Container className="relative z-10 flex flex-col items-center justify-center py-10 sm:py-14 lg:py-16">
