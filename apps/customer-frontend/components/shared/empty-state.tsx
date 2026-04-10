@@ -12,7 +12,7 @@ export function EmptyState({ title, description, action, className }: EmptyState
   return (
     <div
       className={cn(
-        'rounded-3xl border border-dashed border-slate-300 bg-white/70 p-8 text-center backdrop-blur-sm',
+        'rounded-3xl border border-dashed border-[rgba(var(--border),0.88)] bg-[rgba(var(--card-surface),0.74)] p-8 text-center backdrop-blur-sm',
         className
       )}
     >
@@ -24,4 +24,3 @@ export function EmptyState({ title, description, action, className }: EmptyState
     </div>
   );
 }
-

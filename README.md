@@ -56,5 +56,6 @@ pnpm build
 ## Documentation
 
 - `docs/customer-backend-project-documentation.md`: backend contract and implementation guide for the customer-facing restaurant experience.
+- `docs/customer-frontend-subdomain-ui.md`: frontend guidance for subdomain-based restaurant pages and the shared customer UI structure.
 - `docs/restaurant-admin-backend-project-documentation.md`: backend contract and implementation guide for the restaurant admin dashboard experience.
 - `docs/justsearch-admin-backend-project-documentation.md`: backend contract and implementation guide for the super admin dashboard experience.

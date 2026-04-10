@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata = {
   title: 'JustSearch Restaurant Activity | Customer Frontend',
   description:
-    'Public restaurant browsing with live QR check-ins, games, points, rewards, and redeem flows.',
+    'Public restaurant browsing with menu, eat-play, Google reviews, and social media routes.',
 };
 
 export default function RootLayout({
