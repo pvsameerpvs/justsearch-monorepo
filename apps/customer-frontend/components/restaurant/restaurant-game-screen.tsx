@@ -68,13 +68,33 @@ export function RestaurantGameScreen({ restaurant, game }: RestaurantGameScreenP
     }
   }, [game.id, onAward]);
 
-  // IMMERSIVE MOBILE UI (No website bars)
+  // IMMERSIVE MOBILE FULLSCREEN MODE
+  if (isPlaying) {
+    return (
+        <div className="fixed inset-0 z-[10001] flex flex-col bg-black lg:hidden">
+            <div className="absolute left-4 top-4 z-[10002]">
+                <button 
+                    onClick={() => setIsPlaying(false)}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md border border-white/10"
+                >
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div className="h-full w-full">
+                {gameBody}
+            </div>
+        </div>
+    );
+  }
+
+  // STANDARD UI (Splash Screen + Desktop UI)
   return (
     <div className="fixed inset-0 z-[10000] flex flex-col bg-[linear-gradient(135deg,#0f172a,#2d1b4e,#4c1d35)] lg:relative lg:inset-auto lg:z-0 lg:block lg:bg-transparent lg:py-10">
       <div className="flex-1 overflow-y-auto lg:flex-none">
-        <Container className="h-full">
-            {!isPlaying ? (
-                /* PREMIUM SPLASH SCREEN UI */
+            <Container className="h-full">
+                {/* MOBILE SPLASH SCREEN UI */}
                 <div className="flex min-h-full flex-col p-6 lg:hidden">
                     {/* Top Bar with Points */}
                     <div className="flex items-center justify-between pb-4">
@@ -139,7 +159,7 @@ export function RestaurantGameScreen({ restaurant, game }: RestaurantGameScreenP
                                 </div>
                             )}
 
-                            <p className="max-w-[280px] text-base font-medium leading-relaxed text-white/70 subpixel-antialiased">
+                            <p className="max-w-[280px] text-base font-medium leading-relaxed text-white/70 subpixel-antialiased subpixel-antialiased subpixel-antialiased">
                                 {game.description}
                             </p>
                         </div>
@@ -152,73 +172,57 @@ export function RestaurantGameScreen({ restaurant, game }: RestaurantGameScreenP
                          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/20"></div>
                     </div>
                 </div>
-            ) : (
-                /* GAME PLAYING UI (Mobile) */
-                <div className="fixed inset-0 z-[10001] bg-black lg:hidden">
-                    <div className="absolute left-4 top-4 z-[4000]">
-                         <button 
-                            onClick={() => setIsPlaying(false)}
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md"
-                        >
-                            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div className="h-full w-full">{gameBody}</div>
+
+                {/* DESKTOP UI (Keeps the "Old UI" clean look) */}
+                <div className="hidden lg:flex lg:flex-col lg:gap-6 lg:py-10">
+                    <Surface className="rounded-[32px] border-white/70 bg-[linear-gradient(140deg,rgba(var(--brand-soft),0.25),rgba(var(--card-surface),0.92),rgba(var(--accent-soft),0.38))] p-6 sm:p-8">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(var(--brand))]">
+                            {subtitle}
+                            </p>
+                            <h1 className="mt-2 font-display text-3xl font-semibold tracking-[-0.06em] text-[rgb(var(--ink))] sm:text-4xl">
+                            {game.icon} {game.name}
+                            </h1>
+                            <p className="mt-3 max-w-2xl text-sm leading-6 text-[rgb(var(--muted))]">
+                            {game.description}
+                            </p>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <ButtonLink href="/eat-play" variant="secondary" size="md">
+                            Back
+                            </ButtonLink>
+                        </div>
+                        </div>
+                    </Surface>
+
+                    <Surface className="rounded-[32px] border-white/70 bg-white/90 p-6 sm:p-8">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--muted))]">
+                            Score
+                            </p>
+                            {lastAward ? (
+                            <p className="mt-2 text-sm font-semibold text-[rgb(var(--ink))]">
+                                {lastAward.label}: score {lastAward.score} • +{lastAward.points} points
+                            </p>
+                            ) : (
+                            <p className="mt-2 text-sm text-[rgb(var(--muted))]">
+                                Play a round to generate a score.
+                            </p>
+                            )}
+                        </div>
+                        <div className="flex flex-col gap-1 text-sm font-semibold text-[rgb(var(--muted))] sm:items-end">
+                            <div>Restaurant: {restaurant.name}</div>
+                            <div className="text-[rgb(var(--ink))]">Your points: {points}</div>
+                        </div>
+                        </div>
+
+                        <div className="mt-6">{gameBody}</div>
+                    </Surface>
                 </div>
-            )}
-
-          {/* DESKTOP UI (Keeps the "Old UI" clean look) */}
-          <div className="hidden flex-col gap-6 lg:flex">
-                <Surface className="rounded-[32px] border-white/70 bg-[linear-gradient(140deg,rgba(var(--brand-soft),0.25),rgba(var(--card-surface),0.92),rgba(var(--accent-soft),0.38))] p-6 sm:p-8">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(var(--brand))]">
-                        {subtitle}
-                        </p>
-                        <h1 className="mt-2 font-display text-3xl font-semibold tracking-[-0.06em] text-[rgb(var(--ink))] sm:text-4xl">
-                        {game.icon} {game.name}
-                        </h1>
-                        <p className="mt-3 max-w-2xl text-sm leading-6 text-[rgb(var(--muted))]">
-                        {game.description}
-                        </p>
-                    </div>
-
-                    <div className="flex gap-3">
-                        <ButtonLink href="/eat-play" variant="secondary" size="md">
-                        Back
-                        </ButtonLink>
-                    </div>
-                    </div>
-                </Surface>
-
-                <Surface className="rounded-[32px] border-white/70 bg-white/90 p-6 sm:p-8">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--muted))]">
-                        Score
-                        </p>
-                        {lastAward ? (
-                        <p className="mt-2 text-sm font-semibold text-[rgb(var(--ink))]">
-                            {lastAward.label}: score {lastAward.score} • +{lastAward.points} points
-                        </p>
-                        ) : (
-                        <p className="mt-2 text-sm text-[rgb(var(--muted))]">
-                            Play a round to generate a score.
-                        </p>
-                        )}
-                    </div>
-                    <div className="flex flex-col gap-1 text-sm font-semibold text-[rgb(var(--muted))] sm:items-end">
-                        <div>Restaurant: {restaurant.name}</div>
-                        <div className="text-[rgb(var(--ink))]">Your points: {points}</div>
-                    </div>
-                    </div>
-
-                    <div className="mt-6">{gameBody}</div>
-                </Surface>
-          </div>
-        </Container>
+            </Container>
       </div>
     </div>
   );

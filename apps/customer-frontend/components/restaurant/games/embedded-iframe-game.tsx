@@ -44,16 +44,17 @@ export function EmbeddedIframeGame({ onAward, gameUrl }: EmbeddedIframeGameProps
   }, [onAward, hasFinished]);
 
   return (
-    <div className="mx-auto w-full max-w-[800px] overflow-hidden rounded-[32px] border border-[rgba(var(--card-border),0.9)] bg-[#0f172a] shadow-xl">
+    <div className="mx-auto flex h-full w-full flex-col overflow-hidden bg-black lg:max-w-[800px] lg:rounded-[32px] lg:border lg:border-[rgba(var(--card-border),0.9)] lg:shadow-xl">
       <iframe
         src={gameUrl}
         title="Professional 3D WebGL Game"
-        className="h-[600px] w-full border-none outline-none"
+        className="h-full w-full border-none outline-none lg:h-[600px]"
+        style={{ minHeight: '100%' }}
         sandbox="allow-scripts allow-same-origin"
       />
       
-      <div className="bg-white/5 p-3 text-center">
-        <p className="text-xs font-medium text-[rgb(var(--muted))]">
+      <div className="hidden bg-white/5 p-3 text-center lg:block">
+        <p className="text-[10px] font-medium text-[rgb(var(--muted))] lg:text-xs">
           Professional WebGL Engine. Play above to sync points to your account.
         </p>
       </div>
