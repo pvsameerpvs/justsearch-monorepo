@@ -2,10 +2,41 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { Home, UtensilsCrossed, Gamepad2, User } from 'lucide-react';
 
 export function RestaurantMobileNav() {
   const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const updateHeightVar = () => {
+      const height = element.offsetHeight;
+      document.documentElement.style.setProperty(
+        '--restaurant-mobile-nav-height',
+        `${height}px`,
+      );
+    };
+
+    updateHeightVar();
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => updateHeightVar());
+      resizeObserver.observe(element);
+    }
+
+    window.addEventListener('resize', updateHeightVar);
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', updateHeightVar);
+      document.documentElement.style.removeProperty('--restaurant-mobile-nav-height');
+    };
+  }, []);
 
   const navItems = [
     { label: 'Home', icon: Home, href: '/' },
@@ -15,7 +46,10 @@ export function RestaurantMobileNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999] w-full lg:hidden">
+    <div
+      ref={containerRef}
+      className="fixed bottom-0 left-0 right-0 z-[9999] w-full lg:hidden"
+    >
       <nav className="flex items-center justify-around rounded-t-[24px] border-t border-x border-white/20 bg-white/95 pb-[calc(env(safe-area-inset-bottom,16px)+8px)] pt-3 shadow-[0_-15px_40px_rgba(0,0,0,0.12)] backdrop-blur-3xl">
         {navItems.map((item) => {
           const isActive = pathname === item.href;

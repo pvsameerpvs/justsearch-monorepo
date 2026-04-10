@@ -6,7 +6,6 @@ import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantMenuCategoryCard } from './restaurant-menu-category-card';
 import { RestaurantMenuHero } from './restaurant-menu-hero';
 import { RestaurantMenuNavigation } from './restaurant-menu-navigation';
-import { RestaurantMobileNav } from './restaurant-mobile-nav';
 
 type RestaurantMenuShowcaseProps = {
   restaurant: Restaurant;
@@ -28,7 +27,6 @@ export function RestaurantMenuShowcase({
 
   return (
     <>
-      <RestaurantMobileNav />
       <RestaurantMenuHero
         restaurant={restaurant}
         itemCount={allItems.length}
@@ -36,7 +34,7 @@ export function RestaurantMenuShowcase({
         currency={currency}
       />
 
-      <section className="relative -mt-12 pb-36 sm:pb-32 lg:pb-32">
+      <section className="relative -mt-12 pb-14 sm:pb-16">
         <Container>
           <RestaurantMenuNavigation
             restaurant={restaurant}

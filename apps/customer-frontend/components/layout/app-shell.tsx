@@ -20,7 +20,9 @@ export async function AppShell({ children, className }: AppShellProps) {
       <div className="pointer-events-none absolute -left-24 top-12 -z-10 h-72 w-72 rounded-full bg-[rgba(var(--page-glow-brand),0.16)] blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-32 -z-10 h-80 w-80 rounded-full bg-[rgba(var(--page-glow-accent),0.18)] blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 left-1/3 -z-10 h-56 w-56 rounded-full bg-[rgba(var(--brand-soft),0.32)] blur-3xl" />
-      <main className="relative">{children}</main>
+      <main className="relative pb-[var(--restaurant-mobile-nav-height,0px)] lg:pb-0">
+        {children}
+      </main>
     </div>
   );
 }

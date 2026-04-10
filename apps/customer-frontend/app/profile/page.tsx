@@ -1,7 +1,6 @@
 "use client";
 
 import { Container } from '@/components/shared/container';
-import { RestaurantMobileNav } from '@/components/restaurant/restaurant-mobile-nav';
 import { User, Settings, CreditCard, Bell, LogOut, ChevronRight, Star, Clock } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -23,8 +22,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--surface))]">
-      <RestaurantMobileNav />
-      
       {/* Header section */}
       <div className="bg-white pb-8 pt-16 shadow-sm">
         <Container>
