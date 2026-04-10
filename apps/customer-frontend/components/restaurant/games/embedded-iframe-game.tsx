@@ -22,11 +22,13 @@ export function EmbeddedIframeGame({ onAward, gameUrl }: EmbeddedIframeGameProps
       if (data && data.type === 'WEBGL_GAME_OVER' && !hasFinished) {
         setHasFinished(true);
         const finalScore = data.score || 0;
+        const finalLevel = data.level || 1;
         const pointsAwarded = Math.min(Math.floor(finalScore / 2), 1500); 
 
         onAward({
           points: pointsAwarded,
           score: finalScore,
+          level: finalLevel,
           label: '3D Pro Game',
         });
       }

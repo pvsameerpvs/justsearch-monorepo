@@ -10,6 +10,7 @@ import { SpinWheelCanvasGame } from './games/spin-wheel-canvas-game';
 import { EmbeddedIframeGame } from './games/embedded-iframe-game';
 import type { GameAwardResult } from './games/game-award';
 import { useLoyaltyPoints } from './use-loyalty-points';
+import { useUserGameStats } from './use-user-game-stats';
 
 type RestaurantGameScreenProps = {
   restaurant: Restaurant;
@@ -18,6 +19,9 @@ type RestaurantGameScreenProps = {
 
 export function RestaurantGameScreen({ restaurant, game }: RestaurantGameScreenProps) {
   const { points, addPoints } = useLoyaltyPoints();
+  const { updateGameStat, getGameStat } = useUserGameStats();
+
+  const currentStats = useMemo(() => getGameStat(game.id), [getGameStat, game.id]);
 
   const subtitle = useMemo(() => {
     if (game.accessLevel === 'public') return 'Public game';
@@ -32,8 +36,10 @@ export function RestaurantGameScreen({ restaurant, game }: RestaurantGameScreenP
     (result: GameAwardResult) => {
       setLastAward(result);
       addPoints(result.points);
+      // PERSIST SCORE AND LEVEL
+      updateGameStat(game.id, result.score, result.level);
     },
-    [addPoints],
+    [addPoints, updateGameStat, game.id],
   );
 
   const gameBody = useMemo(() => {
@@ -117,6 +123,22 @@ export function RestaurantGameScreen({ restaurant, game }: RestaurantGameScreenP
                             <h2 className="mb-3 text-4xl font-black uppercase italic tracking-tighter text-white drop-shadow-2xl">
                                 {game.name}
                             </h2>
+
+                            {/* PERSISTED STATS BAR */}
+                            {currentStats.roundsPlayed > 0 && (
+                                <div className="mx-auto mb-6 flex max-w-[240px] items-center gap-4 rounded-2xl bg-white/5 p-2 backdrop-blur-md border border-white/10">
+                                    <div className="flex-1">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Best Score</p>
+                                        <p className="font-black text-white">{currentStats.highScore}</p>
+                                    </div>
+                                    <div className="h-8 w-px bg-white/10"></div>
+                                    <div className="flex-1">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Reached</p>
+                                        <p className="font-black text-white">LVL {currentStats.maxLevel}</p>
+                                    </div>
+                                </div>
+                            )}
+
                             <p className="max-w-[280px] text-base font-medium leading-relaxed text-white/70 subpixel-antialiased">
                                 {game.description}
                             </p>
