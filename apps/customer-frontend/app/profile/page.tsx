@@ -1,14 +1,16 @@
 "use client";
 
 import { Container } from '@/components/shared/container';
+import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
 import { User, Settings, CreditCard, Bell, LogOut, ChevronRight, Star, Clock } from 'lucide-react';
 
 export default function ProfilePage() {
+  const { points } = useLoyaltyPoints();
   const user = {
     name: "Sameer",
     email: "sameer@example.com",
     avatar: null,
-    points: 1250,
+    points,
     tier: "Gold Member"
   };
 

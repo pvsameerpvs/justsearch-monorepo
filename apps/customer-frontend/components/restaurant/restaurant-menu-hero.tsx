@@ -42,7 +42,7 @@ export function RestaurantMenuHero({
 
       <Container className="relative z-10 flex flex-col items-center justify-center py-10 sm:py-14 lg:py-16">
         {/* Top Header Actions */}
-        <div className="absolute inset-x-0 top-6 z-50 flex items-center justify-between px-4 sm:top-8 sm:px-6">
+        <div className="absolute inset-x-0 top-6 z-50 hidden items-center justify-between px-4 sm:top-8 sm:px-6 lg:flex">
           <button
             onClick={() => window.history.back()}
             className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20 active:scale-95 shadow-lg"

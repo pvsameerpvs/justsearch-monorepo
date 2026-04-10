@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from 'next/navigation';
+import { RestaurantMobileHeader } from '@/components/restaurant/restaurant-mobile-header';
 import { RestaurantMobileNav } from '@/components/restaurant/restaurant-mobile-nav';
 import type { ReactNode } from 'react';
 
@@ -16,6 +17,7 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
 
   return (
     <>
+      {showMobileNav && <RestaurantMobileHeader />}
       {showMobileNav && <RestaurantMobileNav />}
       {children}
     </>
