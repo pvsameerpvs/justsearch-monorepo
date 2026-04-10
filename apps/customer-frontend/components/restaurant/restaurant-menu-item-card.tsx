@@ -20,14 +20,16 @@ export function RestaurantMenuItemCard({
 
   return (
     <article className={`overflow-hidden rounded-[24px] border border-[rgba(var(--border),0.7)] bg-[rgba(var(--card-surface-muted),0.92)] shadow-[0_12px_32px_rgba(15,23,42,0.04)] transition-all hover:shadow-[0_18px_44px_rgba(15,23,42,0.06)] ${
-      isList ? 'flex flex-col sm:flex-row' : ''
+      isList ? 'flex flex-row' : 'flex flex-col'
     }`}>
       {/* Image Section */}
       <div
         role="img"
         aria-label={`${item.name} presentation`}
         className={`relative bg-cover bg-center shrink-0 ${
-          isList ? 'aspect-video w-full sm:aspect-[4/3] sm:w-[240px]' : 'aspect-[4/3] w-full'
+          isList 
+            ? 'w-[100px] sm:w-[240px] sm:aspect-[4/3]' 
+            : 'aspect-[4/3] w-full'
         }`}
         style={{
           backgroundImage: imageBackground,
@@ -35,8 +37,8 @@ export function RestaurantMenuItemCard({
       >
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.2))]" />
         
-        {/* Tags on Image */}
-        <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+        {/* Tags on Image - Only on Grid or large List */}
+        <div className={`absolute left-4 top-4 flex flex-wrap gap-2 ${isList ? 'hidden sm:flex' : 'flex'}`}>
           {item.tags?.map((tag) => (
             <span
               key={tag}
@@ -58,21 +60,21 @@ export function RestaurantMenuItemCard({
       </div>
 
       {/* Content Section */}
-      <div className={`flex flex-1 flex-col justify-between p-5 sm:p-6 ${isList ? 'sm:py-5' : ''}`}>
+      <div className={`flex flex-1 flex-col justify-between p-4 sm:p-6 ${isList ? 'py-4' : ''}`}>
         <div className="space-y-4">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center justify-between sm:justify-start sm:gap-4">
-                <h3 className="font-display text-xl font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
+            <div className="flex-1 space-y-1 sm:space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-display text-base font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl leading-tight">
                   {item.name}
                 </h3>
                 {isList && (
-                   <span className="font-display text-lg font-bold tracking-tight text-[rgb(var(--brand))]">
+                   <span className="font-display text-sm font-bold tracking-tight text-[rgb(var(--brand))] sm:text-xl">
                     {formatCurrency(item.price, item.currency)}
                   </span>
                 )}
               </div>
-              <p className="text-sm leading-relaxed text-[rgb(var(--muted))] line-clamp-2 sm:line-clamp-none">
+              <p className="text-[11px] leading-relaxed text-[rgb(var(--muted))] line-clamp-2 sm:text-sm sm:line-clamp-none">
                 {item.description}
               </p>
             </div>
@@ -98,9 +100,9 @@ export function RestaurantMenuItemCard({
 
         {/* Footer info (List only) */}
         {isList && (
-          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+          <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-3 sm:mt-4 sm:pt-4">
             <span
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] ${
+              className={`inline-flex items-center gap-2 rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-[0.1em] sm:px-3 sm:py-1.5 sm:text-[10px] ${
                 item.isAvailable
                   ? 'bg-[rgb(var(--brand-soft))] text-[rgb(var(--brand))]'
                   : 'bg-[rgba(var(--border),0.78)] text-[rgb(var(--muted))]'
@@ -114,7 +116,7 @@ export function RestaurantMenuItemCard({
               {item.isAvailable ? 'Available' : 'Limited'}
             </span>
             
-            <button className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--brand))] hover:underline">
+            <button className="text-[9px] font-bold uppercase tracking-widest text-[rgb(var(--brand))] hover:underline sm:text-[10px]">
               View Details
             </button>
           </div>

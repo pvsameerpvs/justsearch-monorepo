@@ -8,7 +8,7 @@ type RestaurantReviewCardProps = {
 
 export function RestaurantReviewCard({ review }: RestaurantReviewCardProps) {
   return (
-    <Surface className="rounded-[32px] border-white/70 bg-white/88 p-6 sm:p-7">
+    <Surface className="rounded-[2px] border-white/70 bg-white/88 p-6 sm:p-7">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">

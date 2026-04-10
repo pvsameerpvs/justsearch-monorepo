@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, Sparkles } from 'lucide-react';
 import { Container } from '@/components/shared/container';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantMenuCategoryCard } from './restaurant-menu-category-card';
@@ -33,78 +33,81 @@ export function RestaurantMenuShowcase({
         currency={currency}
       />
 
-      <section className="relative -mt-10 pb-20 sm:pb-24 lg:pb-32">
+      <section className="relative -mt-12 pb-20 sm:pb-24 lg:pb-32">
         <Container>
-          {/* Category Navigation Bar */}
-          <div className="sticky top-4 z-40 mb-12 flex flex-col gap-6 rounded-[32px] border border-white/80 bg-white/60 p-4 shadow-[0_20px_50px_rgba(0,0,0,0.05)] backdrop-blur-xl sm:p-6">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[rgb(var(--brand))]">
-                  Menu Selection
-                </p>
-                <div className="mt-1 flex items-center gap-4">
-                  <h2 className="font-display text-2xl font-bold tracking-tight text-[rgb(var(--ink))]">
-                    Explore Categories
-                  </h2>
+          {/* Premium Category Navigation Bar */}
+          <div className="sticky top-6 z-40 mb-16 rounded-t-[40px] rounded-b-[2px] border border-white/40 bg-white/70 p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all sm:p-3">
+            <div className="flex flex-col gap-4 overflow-hidden rounded-t-[32px] rounded-b-[2px] bg-white/40 p-4 sm:p-5">
+              
+              {/* Header section with Stats and View Toggle */}
+              <div className="flex flex-col justify-between gap-5 border-b border-slate-200/60 pb-5 sm:flex-row sm:items-center">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgb(var(--brand))] text-white shadow-lg shadow-[rgb(var(--brand)/0.2)]">
+                    <Sparkles className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-xl font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl">
+                      Menu Selection
+                    </h2>
+                    <div className="flex items-center gap-2">
+                       <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                        {availableItems.length} Available dishes
+                       </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-6 sm:justify-end">
+                  {/* Layout Toggle */}
+                  <div className="flex items-center rounded-xl bg-slate-100/80 p-1">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition-all rounded-lg ${
+                        viewMode === 'grid'
+                          ? 'bg-white text-[rgb(var(--brand))] shadow-sm'
+                          : 'text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      <LayoutGrid className="h-3.5 w-3.5" />
+                      Grid
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition-all rounded-lg ${
+                        viewMode === 'list'
+                          ? 'bg-white text-[rgb(var(--brand))] shadow-sm'
+                          : 'text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      <List className="h-3.5 w-3.5" />
+                      List
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4">
-                {/* View Mode Toggle */}
-                <div className="flex items-center rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
-                      viewMode === 'grid'
-                        ? 'bg-[rgb(var(--brand))] text-white shadow-md'
-                        : 'text-slate-400 hover:text-slate-600'
-                    }`}
-                    title="Grid View"
+              {/* Scrollable Categories Section */}
+              <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto py-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                {restaurant.menu.map((category) => (
+                  <a
+                    key={category.id}
+                    href={`#${category.id}`}
+                    className="group relative flex shrink-0 items-center gap-3 rounded-[2px] border border-slate-200 bg-white px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-700 transition-all hover:border-[rgb(var(--brand))] hover:bg-slate-50 hover:text-[rgb(var(--brand))] active:scale-95 sm:text-sm sm:px-5 sm:py-3 sm:normal-case sm:tracking-normal"
                   >
-                    <LayoutGrid className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
-                      viewMode === 'list'
-                        ? 'bg-[rgb(var(--brand))] text-white shadow-md'
-                        : 'text-slate-400 hover:text-slate-600'
-                    }`}
-                    title="List View"
-                  >
-                    <List className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="h-4 w-px bg-slate-200" />
-
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                    {availableItems.length} Available for order
-                  </span>
-                </div>
+                    <span className="text-xl transition-transform group-hover:scale-110">{category.emoji}</span>
+                    <span className="whitespace-nowrap">{category.title}</span>
+                    <div className="absolute -bottom-px left-0 h-[2px] w-0 bg-[rgb(var(--brand))] transition-all group-hover:w-full" />
+                  </a>
+                ))}
               </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2 sm:gap-3">
-              {restaurant.menu.map((category) => (
-                <a
-                  key={category.id}
-                  href={`#${category.id}`}
-                  className="group relative flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition-all hover:border-[rgb(var(--brand))] hover:text-[rgb(var(--brand))] hover:shadow-lg hover:shadow-[rgb(var(--brand)/0.1)] active:scale-95"
-                >
-                  <span className="text-lg transition-transform group-hover:scale-125">{category.emoji}</span>
-                  {category.title}
-                </a>
-              ))}
             </div>
           </div>
 
           {/* Menu Sections */}
           <div className="space-y-16 sm:space-y-24">
             {restaurant.menu.map((category) => (
-              <div key={category.id} id={category.id} className="scroll-mt-32">
+              <div key={category.id} id={category.id} className="scroll-mt-36">
                 <RestaurantMenuCategoryCard category={category} viewMode={viewMode} />
               </div>
             ))}
