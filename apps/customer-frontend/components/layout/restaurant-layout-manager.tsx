@@ -12,13 +12,12 @@ type RestaurantLayoutManagerProps = {
 export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerProps) {
   const pathname = usePathname();
   
-  // Only show the bottom navigation bar on pages that are NOT the landing page
-  const showMobileNav = pathname !== '/';
+  const showRestaurantChrome = pathname !== '/';
 
   return (
     <>
-      {showMobileNav && <RestaurantMobileHeader />}
-      {showMobileNav && <RestaurantMobileNav />}
+      {showRestaurantChrome && <RestaurantMobileHeader />}
+      {showRestaurantChrome && <RestaurantMobileNav />}
       {children}
     </>
   );

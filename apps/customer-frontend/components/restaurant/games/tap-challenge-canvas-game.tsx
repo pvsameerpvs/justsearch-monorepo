@@ -2,15 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { themeRgb, themeRgba } from './canvas-theme';
-
-type AwardResult = {
-  points: number;
-  score: number;
-  label: string;
-};
+import type { GameAwardHandler } from './game-award';
 
 type TapChallengeCanvasGameProps = {
-  onAward: (result: AwardResult) => void;
+  onAward: GameAwardHandler;
 };
 
 const TAU = Math.PI * 2;

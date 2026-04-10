@@ -18,7 +18,7 @@ export function RestaurantMenuNavigation({
   setViewMode,
 }: RestaurantMenuNavigationProps) {
   return (
-    <div className="sticky top-6 z-40 mb-16 rounded-[14px] border border-white/40 bg-white/70 p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all sm:p-3">
+    <div className="sticky top-[calc(var(--restaurant-mobile-header-height,0px)+12px)] z-40 mb-16 rounded-[14px] border border-white/40 bg-white/70 p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all sm:p-3">
       <div className="flex flex-col gap-4 overflow-hidden rounded-[14px] bg-white/40 p-4 sm:p-5">
         
         {/* Header section with Stats and View Toggle */}

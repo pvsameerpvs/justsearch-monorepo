@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { ArrowLeft, User } from 'lucide-react';
+import { useMeasuredCssVarHeight } from '@/components/layout/use-measured-css-var-height';
 
 const routeTitles: Record<string, string> = {
   '/menu': 'Menu',
@@ -43,44 +44,15 @@ function getBackHref(pathname: string) {
 
 export function RestaurantMobileHeader() {
   const pathname = usePathname();
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useMeasuredCssVarHeight('--restaurant-mobile-header-height');
 
   const title = useMemo(() => getHeaderTitle(pathname), [pathname]);
   const backHref = useMemo(() => getBackHref(pathname), [pathname]);
 
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return;
-
-    const updateHeightVar = () => {
-      const height = element.offsetHeight;
-      document.documentElement.style.setProperty(
-        '--restaurant-mobile-header-height',
-        `${height}px`,
-      );
-    };
-
-    updateHeightVar();
-
-    let resizeObserver: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => updateHeightVar());
-      resizeObserver.observe(element);
-    }
-
-    window.addEventListener('resize', updateHeightVar);
-
-    return () => {
-      resizeObserver?.disconnect();
-      window.removeEventListener('resize', updateHeightVar);
-      document.documentElement.style.removeProperty('--restaurant-mobile-header-height');
-    };
-  }, []);
-
   return (
     <div
       ref={containerRef}
-      className="fixed inset-x-0 top-0 z-[9999] w-full lg:hidden"
+      className="fixed inset-x-0 top-0 z-[9999] w-full"
     >
       <div className="px-3 pb-3 pt-[calc(env(safe-area-inset-top,0px)+12px)]">
         <div className="flex items-center justify-between gap-3 rounded-[28px] border border-[rgba(var(--border),0.9)] bg-white/85 px-4 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.10)] backdrop-blur-3xl">
@@ -110,4 +82,3 @@ export function RestaurantMobileHeader() {
     </div>
   );
 }
-

@@ -2,15 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { themeRgb, themeRgba } from './canvas-theme';
-
-type AwardResult = {
-  points: number;
-  score: number;
-  label: string;
-};
+import type { GameAwardHandler } from './game-award';
 
 type QuickQuizCanvasGameProps = {
-  onAward: (result: AwardResult) => void;
+  onAward: GameAwardHandler;
 };
 
 type QuizQuestion = {

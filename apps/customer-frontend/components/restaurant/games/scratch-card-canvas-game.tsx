@@ -1,15 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-type AwardResult = {
-  points: number;
-  score: number;
-  label: string;
-};
+import type { GameAwardHandler } from './game-award';
 
 type ScratchCardCanvasGameProps = {
-  onAward: (result: AwardResult) => void;
+  onAward: GameAwardHandler;
 };
 
 function randomPrize() {

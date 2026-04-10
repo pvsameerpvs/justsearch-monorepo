@@ -10,7 +10,7 @@ jspm_packages/
 out/
 dist/
 build/
-lib/
+/lib/
 .turbo/
 .cache/
 .parcel-cache/

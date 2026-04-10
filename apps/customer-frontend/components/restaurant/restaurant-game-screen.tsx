@@ -9,6 +9,7 @@ import { QuickQuizCanvasGame } from './games/quick-quiz-canvas-game';
 import { ScratchCardCanvasGame } from './games/scratch-card-canvas-game';
 import { SpinWheelCanvasGame } from './games/spin-wheel-canvas-game';
 import { TapChallengeCanvasGame } from './games/tap-challenge-canvas-game';
+import type { GameAwardResult } from './games/game-award';
 import { useLoyaltyPoints } from './use-loyalty-points';
 
 type RestaurantGameScreenProps = {
@@ -24,14 +25,10 @@ export function RestaurantGameScreen({ restaurant, game }: RestaurantGameScreenP
     return 'Session required (demo mode)';
   }, [game.accessLevel]);
 
-  const [lastAward, setLastAward] = useState<{
-    points: number;
-    score: number;
-    label: string;
-  } | null>(null);
+  const [lastAward, setLastAward] = useState<GameAwardResult | null>(null);
 
   const onAward = useCallback(
-    (result: { points: number; score: number; label: string }) => {
+    (result: GameAwardResult) => {
       setLastAward(result);
       addPoints(result.points);
     },

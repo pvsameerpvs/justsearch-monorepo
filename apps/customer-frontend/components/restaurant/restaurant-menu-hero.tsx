@@ -1,25 +1,16 @@
 "use client";
 
-import { ArrowLeft, Sparkles, UtensilsCrossed, Calendar, Tag, User } from 'lucide-react';
-import { ButtonLink } from '@/components/shared/button-link';
+import { Calendar } from 'lucide-react';
 import { Container } from '@/components/shared/container';
-import { formatCurrency } from '@/lib/format';
-import { getRestaurantDomain } from '@/lib/restaurant-utils';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantLogoBadge } from './restaurant-logo-badge';
 
 type RestaurantMenuHeroProps = {
   restaurant: Restaurant;
-  itemCount: number;
-  lowestPrice: number;
-  currency: string;
 };
 
 export function RestaurantMenuHero({
   restaurant,
-  itemCount,
-  lowestPrice,
-  currency,
 }: RestaurantMenuHeroProps) {
   const todayHours =
     restaurant.openingHours.find((entry) => entry.isToday)?.hours ??
@@ -29,7 +20,7 @@ export function RestaurantMenuHero({
   const backgroundImage = `https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=2070`;
 
   return (
-    <section className="relative w-full overflow-hidden">
+    <section className="relative w-full overflow-hidden -mt-[var(--restaurant-mobile-header-height,0px)] pt-[var(--restaurant-mobile-header-height,0px)]">
       {/* Immersive Full-Width Background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <img
@@ -41,21 +32,6 @@ export function RestaurantMenuHero({
       </div>
 
       <Container className="relative z-10 flex flex-col items-center justify-center py-10 sm:py-14 lg:py-16">
-        {/* Top Header Actions */}
-        <div className="absolute inset-x-0 top-6 z-50 hidden items-center justify-between px-4 sm:top-8 sm:px-6 lg:flex">
-          <button
-            onClick={() => window.history.back()}
-            className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20 active:scale-95 shadow-lg"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          
-          <button
-            className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all hover:scale-105 hover:bg-white/20 active:scale-95 shadow-lg"
-          >
-            <User className="h-4 w-4" />
-          </button>
-        </div>
 
         {/* Centered Content Row */}
         <div className="flex w-full flex-col items-center text-center">

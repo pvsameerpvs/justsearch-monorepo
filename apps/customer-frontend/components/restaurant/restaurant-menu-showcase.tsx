@@ -18,27 +18,19 @@ export function RestaurantMenuShowcase({
 }: RestaurantMenuShowcaseProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
 
-  // Derived menu metrics
-  const allItems = restaurant.menu.flatMap((category) => category.items);
-  const availableItems = allItems.filter((item) => item.isAvailable);
-  const priceValues = allItems.map((item) => item.price);
-  const currency = allItems[0]?.currency ?? 'AED';
-  const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : 0;
+  const availableItemsCount = restaurant.menu
+    .flatMap((category) => category.items)
+    .filter((item) => item.isAvailable).length;
 
   return (
     <>
-      <RestaurantMenuHero
-        restaurant={restaurant}
-        itemCount={allItems.length}
-        lowestPrice={lowestPrice}
-        currency={currency}
-      />
+      <RestaurantMenuHero restaurant={restaurant} />
 
       <section className="relative -mt-12 pb-14 sm:pb-16">
         <Container>
           <RestaurantMenuNavigation
             restaurant={restaurant}
-            availableItemsCount={availableItems.length}
+            availableItemsCount={availableItemsCount}
             viewMode={viewMode}
             setViewMode={setViewMode}
           />
