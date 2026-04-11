@@ -46,55 +46,38 @@ export function RestaurantMenuNavigation({
           </div>
 
           <div className="flex flex-col items-stretch gap-3 sm:items-end">
-            <div className="inline-flex rounded-xl bg-slate-100/80 p-1">
-              <button
-                onClick={() => setFulfillmentMode('dine-in')}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
-                  fulfillmentMode === 'dine-in'
-                    ? 'bg-white text-[rgb(var(--brand))] shadow-sm'
-                    : 'text-slate-400 hover:text-slate-600'
-                }`}
-              >
-                <UtensilsCrossed className="h-3.5 w-3.5" />
-                Dine In
-              </button>
-              <button
-                onClick={() => setFulfillmentMode('delivery')}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
-                  fulfillmentMode === 'delivery'
-                    ? 'bg-white text-[rgb(var(--brand))] shadow-sm'
-                    : 'text-slate-400 hover:text-slate-600'
-                }`}
-              >
-                <Bike className="h-3.5 w-3.5" />
-                Delivery
-              </button>
-            </div>
+            
 
-            {/* Layout Toggle */}
-            <div className="flex items-center rounded-xl bg-slate-100/80 p-1">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition-all rounded-lg ${
-                  viewMode === 'grid'
-                    ? 'bg-white text-[rgb(var(--brand))] shadow-sm'
-                    : 'text-slate-400 hover:text-slate-600'
-                }`}
-              >
-                <LayoutGrid className="h-3.5 w-3.5" />
-                Grid
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition-all rounded-lg ${
-                  viewMode === 'list'
-                    ? 'bg-white text-[rgb(var(--brand))] shadow-sm'
-                    : 'text-slate-400 hover:text-slate-600'
-                }`}
-              >
-                <List className="h-3.5 w-3.5" />
-                List
-              </button>
+            {/* Layout Toggle - Premium App Style */}
+            <div className="flex items-center self-end sm:self-auto">
+              <p className="mr-3 hidden text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 sm:block">
+                View
+              </p>
+              <div className="inline-flex items-center rounded-2xl bg-slate-100/80 p-1 shadow-inner">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`flex h-10 w-12 items-center justify-center rounded-xl transition-all duration-300 active:scale-90 ${
+                    viewMode === 'grid'
+                      ? 'bg-white text-[rgb(var(--brand))] shadow-[0_4px_12px_rgba(0,0,0,0.06)]'
+                      : 'text-slate-400 hover:text-slate-500'
+                  }`}
+                  aria-label="Grid view"
+                >
+                  <LayoutGrid className={`h-4 w-4 ${viewMode === 'grid' ? 'scale-110' : 'scale-100'}`} />
+                </button>
+                <div className="h-4 w-px bg-slate-200/60 mx-0.5" />
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex h-10 w-12 items-center justify-center rounded-xl transition-all duration-300 active:scale-90 ${
+                    viewMode === 'list'
+                      ? 'bg-white text-[rgb(var(--brand))] shadow-[0_4px_12px_rgba(0,0,0,0.06)]'
+                      : 'text-slate-400 hover:text-slate-500'
+                  }`}
+                  aria-label="List view"
+                >
+                  <List className={`h-4 w-4 ${viewMode === 'list' ? 'scale-110' : 'scale-100'}`} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

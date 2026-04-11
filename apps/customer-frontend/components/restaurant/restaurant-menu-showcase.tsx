@@ -43,7 +43,11 @@ export function RestaurantMenuShowcase({
 
   return (
     <>
-      <RestaurantMenuHero restaurant={restaurant} />
+      <RestaurantMenuHero 
+        restaurant={restaurant} 
+        fulfillmentMode={mode}
+        setFulfillmentMode={setMode}
+      />
 
       <section
         className="relative -mt-12 pb-14 sm:pb-16"
