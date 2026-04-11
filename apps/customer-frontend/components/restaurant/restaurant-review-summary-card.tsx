@@ -12,7 +12,7 @@ export function RestaurantReviewSummaryCard({
   verifiedCount,
 }: RestaurantReviewSummaryCardProps) {
   return (
-    <Surface className="rounded-[32px] border-white/70 bg-[linear-gradient(180deg,rgba(var(--brand-soft),0.42),rgba(255,255,255,0.96))] p-6 sm:p-7">
+    <Surface className="rounded-[32px] border-white/70 bg-[linear-gradient(180deg,rgb(var(--brand-soft)/0.42),rgba(255,255,255,0.96))] p-6 sm:p-7">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--brand))]">
         Reputation snapshot
       </p>
@@ -32,7 +32,7 @@ export function RestaurantReviewSummaryCard({
         area can later connect to a live Google review feed.
       </p>
 
-      <div className="mt-6 rounded-[24px] border border-[rgba(var(--card-border),0.86)] bg-[rgba(var(--card-surface),0.82)] p-4">
+      <div className="mt-6 rounded-[24px] border border-[rgb(var(--card-border)/0.86)] bg-[rgb(var(--card-surface)/0.82)] p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
           Verified voices
         </p>

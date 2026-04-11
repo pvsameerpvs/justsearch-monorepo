@@ -23,7 +23,7 @@ export function RestaurantLogoBadge({
   return (
     <div
       className={cn(
-        'relative overflow-hidden border border-[rgba(var(--card-border),0.9)] bg-[rgba(var(--card-surface),0.96)] shadow-[0_18px_60px_rgba(15,23,42,0.15)] ring-1 ring-[rgba(var(--border),0.28)]',
+        'relative overflow-hidden border border-[rgb(var(--card-border)/0.9)] bg-[rgb(var(--card-surface)/0.96)] shadow-[0_18px_60px_rgba(15,23,42,0.15)] ring-1 ring-[rgb(var(--border)/0.28)]',
         sizeClasses[size],
         className
       )}
@@ -35,7 +35,7 @@ export function RestaurantLogoBadge({
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(145deg,rgb(var(--logo-from)),rgba(var(--logo-to),0.92))] font-display font-semibold tracking-[-0.08em] text-white">
+        <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(145deg,rgb(var(--logo-from)),rgb(var(--logo-to)/0.92))] font-display font-semibold tracking-[-0.08em] text-white">
           {initials}
         </div>
       )}

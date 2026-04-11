@@ -16,10 +16,10 @@ export function RestaurantMenuItemCard({
   
   const imageBackground = item.image
     ? `linear-gradient(180deg, rgba(15, 23, 42, 0.05), rgba(15, 23, 42, 0.28)), url(${item.image})`
-    : 'linear-gradient(135deg, rgba(var(--brand-soft), 0.96), rgba(var(--accent-soft), 0.88))';
+    : 'linear-gradient(135deg, rgb(var(--brand-soft) / 0.96), rgb(var(--accent-soft) / 0.88))';
 
   return (
-    <article className={`overflow-hidden rounded-[14px] border border-[rgba(var(--border),0.7)] bg-[rgba(var(--card-surface-muted),0.92)] shadow-[0_12px_32px_rgba(15,23,42,0.04)] transition-all hover:shadow-[0_18px_44px_rgba(15,23,42,0.06)] ${
+    <article className={`overflow-hidden rounded-[14px] border border-[rgb(var(--border)/0.7)] bg-[rgb(var(--card-surface-muted)/0.92)] shadow-[0_12px_32px_rgba(15,23,42,0.04)] transition-all hover:shadow-[0_18px_44px_rgba(15,23,42,0.06)] ${
       isList ? 'flex flex-row' : 'flex flex-col'
     }`}>
       {/* Image Section */}
@@ -84,7 +84,7 @@ export function RestaurantMenuItemCard({
                 className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] ${
                   item.isAvailable
                     ? 'bg-[rgb(var(--brand-soft))] text-[rgb(var(--brand))]'
-                    : 'bg-[rgba(var(--border),0.78)] text-[rgb(var(--muted))]'
+                    : 'bg-[rgb(var(--border)/0.78)] text-[rgb(var(--muted))]'
                 }`}
               >
                 {item.isAvailable ? (
@@ -105,7 +105,7 @@ export function RestaurantMenuItemCard({
               className={`inline-flex items-center gap-2 rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-[0.1em] sm:px-3 sm:py-1.5 sm:text-[10px] ${
                 item.isAvailable
                   ? 'bg-[rgb(var(--brand-soft))] text-[rgb(var(--brand))]'
-                  : 'bg-[rgba(var(--border),0.78)] text-[rgb(var(--muted))]'
+                  : 'bg-[rgb(var(--border)/0.78)] text-[rgb(var(--muted))]'
               }`}
             >
               {item.isAvailable ? (

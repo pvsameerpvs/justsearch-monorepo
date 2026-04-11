@@ -145,7 +145,7 @@ export function ScratchCardCanvasGame({ onAward }: ScratchCardCanvasGameProps) {
 
   return (
     <div className="mx-auto w-full max-w-[520px]">
-      <div className="rounded-[32px] border border-[rgba(var(--card-border),0.9)] bg-[rgba(var(--card-surface),0.9)] p-6 sm:p-8">
+      <div className="rounded-[32px] border border-[rgb(var(--card-border)/0.9)] bg-[rgb(var(--card-surface)/0.9)] p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
@@ -158,13 +158,13 @@ export function ScratchCardCanvasGame({ onAward }: ScratchCardCanvasGameProps) {
           <button
             type="button"
             onClick={reset}
-            className="rounded-full border border-[rgba(var(--border),0.9)] bg-white/70 px-4 py-2 text-sm font-medium text-[rgb(var(--ink))] transition-all hover:bg-white"
+            className="rounded-full border border-[rgb(var(--border)/0.9)] bg-white/70 px-4 py-2 text-sm font-medium text-[rgb(var(--ink))] transition-all hover:bg-white"
           >
             New card
           </button>
         </div>
 
-        <div className="relative mt-6 overflow-hidden rounded-[28px] bg-[rgba(var(--brand-soft),0.22)]">
+        <div className="relative mt-6 overflow-hidden rounded-[28px] bg-[rgb(var(--brand-soft)/0.22)]">
           <div className="flex aspect-[16/10] w-full items-center justify-center p-8 text-center">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--brand))]">
@@ -193,7 +193,7 @@ export function ScratchCardCanvasGame({ onAward }: ScratchCardCanvasGameProps) {
         </div>
 
         {revealed ? (
-          <div className="mt-6 rounded-[22px] border border-[rgba(var(--card-border),0.9)] bg-white/70 p-4 text-center">
+          <div className="mt-6 rounded-[22px] border border-[rgb(var(--card-border)/0.9)] bg-white/70 p-4 text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
               Score
             </p>

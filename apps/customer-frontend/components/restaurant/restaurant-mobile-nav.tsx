@@ -16,6 +16,11 @@ export function RestaurantMobileNav() {
     { label: 'Profile', icon: User, href: '/profile' },
   ];
 
+  const isActiveHref = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
     <div
       ref={containerRef}
@@ -23,7 +28,7 @@ export function RestaurantMobileNav() {
     >
       <nav className="flex items-center justify-around rounded-t-[24px] border-t border-x border-white/20 bg-white/95 pb-[calc(env(safe-area-inset-bottom,16px)+8px)] pt-3 shadow-[0_-15px_40px_rgba(0,0,0,0.12)] backdrop-blur-3xl">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = isActiveHref(item.href);
           return (
             <Link
               key={item.label}
@@ -36,7 +41,7 @@ export function RestaurantMobileNav() {
             >
               <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
                 isActive 
-                  ? 'bg-[rgb(var(--brand)/0.15)] shadow-[0_8px_16px_rgba(var(--brand),0.08)]' 
+                  ? 'bg-[rgb(var(--brand)/0.15)] shadow-[0_8px_16px_rgb(var(--brand)/0.08)]' 
                   : 'bg-transparent'
               }`}>
                 <item.icon className={`h-5 w-5 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
@@ -46,7 +51,7 @@ export function RestaurantMobileNav() {
               </span>
               
               {isActive && (
-                <div className="absolute -top-1 h-1 w-1 rounded-full bg-[rgb(var(--brand))] shadow-[0_0_8px_rgba(var(--brand),0.5)]" />
+                <div className="absolute -top-1 h-1 w-1 rounded-full bg-[rgb(var(--brand))] shadow-[0_0_8px_rgb(var(--brand)/0.5)]" />
               )}
             </Link>
           );

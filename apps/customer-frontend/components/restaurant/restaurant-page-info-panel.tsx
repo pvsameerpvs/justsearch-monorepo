@@ -12,7 +12,7 @@ export function RestaurantPageInfoPanel({
   const domain = getRestaurantDomain(restaurant);
 
   return (
-    <div className="rounded-[32px] border border-[rgba(var(--card-border),0.86)] bg-[rgba(var(--card-surface),0.82)] p-6 shadow-[0_18px_48px_rgba(15,23,42,0.08)]">
+    <div className="rounded-[32px] border border-[rgb(var(--card-border)/0.86)] bg-[rgb(var(--card-surface)/0.82)] p-6 shadow-[0_18px_48px_rgba(15,23,42,0.08)]">
       <div className="flex items-start gap-4">
         <RestaurantLogoBadge restaurant={restaurant} size="lg" />
         <div className="space-y-2">
@@ -26,7 +26,7 @@ export function RestaurantPageInfoPanel({
         </div>
       </div>
 
-      <div className="mt-6 rounded-[24px] border border-[rgba(var(--border),0.75)] bg-[rgba(var(--card-surface-muted),0.92)] p-4">
+      <div className="mt-6 rounded-[24px] border border-[rgb(var(--border)/0.75)] bg-[rgb(var(--card-surface-muted)/0.92)] p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
           Subdomain route
         </p>

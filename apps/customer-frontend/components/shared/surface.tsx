@@ -10,7 +10,7 @@ export function Surface({ children, className }: SurfaceProps) {
   return (
     <Card
       className={cn(
-        'border-[rgba(var(--card-border),0.9)] bg-[rgba(var(--card-surface),0.86)] shadow-[0_10px_40px_rgba(15,23,42,0.06)] backdrop-blur-sm',
+        'border-[rgb(var(--card-border)/0.9)] bg-[rgb(var(--card-surface)/0.86)] shadow-[0_10px_40px_rgba(15,23,42,0.06)] backdrop-blur-sm',
         className
       )}
     >

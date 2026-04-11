@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { themeRgb, themeRgba } from './canvas-theme';
 import type { GameAwardHandler } from './game-award';
 
 type RunnerCanvasGameProps = {
@@ -20,7 +19,6 @@ export function RunnerCanvasGame({ onAward }: RunnerCanvasGameProps) {
   const awardedRef = useRef(false);
 
   const [status, setStatus] = useState<'idle' | 'running' | 'finished'>('idle');
-  const [score, setScore] = useState(0);
 
   // Game state refs (to avoid deps in draw loop)
   const playerRef = useRef({ y: 0, velocity: 0, isGrounded: true });
@@ -32,30 +30,11 @@ export function RunnerCanvasGame({ onAward }: RunnerCanvasGameProps) {
   const GRAVITY = 1500;
   const JUMP_FORCE = -600;
 
-  const themeRef = useRef({
-    brand: 'rgb(15, 118, 110)',
-    accent: 'rgb(245, 170, 66)',
-    ink: 'rgb(15, 23, 42)',
-    muted: 'rgb(94, 108, 132)',
-    background: 'rgba(15, 118, 110, 0.1)',
-  });
-
-  useEffect(() => {
-    themeRef.current = {
-      brand: themeRgb('--brand', '15 118 110'),
-      accent: themeRgb('--accent', '245 170 66'),
-      ink: themeRgb('--ink', '15 23 42'),
-      muted: themeRgb('--muted', '94 108 132'),
-      background: themeRgba('--brand', '15 118 110', 0.12),
-    };
-  }, []);
-
   const resetGame = useCallback(() => {
     playerRef.current = { y: 0, velocity: 0, isGrounded: true };
     obstaclesRef.current = [];
     scoreRef.current = 0;
     speedRef.current = 300;
-    setScore(0);
     awardedRef.current = false;
   }, []);
 
@@ -98,7 +77,6 @@ export function RunnerCanvasGame({ onAward }: RunnerCanvasGameProps) {
       if (obstacles.length > 0 && obstacles[0].x + obstacles[0].width < 0) {
         obstacles.shift();
         scoreRef.current += 10;
-        setScore(scoreRef.current);
       }
 
       // Spawn new obstacles
@@ -253,7 +231,7 @@ export function RunnerCanvasGame({ onAward }: RunnerCanvasGameProps) {
         width={800}
         height={400}
         onPointerDown={onPointerDown}
-        className="h-auto w-full touch-none select-none overflow-hidden rounded-[32px] border border-[rgba(var(--card-border),0.9)] bg-[#0f172a] shadow-sm cursor-pointer"
+        className="h-auto w-full touch-none select-none overflow-hidden rounded-[32px] border border-[rgb(var(--card-border)/0.9)] bg-[#0f172a] shadow-sm cursor-pointer"
       />
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">

@@ -14,7 +14,7 @@ export function RestaurantJourneyStepCard({
   icon: Icon,
 }: RestaurantJourneyStepCardProps) {
   return (
-    <div className="rounded-[24px] border border-[rgba(var(--border),0.72)] bg-[rgba(var(--card-surface-muted),0.88)] p-4">
+    <div className="rounded-[24px] border border-[rgb(var(--border)/0.72)] bg-[rgb(var(--card-surface-muted)/0.88)] p-4">
       <div className="flex items-start gap-4">
         <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
           <Icon className="h-5 w-5 text-[rgb(var(--brand))]" />

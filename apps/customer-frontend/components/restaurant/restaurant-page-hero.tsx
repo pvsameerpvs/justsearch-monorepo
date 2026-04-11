@@ -29,11 +29,11 @@ export function RestaurantPageHero({
   return (
     <section className="pt-8 pb-6 sm:pt-10 sm:pb-8">
       <Container>
-        <Surface className="overflow-hidden rounded-[32px] border-[rgba(var(--card-border),0.9)] bg-[linear-gradient(140deg,rgba(var(--brand-soft),0.34),rgba(var(--card-surface),0.95),rgba(var(--accent-soft),0.42))] p-6 sm:p-8">
+        <Surface className="overflow-hidden rounded-[32px] border-[rgb(var(--card-border)/0.9)] bg-[linear-gradient(140deg,rgb(var(--brand-soft)/0.34),rgb(var(--card-surface)/0.95),rgb(var(--accent-soft)/0.42))] p-6 sm:p-8">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-6">
               <div className="space-y-4">
-                <span className="inline-flex rounded-full border border-[rgba(var(--card-border),0.86)] bg-[rgba(var(--card-surface),0.84)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(var(--brand))]">
+                <span className="inline-flex rounded-full border border-[rgb(var(--card-border)/0.86)] bg-[rgb(var(--card-surface)/0.84)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(var(--brand))]">
                   {eyebrow}
                 </span>
                 <h1 className="font-display text-4xl font-semibold tracking-[-0.08em] text-[rgb(var(--ink))] sm:text-5xl">

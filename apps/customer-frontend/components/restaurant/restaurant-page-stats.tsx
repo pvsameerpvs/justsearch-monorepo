@@ -13,7 +13,7 @@ export function RestaurantPageStats({ stats }: RestaurantPageStatsProps) {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-[24px] border border-[rgba(var(--card-border),0.86)] bg-[rgba(var(--card-surface),0.84)] p-4 shadow-[0_14px_36px_rgba(15,23,42,0.06)]"
+          className="rounded-[24px] border border-[rgb(var(--card-border)/0.86)] bg-[rgb(var(--card-surface)/0.84)] p-4 shadow-[0_14px_36px_rgba(15,23,42,0.06)]"
         >
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
             {stat.label}

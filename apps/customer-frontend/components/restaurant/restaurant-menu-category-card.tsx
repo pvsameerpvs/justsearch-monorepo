@@ -1,4 +1,3 @@
-import { Sparkles } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
 import type { MenuCategory } from '@/lib/restaurant-types';
 import { RestaurantMenuSubcategorySection } from './restaurant-menu-subcategory-section';
@@ -26,7 +25,7 @@ export function RestaurantMenuCategoryCard({
 
   return (
     <section id={category.id} className="scroll-mt-24">
-      <Surface className="rounded-[14px] border-[rgba(var(--card-border),0.9)] bg-[rgba(var(--card-surface),0.88)] p-6 sm:p-8">
+      <Surface className="rounded-[14px] border-[rgb(var(--card-border)/0.9)] bg-[rgb(var(--card-surface)/0.88)] p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--brand))]">

@@ -203,7 +203,7 @@ export function SpinWheelCanvasGame({ onAward }: SpinWheelCanvasGameProps) {
         ref={canvasRef}
         width={600}
         height={600}
-        className="h-auto w-full select-none rounded-[28px] border border-[rgba(var(--border),0.8)] bg-white/70 shadow-sm"
+        className="h-auto w-full select-none rounded-[28px] border border-[rgb(var(--border)/0.8)] bg-white/70 shadow-sm"
       />
 
       <div className="mt-5 flex flex-col gap-3">
@@ -217,7 +217,7 @@ export function SpinWheelCanvasGame({ onAward }: SpinWheelCanvasGameProps) {
         </button>
 
         {resultPoints !== null ? (
-          <div className="rounded-[22px] border border-[rgba(var(--card-border),0.9)] bg-[rgba(var(--card-surface),0.84)] p-4 text-center">
+          <div className="rounded-[22px] border border-[rgb(var(--card-border)/0.9)] bg-[rgb(var(--card-surface)/0.84)] p-4 text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
               Result
             </p>

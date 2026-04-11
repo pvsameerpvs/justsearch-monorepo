@@ -7,8 +7,6 @@ type RestaurantGamePreviewCardProps = { game: Game };
 const defaultGameCovers: Record<string, string> = {
   'spin-wheel': '/games/spin-wheel.svg',
   'scratch-card': '/games/scratch-card.svg',
-  'tap-challenge': '/games/tap-challenge.svg',
-  'quick-quiz': '/games/quick-quiz.svg',
 };
 
 export function RestaurantGamePreviewCard({
@@ -22,9 +20,9 @@ export function RestaurantGamePreviewCard({
       className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand))] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
       aria-label={`Play ${game.name}`}
     >
-      <Surface className="flex h-full flex-col overflow-hidden rounded-[18px] border-[rgba(var(--border),0.9)] bg-white/90 p-0 shadow-sm transition-all duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_46px_rgba(15,23,42,0.10)]">
+      <Surface className="flex h-full flex-col overflow-hidden rounded-[18px] border-[rgb(var(--border)/0.9)] bg-white/90 p-0 shadow-sm transition-all duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_46px_rgba(15,23,42,0.10)]">
         <div className="bg-white p-3">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[14px] border border-[rgba(var(--border),0.9)] bg-[rgba(var(--card-surface-muted),0.9)]">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[14px] border border-[rgb(var(--border)/0.9)] bg-[rgb(var(--card-surface-muted)/0.9)]">
             {coverImageUrl ? (
               <img
                 src={coverImageUrl}
@@ -33,7 +31,7 @@ export function RestaurantGamePreviewCard({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(140deg,rgba(var(--brand-soft),0.55),rgba(var(--accent-soft),0.45))] text-6xl">
+              <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(140deg,rgb(var(--brand-soft)/0.55),rgb(var(--accent-soft)/0.45))] text-6xl">
                 <span aria-hidden="true">{game.icon}</span>
               </div>
             )}
