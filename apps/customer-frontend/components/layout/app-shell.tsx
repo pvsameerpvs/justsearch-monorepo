@@ -16,7 +16,7 @@ export async function AppShell({ children, className }: AppShellProps) {
       style={getRestaurantThemeVars(restaurant.theme)}
       className={cn('relative min-h-screen overflow-hidden bg-white', className)}
     >
-      <main className="relative pb-[var(--restaurant-mobile-nav-height,0px)] pt-[var(--restaurant-mobile-header-height,0px)]">
+      <main className="relative pb-[calc(var(--restaurant-mobile-nav-height,0px)+16px)] pt-[var(--restaurant-mobile-header-height,0px)]">
         {children}
       </main>
     </div>

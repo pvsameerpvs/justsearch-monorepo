@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, type Router as ExpressRouter } from 'express';
 // import authRoutes from '../modules/auth/auth.routes';
 // import userRoutes from '../modules/users/user.routes';
 // import restaurantRoutes from '../modules/restaurants/restaurant.routes';
 
-const router = Router();
+const router: ExpressRouter = Router();
 
 // Routes will be registered here as they are developed
 // For now, simple registration placeholders

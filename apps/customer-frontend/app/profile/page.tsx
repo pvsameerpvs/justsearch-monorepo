@@ -6,11 +6,13 @@ import { Surface } from '@/components/shared/surface';
 import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
 import { ProfileMenuItem } from '@/components/restaurant/profile/profile-menu-item';
 import { Gamepad2, Gift, HelpCircle, Settings, Star, User } from 'lucide-react';
+import { useRegistration } from '@/components/auth/registration-context';
 
 export default function ProfilePage() {
   const { points } = useLoyaltyPoints();
+  const { user, isRegistered, openModal } = useRegistration();
 
-  const userName = 'Guest';
+  const userName = user?.name ?? 'Guest';
   const tierLabel =
     points >= 2000 ? 'Platinum' : points >= 1200 ? 'Gold' : points >= 600 ? 'Silver' : 'Member';
 
@@ -35,9 +37,20 @@ export default function ProfilePage() {
                 <h1 className="mt-1 truncate font-display text-2xl font-semibold tracking-[-0.06em] text-[rgb(var(--ink))]">
                   {userName}
                 </h1>
-                <p className="mt-1 text-sm font-medium text-[rgb(var(--muted))]">
-                  Status: {tierLabel} member
-                </p>
+                <div className="mt-1 space-y-1 text-sm font-medium text-[rgb(var(--muted))]">
+                  <p>Status: {tierLabel} member</p>
+                  {isRegistered && user ? (
+                    <p className="font-mono">{user.mobile}</p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={openModal}
+                      className="text-left text-sm font-semibold text-[rgb(var(--brand))] hover:underline"
+                    >
+                      Verify mobile to play games
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 

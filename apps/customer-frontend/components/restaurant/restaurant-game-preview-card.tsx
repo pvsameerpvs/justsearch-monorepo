@@ -1,6 +1,9 @@
+"use client";
+
 import Link from 'next/link';
 import { Surface } from '@/components/shared/surface';
 import type { Game } from '@/lib/restaurant-types';
+import { useRegistration } from '@/components/auth/registration-context';
 
 type RestaurantGamePreviewCardProps = { game: Game };
 
@@ -13,10 +16,16 @@ export function RestaurantGamePreviewCard({
   game,
 }: RestaurantGamePreviewCardProps) {
   const coverImageUrl = game.coverImageUrl ?? defaultGameCovers[game.id];
+  const { isRegistered, openModal } = useRegistration();
 
   return (
     <Link
       href={`/eat-play/${game.id}`}
+      onClick={(event) => {
+        if (isRegistered) return;
+        event.preventDefault();
+        openModal();
+      }}
       className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand))] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
       aria-label={`Play ${game.name}`}
     >

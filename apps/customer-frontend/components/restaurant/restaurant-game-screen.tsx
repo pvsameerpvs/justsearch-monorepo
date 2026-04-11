@@ -10,6 +10,7 @@ import type { GameAwardResult } from './games/game-award';
 import { RunnerCanvasGame } from './games/runner-canvas-game';
 import { ScratchCardCanvasGame } from './games/scratch-card-canvas-game';
 import { SpinWheelCanvasGame } from './games/spin-wheel-canvas-game';
+import { useRegistration } from '@/components/auth/registration-context';
 import { useLoyaltyPoints } from './use-loyalty-points';
 import { useUserGameStats } from './use-user-game-stats';
 
@@ -28,6 +29,7 @@ export function RestaurantGameScreen({
   restaurant,
   game,
 }: RestaurantGameScreenProps) {
+  const { isRegistered, openModal } = useRegistration();
   const { points, addPoints } = useLoyaltyPoints();
   const { updateGameStat, getGameStat } = useUserGameStats();
   const [lastAward, setLastAward] = useState<GameAwardResult | null>(null);
@@ -49,6 +51,26 @@ export function RestaurantGameScreen({
   );
 
   const gameBody = useMemo(() => {
+    if (!isRegistered) {
+      return (
+        <div className="rounded-[28px] border border-[rgb(var(--card-border)/0.9)] bg-white/80 p-6 text-center">
+          <p className="text-sm font-semibold text-[rgb(var(--ink))]">
+            Registration required
+          </p>
+          <p className="mt-2 text-sm text-[rgb(var(--muted))]">
+            Verify your mobile number to play games and save scores.
+          </p>
+          <button
+            type="button"
+            onClick={openModal}
+            className="mt-5 inline-flex h-11 items-center justify-center rounded-2xl bg-[rgb(var(--brand))] px-6 text-sm font-semibold text-white shadow-[0_14px_36px_rgb(var(--brand)/0.22)] transition-all hover:brightness-110 active:scale-[0.99]"
+          >
+            Register now
+          </button>
+        </div>
+      );
+    }
+
     if (game.embedId) {
       return (
         <EmbeddedIframeGame
@@ -72,7 +94,7 @@ export function RestaurantGameScreen({
         </p>
       </div>
     );
-  }, [game.embedId, game.id, game.name, onAward]);
+  }, [game.embedId, game.id, game.name, onAward, isRegistered, openModal]);
 
   return (
     <section className="py-8 sm:py-10">

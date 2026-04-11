@@ -1,5 +1,6 @@
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
+import { RegistrationSettingsCard } from '@/components/restaurant/profile/registration-settings-card';
 
 const settings = [
   { title: 'Notifications', description: 'Promo messages and updates (demo)' },
@@ -25,6 +26,7 @@ export default function ProfileSettingsPage() {
           </Surface>
 
           <div className="grid gap-4">
+            <RegistrationSettingsCard />
             {settings.map((item) => (
               <Surface
                 key={item.title}
@@ -44,4 +46,3 @@ export default function ProfileSettingsPage() {
     </section>
   );
 }
-

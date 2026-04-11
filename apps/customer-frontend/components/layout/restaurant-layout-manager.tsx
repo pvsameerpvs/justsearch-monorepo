@@ -3,6 +3,9 @@
 import { usePathname } from 'next/navigation';
 import { RestaurantMobileHeader } from '@/components/restaurant/restaurant-mobile-header';
 import { RestaurantMobileNav } from '@/components/restaurant/restaurant-mobile-nav';
+import { RegistrationProvider } from '@/components/auth/registration-context';
+import { RegistrationModal } from '@/components/auth/registration-modal';
+import { RegistrationRouteGuard } from '@/components/auth/registration-route-guard';
 import type { ReactNode } from 'react';
 
 type RestaurantLayoutManagerProps = {
@@ -15,10 +18,12 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
   const showRestaurantChrome = pathname !== '/';
 
   return (
-    <>
+    <RegistrationProvider>
+      <RegistrationRouteGuard />
       {showRestaurantChrome && <RestaurantMobileHeader />}
       {showRestaurantChrome && <RestaurantMobileNav />}
       {children}
-    </>
+      <RegistrationModal />
+    </RegistrationProvider>
   );
 }
