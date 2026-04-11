@@ -24,7 +24,7 @@ export function RestaurantDeliveryCartBar({
     <div className="fixed inset-x-0 z-[9998] px-3 sm:px-6" style={{ bottom: 'calc(var(--restaurant-mobile-nav-height,0px) + 12px)' }}>
       <div className="mx-auto w-full max-w-3xl">
         {savings > 0 ? (
-          <div className="rounded-t-[20px] border border-b-0 border-[rgba(245,158,11,0.22)] bg-[rgba(254,249,195,0.96)] px-4 py-3 text-center text-xs font-semibold text-[rgb(120,53,15)] shadow-[0_-8px_20px_rgba(245,158,11,0.10)]">
+          <div className="mx-auto w-fit rounded-t-2xl border border-b-0 border-[rgba(245,158,11,0.22)] bg-[rgba(254,249,195,0.96)] px-6 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-[rgb(120,53,15)] shadow-[0_-8px_20px_rgba(245,158,11,0.06)]">
             {formatCurrency(savings, currency)} saved | Free delivery applied
           </div>
         ) : null}
@@ -64,7 +64,7 @@ export function RestaurantDeliveryCartBar({
               e.stopPropagation();
               handleCheckout();
             }}
-            className="inline-flex h-12 shrink-0 items-center justify-center rounded-[18px] bg-[#ffd814] px-6 text-base font-bold text-[#2d2612] shadow-[0_10px_28px_rgba(255,216,20,0.35)] transition-all hover:brightness-105 active:scale-95"
+            className="inline-flex h-12 shrink-0 items-center justify-center rounded-[18px] bg-[rgb(var(--brand))] px-6 text-base font-bold text-white shadow-[0_10px_28px_rgb(var(--brand)/0.25)] transition-all hover:brightness-105 active:scale-95"
           >
             Checkout
           </button>

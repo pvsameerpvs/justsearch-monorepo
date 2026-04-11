@@ -109,7 +109,12 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
   }
 
   return (
-    <section className="py-6 sm:py-8">
+    <section 
+      className="py-6 sm:py-8"
+      style={{ 
+        paddingBottom: 'calc(var(--restaurant-mobile-nav-height,0px) + 140px)' 
+      }}
+    >
       <Container className="max-w-3xl">
         <div className="space-y-5">
           <div className="rounded-[28px] border border-[rgb(var(--border)/0.8)] bg-white shadow-[0_18px_48px_rgba(15,23,42,0.08)]">
@@ -254,29 +259,27 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
       </Container>
 
       <div className="fixed inset-x-0 z-[9998] px-3 sm:px-6" style={{ bottom: 'calc(var(--restaurant-mobile-nav-height,0px) + 12px)' }}>
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 rounded-[24px] border border-[rgb(var(--border)/0.85)] bg-white px-5 py-4 shadow-[0_20px_60px_rgba(15,23,42,0.16)]">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 rounded-[26px] border border-[rgb(var(--border)/0.85)] bg-white px-6 py-5 shadow-[0_24px_64px_-12px_rgba(15,23,42,0.18)]">
           <div className="min-w-0">
-            <p className="text-3xl font-bold tracking-tight text-[rgb(var(--ink))]">
-              Total {formatCurrency(displayTotal, currency)}
+            <p className="text-sm font-bold uppercase tracking-widest text-[rgb(var(--muted))]">Total</p>
+            <p className="text-2xl font-black tracking-tight text-[rgb(var(--ink))]">
+              {formatCurrency(displayTotal, currency)}
             </p>
-            <p className="mt-1 text-sm font-semibold text-[rgb(var(--brand))]">
-              {formatCurrency(displaySavings, currency)} off applied
-            </p>
-            {error ? <p className="mt-1 text-sm font-medium text-red-600">{error}</p> : null}
+            {error ? <p className="mt-1 text-[10px] font-bold text-red-600">{error}</p> : null}
             {latestOrder ? (
-              <p className="mt-1 text-sm font-medium text-emerald-600">
-                Order #{latestOrder.id} placed successfully
+              <p className="mt-1 text-[10px] font-bold text-emerald-600">
+                Order #{latestOrder.id} placed!
               </p>
             ) : null}
           </div>
-
+          
           <button
             type="button"
             onClick={onPlaceOrder}
             disabled={cartCount === 0}
-            className="inline-flex h-14 shrink-0 items-center justify-center rounded-[20px] bg-[#ffd814] px-8 text-xl font-bold text-[#2d2612] shadow-[0_14px_36px_rgba(255,216,20,0.34)] transition-all hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-14 shrink-0 items-center justify-center rounded-[20px] bg-[rgb(var(--brand))] px-8 text-lg font-bold text-white shadow-[0_12px_36px_rgb(var(--brand)/0.25)] transition-all hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {cartCount > 0 ? 'Place order' : 'Order placed'}
+            {cartCount > 0 ? 'Place Order' : 'Order Placed'}
           </button>
         </div>
       </div>

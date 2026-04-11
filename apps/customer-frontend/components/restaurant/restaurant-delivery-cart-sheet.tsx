@@ -50,8 +50,10 @@ export function RestaurantDeliveryCartSheet({
 
       <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-3xl px-3 pb-[calc(var(--restaurant-mobile-nav-height,0px)+12px)] sm:px-6">
         <div className="overflow-hidden rounded-[28px] border border-[rgb(var(--border)/0.9)] bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]">
-          <div className="border-b border-[rgba(245,158,11,0.2)] bg-[rgba(254,249,195,0.95)] px-5 py-4 text-center text-sm font-semibold text-[rgb(120,53,15)]">
-            {formatCurrency(savings, currency)} saved | Free delivery applied
+          <div className="flex justify-center pt-4">
+            <div className="w-fit rounded-full border border-[rgba(245,158,11,0.2)] bg-[rgba(254,249,195,0.95)] px-5 py-1.5 text-center text-[10px] font-bold uppercase tracking-wider text-[rgb(120,53,15)]">
+              {formatCurrency(savings, currency)} saved | Free delivery applied
+            </div>
           </div>
 
           <div className="flex items-center justify-between px-5 py-4">
@@ -144,7 +146,7 @@ export function RestaurantDeliveryCartSheet({
             <button
               type="button"
               onClick={handleCheckout}
-              className="inline-flex h-12 shrink-0 items-center justify-center rounded-[18px] bg-[#ffd814] px-7 text-base font-bold text-[#2d2612] shadow-[0_10px_28px_rgba(255,216,20,0.35)] transition-all hover:brightness-105 active:scale-95"
+              className="inline-flex h-12 shrink-0 items-center justify-center rounded-[18px] bg-[rgb(var(--brand))] px-7 text-base font-bold text-white shadow-[0_10px_28px_rgb(var(--brand)/0.25)] transition-all hover:brightness-105 active:scale-95"
             >
               Checkout
             </button>
