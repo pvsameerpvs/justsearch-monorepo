@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { ButtonLink } from '@/components/shared/button-link';
 import { Container } from '@/components/shared/container';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -10,9 +10,9 @@ import type { Restaurant } from '@/lib/restaurant-types';
 /* Modular Components Imported from the Checkout Folder */
 import { CheckoutAddressCard } from './checkout/checkout-address-card';
 import { CheckoutSummaryCard } from './checkout/checkout-summary-card';
-import { CheckoutTrackingCard } from './checkout/checkout-tracking-card';
 import { CheckoutStickyFooter } from './checkout/checkout-sticky-footer';
 import { useRestaurantFulfillment } from './use-restaurant-fulfillment';
+import { useAddressBook } from './use-address-book';
 
 function getCheckoutLineTotal(item: {
   price: number;
@@ -29,48 +29,67 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
     cartCount,
     total,
     deliverySavings,
-    orders,
     placeOrder,
   } = useRestaurantFulfillment(restaurant);
 
+  const { addresses, addAddress } = useAddressBook();
+  
   /* Centralized Checkout State */
-  const [addressTitle, setAddressTitle] = useState('Work');
-  const [address, setAddress] = useState('Dubai Damas tower, 28 Al Maktoum Road, Riggat Al Buteen, Dubai');
-  const [addressDetails, setAddressDetails] = useState('305 office number');
+  const [addressTitle, setAddressTitle] = useState('Home');
+  const [address, setAddress] = useState('');
+  const [addressDetails, setAddressDetails] = useState('');
+  const [alternateNumber, setAlternateNumber] = useState('');
   const [handoff, setHandoff] = useState('Hand it to me');
-  const [note, setNote] = useState('');
+  const [restaurantNote, setRestaurantNote] = useState('');
+  const [riderNote, setRiderNote] = useState('');
+  const [promoCode, setPromoCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
 
+  // Sync with first saved address on load
+  useEffect(() => {
+    if (addresses.length > 0 && !address) {
+      setAddressTitle(addresses[0].label);
+      setAddress(addresses[0].address);
+      setAddressDetails(addresses[0].details);
+      setAlternateNumber(addresses[0].alternateNumber || '');
+    }
+  }, [addresses, address]);
+
+  const onSwitchAddress = () => {
+    if (addresses.length <= 1) return;
+    
+    const currentIndex = addresses.findIndex(a => a.address === address);
+    const nextIndex = (currentIndex + 1) % addresses.length;
+    const nextAddr = addresses[nextIndex];
+    
+    setAddressTitle(nextAddr.label);
+    setAddress(nextAddr.address);
+    setAddressDetails(nextAddr.details);
+    setAlternateNumber(nextAddr.alternateNumber || '');
+  };
+
   const currency = cart[0]?.currency ?? restaurant.menu[0]?.items[0]?.currency ?? 'AED';
 
-  /* Logic: Determine which data to display (Current Cart vs Latest Order) */
-  const latestOrder = useMemo(
-    () => (placedOrderId ? orders.find((order) => order.id === placedOrderId) ?? null : null),
-    [orders, placedOrderId],
-  );
-  
-  const fallbackOrder = latestOrder ?? orders[0] ?? null;
-  
   const displayItems = useMemo(
     () =>
-      (cartCount > 0 ? cart : fallbackOrder?.items ?? []).map((item) => ({
+      cart.map((item) => ({
         ...item,
         lineTotal: getCheckoutLineTotal(item),
       })),
-    [cart, cartCount, fallbackOrder?.items],
+    [cart],
   );
 
-  const displayTotal = cartCount > 0 ? total : fallbackOrder?.total ?? 0;
-  const displaySavings = cartCount > 0 ? deliverySavings : fallbackOrder?.deliverySavings ?? 0;
+  const displayTotal = total;
+  const displaySavings = deliverySavings;
 
   const onPlaceOrder = () => {
     setMode('delivery');
 
-    const combinedAddress = `${addressTitle} - ${address}\n${addressDetails}\n${handoff}${note ? `\n${note}` : ''}`;
+    const combinedAddress = `${addressTitle} - ${address}\n${addressDetails}\n${handoff}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
     const orderId = placeOrder({
       address: combinedAddress,
-      note,
+      note: restaurantNote,
     });
 
     if (!orderId) {
@@ -83,7 +102,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
   };
 
   /* Empty State View */
-  if (cartCount === 0 && orders.length === 0) {
+  if (cartCount === 0) {
     return (
       <section className="py-8 sm:py-10">
         <Container className="max-w-3xl">
@@ -116,13 +135,21 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             addressTitle={addressTitle}
             address={address}
             addressDetails={addressDetails}
+            alternateNumber={alternateNumber}
             handoff={handoff}
-            note={note}
-            setAddressTitle={setAddressTitle}
             setAddress={setAddress}
             setAddressDetails={setAddressDetails}
+            setAlternateNumber={setAlternateNumber}
             setHandoff={setHandoff}
-            setNote={setNote}
+            note={riderNote}
+            setNote={setRiderNote}
+            onSwitch={addresses.length > 1 ? onSwitchAddress : undefined}
+            onSaveToProfile={() => addAddress({
+              label: addressTitle as any,
+              address: address,
+              details: addressDetails,
+              alternateNumber: alternateNumber
+            })}
           />
 
           {/* 2. Order Summary Section */}
@@ -131,13 +158,10 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             displayItems={displayItems}
             displaySavings={displaySavings}
             currency={currency}
-            note={note}
-            setNote={setNote}
-          />
-
-          {/* 3. Order History & Tracking Section */}
-          <CheckoutTrackingCard 
-            orders={orders}
+            note={restaurantNote}
+            setNote={setRestaurantNote}
+            promoCode={promoCode}
+            setPromoCode={setPromoCode}
           />
           
         </div>

@@ -5,7 +5,7 @@ import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
 import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
 import { ProfileMenuItem } from '@/components/restaurant/profile/profile-menu-item';
-import { Gamepad2, Gift, HelpCircle, Settings, Star, User } from 'lucide-react';
+import { Gamepad2, Gift, HelpCircle, MapPin, Settings, ShoppingBag, Star, Ticket, User } from 'lucide-react';
 import { useRegistration } from '@/components/auth/registration-context';
 
 export default function ProfilePage() {
@@ -106,6 +106,24 @@ export default function ProfilePage() {
                 icon={HelpCircle}
                 label="How to Play"
                 description="Rules for each game"
+              />
+              <ProfileMenuItem
+                href="/profile/addresses"
+                icon={MapPin}
+                label="Saved Addresses"
+                description="Manage your delivery locations"
+              />
+              <ProfileMenuItem
+                href="/profile/vouchers"
+                icon={Ticket}
+                label="Voucher Wallet"
+                description="Your special offers and coupons"
+              />
+              <ProfileMenuItem
+                href="/profile/orders"
+                icon={ShoppingBag}
+                label="Order History"
+                description="Track and reorder meals"
               />
               <ProfileMenuItem
                 href="/profile/settings"

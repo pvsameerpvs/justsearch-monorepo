@@ -23,7 +23,9 @@ test-results/
 
 # Environment files
 .env
+.env.local
 .env.*
+.env.example
 !**/.env.example
 !**/.env.*.example
 
