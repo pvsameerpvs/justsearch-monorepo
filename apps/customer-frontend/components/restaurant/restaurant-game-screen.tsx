@@ -7,6 +7,7 @@ import { Surface } from '@/components/shared/surface';
 import type { Game, Restaurant } from '@/lib/restaurant-types';
 import { ScratchCardCanvasGame } from './games/scratch-card-canvas-game';
 import { SpinWheelCanvasGame } from './games/spin-wheel-canvas-game';
+import { RunnerCanvasGame } from './games/runner-canvas-game';
 import { EmbeddedIframeGame } from './games/embedded-iframe-game';
 import type { GameAwardResult } from './games/game-award';
 import { useLoyaltyPoints } from './use-loyalty-points';
@@ -54,6 +55,9 @@ export function RestaurantGameScreen({ restaurant, game }: RestaurantGameScreenP
         return <SpinWheelCanvasGame onAward={onAward} />;
       case 'scratch-card':
         return <ScratchCardCanvasGame onAward={onAward} />;
+      case 'runner':
+      case 'vex-runner': // Slot for local runner testing
+        return <RunnerCanvasGame onAward={onAward} />;
       default:
         // Handle all dynamic Vex/External games using embedId
         if (game.embedId) {
