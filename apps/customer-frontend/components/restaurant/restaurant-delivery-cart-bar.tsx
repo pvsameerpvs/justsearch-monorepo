@@ -1,8 +1,8 @@
 "use client";
 
-import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import { formatCurrency } from '@/lib/format';
+import { useCheckoutGate } from './use-checkout-gate';
 
 type RestaurantDeliveryCartBarProps = {
   currency: string;
@@ -19,6 +19,7 @@ export function RestaurantDeliveryCartBar({
   savings,
   onOpenCart,
 }: RestaurantDeliveryCartBarProps) {
+  const { handleCheckout } = useCheckoutGate();
   return (
     <div className="fixed inset-x-0 z-[9998] px-3 sm:px-6" style={{ bottom: 'calc(var(--restaurant-mobile-nav-height,0px) + 12px)' }}>
       <div className="mx-auto w-full max-w-3xl">
@@ -57,13 +58,16 @@ export function RestaurantDeliveryCartBar({
             </div>
           </div>
 
-          <Link
-            href="/menu/checkout"
-            onClick={(event) => event.stopPropagation()}
-            className="inline-flex h-12 shrink-0 items-center justify-center rounded-[18px] bg-[#ffd814] px-6 text-base font-bold text-[#2d2612] shadow-[0_10px_28px_rgba(255,216,20,0.35)] transition-all hover:brightness-105"
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCheckout();
+            }}
+            className="inline-flex h-12 shrink-0 items-center justify-center rounded-[18px] bg-[#ffd814] px-6 text-base font-bold text-[#2d2612] shadow-[0_10px_28px_rgba(255,216,20,0.35)] transition-all hover:brightness-105 active:scale-95"
           >
             Checkout
-          </Link>
+          </button>
         </div>
       </div>
     </div>

@@ -1,17 +1,14 @@
 "use client";
 
-import { Bike, LayoutGrid, List, UtensilsCrossed } from 'lucide-react';
+import { LayoutGrid, List } from 'lucide-react';
 import type { Restaurant } from '@/lib/restaurant-types';
 import type { ViewMode } from './restaurant-menu-showcase';
-import type { FulfillmentMode } from './use-restaurant-fulfillment';
 
 type RestaurantMenuNavigationProps = {
   restaurant: Restaurant;
   availableItemsCount: number;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
-  fulfillmentMode: FulfillmentMode;
-  setFulfillmentMode: (mode: FulfillmentMode) => void;
 };
 
 export function RestaurantMenuNavigation({
@@ -19,8 +16,6 @@ export function RestaurantMenuNavigation({
   availableItemsCount,
   viewMode,
   setViewMode,
-  fulfillmentMode,
-  setFulfillmentMode,
 }: RestaurantMenuNavigationProps) {
   return (
     <div className="sticky top-[calc(var(--restaurant-mobile-header-height,0px)+12px)] z-40 mb-16 rounded-[14px] border border-white/40 bg-white/70 p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all sm:p-3">
@@ -29,8 +24,8 @@ export function RestaurantMenuNavigation({
         {/* Header section with Stats and View Toggle */}
         <div className="flex flex-col justify-between gap-5 border-b border-slate-200/60 pb-5 sm:flex-row sm:items-center">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgb(var(--brand))] text-white shadow-lg shadow-[rgb(var(--brand)/0.2)]">
-              <UtensilsCrossed className="h-6 w-6" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg">
+              <LayoutGrid className="h-6 w-6" />
             </div>
             <div>
               <h2 className="font-display text-xl font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl">

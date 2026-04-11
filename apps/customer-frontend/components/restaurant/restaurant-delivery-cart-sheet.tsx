@@ -1,8 +1,8 @@
 "use client";
 
-import Link from 'next/link';
 import { Trash2, X } from 'lucide-react';
 import { formatCurrency } from '@/lib/format';
+import { useCheckoutGate } from './use-checkout-gate';
 
 type CartItem = {
   itemId: string;
@@ -35,6 +35,8 @@ export function RestaurantDeliveryCartSheet({
   onClear,
   onUpdateQuantity,
 }: RestaurantDeliveryCartSheetProps) {
+  const { handleCheckout } = useCheckoutGate();
+
   if (!open) return null;
 
   return (
@@ -139,12 +141,13 @@ export function RestaurantDeliveryCartSheet({
               <p className="text-sm text-[rgb(var(--muted))]">Free delivery</p>
             </div>
 
-            <Link
-              href="/menu/checkout"
-              className="inline-flex h-12 shrink-0 items-center justify-center rounded-[18px] bg-[#ffd814] px-7 text-base font-bold text-[#2d2612] shadow-[0_10px_28px_rgba(255,216,20,0.35)] transition-all hover:brightness-105"
+            <button
+              type="button"
+              onClick={handleCheckout}
+              className="inline-flex h-12 shrink-0 items-center justify-center rounded-[18px] bg-[#ffd814] px-7 text-base font-bold text-[#2d2612] shadow-[0_10px_28px_rgba(255,216,20,0.35)] transition-all hover:brightness-105 active:scale-95"
             >
               Checkout
-            </Link>
+            </button>
           </div>
         </div>
       </div>

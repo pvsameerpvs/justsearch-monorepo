@@ -17,7 +17,7 @@ export function RegistrationRouteGuard() {
 
     if (isRegistered) return;
     if (isModalOpen) return;
-    if (!pathname.startsWith('/eat-play')) return;
+    if (!pathname.startsWith('/eat-play') && !pathname.startsWith('/menu/checkout')) return;
 
     // If user closes the modal without verifying, send them home.
     if (wasModalOpen) {

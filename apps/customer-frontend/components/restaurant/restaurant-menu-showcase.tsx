@@ -63,8 +63,6 @@ export function RestaurantMenuShowcase({
             availableItemsCount={availableItemsCount}
             viewMode={viewMode}
             setViewMode={setViewMode}
-            fulfillmentMode={mode}
-            setFulfillmentMode={setMode}
           />
 
           {/* Menu Sections List */}
