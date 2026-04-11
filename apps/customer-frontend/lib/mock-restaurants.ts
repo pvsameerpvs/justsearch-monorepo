@@ -62,6 +62,7 @@ export const mockRestaurants: Record<string, Restaurant> = {
       { platform: 'Facebook', url: 'https://facebook.com/mosaictable', handle: 'Mosaic Table' },
       { platform: 'WhatsApp', url: 'https://wa.me/97145550188', handle: '+971 4 555 0188' },
       { platform: 'TikTok', url: 'https://tiktok.com/@mosaictable', handle: '@mosaictable' },
+      { platform: 'Snapchat', url: 'https://snapchat.com/add/the-mosaic', handle: 'the-mosaic' },
     ],
     menu: [
       {

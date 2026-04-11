@@ -21,7 +21,7 @@ export type RestaurantTheme = {
 };
 
 export type SocialLink = {
-  platform: 'Instagram' | 'Facebook' | 'WhatsApp' | 'TikTok' | 'Twitter' | 'YouTube';
+  platform: 'Instagram' | 'Facebook' | 'WhatsApp' | 'TikTok' | 'Twitter' | 'YouTube' | 'Snapchat';
   url: string;
   handle: string;
 };
