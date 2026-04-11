@@ -1,7 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Allow cross-origin access for dev resources (like fonts) on your local network IP
-  allowedDevOrigins: ['192.168.70.30:3000'],
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
+    ],
+  },
+  allowedDevOrigins: [
+    'localhost:3000',
+    '192.168.70.30',
+    '*.loca.lt',
+    '*.ngrok-free.app',
+    '*.ngrok.io',
+    '0.0.0.0'
+  ],
 }
 
 module.exports = nextConfig
