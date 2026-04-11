@@ -1,16 +1,25 @@
 import { Surface } from '@/components/shared/surface';
-import type { MenuCategory } from '@/lib/restaurant-types';
+import type { MenuCategory, MenuItem } from '@/lib/restaurant-types';
 import { RestaurantMenuSubcategorySection } from './restaurant-menu-subcategory-section';
 import type { ViewMode } from './restaurant-menu-showcase';
+import type { FulfillmentMode } from './use-restaurant-fulfillment';
 
 type RestaurantMenuCategoryCardProps = {
   category: MenuCategory;
   viewMode: ViewMode;
+  fulfillmentMode?: FulfillmentMode;
+  getCartQuantity?: (itemId: string) => number;
+  onAddToCart?: (item: MenuItem) => void;
+  onUpdateCartQuantity?: (itemId: string, quantity: number) => void;
 };
 
 export function RestaurantMenuCategoryCard({
   category,
   viewMode,
+  fulfillmentMode = 'dine-in',
+  getCartQuantity,
+  onAddToCart,
+  onUpdateCartQuantity,
 }: RestaurantMenuCategoryCardProps) {
   const groupedItems = Object.entries(
     category.items.reduce<Record<string, typeof category.items>>((groups, item) => {
@@ -47,6 +56,10 @@ export function RestaurantMenuCategoryCard({
               title={title}
               items={items}
               viewMode={viewMode}
+              fulfillmentMode={fulfillmentMode}
+              getCartQuantity={getCartQuantity}
+              onAddToCart={onAddToCart}
+              onUpdateCartQuantity={onUpdateCartQuantity}
             />
           ))}
         </div>

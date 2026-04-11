@@ -1,14 +1,17 @@
 "use client";
 
-import { LayoutGrid, List, UtensilsCrossed } from 'lucide-react';
+import { Bike, LayoutGrid, List, UtensilsCrossed } from 'lucide-react';
 import type { Restaurant } from '@/lib/restaurant-types';
 import type { ViewMode } from './restaurant-menu-showcase';
+import type { FulfillmentMode } from './use-restaurant-fulfillment';
 
 type RestaurantMenuNavigationProps = {
   restaurant: Restaurant;
   availableItemsCount: number;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
+  fulfillmentMode: FulfillmentMode;
+  setFulfillmentMode: (mode: FulfillmentMode) => void;
 };
 
 export function RestaurantMenuNavigation({
@@ -16,6 +19,8 @@ export function RestaurantMenuNavigation({
   availableItemsCount,
   viewMode,
   setViewMode,
+  fulfillmentMode,
+  setFulfillmentMode,
 }: RestaurantMenuNavigationProps) {
   return (
     <div className="sticky top-[calc(var(--restaurant-mobile-header-height,0px)+12px)] z-40 mb-16 rounded-[14px] border border-white/40 bg-white/70 p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all sm:p-3">
@@ -40,7 +45,32 @@ export function RestaurantMenuNavigation({
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-6 sm:justify-end">
+          <div className="flex flex-col items-stretch gap-3 sm:items-end">
+            <div className="inline-flex rounded-xl bg-slate-100/80 p-1">
+              <button
+                onClick={() => setFulfillmentMode('dine-in')}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+                  fulfillmentMode === 'dine-in'
+                    ? 'bg-white text-[rgb(var(--brand))] shadow-sm'
+                    : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <UtensilsCrossed className="h-3.5 w-3.5" />
+                Dine In
+              </button>
+              <button
+                onClick={() => setFulfillmentMode('delivery')}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+                  fulfillmentMode === 'delivery'
+                    ? 'bg-white text-[rgb(var(--brand))] shadow-sm'
+                    : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <Bike className="h-3.5 w-3.5" />
+                Delivery
+              </button>
+            </div>
+
             {/* Layout Toggle */}
             <div className="flex items-center rounded-xl bg-slate-100/80 p-1">
               <button

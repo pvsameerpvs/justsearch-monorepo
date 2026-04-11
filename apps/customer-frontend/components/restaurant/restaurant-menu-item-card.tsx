@@ -1,18 +1,29 @@
 import { Check, Clock3 } from 'lucide-react';
+import { cn } from '@/lib/cn';
 import { formatCurrency } from '@/lib/format';
 import type { MenuItem } from '@/lib/restaurant-types';
 import type { ViewMode } from './restaurant-menu-showcase';
+import type { FulfillmentMode } from './use-restaurant-fulfillment';
 
 type RestaurantMenuItemCardProps = {
   item: MenuItem;
   viewMode?: ViewMode;
+  fulfillmentMode?: FulfillmentMode;
+  cartQuantity?: number;
+  onAddToCart?: (item: MenuItem) => void;
+  onUpdateCartQuantity?: (itemId: string, quantity: number) => void;
 };
 
 export function RestaurantMenuItemCard({
   item,
   viewMode = 'grid',
+  fulfillmentMode = 'dine-in',
+  cartQuantity = 0,
+  onAddToCart,
+  onUpdateCartQuantity,
 }: RestaurantMenuItemCardProps) {
   const isList = viewMode === 'list';
+  const isDeliveryMode = fulfillmentMode === 'delivery';
   
   const imageBackground = item.image
     ? `linear-gradient(180deg, rgba(15, 23, 42, 0.05), rgba(15, 23, 42, 0.28)), url(${item.image})`
@@ -116,11 +127,80 @@ export function RestaurantMenuItemCard({
               {item.isAvailable ? 'Available' : 'Limited'}
             </span>
             
-            <button className="text-[9px] font-bold uppercase tracking-widest text-[rgb(var(--brand))] hover:underline sm:text-[10px]">
-              View Details
-            </button>
+            {isDeliveryMode && item.isAvailable && onAddToCart ? (
+              cartQuantity > 0 && onUpdateCartQuantity ? (
+                <div className="inline-flex items-center rounded-full bg-white p-1 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => onUpdateCartQuantity(item.id, cartQuantity - 1)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold text-[rgb(var(--ink))]"
+                  >
+                    -
+                  </button>
+                  <span className="min-w-[1.75rem] text-center text-sm font-bold text-[rgb(var(--ink))]">
+                    {cartQuantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onUpdateCartQuantity(item.id, cartQuantity + 1)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold text-[rgb(var(--ink))]"
+                  >
+                    +
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onAddToCart(item)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-2xl font-semibold text-[rgb(var(--ink))] shadow-[0_10px_24px_rgba(15,23,42,0.14)] transition-all hover:brightness-105"
+                >
+                  +
+                </button>
+              )
+            ) : (
+              <button className="text-[9px] font-bold uppercase tracking-widest text-[rgb(var(--brand))] hover:underline sm:text-[10px]">
+                View Details
+              </button>
+            )}
           </div>
         )}
+
+        {!isList && isDeliveryMode && item.isAvailable && onAddToCart ? (
+          <div className="mt-4">
+            {cartQuantity > 0 && onUpdateCartQuantity ? (
+              <div className="inline-flex items-center rounded-full bg-[rgb(var(--card-surface-muted)/0.9)] p-1">
+                <button
+                  type="button"
+                  onClick={() => onUpdateCartQuantity(item.id, cartQuantity - 1)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-[rgb(var(--ink))]"
+                >
+                  -
+                </button>
+                <span className="min-w-[2rem] text-center text-sm font-bold text-[rgb(var(--ink))]">
+                  {cartQuantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onUpdateCartQuantity(item.id, cartQuantity + 1)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-[rgb(var(--ink))]"
+                >
+                  +
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onAddToCart(item)}
+                className={cn(
+                  'inline-flex h-11 w-full items-center justify-center rounded-[14px] text-sm font-semibold transition-all',
+                  'bg-[rgb(var(--brand))] text-white shadow-[0_16px_28px_rgb(var(--brand)/0.2)] hover:brightness-105',
+                )}
+              >
+                Add to Delivery Cart
+              </button>
+            )}
+          </div>
+        ) : null}
       </div>
     </article>
   );

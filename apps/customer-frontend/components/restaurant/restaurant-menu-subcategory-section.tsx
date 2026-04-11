@@ -1,17 +1,26 @@
 import type { MenuItem } from '@/lib/restaurant-types';
 import { RestaurantMenuItemCard } from './restaurant-menu-item-card';
 import type { ViewMode } from './restaurant-menu-showcase';
+import type { FulfillmentMode } from './use-restaurant-fulfillment';
 
 type RestaurantMenuSubcategorySectionProps = {
   title: string;
   items: MenuItem[];
   viewMode?: ViewMode;
+  fulfillmentMode?: FulfillmentMode;
+  getCartQuantity?: (itemId: string) => number;
+  onAddToCart?: (item: MenuItem) => void;
+  onUpdateCartQuantity?: (itemId: string, quantity: number) => void;
 };
 
 export function RestaurantMenuSubcategorySection({
   title,
   items,
   viewMode = 'grid',
+  fulfillmentMode = 'dine-in',
+  getCartQuantity,
+  onAddToCart,
+  onUpdateCartQuantity,
 }: RestaurantMenuSubcategorySectionProps) {
   return (
     <div className="space-y-4">
@@ -35,7 +44,15 @@ export function RestaurantMenuSubcategorySection({
           : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3'
       }>
         {items.map((item) => (
-          <RestaurantMenuItemCard key={item.id} item={item} viewMode={viewMode} />
+          <RestaurantMenuItemCard
+            key={item.id}
+            item={item}
+            viewMode={viewMode}
+            fulfillmentMode={fulfillmentMode}
+            cartQuantity={getCartQuantity?.(item.id) ?? 0}
+            onAddToCart={onAddToCart}
+            onUpdateCartQuantity={onUpdateCartQuantity}
+          />
         ))}
       </div>
     </div>

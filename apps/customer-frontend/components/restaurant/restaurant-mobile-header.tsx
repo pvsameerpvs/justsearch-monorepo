@@ -8,6 +8,7 @@ import { useMeasuredCssVarHeight } from '@/components/layout/use-measured-css-va
 
 const routeTitles: Record<string, string> = {
   '/menu': 'Menu',
+  '/menu/checkout': 'Checkout',
   '/eat-play': 'Games',
   '/google-reviews': 'Reviews',
   '/social-media': 'Social',
@@ -43,6 +44,10 @@ function getHeaderTitle(pathname: string) {
 }
 
 function getBackHref(pathname: string) {
+  if (pathname.startsWith('/menu/')) {
+    return '/menu';
+  }
+
   if (pathname.startsWith('/profile/')) {
     return '/profile';
   }
