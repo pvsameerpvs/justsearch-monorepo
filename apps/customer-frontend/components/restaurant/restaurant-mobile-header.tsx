@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { ArrowLeft, User } from 'lucide-react';
 import { useSmartBackNavigation } from '@/components/layout/use-smart-back-navigation';
@@ -56,7 +56,7 @@ function getHeaderTitle(pathname: string) {
 
 function getBackHref(pathname: string) {
   if (pathname.startsWith('/menu/checkout/status/')) {
-    return '/menu/checkout';
+    return '/';
   }
 
   if (pathname.startsWith('/profile/orders/')) {
@@ -81,10 +81,15 @@ function getBackHref(pathname: string) {
 export function RestaurantMobileHeader() {
   const pathname = usePathname();
   const containerRef = useMeasuredCssVarHeight('--restaurant-mobile-header-height');
+  const router = useRouter();
 
   const title = useMemo(() => getHeaderTitle(pathname), [pathname]);
   const backHref = useMemo(() => getBackHref(pathname), [pathname]);
-  const goBack = useSmartBackNavigation(pathname, backHref);
+  const smartBack = useSmartBackNavigation(pathname, backHref);
+
+  const goBack = pathname.startsWith('/menu/checkout/status/')
+    ? () => router.push(backHref)
+    : smartBack;
 
   return (
     <div
