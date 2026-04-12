@@ -12,6 +12,8 @@ import {
     getCheckoutStageIndex, 
     CHECKOUT_STAGE_COMPLETED_MS 
 } from './checkout/checkout-live-status-utils';
+import { AnimatedStatusEmoji } from './checkout/animated-status-emoji';
+import { MultiOrderCircularProgress } from './checkout/multi-order-circular-progress';
 
 type RestaurantHomeHeroProps = {
   restaurant: Restaurant;
@@ -23,26 +25,30 @@ export function RestaurantHomeHero({ restaurant }: RestaurantHomeHeroProps) {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 333);
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
 
-  const progress = useMemo(() => {
-    if (!hydrated || orders.length === 0) return null;
-    const latest = orders[0];
-    const stageIndex = getCheckoutStageIndex(latest.createdAt, now, latest.status);
-    if (stageIndex >= 3) return null;
-    
-    return Math.min(1, (now - latest.createdAt) / CHECKOUT_STAGE_COMPLETED_MS);
+  const activeOrders = useMemo(() => {
+    if (!hydrated) return [];
+    return orders
+      .filter(o => getCheckoutStageIndex(o.createdAt, now, o.status) < 3)
+      .sort((a, b) => a.createdAt - b.createdAt)
+      .map(o => ({
+        id: o.id,
+        progress: Math.min(1, (now - o.createdAt) / CHECKOUT_STAGE_COMPLETED_MS)
+      }));
   }, [hydrated, orders, now]);
 
-  const showProgress = progress !== null;
-  const latestOrder = orders[0];
-  const isOnTheWay = hydrated && latestOrder?.riderName;
-
-  const emojis = isOnTheWay 
-    ? ['🛵', '🏠', '📍', '🍱','🍔', '🍽️', '🍜', '👨‍🍳', '🌯', '🍱', '🍜', '🍲'] 
-    : ['🍔', '🍽️', '🍜', '👨‍🍳', '🌯', '🍱', '🍜', '🍲'];
+  const showProgress = activeOrders.length > 0;
+  const latestOrder = [...activeOrders].sort((a, b) => {
+    const orderA = orders.find(o => o.id === a.id);
+    const orderB = orders.find(o => o.id === b.id);
+    return (orderB?.createdAt || 0) - (orderA?.createdAt || 0);
+  })[0];
+  
+  const actualLatestOrder = orders.find(o => o.id === latestOrder?.id);
+  const isOnTheWay = hydrated && !!actualLatestOrder?.riderName;
 
   return (
     <section className="pt-6 pb-4 sm:pt-8 sm:pb-6 lg:pt-5 lg:pb-3">
@@ -72,46 +78,15 @@ export function RestaurantHomeHero({ restaurant }: RestaurantHomeHeroProps) {
                     className="flex flex-col items-center animate-in fade-in zoom-in duration-700 hover:scale-105 transition-transform active:scale-95"
                   >
                     <div className="relative h-24 w-24">
-                      {/* Premium Circular Tracker */}
-                      <svg className="h-full w-full -rotate-90 overflow-visible" viewBox="0 0 100 100">
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="44"
-                          className="stroke-slate-200 fill-none"
-                          strokeWidth="7"
-                        />
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="44"
-                          className="stroke-[rgb(var(--brand))] fill-none transition-all duration-1000 ease-out"
-                          strokeWidth="7"
-                          strokeDasharray="276.46"
-                          strokeDashoffset={276.46 * (1 - progress)}
-                          strokeLinecap="round"
-                        />
-                      </svg>
+                      <MultiOrderCircularProgress 
+                        orders={activeOrders} 
+                        className="h-full w-full"
+                      />
                       
-                      {/* Animated Central Icons (Switch 3 times per second) */}
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="flex items-center justify-center">
-                          <span className="text-3xl animate-in fade-in zoom-in duration-300" key={Math.floor(now / 333)}>
-                            {emojis[Math.floor(now / 333) % emojis.length]}
-                          </span>
-                        </div>
+                        <AnimatedStatusEmoji isOnTheWay={isOnTheWay} />
                       </div>
                     </div>
-                    
-                    {/* Status Info */}
-                    {/* <div className="mt-3 flex flex-col items-center gap-1">
-                      <span className="text-xl font-black tracking-tight text-slate-800">
-                        {Math.round(progress * 100)}%
-                      </span>
-                      <span className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[rgb(var(--brand))] px-2 py-0.5 rounded-full bg-[rgb(var(--brand-soft)/0.15)]">
-                        {isOnTheWay ? 'On the way' : 'Preparing'}
-                      </span>
-                    </div> */}
                   </Link>
                 )}
               </div>

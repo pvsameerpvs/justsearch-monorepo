@@ -20,31 +20,30 @@ export function ActiveOrderTracker() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const activeOrder = useMemo(() => {
-    if (!hydrated || orders.length === 0) return null;
+  const activeOrders = useMemo(() => {
+    if (!hydrated) return [];
     
-    // Most recent order
-    const latest = orders[0];
-    const stageIndex = getCheckoutStageIndex(latest.createdAt, now, latest.status);
-    
-    // Only show if not delivered
-    if (stageIndex >= 3) return null;
-    
-    return latest;
+    return orders
+      .filter(o => getCheckoutStageIndex(o.createdAt, now, o.status) < 3)
+      .sort((a, b) => a.createdAt - b.createdAt)
+      .map(o => {
+        const stageIndex = getCheckoutStageIndex(o.createdAt, now, o.status);
+        const liveStages = getCheckoutLiveStages(o.riderName);
+        return {
+          id: o.id,
+          progress: Math.min(1, (now - o.createdAt) / CHECKOUT_STAGE_COMPLETED_MS),
+          stageLabel: liveStages[Math.min(stageIndex, liveStages.length - 1)].label,
+          createdAt: o.createdAt,
+          isOnTheWay: !!o.riderName
+        };
+      });
   }, [hydrated, orders, now]);
 
-  if (!activeOrder) return null;
-
-  const stageIndex = getCheckoutStageIndex(activeOrder.createdAt, now, activeOrder.status);
-  const liveStages = getCheckoutLiveStages(activeOrder.riderName);
-  const overallProgress = Math.min(1, (now - activeOrder.createdAt) / CHECKOUT_STAGE_COMPLETED_MS);
-  const currentStageLabel = liveStages[Math.min(stageIndex, liveStages.length - 1)].label;
+  if (activeOrders.length === 0) return null;
 
   return (
     <CheckoutLiveProgressCircle 
-      progress={overallProgress}
-      stageLabel={currentStageLabel}
-      orderId={activeOrder.id}
+      orders={activeOrders}
     />
   );
 }
