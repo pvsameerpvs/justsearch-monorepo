@@ -9,10 +9,11 @@ import type { Restaurant } from '@/lib/restaurant-types';
 
 /* Modular Components Imported from the Checkout Folder */
 import { CheckoutAddressCard } from './checkout/checkout-address-card';
+import { CheckoutAddressSelectorSheet } from './checkout/checkout-address-selector-sheet';
 import { CheckoutSummaryCard } from './checkout/checkout-summary-card';
 import { CheckoutStickyFooter } from './checkout/checkout-sticky-footer';
 import { useRestaurantFulfillment } from './use-restaurant-fulfillment';
-import { useAddressBook } from './use-address-book';
+import { type SavedAddress, useAddressBook } from './use-address-book';
 
 function getCheckoutLineTotal(item: {
   price: number;
@@ -32,13 +33,15 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
     placeOrder,
   } = useRestaurantFulfillment(restaurant);
 
-  const { addresses, addAddress } = useAddressBook();
+  const { addresses, addAddress, hydrated: addressesHydrated } = useAddressBook();
   
   /* Centralized Checkout State */
   const [addressTitle, setAddressTitle] = useState('Home');
   const [address, setAddress] = useState('');
   const [addressDetails, setAddressDetails] = useState('');
   const [alternateNumber, setAlternateNumber] = useState('');
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [isAddressBookOpen, setIsAddressBookOpen] = useState(false);
   const [handoff, setHandoff] = useState('Hand it to me');
   const [restaurantNote, setRestaurantNote] = useState('');
   const [riderNote, setRiderNote] = useState('');
@@ -46,28 +49,38 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
   const [error, setError] = useState<string | null>(null);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
 
+  const applySavedAddress = (savedAddress: SavedAddress) => {
+    setSelectedAddressId(savedAddress.id);
+    setAddressTitle(savedAddress.label);
+    setAddress(savedAddress.address);
+    setAddressDetails(savedAddress.details);
+    setAlternateNumber(savedAddress.alternateNumber || '');
+  };
+
+  const applyCurrentLocationAddress = (resolvedAddress: string) => {
+    setSelectedAddressId(null);
+    setAddressTitle('Current location');
+    setAddress(resolvedAddress);
+    setAddressDetails('');
+    setAlternateNumber('');
+  };
+
   // Sync with first saved address on load
   useEffect(() => {
-    if (addresses.length > 0 && !address) {
-      setAddressTitle(addresses[0].label);
-      setAddress(addresses[0].address);
-      setAddressDetails(addresses[0].details);
-      setAlternateNumber(addresses[0].alternateNumber || '');
+    if (!addressesHydrated || addresses.length === 0) {
+      return;
     }
-  }, [addresses, address]);
 
-  const onSwitchAddress = () => {
-    if (addresses.length <= 1) return;
-    
-    const currentIndex = addresses.findIndex(a => a.address === address);
-    const nextIndex = (currentIndex + 1) % addresses.length;
-    const nextAddr = addresses[nextIndex];
-    
-    setAddressTitle(nextAddr.label);
-    setAddress(nextAddr.address);
-    setAddressDetails(nextAddr.details);
-    setAlternateNumber(nextAddr.alternateNumber || '');
-  };
+    const selectedAddress = addresses.find((item) => item.id === selectedAddressId);
+
+    if (selectedAddress) {
+      return;
+    }
+
+    if (!address || !selectedAddressId) {
+      applySavedAddress(addresses[0]);
+    }
+  }, [address, addresses, addressesHydrated, selectedAddressId]);
 
   const currency = cart[0]?.currency ?? restaurant.menu[0]?.items[0]?.currency ?? 'AED';
 
@@ -86,7 +99,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
   const onPlaceOrder = () => {
     setMode('delivery');
 
-    const combinedAddress = `${addressTitle} - ${address}\n${addressDetails}\n${handoff}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
+    const combinedAddress = `${addressTitle} - ${address}\n${addressDetails}${alternateNumber ? `\nAlt number: ${alternateNumber}` : ''}\n${handoff}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
     const orderId = placeOrder({
       address: combinedAddress,
       note: restaurantNote,
@@ -136,20 +149,13 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             address={address}
             addressDetails={addressDetails}
             alternateNumber={alternateNumber}
+            savedAddressesCount={addresses.length}
             handoff={handoff}
-            setAddress={setAddress}
-            setAddressDetails={setAddressDetails}
             setAlternateNumber={setAlternateNumber}
             setHandoff={setHandoff}
             note={riderNote}
             setNote={setRiderNote}
-            onSwitch={addresses.length > 1 ? onSwitchAddress : undefined}
-            onSaveToProfile={() => addAddress({
-              label: addressTitle as any,
-              address: address,
-              details: addressDetails,
-              alternateNumber: alternateNumber
-            })}
+            onOpenAddressBook={() => setIsAddressBookOpen(true)}
           />
 
           {/* 2. Order Summary Section */}
@@ -175,6 +181,19 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         latestOrderId={placedOrderId}
         cartCount={cartCount}
         onPlaceOrder={onPlaceOrder}
+      />
+
+      <CheckoutAddressSelectorSheet
+        open={isAddressBookOpen}
+        addresses={addresses}
+        selectedAddressId={selectedAddressId ?? undefined}
+        onClose={() => setIsAddressBookOpen(false)}
+        onSelectAddress={applySavedAddress}
+        onAddAddress={(newAddress) => {
+          const createdAddress = addAddress(newAddress);
+          applySavedAddress(createdAddress);
+        }}
+        onUseCurrentLocation={applyCurrentLocationAddress}
       />
     </section>
   );

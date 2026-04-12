@@ -1,7 +1,7 @@
 "use client";
 
-import { MapPin, Clock3, ShieldCheck, Phone, Loader2, Save } from 'lucide-react';
-import { useGeolocation } from '../use-geolocation';
+import Link from 'next/link';
+import { ChevronRight, Clock3, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 type CheckoutAddressCardProps = {
@@ -9,15 +9,13 @@ type CheckoutAddressCardProps = {
   address: string;
   addressDetails: string;
   alternateNumber?: string;
+  savedAddressesCount?: number;
   handoff: string;
   note: string;
-  setAddress: (val: string) => void;
-  setAddressDetails: (val: string) => void;
   setAlternateNumber?: (val: string) => void;
   setHandoff: (updater: (curr: string) => string) => void;
   setNote: (val: string) => void;
-  onSwitch?: () => void;
-  onSaveToProfile?: () => void;
+  onOpenAddressBook?: () => void;
 };
 
 export function CheckoutAddressCard({
@@ -25,98 +23,88 @@ export function CheckoutAddressCard({
   address,
   addressDetails,
   alternateNumber,
+  savedAddressesCount = 0,
   handoff,
-  setAddress,
-  setAddressDetails,
-  setAlternateNumber,
   setHandoff,
   note,
+  setAlternateNumber,
   setNote,
-  onSwitch,
-  onSaveToProfile,
+  onOpenAddressBook,
 }: CheckoutAddressCardProps) {
-  const { getCurrentAddress, isLocating, error } = useGeolocation();
-
-  const handleGetCurrentLocation = async () => {
-    const addr = await getCurrentAddress();
-    if (addr) {
-      setAddress(addr);
-    } else if (error) {
-      alert(error);
-    }
-  };
-
   return (
     <div className="rounded-[32px] border border-[rgb(var(--border)/0.6)] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-      <div className="border-b border-[rgb(var(--border)/0.4)] px-6 py-7">
-        <div className="flex items-start gap-4">
-          <button 
-            type="button"
-            onClick={handleGetCurrentLocation}
-            disabled={isLocating}
-            className={cn(
-              "mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all active:scale-95",
-              isLocating ? "bg-slate-100" : "bg-[rgb(var(--brand-soft)/0.4)] text-[rgb(var(--brand))] hover:bg-[rgb(var(--brand-soft)/0.6)]"
-            )}
-          >
-            {isLocating ? <Loader2 className="h-5 w-5 animate-spin text-slate-400" /> : <MapPin className="h-5 w-5" />}
-          </button>
-          
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                  {addressTitle}
-                </span>
-                {onSwitch && (
-                  <button
-                    type="button"
-                    onClick={onSwitch}
-                    className="text-xs font-bold text-[rgb(var(--brand))] transition-colors hover:opacity-80"
-                  >
-                    Switch
-                  </button>
-                )}
-              </div>
-              
-              {onSaveToProfile && (
-                <button
-                  type="button"
-                  onClick={onSaveToProfile}
-                  className="flex items-center gap-1.5 rounded-full bg-[rgb(var(--brand-soft)/0.3)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[rgb(var(--brand))] transition-all hover:bg-[rgb(var(--brand-soft)/0.5)] active:scale-95"
-                >
-                  <Save className="h-3 w-3" />
-                  Save to Profile
-                </button>
-              )}
-            </div>
-
-            <textarea
-              rows={2}
-              value={address}
-              onChange={(event) => setAddress(event.target.value)}
-              className="mt-3 w-full resize-none border-none bg-transparent p-0 text-[15px] font-bold leading-relaxed text-[rgb(var(--ink))] outline-none placeholder:font-normal placeholder:text-slate-300"
-              placeholder="Your delivery address..."
-            />
-
-            <div className="mt-3 space-y-3">
-              <input
-                value={addressDetails}
-                onChange={(event) => setAddressDetails(event.target.value)}
-                placeholder="Flat/Office #"
-                className="w-full rounded-xl bg-slate-50 px-3 py-3.5 text-[13px] font-semibold text-[rgb(var(--ink))] outline-none ring-1 ring-slate-100 focus:ring-[rgb(var(--brand)/0.2)]"
-              />
-              <div className="flex w-full items-center gap-2 rounded-xl bg-slate-50 px-3 py-3.5 outline-none ring-1 ring-slate-100 focus-within:ring-[rgb(var(--brand)/0.2)]">
-                <Phone className="h-4 w-4 text-slate-400" />
-                <input
-                  value={alternateNumber || ''}
-                  onChange={(event) => setAlternateNumber?.(event.target.value)}
-                  placeholder="Alt. Mobile (Optional)"
-                  className="w-full bg-transparent text-[13px] font-semibold text-[rgb(var(--ink))] outline-none"
-                />
-              </div>
-            </div>
+      <div className="border-b border-[rgb(var(--border)/0.4)] px-6 py-6">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+              Delivery Address
+            </p>
+            <p className="mt-1 text-[12px] text-[rgb(var(--muted))]">
+              Choose from your saved profile addresses
+            </p>
           </div>
+          <span className="rounded-full bg-[rgb(var(--brand-soft)/0.3)] px-3 py-1 text-[11px] font-semibold text-[rgb(var(--brand))]">
+            {savedAddressesCount} saved
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={onOpenAddressBook}
+          className="flex w-full items-start gap-4 rounded-[24px] border border-[rgb(var(--border)/0.66)] bg-[rgb(var(--card-surface-muted)/0.72)] px-4 py-4 text-left transition-colors hover:bg-[rgb(var(--brand-soft)/0.16)]"
+        >
+          <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[rgb(var(--brand-soft)/0.4)] text-[rgb(var(--brand))]">
+            <MapPin className="h-5 w-5" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
+              Select delivery address
+            </p>
+            <p className="mt-1 text-sm font-semibold text-[rgb(var(--ink))]">
+              {addressTitle}
+            </p>
+            <p className="mt-1 text-sm leading-5 text-[rgb(var(--muted))]">
+              {address || 'Choose a saved address from your profile'}
+            </p>
+            {addressDetails ? (
+              <p className="mt-2 text-[12px] text-[rgb(var(--muted))]">
+                {addressDetails}
+              </p>
+            ) : null}
+            {alternateNumber ? (
+              <p className="mt-1 inline-flex items-center gap-1.5 text-[12px] font-medium text-[rgb(var(--muted))]">
+                <Phone className="h-3.5 w-3.5" />
+                {alternateNumber}
+              </p>
+            ) : null}
+          </div>
+
+          <ChevronRight className="mt-2 h-5 w-5 shrink-0 text-[rgb(var(--muted))]" />
+        </button>
+
+        <div className="mt-4 flex justify-end">
+          <Link
+            href="/profile/addresses"
+            className="text-[12px] font-semibold text-[rgb(var(--brand))] transition-opacity hover:opacity-80"
+          >
+            Manage addresses
+          </Link>
+        </div>
+      </div>
+
+      <div className="border-b border-[rgb(var(--border)/0.4)] px-6 py-5">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+          Contact Number
+        </p>
+        <div className="mt-3 flex items-center gap-2 rounded-[18px] border border-[rgb(var(--border)/0.72)] bg-[rgb(var(--card-surface-muted)/0.6)] px-4 py-3">
+          <Phone className="h-4 w-4 text-slate-400" />
+          <input
+            value={alternateNumber ?? ''}
+            onChange={(event) => setAlternateNumber?.(event.target.value)}
+            placeholder="Alt. number for this order (optional)"
+            className="w-full bg-transparent text-sm font-medium text-[rgb(var(--ink))] outline-none placeholder:text-slate-400"
+          />
         </div>
       </div>
 

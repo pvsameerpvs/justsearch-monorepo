@@ -54,7 +54,9 @@ export function useAddressBook() {
 
   const addAddress = (newAddr: Omit<SavedAddress, 'id'>) => {
     const id = Math.random().toString(36).substr(2, 9);
-    setAddresses(curr => [...curr, { ...newAddr, id }]);
+    const createdAddress = { ...newAddr, id };
+    setAddresses(curr => [...curr, createdAddress]);
+    return createdAddress;
   };
 
   const removeAddress = (id: string) => {
