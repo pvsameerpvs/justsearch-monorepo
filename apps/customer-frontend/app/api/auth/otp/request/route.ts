@@ -72,7 +72,11 @@ export async function POST(request: Request) {
 
   const payload: Record<string, unknown> = { requestId };
 
-  if (process.env.NODE_ENV !== 'production') {
+  const debugOtpEnabled =
+    process.env.NEXT_PUBLIC_DEBUG_OTP === 'true' ||
+    process.env.DEBUG_OTP === 'true';
+
+  if (debugOtpEnabled) {
     payload.demoOtp = otp;
   }
 
