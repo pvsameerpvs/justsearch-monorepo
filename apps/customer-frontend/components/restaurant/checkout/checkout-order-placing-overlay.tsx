@@ -1,7 +1,9 @@
 "use client";
+import { Check } from 'lucide-react';
 
 type CheckoutOrderPlacingOverlayProps = {
   progress: number;
+  isSuccess?: boolean;
 };
 
 const RADIUS = 54;
@@ -9,9 +11,11 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export function CheckoutOrderPlacingOverlay({
   progress,
+  isSuccess,
 }: CheckoutOrderPlacingOverlayProps) {
   const normalizedProgress = Math.min(1, Math.max(0, progress));
   const dashOffset = CIRCUMFERENCE * (1 - normalizedProgress);
+  const showSuccess = isSuccess || normalizedProgress >= 1;
 
   return (
     <div className="fixed inset-0 z-[10020] flex items-center justify-center bg-black/50 px-6 backdrop-blur-[3px]">
@@ -42,17 +46,23 @@ export function CheckoutOrderPlacingOverlay({
           </svg>
 
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex h-[78px] w-[78px] items-center justify-center rounded-full bg-black text-[36px] shadow-[0_12px_24px_rgba(15,23,42,0.25)]">
-              <span className="animate-pulse">🍔</span>
+            <div className={`flex h-[78px] w-[78px] items-center justify-center rounded-full text-[36px] shadow-[0_12px_24px_rgba(15,23,42,0.25)] transition-all duration-500 ${showSuccess ? 'bg-[rgb(var(--brand))] scale-110' : 'bg-black'}`}>
+              {showSuccess ? (
+                <Check className="h-10 w-10 text-white" strokeWidth={3} />
+              ) : (
+                <span className="animate-pulse">🍔</span>
+              )}
             </div>
           </div>
         </div>
 
-        <p className="mt-5 text-base font-semibold tracking-tight text-[rgb(var(--ink))]">
-          Placing your order
+        <p className={`mt-5 text-base font-semibold tracking-tight transition-colors duration-500 ${showSuccess ? 'text-[rgb(var(--brand))] uppercase tracking-[0.05em]' : 'text-[rgb(var(--ink))]'}`}>
+          {showSuccess ? 'Order placed!' : 'Placing your order'}
         </p>
         <p className="mt-1 text-[13px] leading-5 text-[rgb(var(--muted))]">
-          Please wait while we confirm with the restaurant.
+          {showSuccess 
+            ? 'Your order is being prepared by the restaurant.' 
+            : 'Please wait while we confirm with the restaurant.'}
         </p>
       </div>
     </div>

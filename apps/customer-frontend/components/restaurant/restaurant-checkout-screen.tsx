@@ -125,7 +125,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
     frameId = window.requestAnimationFrame(animate);
     const redirectTimer = window.setTimeout(() => {
       router.push(`/menu/checkout/status/${encodeURIComponent(placingOrder.orderId)}`);
-    }, ORDER_PLACING_DURATION_MS + 120);
+    }, ORDER_PLACING_DURATION_MS + 1000); // Give 1 second to see the "Order Placed!" state
 
     return () => {
       window.cancelAnimationFrame(frameId);
