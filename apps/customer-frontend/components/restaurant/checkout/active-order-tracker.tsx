@@ -44,6 +44,7 @@ export function ActiveOrderTracker() {
     <CheckoutLiveProgressCircle 
       progress={overallProgress}
       stageLabel={currentStageLabel}
+      orderId={activeOrder.id}
     />
   );
 }
