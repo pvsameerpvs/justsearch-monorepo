@@ -1,15 +1,8 @@
-"use client";
+import { ProfileOrdersScreen } from '@/components/restaurant/profile/orders/profile-orders-screen';
+import { getCurrentRestaurant } from '@/lib/restaurant-resolver';
 
-import { ProfileSectionLayout } from '@/components/restaurant/profile/profile-section-layout';
-import { ProfileOrderHistory } from '@/components/restaurant/profile/sections/profile-order-history';
+export default async function OrdersHistoryPage() {
+  const restaurant = await getCurrentRestaurant();
 
-export default function OrdersHistoryPage() {
-  return (
-    <ProfileSectionLayout 
-      title="Order History" 
-      description="View details of your past orders, track active deliveries, and reorder your favorites."
-    >
-      <ProfileOrderHistory />
-    </ProfileSectionLayout>
-  );
+  return <ProfileOrdersScreen restaurant={restaurant} />;
 }

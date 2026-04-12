@@ -344,6 +344,7 @@ export function useRestaurantFulfillment(restaurant: Restaurant) {
   };
 
   return {
+    hydrated,
     mode: state.mode,
     setMode,
     cart,

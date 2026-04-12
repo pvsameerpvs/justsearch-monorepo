@@ -72,9 +72,7 @@ export async function POST(request: Request) {
 
   const payload: Record<string, unknown> = { requestId };
 
-  // PROFESSIONAL DEPLOYMENT: 
-  // Allow debugging OTP on Vercel if this specific toggle is set to 'true'
-  if (process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_DEBUG_OTP === 'true') {
+  if (process.env.NODE_ENV !== 'production') {
     payload.demoOtp = otp;
   }
 
