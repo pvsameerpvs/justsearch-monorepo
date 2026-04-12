@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ButtonLink } from '@/components/shared/button-link';
 import { Container } from '@/components/shared/container';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -10,10 +11,13 @@ import type { Restaurant } from '@/lib/restaurant-types';
 /* Modular Components Imported from the Checkout Folder */
 import { CheckoutAddressCard } from './checkout/checkout-address-card';
 import { CheckoutAddressSelectorSheet } from './checkout/checkout-address-selector-sheet';
+import { CheckoutOrderPlacingOverlay } from './checkout/checkout-order-placing-overlay';
 import { CheckoutSummaryCard } from './checkout/checkout-summary-card';
 import { CheckoutStickyFooter } from './checkout/checkout-sticky-footer';
 import { useRestaurantFulfillment } from './use-restaurant-fulfillment';
 import { type SavedAddress, useAddressBook } from './use-address-book';
+
+const ORDER_PLACING_DURATION_MS = 2800;
 
 function getCheckoutLineTotal(item: {
   price: number;
@@ -24,8 +28,8 @@ function getCheckoutLineTotal(item: {
 }
 
 export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restaurant }) {
+  const router = useRouter();
   const {
-    setMode,
     cart,
     cartCount,
     total,
@@ -48,6 +52,11 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
   const [promoCode, setPromoCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
+  const [placingOrder, setPlacingOrder] = useState<{
+    orderId: string;
+    startedAt: number;
+  } | null>(null);
+  const [placingProgress, setPlacingProgress] = useState(0);
 
   const applySavedAddress = (savedAddress: SavedAddress) => {
     setSelectedAddressId(savedAddress.id);
@@ -96,8 +105,38 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
   const displayTotal = total;
   const displaySavings = deliverySavings;
 
+  useEffect(() => {
+    if (!placingOrder) {
+      setPlacingProgress(0);
+      return;
+    }
+
+    let frameId = 0;
+    const animate = () => {
+      const elapsed = Date.now() - placingOrder.startedAt;
+      const nextProgress = Math.min(1, elapsed / ORDER_PLACING_DURATION_MS);
+      setPlacingProgress(nextProgress);
+
+      if (nextProgress < 1) {
+        frameId = window.requestAnimationFrame(animate);
+      }
+    };
+
+    frameId = window.requestAnimationFrame(animate);
+    const redirectTimer = window.setTimeout(() => {
+      router.push(`/menu/checkout/status/${encodeURIComponent(placingOrder.orderId)}`);
+    }, ORDER_PLACING_DURATION_MS + 120);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(redirectTimer);
+    };
+  }, [placingOrder, router]);
+
   const onPlaceOrder = () => {
-    setMode('delivery');
+    if (placingOrder) {
+      return;
+    }
 
     const combinedAddress = `${addressTitle} - ${address}\n${addressDetails}${alternateNumber ? `\nAlt number: ${alternateNumber}` : ''}\n${handoff}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
     const orderId = placeOrder({
@@ -112,10 +151,14 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
 
     setError(null);
     setPlacedOrderId(orderId);
+    setPlacingOrder({
+      orderId,
+      startedAt: Date.now(),
+    });
   };
 
   /* Empty State View */
-  if (cartCount === 0) {
+  if (cartCount === 0 && !placingOrder) {
     return (
       <section className="py-8 sm:py-10">
         <Container className="max-w-3xl">
@@ -180,6 +223,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         error={error}
         latestOrderId={placedOrderId}
         cartCount={cartCount}
+        isPlacing={Boolean(placingOrder)}
         onPlaceOrder={onPlaceOrder}
       />
 
@@ -195,6 +239,10 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         }}
         onUseCurrentLocation={applyCurrentLocationAddress}
       />
+
+      {placingOrder ? (
+        <CheckoutOrderPlacingOverlay progress={placingProgress} />
+      ) : null}
     </section>
   );
 }

@@ -34,6 +34,10 @@ function getHeaderTitle(pathname: string) {
     return routeTitles[pathname];
   }
 
+  if (pathname.startsWith('/menu/checkout/status/')) {
+    return 'Order Status';
+  }
+
   if (pathname.startsWith('/profile/')) {
     if (pathname.startsWith('/profile/orders/')) {
       return 'Order Summary';
@@ -51,6 +55,10 @@ function getHeaderTitle(pathname: string) {
 }
 
 function getBackHref(pathname: string) {
+  if (pathname.startsWith('/menu/checkout/status/')) {
+    return '/menu/checkout';
+  }
+
   if (pathname.startsWith('/profile/orders/')) {
     return '/profile/orders';
   }

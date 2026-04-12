@@ -22,6 +22,7 @@ type StoredOrder = {
   address: string;
   note: string;
   riderName: string;
+  riderPhone?: string;
   subtotal: number;
   deliveryFee: number;
   deliverySavings?: number;
@@ -44,8 +45,8 @@ export type DeliveryOrder = StoredOrder & {
 
 const STORAGE_PREFIX = 'justsearch:restaurant:fulfillment';
 const DELIVERY_BASE_FEE = 7;
-const STATUS_CONFIRMED_MS = 2 * 60 * 1000;
-const STATUS_ASSIGNED_MS = 6 * 60 * 1000;
+export const ORDER_STATUS_ASSIGNED_DELIVERY_BOY_MS = 2 * 60 * 1000;
+export const ORDER_STATUS_DELIVERED_MS = 6 * 60 * 1000;
 const DEFAULT_RIDER_NAME = 'Delivery Rider';
 
 function getStorageKey(restaurantSlug: string) {
@@ -85,6 +86,8 @@ function isStoredOrder(value: unknown): value is StoredOrder {
     typeof candidate.address === 'string' &&
     typeof candidate.note === 'string' &&
     typeof candidate.riderName === 'string' &&
+    (typeof candidate.riderPhone === 'undefined' ||
+      typeof candidate.riderPhone === 'string') &&
     typeof candidate.subtotal === 'number' &&
     typeof candidate.deliveryFee === 'number' &&
     (typeof candidate.deliverySavings === 'undefined' ||
@@ -147,14 +150,19 @@ function buildRiderName(restaurantName: string) {
   return shortName ? `${shortName} Rider` : DEFAULT_RIDER_NAME;
 }
 
+function buildRiderPhone() {
+  const tail = Math.floor(1000000 + Math.random() * 9000000);
+  return `+971 5${tail}`;
+}
+
 function buildOrderStatus(createdAt: number, now: number): DeliveryOrderStatus {
   const elapsed = now - createdAt;
 
-  if (elapsed >= STATUS_ASSIGNED_MS) {
+  if (elapsed >= ORDER_STATUS_DELIVERED_MS) {
     return 'delivered';
   }
 
-  if (elapsed >= STATUS_CONFIRMED_MS) {
+  if (elapsed >= ORDER_STATUS_ASSIGNED_DELIVERY_BOY_MS) {
     return 'assigned_delivery_boy';
   }
 
@@ -327,6 +335,7 @@ export function useRestaurantFulfillment(restaurant: Restaurant) {
       address: trimmedAddress,
       note: trimmedNote,
       riderName: buildRiderName(restaurant.name),
+      riderPhone: buildRiderPhone(),
       subtotal,
       deliveryFee: 0,
       deliverySavings: DELIVERY_BASE_FEE,
