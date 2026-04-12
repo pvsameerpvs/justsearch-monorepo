@@ -14,22 +14,23 @@ const spaceGrotesk = Space_Grotesk({
   variable: '--font-display',
 });
 
-export const metadata = {
-  title: 'JustSearch Restaurant Activity | Customer Frontend',
-  description:
-    'Public restaurant browsing with menu, eat-play, Google reviews, and social media routes.',
-};
+import { getCurrentRestaurant } from '@/lib/restaurant-resolver';
+import { RestaurantProvider } from '@/components/restaurant/restaurant-context';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: ReactNode;
 }) {
+  const restaurant = await getCurrentRestaurant();
+
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className={inter.className}>
         <AppShell>
-          <RestaurantLayoutManager>{children}</RestaurantLayoutManager>
+          <RestaurantProvider restaurant={restaurant}>
+            <RestaurantLayoutManager>{children}</RestaurantLayoutManager>
+          </RestaurantProvider>
         </AppShell>
       </body>
     </html>

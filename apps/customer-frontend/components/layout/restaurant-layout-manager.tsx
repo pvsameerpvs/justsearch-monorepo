@@ -6,6 +6,7 @@ import { RestaurantMobileNav } from '@/components/restaurant/restaurant-mobile-n
 import { RegistrationProvider } from '@/components/auth/registration-context';
 import { RegistrationModal } from '@/components/auth/registration-modal';
 import { RegistrationRouteGuard } from '@/components/auth/registration-route-guard';
+import { ActiveOrderTracker } from '@/components/restaurant/checkout/active-order-tracker';
 import type { ReactNode } from 'react';
 
 type RestaurantLayoutManagerProps = {
@@ -23,7 +24,12 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
   return (
     <RegistrationProvider>
       <RegistrationRouteGuard />
-      {showRestaurantChrome && <RestaurantMobileHeader />}
+      {showRestaurantChrome && (
+        <>
+          <RestaurantMobileHeader />
+          <ActiveOrderTracker />
+        </>
+      )}
       {showBottomNav && <RestaurantMobileNav />}
       {children}
       <RegistrationModal />
