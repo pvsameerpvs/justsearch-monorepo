@@ -25,11 +25,12 @@ export function CheckoutLiveProgressCircle({
   const isDone = primaryOrder.progress >= 1;
 
   const content = (
-    <div className="relative h-20 w-20">
-      <div className="absolute inset-0 rounded-full bg-white/80 p-1 shadow-2xl backdrop-blur-md">
+    <div className="relative h-16 w-16">
+      <div className="absolute inset-0 rounded-full bg-white/80 shadow-2xl backdrop-blur-md">
         <MultiOrderCircularProgress 
           orders={orders} 
-          radii={[28, 22, 16, 10]} 
+          radii={[30, 24, 18, 12]} 
+          viewBox={64}
           size={undefined} // rely on className
           className="h-full w-full"
         />
@@ -38,12 +39,12 @@ export function CheckoutLiveProgressCircle({
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         {isDone ? (
           <div className="rounded-full bg-green-500 p-1 text-white">
-            <Check className="h-5 w-5" strokeWidth={3} />
+            <Check className="h-4 w-4" strokeWidth={3} />
           </div>
         ) : (
           <AnimatedStatusEmoji 
             isOnTheWay={primaryOrder.isOnTheWay} 
-            className="text-2xl" 
+            className="text-xl" 
           />
         )}
       </div>
