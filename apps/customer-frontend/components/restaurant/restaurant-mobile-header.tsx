@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { ArrowLeft, User } from 'lucide-react';
+import { useSmartBackNavigation } from '@/components/layout/use-smart-back-navigation';
 import { useMeasuredCssVarHeight } from '@/components/layout/use-measured-css-var-height';
 
 const routeTitles: Record<string, string> = {
@@ -13,6 +14,8 @@ const routeTitles: Record<string, string> = {
   '/google-reviews': 'Reviews',
   '/social-media': 'Social',
   '/profile': 'Profile',
+  '/profile/addresses': 'Addresses',
+  '/profile/orders': 'Orders',
   '/profile/points': 'Points',
   '/profile/rewards': 'Rewards',
   '/profile/how-to-play': 'How to Play',
@@ -32,6 +35,10 @@ function getHeaderTitle(pathname: string) {
   }
 
   if (pathname.startsWith('/profile/')) {
+    if (pathname.startsWith('/profile/orders/')) {
+      return 'Order Summary';
+    }
+
     return 'Profile';
   }
 
@@ -44,6 +51,10 @@ function getHeaderTitle(pathname: string) {
 }
 
 function getBackHref(pathname: string) {
+  if (pathname.startsWith('/profile/orders/')) {
+    return '/profile/orders';
+  }
+
   if (pathname.startsWith('/menu/')) {
     return '/menu';
   }
@@ -65,6 +76,7 @@ export function RestaurantMobileHeader() {
 
   const title = useMemo(() => getHeaderTitle(pathname), [pathname]);
   const backHref = useMemo(() => getBackHref(pathname), [pathname]);
+  const goBack = useSmartBackNavigation(pathname, backHref);
 
   return (
     <div
@@ -73,13 +85,14 @@ export function RestaurantMobileHeader() {
     >
       <div className="px-3 pb-3 pt-[calc(env(safe-area-inset-top,0px)+12px)]">
         <div className="flex items-center justify-between gap-3 rounded-[28px] border border-[rgb(var(--border)/0.9)] bg-white/85 px-4 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.10)] backdrop-blur-3xl">
-          <Link
-            href={backHref}
+          <button
+            type="button"
+            onClick={goBack}
             className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[rgb(var(--border)/0.9)] bg-white/70 text-[rgb(var(--ink))] shadow-sm transition-all active:scale-90"
             aria-label="Back"
           >
             <ArrowLeft className="h-5 w-5" />
-          </Link>
+          </button>
 
           <div className="min-w-0 flex-1 text-center">
             <p className="truncate text-sm font-bold tracking-tight text-[rgb(var(--ink))]">
