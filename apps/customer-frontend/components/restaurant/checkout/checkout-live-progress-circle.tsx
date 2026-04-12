@@ -4,25 +4,25 @@ import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { AnimatedStatusEmoji } from './animated-status-emoji';
 import { MultiOrderCircularProgress } from './multi-order-circular-progress';
-
-type ActiveOrderInfo = {
-  id: string;
-  progress: number;
-  stageLabel: string;
-  createdAt: number;
-  isOnTheWay: boolean;
-};
+import {
+  type CheckoutActiveOrderSummary,
+  getCheckoutStatusHref,
+} from './checkout-live-status-utils';
 
 type CheckoutLiveProgressCircleProps = {
-  orders: ActiveOrderInfo[];
+  orders: CheckoutActiveOrderSummary[];
 };
 
 export function CheckoutLiveProgressCircle({
   orders,
 }: CheckoutLiveProgressCircleProps) {
+  if (orders.length === 0) {
+    return null;
+  }
+
   const primaryOrder = orders[0];
-  const latestOrder = [...orders].sort((a, b) => b.createdAt - a.createdAt)[0];
   const isDone = primaryOrder.progress >= 1;
+  const statusHref = getCheckoutStatusHref(orders.map((order) => order.id));
 
   const content = (
     <div className="relative h-16 w-16">
@@ -53,9 +53,9 @@ export function CheckoutLiveProgressCircle({
 
   return (
     <div className="fixed bottom-[calc(var(--restaurant-mobile-nav-height,0px)+24px)] right-6 z-[10000] transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
-      {latestOrder?.id ? (
+      {statusHref ? (
         <Link 
-          href={`/menu/checkout/status/${latestOrder.id}`}
+          href={statusHref}
           className="block transition-transform hover:scale-105 active:scale-95"
         >
           {content}

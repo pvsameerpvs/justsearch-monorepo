@@ -2,6 +2,7 @@
 
 import {
   ORDER_STATUS_DELIVERED_MS,
+  type DeliveryOrder,
   type DeliveryOrderStatus,
 } from '../use-restaurant-fulfillment';
 
@@ -14,6 +15,12 @@ export type CheckoutLiveStage = {
 export const CHECKOUT_STAGE_READY_MS = 90 * 1000;
 export const CHECKOUT_STAGE_ASSIGNED_MS = 3 * 60 * 1000;
 export const CHECKOUT_STAGE_COMPLETED_MS = ORDER_STATUS_DELIVERED_MS;
+
+export type CheckoutActiveOrderSummary = {
+  id: string;
+  progress: number;
+  isOnTheWay: boolean;
+};
 
 export function getCheckoutStageIndex(
   createdAt: number,
@@ -62,6 +69,26 @@ export function getCheckoutLiveStages(riderName: string): CheckoutLiveStage[] {
   ];
 }
 
+export function getActiveCheckoutOrders(
+  orders: DeliveryOrder[],
+  now: number,
+) {
+  return orders
+    .filter((order) => getCheckoutStageIndex(order.createdAt, now, order.status) < 3)
+    .sort((a, b) => a.createdAt - b.createdAt);
+}
+
+export function getCheckoutOrderSummaries(
+  orders: DeliveryOrder[],
+  now: number,
+): CheckoutActiveOrderSummary[] {
+  return getActiveCheckoutOrders(orders, now).map((order) => ({
+    id: order.id,
+    progress: Math.min(1, (now - order.createdAt) / CHECKOUT_STAGE_COMPLETED_MS),
+    isOnTheWay: !!order.riderName,
+  }));
+}
+
 export function buildFallbackRiderPhone(orderId: string) {
   const digits = orderId.replace(/\D/g, '');
   const seeded = digits.slice(-7).padStart(7, '4');
@@ -77,4 +104,16 @@ export function formatOrderStageEta(createdAt: number) {
   const hh = etaDate.getHours().toString().padStart(2, '0');
   const mm = etaDate.getMinutes().toString().padStart(2, '0');
   return `${hh}:${mm}`;
+}
+
+export function getCheckoutStatusHref(orderIds: string[]) {
+  if (orderIds.length === 0) {
+    return null;
+  }
+
+  if (orderIds.length > 1) {
+    return '/menu/checkout/status';
+  }
+
+  return `/menu/checkout/status/${encodeURIComponent(orderIds[0])}`;
 }

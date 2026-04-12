@@ -10,6 +10,7 @@ import { useMeasuredCssVarHeight } from '@/components/layout/use-measured-css-va
 const routeTitles: Record<string, string> = {
   '/menu': 'Menu',
   '/menu/checkout': 'Checkout',
+  '/menu/checkout/status': 'Order Status',
   '/eat-play': 'Games',
   '/google-reviews': 'Reviews',
   '/social-media': 'Social',
@@ -56,6 +57,10 @@ function getHeaderTitle(pathname: string) {
 
 function getBackHref(pathname: string) {
   if (pathname.startsWith('/menu/checkout/status/')) {
+    return '/menu/checkout/status';
+  }
+
+  if (pathname === '/menu/checkout/status') {
     return '/';
   }
 
@@ -87,7 +92,7 @@ export function RestaurantMobileHeader() {
   const backHref = useMemo(() => getBackHref(pathname), [pathname]);
   const smartBack = useSmartBackNavigation(pathname, backHref);
 
-  const goBack = pathname.startsWith('/menu/checkout/status/')
+  const goBack = pathname.startsWith('/menu/checkout/status')
     ? () => router.push(backHref)
     : smartBack;
 

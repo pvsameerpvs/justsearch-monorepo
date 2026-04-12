@@ -17,7 +17,7 @@ import { CheckoutStickyFooter } from './checkout/checkout-sticky-footer';
 import { useRestaurantFulfillment } from './use-restaurant-fulfillment';
 import { type SavedAddress, useAddressBook } from './use-address-book';
 
-const ORDER_PLACING_DURATION_MS = 2800;
+const ORDER_PLACING_DURATION_MS = 1800;
 
 function getCheckoutLineTotal(item: {
   price: number;

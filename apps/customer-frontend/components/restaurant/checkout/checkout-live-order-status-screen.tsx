@@ -100,6 +100,18 @@ export function CheckoutLiveOrderStatusScreen({
   const addressLines = splitAddress(order.address);
   const riderPhone = order.riderPhone ?? buildFallbackRiderPhone(order.id);
   const telValue = normalizeTelValue(riderPhone);
+  const headline =
+    stageIndex === 3
+      ? 'Order delivered'
+      : stageIndex === 2
+        ? 'Delivery boy assigned'
+        : 'Order placed';
+  const supportText =
+    stageIndex === 3
+      ? 'Delivered successfully.'
+      : stageIndex === 0
+        ? 'We received your order and are sending it to the restaurant.'
+        : `Estimated arrival around ${formatOrderStageEta(order.createdAt)}`;
 
   return (
     <section className="py-4 sm:py-6">
@@ -112,21 +124,11 @@ export function CheckoutLiveOrderStatusScreen({
                   Order #{order.id}
                 </p>
                 <h2 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[rgb(var(--ink))]">
-                  {stageIndex === 3
-                    ? 'Order delivered'
-                    : stageIndex === 2
-                      ? 'Delivery boy assigned'
-                      : 'Order in progress'}
+                  {headline}
                 </h2>
-                {stageIndex === 3 ? (
-                  <p className="mt-1 text-[12px] text-[rgb(var(--muted))]">
-                    Delivered successfully.
-                  </p>
-                ) : (
-                  <p className="mt-1 text-[12px] text-[rgb(var(--muted))]">
-                    Estimated arrival around {formatOrderStageEta(order.createdAt)}
-                  </p>
-                )}
+                <p className="mt-1 text-[12px] text-[rgb(var(--muted))]">
+                  {supportText}
+                </p>
               </div>
 
               <Link

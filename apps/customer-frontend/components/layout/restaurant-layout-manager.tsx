@@ -19,7 +19,7 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
   const showRestaurantChrome = pathname !== '/';
   const hideBottomNavOnCheckout =
     pathname === '/menu/checkout' || pathname.startsWith('/menu/checkout/');
-  const hideTrackerOnStatusPage = pathname.includes('/menu/checkout/status/');
+  const hideTrackerOnStatusPage = pathname.startsWith('/menu/checkout/status');
   
   const showBottomNav = showRestaurantChrome && !hideBottomNavOnCheckout;
   const showOrderTracker = showRestaurantChrome && !hideTrackerOnStatusPage;
