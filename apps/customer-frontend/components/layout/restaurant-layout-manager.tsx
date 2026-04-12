@@ -16,12 +16,15 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
   const pathname = usePathname();
   
   const showRestaurantChrome = pathname !== '/';
+  const hideBottomNavOnCheckout =
+    pathname === '/menu/checkout' || pathname.startsWith('/menu/checkout/');
+  const showBottomNav = showRestaurantChrome && !hideBottomNavOnCheckout;
 
   return (
     <RegistrationProvider>
       <RegistrationRouteGuard />
       {showRestaurantChrome && <RestaurantMobileHeader />}
-      {showRestaurantChrome && <RestaurantMobileNav />}
+      {showBottomNav && <RestaurantMobileNav />}
       {children}
       <RegistrationModal />
     </RegistrationProvider>
