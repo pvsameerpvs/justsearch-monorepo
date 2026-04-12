@@ -2,16 +2,26 @@
 
 import { useState } from 'react';
 
+export type GeolocationCoordinates = {
+  latitude: number;
+  longitude: number;
+};
+
+export type GeolocationResult = {
+  address: string | null;
+  coords: GeolocationCoordinates | null;
+};
+
 export function useGeolocation() {
   const [isLocating, setIsLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getCurrentAddress = async (): Promise<string | null> => {
+  const getCurrentLocation = async (): Promise<GeolocationResult> => {
     const HERE_API_KEY = process.env.NEXT_PUBLIC_HERE_API_KEY;
 
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser.");
-      return null;
+      return { address: null, coords: null };
     }
 
     setIsLocating(true);
@@ -38,7 +48,10 @@ export function useGeolocation() {
             if ((!revRes.ok && !discRes.ok) || !HERE_API_KEY) {
               const fallbackRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=en`);
               const fallbackData = await fallbackRes.json();
-              resolve(fallbackData.display_name || null);
+              resolve({
+                address: fallbackData.display_name || null,
+                coords: { latitude, longitude },
+              });
               return;
             }
 
@@ -60,14 +73,20 @@ export function useGeolocation() {
               if (addr.city) parts.push(addr.city);
               
               const uniqueParts = Array.from(new Set(parts));
-              resolve(uniqueParts.join(', '));
+              resolve({
+                address: uniqueParts.join(', '),
+                coords: { latitude, longitude },
+              });
             } else {
-              resolve(buildingName || null);
+              resolve({
+                address: buildingName || null,
+                coords: { latitude, longitude },
+              });
             }
           } catch (err) {
             console.error("Location error:", err);
             setError("Failed to resolve address.");
-            resolve(null);
+            resolve({ address: null, coords: null });
           } finally {
             setIsLocating(false);
           }
@@ -79,12 +98,17 @@ export function useGeolocation() {
           else if (err.code === 2) msg = "Location unavailable.";
           else if (err.code === 3) msg = "Request timed out.";
           setError(msg);
-          resolve(null);
+          resolve({ address: null, coords: null });
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     });
   };
 
-  return { getCurrentAddress, isLocating, error };
+  const getCurrentAddress = async (): Promise<string | null> => {
+    const result = await getCurrentLocation();
+    return result.address;
+  };
+
+  return { getCurrentAddress, getCurrentLocation, isLocating, error };
 }

@@ -3,10 +3,11 @@
 import { Loader2, MapPin, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { EmptyState } from '@/components/shared/empty-state';
-import { useGeolocation } from '../use-geolocation';
+import { useGeolocation, type GeolocationCoordinates } from '../use-geolocation';
 import type { SavedAddress } from '../use-address-book';
 import { CheckoutAddAddressForm } from './checkout-add-address-form';
 import { CheckoutAddressSelectorItem } from './checkout-address-selector-item';
+import { CheckoutMapAddressPicker } from './checkout-map-address-picker';
 
 type CheckoutAddressSelectorSheetProps = {
   open: boolean;
@@ -27,52 +28,75 @@ export function CheckoutAddressSelectorSheet({
   onAddAddress,
   onUseCurrentLocation,
 }: CheckoutAddressSelectorSheetProps) {
-  const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [mode, setMode] = useState<'list' | 'map' | 'add'>('list');
+  const [mapSelection, setMapSelection] = useState<{ type: 'pinned' } | { type: 'saved'; id: string }>({ type: 'pinned' });
   const [currentLocationAddress, setCurrentLocationAddress] = useState<string | null>(null);
-  const { getCurrentAddress, isLocating, error } = useGeolocation();
+  const [currentLocationCoords, setCurrentLocationCoords] = useState<GeolocationCoordinates | null>(null);
+  const { getCurrentLocation, isLocating, error } = useGeolocation();
 
   useEffect(() => {
     if (open) {
       return;
     }
 
-    setIsAddingAddress(false);
+    setMode('list');
+    setMapSelection({ type: 'pinned' });
     setCurrentLocationAddress(null);
+    setCurrentLocationCoords(null);
   }, [open]);
 
   if (!open) {
     return null;
   }
 
-  const normalizeAddress = (value: string) =>
-    value
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .replace(/,/g, '')
-      .trim();
+  const getFallbackPinnedAddress = () => {
+    const selectedAddress =
+      addresses.find((address) => address.id === selectedAddressId) ??
+      addresses[0];
+
+    return selectedAddress?.address ?? 'Pinned delivery location';
+  };
+
+  const openMapMode = ({
+    address,
+    coords,
+  }: {
+    address: string;
+    coords: GeolocationCoordinates | null;
+  }) => {
+    setCurrentLocationAddress(address);
+    setCurrentLocationCoords(coords);
+    setMapSelection({ type: 'pinned' });
+    setMode('map');
+  };
 
   const handleUseCurrentLocation = async () => {
-    const resolvedAddress = await getCurrentAddress();
+    const result = await getCurrentLocation();
+    const resolvedAddress = result.address;
 
     if (resolvedAddress) {
-      const matchingSavedAddress = addresses.find(
-        (address) =>
-          normalizeAddress(address.address) === normalizeAddress(resolvedAddress),
-      );
-
-      if (matchingSavedAddress) {
-        onSelectAddress(matchingSavedAddress);
-        onClose();
-        return;
-      }
-
-      setCurrentLocationAddress(resolvedAddress);
+      openMapMode({
+        address: resolvedAddress,
+        coords: result.coords,
+      });
       return;
     }
 
     if (error) {
       alert(error);
     }
+
+    openMapMode({
+      address: getFallbackPinnedAddress(),
+      coords: null,
+    });
+  };
+
+  const handleOpenMapChooser = () => {
+    openMapMode({
+      address: currentLocationAddress ?? getFallbackPinnedAddress(),
+      coords: currentLocationCoords ?? null,
+    });
   };
 
   return (
@@ -96,19 +120,60 @@ export function CheckoutAddressSelectorSheet({
           </button>
 
           <div className="px-5 pb-[calc(env(safe-area-inset-bottom,0px)+20px)] pt-5 sm:px-6">
-            {isAddingAddress ? (
+            {mode === 'add' ? (
               <CheckoutAddAddressForm
                 initialAddress={currentLocationAddress ?? undefined}
                 onSave={(address) => {
                   onAddAddress(address);
-                  setIsAddingAddress(false);
+                  setMode('list');
                   setCurrentLocationAddress(null);
+                  setCurrentLocationCoords(null);
                   onClose();
                 }}
                 onCancel={() => {
-                  setIsAddingAddress(false);
-                  setCurrentLocationAddress(null);
+                  setMode(currentLocationAddress ? 'map' : 'list');
                 }}
+              />
+            ) : mode === 'map' && currentLocationAddress ? (
+              <CheckoutMapAddressPicker
+                pinnedAddress={currentLocationAddress}
+                pinnedCoords={currentLocationCoords}
+                addresses={addresses}
+                selection={mapSelection}
+                isLocating={isLocating}
+                onLocateMe={handleUseCurrentLocation}
+                onSelectPinned={() => setMapSelection({ type: 'pinned' })}
+                onSelectSaved={(id) => setMapSelection({ type: 'saved', id })}
+                onUsePinnedForOrder={() => {
+                  onUseCurrentLocation(currentLocationAddress);
+                  onClose();
+                }}
+                onPinnedLocationChange={(address, coords) => {
+                  setCurrentLocationAddress(address);
+                  setCurrentLocationCoords(coords);
+                  setMapSelection({ type: 'pinned' });
+                }}
+                onPrimaryAction={() => {
+                  if (mapSelection.type === 'saved') {
+                    const selectedAddress = addresses.find(
+                      (address) => address.id === mapSelection.id,
+                    );
+
+                    if (selectedAddress) {
+                      onSelectAddress(selectedAddress);
+                      onClose();
+                    }
+
+                    return;
+                  }
+
+                  setMode('add');
+                }}
+                primaryActionLabel={
+                  mapSelection.type === 'saved'
+                    ? 'Deliver to selected address'
+                    : 'Add address details'
+                }
               />
             ) : addresses.length === 0 ? (
               <EmptyState
@@ -116,14 +181,24 @@ export function CheckoutAddressSelectorSheet({
                 description="Add an address in your profile to use it quickly at checkout."
                 className="rounded-[24px] p-6"
                 action={
-                  <button
-                    type="button"
-                    onClick={() => setIsAddingAddress(true)}
-                    className="inline-flex items-center gap-2 rounded-full bg-[rgb(var(--brand))] px-4 py-2.5 text-sm font-semibold text-white"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add delivery address
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleUseCurrentLocation}
+                      className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--brand)/0.3)] bg-white px-4 py-2.5 text-sm font-semibold text-[rgb(var(--brand))]"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Choose location on map
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMode('add')}
+                      className="inline-flex items-center gap-2 rounded-full bg-[rgb(var(--brand))] px-4 py-2.5 text-sm font-semibold text-white"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add delivery address
+                    </button>
+                  </div>
                 }
               />
             ) : (
@@ -150,35 +225,18 @@ export function CheckoutAddressSelectorSheet({
                     {isLocating ? 'Locating...' : 'Use current location'}
                   </button>
 
-                  {currentLocationAddress ? (
-                    <div className="mt-3 rounded-[20px] border border-[rgb(var(--brand)/0.24)] bg-[rgb(var(--brand-soft)/0.28)] p-3.5">
-                      <p className="text-sm font-semibold text-[rgb(var(--brand))]">
-                        Current location detected
-                      </p>
-                      <p className="mt-1 text-[13px] leading-5 text-[rgb(var(--muted))]">
-                        {currentLocationAddress}
-                      </p>
-                      <div className="mt-3 flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            onUseCurrentLocation(currentLocationAddress);
-                            onClose();
-                          }}
-                          className="flex-1 rounded-full border border-[rgb(var(--brand)/0.3)] bg-white px-3 py-2 text-[12px] font-semibold text-[rgb(var(--brand))]"
-                        >
-                          Use for this order
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingAddress(true)}
-                          className="flex-1 rounded-full bg-[rgb(var(--brand))] px-3 py-2 text-[12px] font-semibold text-white"
-                        >
-                          Save as address
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
+                  <button
+                    type="button"
+                    onClick={handleOpenMapChooser}
+                    className="ml-2 mt-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--brand)/0.3)] bg-white px-3 py-2 text-[12px] font-semibold text-[rgb(var(--brand))] transition-colors hover:bg-[rgb(var(--brand-soft)/0.2)]"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Choose location on map
+                  </button>
+
+                  <p className="mt-2 text-[12px] font-medium text-[rgb(var(--muted))]">
+                    If location is different from your saved addresses, we will open map choose mode.
+                  </p>
                 </div>
 
                 <div className="max-h-[52vh] space-y-3 overflow-y-auto pb-4">
@@ -198,7 +256,11 @@ export function CheckoutAddressSelectorSheet({
                 <div className="border-t border-[rgb(var(--border)/0.7)] pt-4">
                   <button
                     type="button"
-                    onClick={() => setIsAddingAddress(true)}
+                    onClick={() => {
+                      setCurrentLocationAddress(null);
+                      setCurrentLocationCoords(null);
+                      setMode('add');
+                    }}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[rgb(var(--brand))] px-5 py-4 text-base font-semibold text-white shadow-[0_10px_24px_rgba(15,118,110,0.22)] transition-transform active:scale-[0.99]"
                   >
                     <Plus className="h-4 w-4" />
