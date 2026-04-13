@@ -8,6 +8,7 @@ import { useRestaurantFulfillment } from '../use-restaurant-fulfillment';
 import { ScratchCard } from './scratch-card';
 import { getNextScratchRewardCandidate } from './reward-offers';
 import { getRewardSeenKey, writeBooleanStorage } from './reward-storage';
+import { RewardTeaserCard } from './reward-teaser-card';
 import { useVoucherWallet } from './use-voucher-wallet';
 import type { ScratchReward } from './reward-types';
 
@@ -16,7 +17,8 @@ export function RewardManager() {
   const { hydrated, orders } = useRestaurantFulfillment();
   const { addPoints } = useLoyaltyPoints();
   const { addVoucher } = useVoucherWallet();
-  const [activeReward, setActiveReward] = useState<ScratchReward | null>(null);
+  const [pendingReward, setPendingReward] = useState<ScratchReward | null>(null);
+  const [isScratchOpen, setIsScratchOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -30,14 +32,19 @@ export function RewardManager() {
   }, [hydrated, orders, now, user]);
 
   useEffect(() => {
-    if (activeReward || !nextRewardCandidate) return;
+    if (pendingReward || !nextRewardCandidate) return;
 
     const timer = window.setTimeout(() => {
-      setActiveReward(nextRewardCandidate.reward);
+      setPendingReward(nextRewardCandidate.reward);
     }, nextRewardCandidate.delayMs);
 
     return () => window.clearTimeout(timer);
-  }, [activeReward, nextRewardCandidate?.reward.id]);
+  }, [nextRewardCandidate?.reward.id, pendingReward?.id]);
+
+  const openScratchCard = useCallback(() => {
+    if (!pendingReward) return;
+    setIsScratchOpen(true);
+  }, [pendingReward]);
 
   const claimReward = useCallback(
     (reward: ScratchReward) => {
@@ -65,21 +72,30 @@ export function RewardManager() {
   );
 
   const closeReward = useCallback(() => {
-    if (activeReward) {
-      writeBooleanStorage(getRewardSeenKey(activeReward.id), true);
-      if (activeReward.trigger === 'welcome') {
+    if (pendingReward) {
+      writeBooleanStorage(getRewardSeenKey(pendingReward.id), true);
+      if (pendingReward.trigger === 'welcome') {
         clearFreshRegistration();
       }
     }
 
-    setActiveReward(null);
-  }, [activeReward]);
+    setIsScratchOpen(false);
+    setPendingReward(null);
+  }, [pendingReward]);
 
   return (
     <AnimatePresence>
-      {activeReward ? (
+      {pendingReward && !isScratchOpen ? (
+        <RewardTeaserCard
+          reward={pendingReward}
+          onOpen={openScratchCard}
+          onDismiss={closeReward}
+        />
+      ) : null}
+
+      {pendingReward && isScratchOpen ? (
         <ScratchCard
-          reward={activeReward}
+          reward={pendingReward}
           onClaim={claimReward}
           onClose={closeReward}
         />
