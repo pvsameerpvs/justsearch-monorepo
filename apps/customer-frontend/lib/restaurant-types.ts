@@ -52,7 +52,9 @@ export type MenuCategory = {
   items: MenuItem[];
 };
 
-export type Game = {
+export type GameType = 'local' | 'embed';
+
+type BaseGame = {
   id: string;
   name: string;
   description: string;
@@ -62,8 +64,20 @@ export type Game = {
   accessLevel: 'public' | 'login_required' | 'session_required';
   isAvailable: boolean;
   tag?: 'HOT' | 'TOP RATED' | 'NEW' | 'PRO';
-  embedId?: string;
 };
+
+export type LocalGame = BaseGame & {
+  type: 'local';
+  localGameId: string;
+};
+
+export type EmbedGame = BaseGame & {
+  type: 'embed';
+  embedUrl: string;
+  embedProvider?: string;
+};
+
+export type Game = LocalGame | EmbedGame;
 
 export type GoogleReview = {
   id: string;

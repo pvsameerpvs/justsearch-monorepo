@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 type GameStat = {
   highScore: number;
+  lastScore: number;
   maxLevel: number;
   roundsPlayed: number;
   lastPlayed: string;
@@ -12,6 +13,23 @@ type GameStat = {
 type GameStatsMap = Record<string, GameStat>;
 
 const STORAGE_KEY = 'justsearch:gameStats';
+const EMPTY_GAME_STAT: GameStat = {
+  highScore: 0,
+  lastScore: 0,
+  maxLevel: 1,
+  roundsPlayed: 0,
+  lastPlayed: "",
+};
+
+function normalizeGameStat(input?: Partial<GameStat>): GameStat {
+  return {
+    highScore: input?.highScore ?? EMPTY_GAME_STAT.highScore,
+    lastScore: input?.lastScore ?? EMPTY_GAME_STAT.lastScore,
+    maxLevel: input?.maxLevel ?? EMPTY_GAME_STAT.maxLevel,
+    roundsPlayed: input?.roundsPlayed ?? EMPTY_GAME_STAT.roundsPlayed,
+    lastPlayed: input?.lastPlayed ?? EMPTY_GAME_STAT.lastPlayed,
+  };
+}
 
 function readStoredStats(): GameStatsMap {
   if (typeof window === 'undefined') return {};
@@ -41,10 +59,11 @@ export function useUserGameStats() {
 
   const updateGameStat = useCallback((gameId: string, score: number, level: number = 1) => {
     setGameStats((current) => {
-      const existing = current[gameId] || { highScore: 0, maxLevel: 1, roundsPlayed: 0, lastPlayed: "" };
+      const existing = normalizeGameStat(current[gameId]);
       
       const updated: GameStat = {
         highScore: Math.max(existing.highScore, score),
+        lastScore: score,
         maxLevel: Math.max(existing.maxLevel, level),
         roundsPlayed: existing.roundsPlayed + 1,
         lastPlayed: new Date().toISOString(),
@@ -57,7 +76,7 @@ export function useUserGameStats() {
   }, []);
 
   const getGameStat = useCallback((gameId: string) => {
-    return gameStats[gameId] || { highScore: 0, maxLevel: 1, roundsPlayed: 0, lastPlayed: "" };
+    return normalizeGameStat(gameStats[gameId]);
   }, [gameStats]);
 
   return { gameStats, updateGameStat, getGameStat };

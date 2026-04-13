@@ -19,14 +19,16 @@ type RestaurantLayoutManagerProps = {
 export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerProps) {
   const restaurant = useRestaurant();
   const pathname = usePathname();
-  
-  const showRestaurantChrome = pathname !== '/';
+  const isGameDetailPage = pathname.startsWith('/eat-play/') && pathname !== '/eat-play';
+
+  const showRestaurantChrome = pathname !== '/' && !isGameDetailPage;
   const hideBottomNavOnCheckout =
-    pathname === '/menu/checkout' || pathname.startsWith('/menu/checkout/');
+    pathname === '/menu/checkout' || pathname.startsWith('/menu/checkout/') || isGameDetailPage;
   const hideTrackerOnStatusPage = pathname.startsWith('/menu/checkout/status');
   
   const showBottomNav = showRestaurantChrome && !hideBottomNavOnCheckout;
   const showOrderTracker = showRestaurantChrome && !hideTrackerOnStatusPage;
+  const showRewardManager = !isGameDetailPage;
 
   return (
     <RegistrationProvider>
@@ -37,7 +39,7 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
         {showBottomNav && <RestaurantMobileNav />}
         {children}
         <RegistrationModal />
-        <RewardManager />
+        {showRewardManager && <RewardManager />}
       </FulfillmentProvider>
     </RegistrationProvider>
   );

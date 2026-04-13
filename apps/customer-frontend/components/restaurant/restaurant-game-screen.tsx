@@ -1,145 +1,141 @@
 "use client";
 
-import { useCallback, useMemo, useState } from 'react';
-import { ButtonLink } from '@/components/shared/button-link';
-import { Container } from '@/components/shared/container';
-import { Surface } from '@/components/shared/surface';
-import type { Game, Restaurant } from '@/lib/restaurant-types';
+import { ArrowLeft } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { Game } from '@/lib/restaurant-types';
 import type { GameAwardResult } from './games/game-award';
-import { RunnerCanvasGame } from './games/runner-canvas-game';
+import { GameCoinPill } from './games/game-coin-pill';
+import { GameExitConfirmDialog } from './games/game-exit-confirm-dialog';
+import { GameIntroStage } from './games/game-intro-stage';
+import { GamePlayerStage } from './games/game-player-stage';
 import { useRegistration } from '@/components/auth/registration-context';
+import { useSmartBackNavigation } from '@/components/layout/use-smart-back-navigation';
 import { useLoyaltyPoints } from './use-loyalty-points';
 import { useUserGameStats } from './use-user-game-stats';
 
 type RestaurantGameScreenProps = {
-  restaurant: Restaurant;
   game: Game;
+  mode?: 'intro' | 'play';
 };
 
-function getAccessSubtitle(accessLevel: Game['accessLevel']) {
-  if (accessLevel === 'public') return 'Public game';
-  if (accessLevel === 'login_required') return 'Login required (demo mode)';
-  return 'Session required (demo mode)';
-}
-
-export function RestaurantGameScreen({
-  restaurant,
-  game,
-}: RestaurantGameScreenProps) {
+export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScreenProps) {
+  const pathname = usePathname();
+  const router = useRouter();
   const { isRegistered, openModal } = useRegistration();
   const { points, addPoints } = useLoyaltyPoints();
   const { updateGameStat, getGameStat } = useUserGameStats();
-  const [lastAward, setLastAward] = useState<GameAwardResult | null>(null);
-
-  const subtitle = useMemo(
-    () => getAccessSubtitle(game.accessLevel),
-    [game.accessLevel],
+  const [isExitDialogOpen, setIsExitDialogOpen] = useState(false);
+  const isIntro = mode === 'intro';
+  const backFallbackPath = useMemo(
+    () => (isIntro ? '/eat-play' : `/eat-play/${game.id}`),
+    [game.id, isIntro],
   );
+  const goBack = useSmartBackNavigation(pathname, backFallbackPath);
+  const gameStat = getGameStat(game.id);
 
-  const stats = useMemo(() => getGameStat(game.id), [getGameStat, game.id]);
+  useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
+    const previous = {
+      rootOverflow: root.style.overflow,
+      bodyOverflow: body.style.overflow,
+      rootOverscroll: root.style.overscrollBehavior,
+      bodyOverscroll: body.style.overscrollBehavior,
+    };
+
+    root.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    root.style.overscrollBehavior = 'none';
+    body.style.overscrollBehavior = 'none';
+
+    return () => {
+      root.style.overflow = previous.rootOverflow;
+      body.style.overflow = previous.bodyOverflow;
+      root.style.overscrollBehavior = previous.rootOverscroll;
+      body.style.overscrollBehavior = previous.bodyOverscroll;
+    };
+  }, []);
 
   const onAward = useCallback(
     (result: GameAwardResult) => {
-      setLastAward(result);
       addPoints(result.points);
       updateGameStat(game.id, result.score, result.level);
     },
     [addPoints, game.id, updateGameStat],
   );
 
-  const gameBody = useMemo(() => {
+  const handleStart = useCallback(() => {
     if (!isRegistered) {
-      return (
-        <div className="rounded-[28px] border border-[rgb(var(--card-border)/0.9)] bg-white/80 p-6 text-center">
-          <p className="text-sm font-semibold text-[rgb(var(--ink))]">
-            Registration required
-          </p>
-          <p className="mt-2 text-sm text-[rgb(var(--muted))]">
-            Verify your mobile number to play games and save scores.
-          </p>
-          <button
-            type="button"
-            onClick={openModal}
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-2xl bg-[rgb(var(--brand))] px-6 text-sm font-semibold text-white shadow-[0_14px_36px_rgb(var(--brand)/0.22)] transition-all hover:brightness-110 active:scale-[0.99]"
-          >
-            Register now
-          </button>
-        </div>
-      );
+      openModal();
+      return;
     }
 
-    if (game.id === 'vex-runner') return <RunnerCanvasGame onAward={onAward} />;
+    router.push(`/eat-play/${game.id}/play`);
+  }, [game.id, isRegistered, openModal, router]);
 
-    return (
-      <div className="rounded-[28px] border border-[rgb(var(--card-border)/0.9)] bg-white/80 p-6 text-center">
-        <p className="text-sm font-semibold text-[rgb(var(--ink))]">
-          This game is not wired up yet.
-        </p>
-        <p className="mt-2 text-sm text-[rgb(var(--muted))]">
-          Game id: <span className="font-mono">{game.id}</span>
-        </p>
-      </div>
-    );
-  }, [game.id, onAward, isRegistered, openModal]);
+  const handleBackPress = useCallback(() => {
+    setIsExitDialogOpen(true);
+  }, []);
+
+  const handleExitConfirm = useCallback(() => {
+    setIsExitDialogOpen(false);
+    goBack();
+  }, [goBack]);
 
   return (
-    <section className="py-8 sm:py-10">
-      <Container>
-        <div className="flex flex-col gap-6">
-          <Surface className="rounded-[32px] border-white/70 bg-[linear-gradient(140deg,rgb(var(--brand-soft)/0.25),rgba(255,255,255,0.92),rgb(var(--accent-soft)/0.38))] p-6 sm:p-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(var(--brand))]">
-                  {subtitle}
-                </p>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-[-0.06em] text-[rgb(var(--ink))] sm:text-4xl">
-                  {game.icon} {game.name}
-                </h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-[rgb(var(--muted))]">
-                  {game.description}
-                </p>
-              </div>
+    <section className="fixed inset-0 overflow-hidden bg-[radial-gradient(circle_at_22%_18%,#8ee6f0_0%,#62d1dc_32%,#34b8c5_70%,#2797a8_100%)]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_15%,rgba(255,255,255,0.32),transparent_42%),radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.2),transparent_44%),radial-gradient(circle_at_50%_84%,rgba(4,65,78,0.22),transparent_55%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-24 top-28 h-56 w-56 rounded-full bg-white/14 blur-2xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-20 bottom-24 h-60 w-60 rounded-full bg-[#0e6f83]/26 blur-3xl"
+      />
 
-              <div className="flex gap-3">
-                <ButtonLink href="/eat-play" variant="secondary" size="md">
-                  Back
-                </ButtonLink>
-              </div>
-            </div>
-          </Surface>
+      <div className="absolute left-0 right-0 top-0 z-20 flex items-start justify-between px-4 pt-[calc(env(safe-area-inset-top,0px)+12px)] sm:px-6">
+        <button
+          type="button"
+          onClick={handleBackPress}
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/45 bg-white/22 text-white shadow-[0_14px_36px_rgba(15,23,42,0.14)] backdrop-blur-md transition-all hover:bg-white/30 active:scale-95"
+          aria-label="Back to games"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
 
-          <Surface className="rounded-[32px] border-white/70 bg-white/90 p-6 sm:p-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgb(var(--muted))]">
-                  Score
-                </p>
-                {lastAward ? (
-                  <p className="mt-2 text-sm font-semibold text-[rgb(var(--ink))]">
-                    {lastAward.label}: score {lastAward.score} • +{lastAward.points} points
-                  </p>
-                ) : (
-                  <p className="mt-2 text-sm text-[rgb(var(--muted))]">
-                    Play a round to generate a score.
-                  </p>
-                )}
-              </div>
+        <GameCoinPill coins={points} />
+      </div>
 
-              <div className="flex flex-col gap-1 text-sm font-semibold text-[rgb(var(--muted))] sm:items-end">
-                <div>Restaurant: {restaurant.name}</div>
-                <div className="text-[rgb(var(--ink))]">Your points: {points}</div>
-                {stats.roundsPlayed > 0 ? (
-                  <div className="text-[rgb(var(--muted))]">
-                    Best: {stats.highScore} • Rounds: {stats.roundsPlayed}
-                  </div>
-                ) : null}
-              </div>
-            </div>
+      {isIntro ? (
+        <>
+          <div className="relative z-10 flex h-full items-center justify-center px-4">
+            <GameIntroStage
+              game={game}
+              onStart={handleStart}
+              hasPlayed={gameStat.roundsPlayed > 0}
+              lastScore={gameStat.lastScore}
+              highScore={gameStat.highScore}
+            />
+          </div>
 
-            <div className="mt-6">{gameBody}</div>
-          </Surface>
-        </div>
-      </Container>
+          <p className="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+18px)] left-1/2 z-10 -translate-x-1/2 text-center text-[11px] font-semibold uppercase tracking-[0.36em] text-white/95 drop-shadow-[0_4px_10px_rgba(3,43,53,0.34)]">
+            Just Search LLC
+          </p>
+        </>
+      ) : (
+        <GamePlayerStage game={game} onAward={onAward} />
+      )}
+
+      <GameExitConfirmDialog
+        open={isExitDialogOpen}
+        onCancel={() => setIsExitDialogOpen(false)}
+        onConfirm={handleExitConfirm}
+      />
     </section>
   );
 }
