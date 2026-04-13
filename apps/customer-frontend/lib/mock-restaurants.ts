@@ -231,6 +231,20 @@ export const mockRestaurants: Record<string, Restaurant> = {
         isAvailable: true,
         tag: 'HOT',
       },
+      {
+        id: 'hungry-bird-rush',
+        name: 'Hungry Bird Rush',
+        description: 'Tap to fly, weave through pipes, and stack points in this arcade challenge.',
+        type: 'local',
+        localGameId: 'hungry-bird-rush',
+        icon: '🐤',
+        coverImageUrl: '/games/hungry-bird-rush-model.png',
+        prize: 'Up to 700 points',
+        communityTopScore: 4320,
+        accessLevel: 'public',
+        isAvailable: true,
+        tag: 'NEW',
+      },
     ],
     reviews: [
       {

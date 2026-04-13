@@ -5,6 +5,7 @@ import type { GameAwardHandler } from '../game-award';
 export type LocalGameRendererProps = {
   game: LocalGame;
   onAward: GameAwardHandler;
+  coins?: number;
 };
 
 export type LocalGameRenderer = (props: LocalGameRendererProps) => ReactElement;

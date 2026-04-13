@@ -137,7 +137,7 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
           </div>
         </>
       ) : (
-        <GamePlayerStage game={game} onAward={onAward} />
+        <GamePlayerStage game={game} onAward={onAward} coins={points} />
       )}
 
       <GameExitConfirmDialog

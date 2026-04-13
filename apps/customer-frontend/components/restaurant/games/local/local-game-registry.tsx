@@ -1,9 +1,11 @@
 "use client";
 
+import { HungryBirdRushGame } from './hungry-bird-rush/hungry-bird-rush-game';
 import { VexRunnerGame } from './vex-runner/vex-runner-game';
 import type { LocalGameRenderer } from './local-game-renderer';
 
 const LOCAL_GAME_REGISTRY: Record<string, LocalGameRenderer> = {
+  'hungry-bird-rush': HungryBirdRushGame,
   'vex-runner': VexRunnerGame,
 };
 

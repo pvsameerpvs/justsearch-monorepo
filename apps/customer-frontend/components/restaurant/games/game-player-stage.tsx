@@ -8,12 +8,13 @@ import { LocalGamePlayer } from './local-game-player';
 type GamePlayerStageProps = {
   game: Game;
   onAward: GameAwardHandler;
+  coins?: number;
 };
 
-export function GamePlayerStage({ game, onAward }: GamePlayerStageProps) {
+export function GamePlayerStage({ game, onAward, coins }: GamePlayerStageProps) {
   if (game.type === 'embed') {
     return <EmbeddedGamePlayer game={game} />;
   }
 
-  return <LocalGamePlayer game={game} onAward={onAward} />;
+  return <LocalGamePlayer game={game} onAward={onAward} coins={coins} />;
 }
