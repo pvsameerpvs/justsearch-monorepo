@@ -12,6 +12,7 @@ import {
 import type { RegisteredUser } from './registered-user';
 
 const STORAGE_KEY = 'justsearch:registeredUser';
+const FRESH_REGISTRATION_KEY = 'justsearch:freshRegistration';
 
 type RegistrationContextValue = {
   user: RegisteredUser | null;
@@ -63,6 +64,53 @@ function writeStoredUser(user: RegisteredUser | null) {
   }
 }
 
+function writeFreshRegistration(user: RegisteredUser | null) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    if (!user) {
+      window.sessionStorage.removeItem(FRESH_REGISTRATION_KEY);
+      return;
+    }
+
+    window.sessionStorage.setItem(FRESH_REGISTRATION_KEY, JSON.stringify(user));
+  } catch {
+    // ignore
+  }
+}
+
+export function readFreshRegistration() {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const raw = window.sessionStorage.getItem(FRESH_REGISTRATION_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as unknown;
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      typeof (parsed as any).name !== 'string' ||
+      typeof (parsed as any).mobile !== 'string' ||
+      typeof (parsed as any).verifiedAt !== 'number'
+    ) {
+      return null;
+    }
+
+    return {
+      name: (parsed as any).name,
+      mobile: (parsed as any).mobile,
+      verifiedAt: (parsed as any).verifiedAt,
+    } satisfies RegisteredUser;
+  } catch {
+    return null;
+  }
+}
+
+export function clearFreshRegistration() {
+  writeFreshRegistration(null);
+}
+
 export function RegistrationProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<RegisteredUser | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,11 +132,13 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
   const setUser = useCallback((nextUser: RegisteredUser) => {
     setUserState(nextUser);
     writeStoredUser(nextUser);
+    writeFreshRegistration(nextUser);
   }, []);
 
   const clearUser = useCallback(() => {
     setUserState(null);
     writeStoredUser(null);
+    writeFreshRegistration(null);
   }, []);
 
   const openModal = useCallback(() => setIsModalOpen(true), []);
@@ -121,4 +171,3 @@ export function useRegistration() {
   }
   return value;
 }
-

@@ -15,6 +15,7 @@ import { CheckoutOrderPlacingOverlay } from './checkout/checkout-order-placing-o
 import { CheckoutSummaryCard } from './checkout/checkout-summary-card';
 import { CheckoutStickyFooter } from './checkout/checkout-sticky-footer';
 import { useRestaurantFulfillment } from './use-restaurant-fulfillment';
+import { getVoucherDiscountAmount, useVoucherWallet } from './checkout/use-voucher-wallet';
 import { type SavedAddress, useAddressBook } from './use-address-book';
 
 const ORDER_PLACING_DURATION_MS = 1800;
@@ -36,6 +37,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
     deliverySavings,
     placeOrder,
   } = useRestaurantFulfillment();
+  const { findVoucherByCode, markVoucherUsed } = useVoucherWallet();
 
   const { addresses, addAddress, hydrated: addressesHydrated } = useAddressBook();
   
@@ -50,6 +52,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
   const [restaurantNote, setRestaurantNote] = useState('');
   const [riderNote, setRiderNote] = useState('');
   const [promoCode, setPromoCode] = useState('');
+  const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [placingOrder, setPlacingOrder] = useState<{
@@ -102,8 +105,21 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
     [cart],
   );
 
-  const displayTotal = total;
-  const displaySavings = deliverySavings;
+  const appliedVoucher = useMemo(
+    () => (appliedPromoCode ? findVoucherByCode(appliedPromoCode) : null),
+    [appliedPromoCode, findVoucherByCode],
+  );
+
+  const promoDiscountAmount = useMemo(
+    () =>
+      appliedVoucher && !appliedVoucher.isUsed
+        ? getVoucherDiscountAmount(appliedVoucher, total)
+        : 0,
+    [appliedVoucher, total],
+  );
+
+  const displayTotal = Math.max(0, total - promoDiscountAmount);
+  const displaySavings = deliverySavings + promoDiscountAmount;
 
   useEffect(() => {
     if (!placingOrder) {
@@ -139,14 +155,27 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
     }
 
     const combinedAddress = `${addressTitle} - ${address}\n${addressDetails}${alternateNumber ? `\nAlt number: ${alternateNumber}` : ''}\n${handoff}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
+    const promoSnapshot = appliedVoucher && !appliedVoucher.isUsed
+      ? {
+          code: appliedVoucher.code,
+          discount: promoDiscountAmount,
+        }
+      : null;
+
     const orderId = placeOrder({
       address: combinedAddress,
       note: restaurantNote,
+      promoCode: promoSnapshot?.code,
+      promoDiscount: promoSnapshot?.discount,
     });
 
     if (!orderId) {
       setError('Add at least one item and a delivery address before placing the order.');
       return;
+    }
+
+    if (promoSnapshot) {
+      markVoucherUsed(promoSnapshot.code);
     }
 
     setError(null);
@@ -155,6 +184,21 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
       orderId,
       startedAt: Date.now(),
     });
+  };
+
+  const applyPromoCode = () => {
+    const normalized = promoCode.trim().toUpperCase();
+    if (!normalized) {
+      setAppliedPromoCode(null);
+      return;
+    }
+
+    const voucher = findVoucherByCode(normalized);
+    if (!voucher || voucher.isUsed) {
+      return;
+    }
+
+    setAppliedPromoCode(voucher.code);
   };
 
   /* Empty State View */
@@ -211,6 +255,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             setNote={setRestaurantNote}
             promoCode={promoCode}
             setPromoCode={setPromoCode}
+            onApplyPromo={applyPromoCode}
           />
           
         </div>

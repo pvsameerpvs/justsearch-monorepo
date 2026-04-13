@@ -1,58 +1,89 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import { clearFreshRegistration, useRegistration } from '@/components/auth/registration-context';
+import { useLoyaltyPoints } from '../use-loyalty-points';
 import { useRestaurantFulfillment } from '../use-restaurant-fulfillment';
 import { ScratchCard } from './scratch-card';
-import { AnimatePresence } from 'framer-motion';
+import { getNextScratchRewardCandidate } from './reward-offers';
+import { getRewardSeenKey, writeBooleanStorage } from './reward-storage';
+import { useVoucherWallet } from './use-voucher-wallet';
+import type { ScratchReward } from './reward-types';
 
-/**
- * GLOBAL REWARD MANAGER
- * This component is invisible and lives at the root of the app.
- * It monitors orders and triggers the Scratch Card 3 seconds after a new order is placed,
- * regardless of what page the user is on.
- */
 export function RewardManager() {
+  const { user } = useRegistration();
   const { hydrated, orders } = useRestaurantFulfillment();
-  const [showScratchCard, setShowScratchCard] = useState(false);
-  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const { addPoints } = useLoyaltyPoints();
+  const { addVoucher } = useVoucherWallet();
+  const [activeReward, setActiveReward] = useState<ScratchReward | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!hydrated || orders.length === 0) return;
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
-    const latestOrder = orders[0];
-    const orderId = latestOrder.id;
-    
-    // 1. Check if the order is fresh (placed in the last 10 mins)
-    const isNewOrder = (Date.now() - latestOrder.createdAt) < 600000;
-    if (!isNewOrder) return;
+  const nextRewardCandidate = useMemo(() => {
+    if (!hydrated) return null;
+    return getNextScratchRewardCandidate({ user, orders, now });
+  }, [hydrated, orders, now, user]);
 
-    // 2. Check if already shown in this session
-    const shownKey = `scratch_shown_${orderId}`;
-    if (sessionStorage.getItem(shownKey)) return;
+  useEffect(() => {
+    if (activeReward || !nextRewardCandidate) return;
 
-    // 3. Trigger the 3-second countdown
-    // This will now survive page changes and status updates
-    const timer = setTimeout(() => {
-      setActiveOrderId(orderId);
-      setShowScratchCard(true);
-    }, 3000);
+    const timer = window.setTimeout(() => {
+      setActiveReward(nextRewardCandidate.reward);
+    }, nextRewardCandidate.delayMs);
 
-    return () => clearTimeout(timer);
-  }, [orders[0]?.id, hydrated]); // Only re-run if the latest order ID or hydration status changes
+    return () => window.clearTimeout(timer);
+  }, [activeReward, nextRewardCandidate?.reward.id]);
 
-  const handleClose = () => {
-    if (activeOrderId) {
-      sessionStorage.setItem(`scratch_shown_${activeOrderId}`, 'true');
+  const claimReward = useCallback(
+    (reward: ScratchReward) => {
+      if (reward.kind === 'voucher') {
+        addVoucher({
+          code: reward.code,
+          title: reward.title,
+          discountLabel: reward.discountLabel,
+          discount: reward.discount,
+          expiryLabel: reward.expiryLabel,
+          source: reward.trigger,
+          mobile: reward.mobile,
+          orderId: reward.orderId,
+        });
+      } else {
+        addPoints(reward.points);
+      }
+
+      writeBooleanStorage(getRewardSeenKey(reward.id), true);
+      if (reward.trigger === 'welcome') {
+        clearFreshRegistration();
+      }
+    },
+    [addPoints, addVoucher],
+  );
+
+  const closeReward = useCallback(() => {
+    if (activeReward) {
+      writeBooleanStorage(getRewardSeenKey(activeReward.id), true);
+      if (activeReward.trigger === 'welcome') {
+        clearFreshRegistration();
+      }
     }
-    setShowScratchCard(false);
-    setActiveOrderId(null);
-  };
+
+    setActiveReward(null);
+  }, [activeReward]);
 
   return (
     <AnimatePresence>
-      {showScratchCard && (
-        <ScratchCard onClose={handleClose} />
-      )}
+      {activeReward ? (
+        <ScratchCard
+          reward={activeReward}
+          onClaim={claimReward}
+          onClose={closeReward}
+        />
+      ) : null}
     </AnimatePresence>
   );
 }

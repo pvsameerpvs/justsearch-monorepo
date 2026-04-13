@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'justsearch:loyaltyPoints';
+const UPDATED_EVENT = 'justsearch:loyaltyPointsUpdated';
 const DEFAULT_POINTS = 1250;
 
 function parsePoints(value: string | null) {
@@ -29,6 +30,7 @@ function writeStoredPoints(value: number) {
 
   try {
     window.localStorage.setItem(STORAGE_KEY, String(Math.max(0, Math.floor(value))));
+    window.dispatchEvent(new Event(UPDATED_EVENT));
   } catch {
     // ignore
   }
@@ -52,7 +54,13 @@ export function useLoyaltyPoints() {
     };
 
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    const onUpdated = () => setPointsState(readStoredPoints());
+
+    window.addEventListener(UPDATED_EVENT, onUpdated);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener(UPDATED_EVENT, onUpdated);
+    };
   }, []);
 
   const setPoints = useCallback((value: number) => {
@@ -76,4 +84,3 @@ export function useLoyaltyPoints() {
 
   return { points, setPoints, addPoints, resetPoints };
 }
-

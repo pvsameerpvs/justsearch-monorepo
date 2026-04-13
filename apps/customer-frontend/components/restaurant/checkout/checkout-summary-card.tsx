@@ -21,6 +21,7 @@ type CheckoutSummaryCardProps = {
   setNote: (val: string) => void;
   promoCode: string;
   setPromoCode: (val: string) => void;
+  onApplyPromo: () => void;
 };
 
 export function CheckoutSummaryCard({
@@ -32,6 +33,7 @@ export function CheckoutSummaryCard({
   setNote,
   promoCode,
   setPromoCode,
+  onApplyPromo,
 }: CheckoutSummaryCardProps) {
   return (
     <div className="rounded-[32px] border border-[rgb(var(--border)/0.6)] bg-white px-6 py-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
@@ -82,6 +84,7 @@ export function CheckoutSummaryCard({
         />
         <button 
           type="button"
+          onClick={onApplyPromo}
           className="rounded-xl bg-slate-900 px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest text-white transition-all active:scale-95"
         >
           Apply

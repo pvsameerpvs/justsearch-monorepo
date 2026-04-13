@@ -26,6 +26,8 @@ type StoredOrder = {
   subtotal: number;
   deliveryFee: number;
   deliverySavings?: number;
+  promoCode?: string;
+  promoDiscount?: number;
   total: number;
 };
 
@@ -90,7 +92,12 @@ type FulfillmentContextType = {
   addToCart: (item: MenuItem) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
-  placeOrder: (data: { address: string; note: string }) => string | null;
+  placeOrder: (data: {
+    address: string;
+    note: string;
+    promoCode?: string;
+    promoDiscount?: number;
+  }) => string | null;
 };
 
 const FulfillmentContext = createContext<FulfillmentContextType | null>(null);
@@ -162,7 +169,7 @@ export function FulfillmentProvider({
     },
     updateQuantity: (id, q) => setState(s => ({ ...s, cart: q <= 0 ? s.cart.filter(i => i.itemId !== id) : s.cart.map(i => i.itemId === id ? { ...i, quantity: q } : i) })),
     clearCart: () => setState(s => ({ ...s, cart: [] })),
-    placeOrder: ({ address, note }) => {
+    placeOrder: ({ address, note, promoCode, promoDiscount = 0 }) => {
         const id = `ORD-${Date.now().toString(36).toUpperCase()}`;
         const newOrder: StoredOrder = {
             id,
@@ -173,7 +180,9 @@ export function FulfillmentProvider({
             riderName: `${restaurant.name} Rider`,
             subtotal,
             deliveryFee: 0,
-            total: subtotal,
+            promoCode,
+            promoDiscount,
+            total: Math.max(0, subtotal - promoDiscount),
         };
         setState(s => ({ ...s, cart: [], orders: [newOrder, ...s.orders].slice(0, 10) }));
         return id;

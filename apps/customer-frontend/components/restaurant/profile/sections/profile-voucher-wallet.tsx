@@ -1,47 +1,28 @@
 "use client";
 
-import { Ticket, Clock, Info, CheckCircle2 } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { CheckCircle2, Clock, Info, Ticket } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
-
-type Voucher = {
-  id: string;
-  code: string;
-  discount: string;
-  title: string;
-  expiry: string;
-  isUsed?: boolean;
-};
-
-const VOUCHERS: Voucher[] = [
-  {
-    id: '1',
-    code: 'WELCOME30',
-    discount: '30% OFF',
-    title: 'First Order Special',
-    expiry: 'Expires in 5 days',
-  },
-  {
-    id: '2',
-    code: 'FREE-DELIVERY',
-    discount: 'FREE',
-    title: 'Weekend Delivery Promo',
-    expiry: 'Expires in 2 days',
-  },
-  {
-    id: '3',
-    code: 'BURGER-LOVE',
-    discount: 'AED 15',
-    title: 'Burger Category Reward',
-    expiry: 'Used 2 weeks ago',
-    isUsed: true
-  },
-];
+import { useVoucherWallet } from '../../checkout/use-voucher-wallet';
 
 export function ProfileVoucherWallet() {
+  const { wallet } = useVoucherWallet();
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const handleCopy = useCallback(async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      window.setTimeout(() => setCopiedCode(null), 1400);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-        {VOUCHERS.map((voucher) => (
+        {wallet.map((voucher) => (
           <Surface 
             key={voucher.id}
             className={`group relative overflow-hidden rounded-[28px] border-white/60 p-6 transition-all ${
@@ -59,14 +40,14 @@ export function ProfileVoucherWallet() {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[rgb(var(--brand))]">
-                    {voucher.discount}
+                    {voucher.discountLabel}
                   </h3>
                   <p className="mt-0.5 text-lg font-bold text-[rgb(var(--ink))]">
                     {voucher.title}
                   </p>
                   <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--muted))]">
                     <Clock className="h-3 w-3" />
-                    {voucher.expiry}
+                    {voucher.expiryLabel}
                   </div>
                 </div>
               </div>
@@ -80,7 +61,12 @@ export function ProfileVoucherWallet() {
                 {voucher.isUsed ? (
                    <CheckCircle2 className="h-6 w-6 text-slate-400" />
                 ) : (
-                  <button className="hidden sm:flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-lg transition-transform hover:scale-110">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(voucher.code)}
+                    className="hidden sm:flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-lg transition-transform hover:scale-110"
+                    aria-label={`Copy ${voucher.code}`}
+                  >
                     <Info className="h-5 w-5" />
                   </button>
                 )}
@@ -93,8 +79,13 @@ export function ProfileVoucherWallet() {
       <div className="rounded-[28px] bg-[rgb(var(--brand-soft)/0.25)] p-6 border border-[rgb(var(--brand)/0.1)]">
         <h4 className="text-sm font-bold text-[rgb(var(--brand))]">How to redeem?</h4>
         <p className="mt-2 text-sm leading-relaxed text-[rgb(var(--muted))]">
-          Copy the voucher code and paste it into the "Promo Code" section during checkout to apply your discount. Rewards points can also be converted to vouchers in the Rewards section.
+          Copy the voucher code and paste it into the promo code section during checkout to apply your discount. Scratch rewards and welcome offers are stored here automatically.
         </p>
+        {copiedCode ? (
+          <p className="mt-2 text-xs font-semibold text-[rgb(var(--brand))]">
+            Copied {copiedCode}
+          </p>
+        ) : null}
       </div>
     </div>
   );
