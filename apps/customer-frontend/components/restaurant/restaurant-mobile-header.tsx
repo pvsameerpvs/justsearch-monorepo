@@ -24,7 +24,7 @@ const routeTitles: Record<string, string> = {
 };
 
 const gameTitles: Record<string, string> = {
-  'vex-runner': 'Vex Runner',
+  'vex-runner': 'Jump & Bite',
 };
 
 function getHeaderTitle(pathname: string) {

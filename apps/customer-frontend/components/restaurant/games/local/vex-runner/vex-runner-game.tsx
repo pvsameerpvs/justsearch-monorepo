@@ -4,9 +4,10 @@ import type { LocalGameRendererProps } from '../local-game-renderer';
 import { useVexRunnerEngine } from './use-vex-runner-engine';
 
 export function VexRunnerGame({ game, onAward }: LocalGameRendererProps) {
-  const { canvasRef, status, jump, restartGame } = useVexRunnerEngine({
+  const { canvasRef, status, isTopScorer, jump, restartGame } = useVexRunnerEngine({
     onAward,
     playerFoodItem: game.playerFoodItem ?? 'burger',
+    topScoreToBeat: game.communityTopScore,
   });
 
   return (
@@ -20,7 +21,12 @@ export function VexRunnerGame({ game, onAward }: LocalGameRendererProps) {
       />
 
       {status === 'finished' ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+22px)] z-20 flex justify-center px-4">
+        <div className="pointer-events-none absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+22px)] z-20 flex flex-col items-center gap-3 px-4">
+          {isTopScorer ? (
+            <p className="inline-flex min-h-10 items-center rounded-full border border-yellow-200/80 bg-yellow-300/20 px-5 text-center text-xs font-semibold tracking-[0.12em] text-yellow-100 shadow-[0_14px_30px_rgba(250,204,21,0.2)] backdrop-blur-sm">
+              You are the Top Scorer!
+            </p>
+          ) : null}
           <button
             type="button"
             onClick={restartGame}

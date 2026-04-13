@@ -218,14 +218,15 @@ export const mockRestaurants: Record<string, Restaurant> = {
     games: [
       {
         id: 'vex-runner',
-        name: 'Vex Runner (Local)',
-        description: 'A special high-performance local version of Vex for the best mobile experience!',
+        name: 'Jump & Bite',
+        description: 'Dash, jump, and dodge obstacles with food runners in this arcade challenge.',
         type: 'local',
         localGameId: 'vex-runner',
         playerFoodItem: 'random',
         icon: '🏃',
-        coverImageUrl: '/games/vex-runner.svg',
+        coverImageUrl: '/games/jump&bite.png',
         prize: 'Up to 1200 points',
+        communityTopScore: 12730,
         accessLevel: 'public',
         isAvailable: true,
         tag: 'HOT',

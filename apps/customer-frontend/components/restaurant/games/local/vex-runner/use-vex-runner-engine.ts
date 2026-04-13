@@ -19,11 +19,13 @@ import type {
 type UseVexRunnerEngineArgs = {
   onAward: GameAwardHandler;
   playerFoodItem: VexRunnerFoodItemPreference;
+  topScoreToBeat?: number;
 };
 
 type UseVexRunnerEngineResult = {
   canvasRef: MutableRefObject<HTMLCanvasElement | null>;
   status: VexRunnerStatus;
+  isTopScorer: boolean;
   jump: () => void;
   restartGame: () => void;
 };
@@ -37,12 +39,14 @@ type PlayerState = {
 export function useVexRunnerEngine({
   onAward,
   playerFoodItem,
+  topScoreToBeat,
 }: UseVexRunnerEngineArgs): UseVexRunnerEngineResult {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const frameRef = useRef<number | null>(null);
   const awardedRef = useRef(false);
 
   const [status, setStatus] = useState<VexRunnerStatus>('running');
+  const [isTopScorer, setIsTopScorer] = useState(false);
 
   const playerRef = useRef<PlayerState>({ y: 0, velocity: 0, isGrounded: true });
   const obstaclesRef = useRef<VexRunnerObstacle[]>([]);
@@ -81,6 +85,7 @@ export function useVexRunnerEngine({
     speedRef.current = VEX_RUNNER_CONFIG.initialSpeed;
     lastTimeRef.current = 0;
     awardedRef.current = false;
+    setIsTopScorer(false);
   }, []);
 
   const restartGame = useCallback(() => {
@@ -175,10 +180,13 @@ export function useVexRunnerEngine({
             setStatus('finished');
             if (!awardedRef.current) {
               awardedRef.current = true;
+              const reachedTopScore =
+                typeof topScoreToBeat === 'number' ? scoreRef.current >= topScoreToBeat : false;
+              setIsTopScorer(reachedTopScore);
               onAward({
                 points: Math.min(scoreRef.current, VEX_RUNNER_CONFIG.maxAwardPoints),
                 score: scoreRef.current,
-                label: 'Endless Runner',
+                label: 'Jump & Bite',
               });
             }
             break;
@@ -236,9 +244,14 @@ export function useVexRunnerEngine({
           width / 2,
           height / 2 + 50,
         );
+        if (isTopScorer) {
+          ctx.font = '800 22px ui-sans-serif, system-ui';
+          ctx.fillStyle = '#facc15';
+          ctx.fillText('You are the Top Scorer!', width / 2, height / 2 + 84);
+        }
       }
     },
-    [onAward, status],
+    [isTopScorer, onAward, status, topScoreToBeat],
   );
 
   useEffect(() => {
@@ -258,6 +271,9 @@ export function useVexRunnerEngine({
 
   const jump = useCallback(() => {
     if (status === 'finished') {
+      if (isTopScorer) {
+        return;
+      }
       restartGame();
       return;
     }
@@ -266,7 +282,7 @@ export function useVexRunnerEngine({
       playerRef.current.velocity = VEX_RUNNER_CONFIG.jumpForce;
       playerRef.current.isGrounded = false;
     }
-  }, [restartGame, status]);
+  }, [isTopScorer, restartGame, status]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -283,6 +299,7 @@ export function useVexRunnerEngine({
   return {
     canvasRef,
     status,
+    isTopScorer,
     jump,
     restartGame,
   };

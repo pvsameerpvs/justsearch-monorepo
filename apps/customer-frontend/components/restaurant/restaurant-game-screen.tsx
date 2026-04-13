@@ -120,6 +120,7 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
               hasPlayed={gameStat.roundsPlayed > 0}
               lastScore={gameStat.lastScore}
               highScore={gameStat.highScore}
+              communityTopScore={game.communityTopScore}
             />
           </div>
 

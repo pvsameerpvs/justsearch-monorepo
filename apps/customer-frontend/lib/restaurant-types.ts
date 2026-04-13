@@ -62,6 +62,7 @@ type BaseGame = {
   icon: string;
   coverImageUrl?: string;
   prize: string;
+  communityTopScore?: number;
   accessLevel: 'public' | 'login_required' | 'session_required';
   isAvailable: boolean;
   tag?: 'HOT' | 'TOP RATED' | 'NEW' | 'PRO';
