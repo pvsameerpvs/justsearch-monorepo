@@ -118,15 +118,27 @@ export function ScratchCard({
     ctx.stroke();
 
     // Composite mode for scratching
-    ctx.globalCompositeOperation = 'destination-out';
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
 
-    const scratch = (x: number, y: number) => {
-      ctx.lineWidth = 40;
+    const scratch = (x: number, y: number, isStarting: boolean = false) => {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 45;
       ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
       ctx.beginPath();
-      ctx.moveTo(x, y);
+      if (isStarting) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.moveTo(lastX, lastY);
+      }
       ctx.lineTo(x, y);
       ctx.stroke();
+      
+      lastX = x;
+      lastY = y;
       checkPercentage();
     };
 
@@ -152,41 +164,68 @@ export function ScratchCard({
       }
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleStart = (x: number, y: number) => {
       if (isScratched) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      if (e.buttons === 1) {
-        scratch(x, y);
-        // Add subtle haptic feedback for mobile users
-        if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-          window.navigator.vibrate(5);
-        }
+      isDrawing = true;
+      scratch(x, y, true);
+    };
+
+    const handleMove = (x: number, y: number) => {
+      if (!isDrawing || isScratched) return;
+      scratch(x, y);
+      
+      // Subtle haptic feedback
+      if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(5);
       }
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isScratched) return;
+    const handleEnd = () => {
+      isDrawing = false;
+    };
+
+    // Mouse Events
+    const onMouseDown = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      handleStart(e.clientX - rect.left, e.clientY - rect.top);
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      handleMove(e.clientX - rect.left, e.clientY - rect.top);
+    };
+
+    // Touch Events
+    const onTouchStart = (e: TouchEvent) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
       const touch = e.touches[0];
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
-      scratch(x, y);
-      
-      // Haptic feedback on touch
-      if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-        window.navigator.vibrate(8);
-      }
+      handleStart(touch.clientX - rect.left, touch.clientY - rect.top);
     };
 
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('touchmove', handleTouchMove);
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      handleMove(touch.clientX - rect.left, touch.clientY - rect.top);
+    };
+
+    canvas.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', handleEnd);
+    
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', handleEnd);
 
     return () => {
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', handleEnd);
+      
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', handleEnd);
     };
   }, [isScratched, onComplete]);
 
