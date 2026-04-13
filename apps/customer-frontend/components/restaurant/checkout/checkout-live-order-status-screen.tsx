@@ -48,7 +48,7 @@ export function CheckoutLiveOrderStatusScreen({
   restaurant,
   orderId,
 }: CheckoutLiveOrderStatusScreenProps) {
-  const { hydrated, orders } = useRestaurantFulfillment(restaurant);
+  const { hydrated, orders } = useRestaurantFulfillment();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {

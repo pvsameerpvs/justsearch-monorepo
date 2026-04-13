@@ -7,6 +7,9 @@ import { RegistrationProvider } from '@/components/auth/registration-context';
 import { RegistrationModal } from '@/components/auth/registration-modal';
 import { RegistrationRouteGuard } from '@/components/auth/registration-route-guard';
 import { ActiveOrderTracker } from '@/components/restaurant/checkout/active-order-tracker';
+import { RewardManager } from '@/components/restaurant/checkout/reward-manager';
+import { FulfillmentProvider } from '@/components/restaurant/use-restaurant-fulfillment';
+import { useRestaurant } from '@/components/restaurant/restaurant-context';
 import type { ReactNode } from 'react';
 
 type RestaurantLayoutManagerProps = {
@@ -14,6 +17,7 @@ type RestaurantLayoutManagerProps = {
 };
 
 export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerProps) {
+  const restaurant = useRestaurant();
   const pathname = usePathname();
   
   const showRestaurantChrome = pathname !== '/';
@@ -26,12 +30,15 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
 
   return (
     <RegistrationProvider>
-      <RegistrationRouteGuard />
-      {showRestaurantChrome && <RestaurantMobileHeader />}
-      {showOrderTracker && <ActiveOrderTracker />}
-      {showBottomNav && <RestaurantMobileNav />}
-      {children}
-      <RegistrationModal />
+      <FulfillmentProvider restaurant={restaurant}>
+        <RegistrationRouteGuard />
+        {showRestaurantChrome && <RestaurantMobileHeader />}
+        {showOrderTracker && <ActiveOrderTracker />}
+        {showBottomNav && <RestaurantMobileNav />}
+        {children}
+        <RegistrationModal />
+        <RewardManager />
+      </FulfillmentProvider>
     </RegistrationProvider>
   );
 }

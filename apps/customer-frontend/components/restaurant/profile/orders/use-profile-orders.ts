@@ -66,7 +66,7 @@ function createDemoOrders(restaurant: Restaurant): DeliveryOrder[] {
 }
 
 export function useProfileOrders(restaurant: Restaurant) {
-  const { hydrated, orders } = useRestaurantFulfillment(restaurant);
+  const { hydrated, orders } = useRestaurantFulfillment();
 
   const fallbackOrders = useMemo(
     () => createDemoOrders(restaurant),

@@ -5,11 +5,8 @@ import { ButtonLink } from '@/components/shared/button-link';
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
 import type { Game, Restaurant } from '@/lib/restaurant-types';
-import { EmbeddedIframeGame } from './games/embedded-iframe-game';
 import type { GameAwardResult } from './games/game-award';
 import { RunnerCanvasGame } from './games/runner-canvas-game';
-import { ScratchCardCanvasGame } from './games/scratch-card-canvas-game';
-import { SpinWheelCanvasGame } from './games/spin-wheel-canvas-game';
 import { useRegistration } from '@/components/auth/registration-context';
 import { useLoyaltyPoints } from './use-loyalty-points';
 import { useUserGameStats } from './use-user-game-stats';
@@ -71,17 +68,6 @@ export function RestaurantGameScreen({
       );
     }
 
-    if (game.embedId) {
-      return (
-        <EmbeddedIframeGame
-          src={`https://html5.gamedistribution.com/${game.embedId}/?gd_sdk_referrer_url=https://justsearch.io`}
-          title={game.name}
-        />
-      );
-    }
-
-    if (game.id === 'spin-wheel') return <SpinWheelCanvasGame onAward={onAward} />;
-    if (game.id === 'scratch-card') return <ScratchCardCanvasGame onAward={onAward} />;
     if (game.id === 'vex-runner') return <RunnerCanvasGame onAward={onAward} />;
 
     return (
@@ -94,7 +80,7 @@ export function RestaurantGameScreen({
         </p>
       </div>
     );
-  }, [game.embedId, game.id, game.name, onAward, isRegistered, openModal]);
+  }, [game.id, onAward, isRegistered, openModal]);
 
   return (
     <section className="py-8 sm:py-10">
@@ -131,10 +117,6 @@ export function RestaurantGameScreen({
                 {lastAward ? (
                   <p className="mt-2 text-sm font-semibold text-[rgb(var(--ink))]">
                     {lastAward.label}: score {lastAward.score} • +{lastAward.points} points
-                  </p>
-                ) : game.embedId ? (
-                  <p className="mt-2 text-sm text-[rgb(var(--muted))]">
-                    External game: score tracking is not available in this demo.
                   </p>
                 ) : (
                   <p className="mt-2 text-sm text-[rgb(var(--muted))]">

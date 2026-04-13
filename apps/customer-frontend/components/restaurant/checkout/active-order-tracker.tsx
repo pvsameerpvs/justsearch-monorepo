@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
-import { useRestaurant } from '@/components/restaurant/restaurant-context';
 import { useRestaurantFulfillment } from '../use-restaurant-fulfillment';
 import {
   getCheckoutOrderSummaries,
@@ -9,8 +8,7 @@ import {
 import { CheckoutLiveProgressCircle } from './checkout-live-progress-circle';
 
 export function ActiveOrderTracker() {
-  const restaurant = useRestaurant();
-  const { hydrated, orders } = useRestaurantFulfillment(restaurant);
+  const { hydrated, orders } = useRestaurantFulfillment();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -20,7 +18,6 @@ export function ActiveOrderTracker() {
 
   const activeOrders = useMemo(() => {
     if (!hydrated) return [];
-
     return getCheckoutOrderSummaries(orders, now);
   }, [hydrated, orders, now]);
 

@@ -32,7 +32,7 @@ export function RestaurantMenuShowcase({
     addToCart,
     updateQuantity,
     clearCart,
-  } = useRestaurantFulfillment(restaurant);
+  } = useRestaurantFulfillment();
 
   const availableItemsCount = restaurant.menu
     .flatMap((category) => category.items)

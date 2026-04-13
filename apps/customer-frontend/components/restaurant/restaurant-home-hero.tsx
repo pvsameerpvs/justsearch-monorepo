@@ -21,7 +21,7 @@ type RestaurantHomeHeroProps = {
 
 export function RestaurantHomeHero({ restaurant }: RestaurantHomeHeroProps) {
   const domain = getRestaurantDomain(restaurant);
-  const { hydrated, orders } = useRestaurantFulfillment(restaurant);
+  const { hydrated, orders } = useRestaurantFulfillment();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {

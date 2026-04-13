@@ -35,7 +35,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
     total,
     deliverySavings,
     placeOrder,
-  } = useRestaurantFulfillment(restaurant);
+  } = useRestaurantFulfillment();
 
   const { addresses, addAddress, hydrated: addressesHydrated } = useAddressBook();
   

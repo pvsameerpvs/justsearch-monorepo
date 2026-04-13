@@ -7,15 +7,10 @@ import { useRegistration } from '@/components/auth/registration-context';
 
 type RestaurantGamePreviewCardProps = { game: Game };
 
-const defaultGameCovers: Record<string, string> = {
-  'spin-wheel': '/games/spin-wheel.svg',
-  'scratch-card': '/games/scratch-card.svg',
-};
-
 export function RestaurantGamePreviewCard({
   game,
 }: RestaurantGamePreviewCardProps) {
-  const coverImageUrl = game.coverImageUrl ?? defaultGameCovers[game.id];
+  const coverImageUrl = game.coverImageUrl;
   const { isRegistered, openModal } = useRegistration();
 
   return (

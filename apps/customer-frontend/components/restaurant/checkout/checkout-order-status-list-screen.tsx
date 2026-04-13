@@ -4,20 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
-import type { Restaurant } from '@/lib/restaurant-types';
 import { useRestaurantFulfillment } from '../use-restaurant-fulfillment';
 import { getActiveCheckoutOrders } from './checkout-live-status-utils';
 import { CheckoutTrackingCard } from './checkout-tracking-card';
 
-type CheckoutOrderStatusListScreenProps = {
-  restaurant: Restaurant;
-};
-
-export function CheckoutOrderStatusListScreen({
-  restaurant,
-}: CheckoutOrderStatusListScreenProps) {
+export function CheckoutOrderStatusListScreen() {
   const router = useRouter();
-  const { hydrated, orders } = useRestaurantFulfillment(restaurant);
+  const { hydrated, orders } = useRestaurantFulfillment();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {

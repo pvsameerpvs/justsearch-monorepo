@@ -24,10 +24,7 @@ const routeTitles: Record<string, string> = {
 };
 
 const gameTitles: Record<string, string> = {
-  'spin-wheel': 'Spin the Wheel',
-  'scratch-card': 'Scratch Card',
-  'tap-challenge': 'Tap Challenge',
-  'quick-quiz': 'Quick Quiz',
+  'vex-runner': 'Vex Runner',
 };
 
 function getHeaderTitle(pathname: string) {
