@@ -222,6 +222,7 @@ export const mockRestaurants: Record<string, Restaurant> = {
         description: 'A special high-performance local version of Vex for the best mobile experience!',
         type: 'local',
         localGameId: 'vex-runner',
+        playerFoodItem: 'random',
         icon: '🏃',
         coverImageUrl: '/games/vex-runner.svg',
         prize: 'Up to 1200 points',

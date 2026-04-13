@@ -3,11 +3,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MutableRefObject } from 'react';
 import type { GameAwardHandler } from '../../game-award';
-import { VEX_RUNNER_CONFIG } from './vex-runner-model';
-import type { VexRunnerObstacle, VexRunnerStatus } from './vex-runner-model';
+import { drawFoodRunner } from './vex-runner-canvas-art';
+import {
+  VEX_RUNNER_CONFIG,
+  VEX_RUNNER_DEFAULT_FOOD_ITEM,
+  VEX_RUNNER_FOOD_ITEMS,
+} from './vex-runner-model';
+import type {
+  VexRunnerFoodItem,
+  VexRunnerFoodItemPreference,
+  VexRunnerObstacle,
+  VexRunnerStatus,
+} from './vex-runner-model';
 
 type UseVexRunnerEngineArgs = {
   onAward: GameAwardHandler;
+  playerFoodItem: VexRunnerFoodItemPreference;
 };
 
 type UseVexRunnerEngineResult = {
@@ -23,7 +34,10 @@ type PlayerState = {
   isGrounded: boolean;
 };
 
-export function useVexRunnerEngine({ onAward }: UseVexRunnerEngineArgs): UseVexRunnerEngineResult {
+export function useVexRunnerEngine({
+  onAward,
+  playerFoodItem,
+}: UseVexRunnerEngineArgs): UseVexRunnerEngineResult {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const frameRef = useRef<number | null>(null);
   const awardedRef = useRef(false);
@@ -32,9 +46,33 @@ export function useVexRunnerEngine({ onAward }: UseVexRunnerEngineArgs): UseVexR
 
   const playerRef = useRef<PlayerState>({ y: 0, velocity: 0, isGrounded: true });
   const obstaclesRef = useRef<VexRunnerObstacle[]>([]);
+  const playerFoodItemRef = useRef<VexRunnerFoodItem>(VEX_RUNNER_DEFAULT_FOOD_ITEM);
   const scoreRef = useRef(0);
   const lastTimeRef = useRef<number>(0);
   const speedRef = useRef(VEX_RUNNER_CONFIG.initialSpeed);
+
+  const resolveFoodItem = useCallback(
+    (
+      preference: VexRunnerFoodItemPreference,
+      previous: VexRunnerFoodItem | null = null,
+    ): VexRunnerFoodItem => {
+      if (preference !== 'random') {
+        return preference;
+      }
+
+      const pool =
+        previous === null
+          ? [...VEX_RUNNER_FOOD_ITEMS]
+          : VEX_RUNNER_FOOD_ITEMS.filter((item) => item !== previous);
+      const selected = pool[Math.floor(Math.random() * pool.length)];
+      return selected ?? VEX_RUNNER_DEFAULT_FOOD_ITEM;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    playerFoodItemRef.current = resolveFoodItem(playerFoodItem);
+  }, [playerFoodItem, resolveFoodItem]);
 
   const resetGameState = useCallback(() => {
     playerRef.current = { y: 0, velocity: 0, isGrounded: true };
@@ -46,9 +84,10 @@ export function useVexRunnerEngine({ onAward }: UseVexRunnerEngineArgs): UseVexR
   }, []);
 
   const restartGame = useCallback(() => {
+    playerFoodItemRef.current = resolveFoodItem(playerFoodItem, playerFoodItemRef.current);
     resetGameState();
     setStatus('running');
-  }, [resetGameState]);
+  }, [playerFoodItem, resetGameState, resolveFoodItem]);
 
   const draw = useCallback(
     (now: number) => {
@@ -101,7 +140,7 @@ export function useVexRunnerEngine({ onAward }: UseVexRunnerEngineArgs): UseVexR
 
         if (obstacles.length > 0 && obstacles[0].x + obstacles[0].width < 0) {
           obstacles.shift();
-          scoreRef.current += 10;
+          scoreRef.current += VEX_RUNNER_CONFIG.scorePerObstacle;
         }
 
         const lastObstacle = obstacles[obstacles.length - 1];
@@ -167,16 +206,15 @@ export function useVexRunnerEngine({ onAward }: UseVexRunnerEngineArgs): UseVexR
         ctx.fill();
       }
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-      ctx.shadowBlur = 10;
-      ctx.fillRect(
+      drawFoodRunner(
+        ctx,
         VEX_RUNNER_CONFIG.playerX,
         playerRef.current.y,
         VEX_RUNNER_CONFIG.playerSize,
-        VEX_RUNNER_CONFIG.playerSize,
+        playerFoodItemRef.current,
+        playerRef.current.velocity,
+        now,
       );
-      ctx.shadowBlur = 0;
 
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.font = '800 24px ui-sans-serif, system-ui';

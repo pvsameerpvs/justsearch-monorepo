@@ -3,8 +3,11 @@
 import type { LocalGameRendererProps } from '../local-game-renderer';
 import { useVexRunnerEngine } from './use-vex-runner-engine';
 
-export function VexRunnerGame({ onAward }: LocalGameRendererProps) {
-  const { canvasRef, status, jump, restartGame } = useVexRunnerEngine({ onAward });
+export function VexRunnerGame({ game, onAward }: LocalGameRendererProps) {
+  const { canvasRef, status, jump, restartGame } = useVexRunnerEngine({
+    onAward,
+    playerFoodItem: game.playerFoodItem ?? 'burger',
+  });
 
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden">

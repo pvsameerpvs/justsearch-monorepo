@@ -1,4 +1,8 @@
 export type VexRunnerStatus = 'running' | 'finished';
+export const VEX_RUNNER_FOOD_ITEMS = ['burger', 'pizza', 'donut', 'taco', 'sushi'] as const;
+export type VexRunnerFoodItem = (typeof VEX_RUNNER_FOOD_ITEMS)[number];
+export type VexRunnerFoodItemPreference = VexRunnerFoodItem | 'random';
+export const VEX_RUNNER_DEFAULT_FOOD_ITEM: VexRunnerFoodItem = 'burger';
 
 export type VexRunnerObstacle = {
   x: number;
@@ -11,6 +15,7 @@ export const VEX_RUNNER_CONFIG = {
   jumpForce: -600,
   initialSpeed: 300,
   speedIncreasePerSecond: 10,
+  scorePerObstacle: 10,
   floorHeight: 50,
   playerSize: 30,
   playerX: 100,

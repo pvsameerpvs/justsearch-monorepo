@@ -53,6 +53,7 @@ export type MenuCategory = {
 };
 
 export type GameType = 'local' | 'embed';
+export type LocalGameFoodItem = 'burger' | 'pizza' | 'donut' | 'taco' | 'sushi';
 
 type BaseGame = {
   id: string;
@@ -69,6 +70,7 @@ type BaseGame = {
 export type LocalGame = BaseGame & {
   type: 'local';
   localGameId: string;
+  playerFoodItem?: LocalGameFoodItem | 'random';
 };
 
 export type EmbedGame = BaseGame & {
