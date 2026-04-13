@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Game } from '@/lib/restaurant-types';
@@ -124,9 +125,16 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
             />
           </div>
 
-          <p className="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+18px)] left-1/2 z-10 -translate-x-1/2 text-center text-[11px] font-semibold uppercase tracking-[0.36em] text-white/95 drop-shadow-[0_4px_10px_rgba(3,43,53,0.34)]">
-            Just Search LLC
-          </p>
+          <div className="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+16px)] left-1/2 z-10 -translate-x-1/2">
+            <Image
+              src="/games/logo-justsearch.png"
+              alt="Just Search"
+              width={160}
+              height={42}
+              priority
+              className="h-auto w-[110px] object-contain drop-shadow-[0_8px_20px_rgba(3,43,53,0.3)] sm:w-[130px]"
+            />
+          </div>
         </>
       ) : (
         <GamePlayerStage game={game} onAward={onAward} />
