@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Coins, Gamepad2, Trophy, Clock3, Sparkles } from 'lucide-react';
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
 import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
 import { useUserGameStats } from '@/components/restaurant/use-user-game-stats';
 import { useRestaurant } from '@/components/restaurant/restaurant-context';
+import { useRegistration } from '@/components/auth/registration-context';
 import { EatPlayGameStatCard } from './eat-play-game-stat-card';
 
 function formatLastPlayed(value: string) {
@@ -20,10 +21,27 @@ function formatLastPlayed(value: string) {
   }).format(new Date(timestamp));
 }
 
+function getTierDetails(points: number) {
+  if (points >= 2000) return { label: 'PLATINUM', color: 'text-sky-700', bg: 'bg-sky-50', border: 'border-sky-200', iconColor: 'text-sky-500' };
+  if (points >= 1200) return { label: 'GOLD', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', iconColor: 'text-amber-500' };
+  if (points >= 600) return { label: 'SILVER', color: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200', iconColor: 'text-slate-400' };
+  return { label: 'ELITE', color: 'text-[rgb(var(--brand))]', bg: 'bg-[rgb(var(--brand-soft)/0.5)]', border: 'border-[rgb(var(--brand)/0.15)]', iconColor: 'text-[rgb(var(--brand))]' };
+}
+
 export function EatPlayProfileScreen() {
   const restaurant = useRestaurant();
   const { points } = useLoyaltyPoints();
   const { getGameStat } = useUserGameStats();
+  const { user } = useRegistration();
+  const userName = user?.name ?? 'Guest Explorer';
+
+  const [playerId, setPlayerId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setPlayerId(Math.floor(Math.random() * 9000) + 1000);
+  }, []);
+
+  const tier = useMemo(() => getTierDetails(points), [points]);
 
   const gameSnapshots = useMemo(() => {
     return restaurant.games
@@ -54,11 +72,20 @@ export function EatPlayProfileScreen() {
       }
     }
 
+    // Level calculation: Every 10 rounds = 1 level
+    const level = Math.floor(roundsPlayed / 10) + 1;
+    const currentLevelRounds = roundsPlayed % 10;
+    const progressToNextLevel = (currentLevelRounds / 10) * 100;
+    const roundsNeeded = 10 - currentLevelRounds;
+
     return {
       roundsPlayed,
       bestScore,
       playedGames,
       lastPlayed,
+      level,
+      progressToNextLevel,
+      roundsNeeded,
     };
   }, [gameSnapshots]);
 
@@ -73,93 +100,148 @@ export function EatPlayProfileScreen() {
     <section className="py-8 sm:py-10">
       <Container>
         <div className="space-y-5">
-          <Surface className="relative overflow-hidden rounded-[30px] border-white/75 bg-[linear-gradient(145deg,rgba(255,247,222,0.95),rgba(255,255,255,0.98),rgba(240,249,255,0.9))] p-6 sm:p-8">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[rgb(var(--brand-soft)/0.65)] blur-2xl"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -left-10 bottom-0 h-36 w-36 rounded-full bg-[rgb(var(--accent-soft)/0.6)] blur-2xl"
-            />
+          {/* Gaming Header - Epic Premium Theme */}
+          <Surface className="relative overflow-hidden rounded-[40px] border-white/80 bg-[linear-gradient(145deg,rgba(var(--brand-rgb),0.1),rgba(255,255,255,0.98),rgba(var(--accent-rgb),0.08))] p-6 sm:p-12 shadow-xl shadow-black/5 ring-1 ring-black/[0.03]">
+            {/* Immersive Decorative Background */}
+            <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgb(var(--brand-soft)/0.5),transparent_70%)] blur-[100px]" />
+            <div className="absolute -left-32 -bottom-32 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-soft)/0.4),transparent_70%)] blur-[100px]" />
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
 
-            <p className="relative text-[11px] font-bold uppercase tracking-[0.22em] text-[rgb(var(--brand))]">
-              Game Profile
-            </p>
-            <h1 className="relative mt-2 font-display text-3xl font-semibold tracking-[-0.05em] text-[rgb(var(--ink))]">
-              My Game Details
-            </h1>
-            <p className="relative mt-2 text-sm font-medium text-[rgb(var(--muted))]">
-              Track your scores and progress across all games in this restaurant.
-            </p>
-
-            <div className="relative mt-5 grid gap-3 sm:grid-cols-4">
-              <div className="rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/85 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--muted))]">
-                  Gold Coins
-                </p>
-                <p className="mt-2 inline-flex items-center gap-2 font-display text-2xl font-semibold tracking-[-0.04em] text-amber-700">
-                  <Coins className="h-5 w-5" />
-                  {points.toLocaleString()}
-                </p>
+            <div className="relative flex flex-col items-stretch gap-10 md:flex-row md:items-center">
+              {/* Level / Rank Badge - Much more clear */}
+              <div className="relative flex shrink-0 justify-center md:justify-start">
+                <div className="group relative flex h-32 w-32 items-center justify-center">
+                  {/* Rotating Outer Ring */}
+                  <div className="absolute inset-0 rounded-[2.5rem] border-4 border-dashed border-[rgb(var(--brand)/0.2)] animate-[spin_20s_linear_infinite]" />
+                  {/* Inner Badge */}
+                  <div className="relative flex h-28 w-28 items-center justify-center rounded-[2rem] bg-white p-1.5 shadow-2xl ring-1 ring-black/[0.05] transition-transform group-hover:scale-105">
+                    <div className="flex h-full w-full flex-col items-center justify-center rounded-[1.6rem] bg-[linear-gradient(135deg,rgb(var(--brand)),rgb(var(--accent)))] text-white shadow-inner">
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Level</span>
+                      <span className="font-display text-5xl font-black leading-none">{totals.level}</span>
+                    </div>
+                  </div>
+                  {/* Floating Rank Ornament */}
+                  <div className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-lg ring-4 ring-white">
+                    <Trophy className="h-5 w-5" />
+                  </div>
+                </div>
               </div>
 
-              <div className="rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/85 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--muted))]">
-                  Games Played
-                </p>
-                <p className="mt-2 inline-flex items-center gap-2 font-display text-2xl font-semibold tracking-[-0.04em] text-[rgb(var(--ink))]">
-                  <Gamepad2 className="h-5 w-5 text-[rgb(var(--brand))]" />
-                  {totals.playedGames}
-                </p>
+              <div className="flex-1 space-y-6">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--muted))]">
+                      ID: PLR_{playerId || '....'}
+                    </span>
+                  </div>
+                  <h1 className="mt-1 font-display text-4xl font-black tracking-tight text-[rgb(var(--ink))] sm:text-5xl">
+                    {userName}
+                  </h1>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <span className={`inline-flex items-center gap-1.5 rounded-full ${tier.bg} px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] ${tier.color} ${tier.border} border shadow-sm transition-all`}>
+                      <Sparkles className={`h-3 w-3 animate-pulse ${tier.iconColor}`} />
+                      {tier.label} MEMBER
+                    </span>
+                  </div>
+                </div>
+
+                {/* Level Progress - Professional Detail */}
+                <div className="max-w-md space-y-3">
+                  <div className="flex items-end justify-between">
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[rgb(var(--muted))]">XP PROGRESSION</p>
+                      <p className="text-sm font-bold text-[rgb(var(--ink))]">
+                        {totals.roundsPlayed.toLocaleString()} <span className="text-[rgb(var(--muted))]">/ { (totals.roundsPlayed + totals.roundsNeeded).toLocaleString() } XP</span>
+                      </p>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-[rgb(var(--brand))]">NEXT LEVEL</p>
+                       <p className="text-sm font-bold text-[rgb(var(--ink))]">LVL {totals.level + 1}</p>
+                    </div>
+                  </div>
+                  <div className="h-4 w-full overflow-hidden rounded-full bg-slate-100 p-1 ring-1 ring-black/[0.05]">
+                    <div 
+                      className="group relative h-full rounded-full bg-[linear-gradient(90deg,rgb(var(--brand)),rgb(var(--accent)))] shadow-[0_0_15px_rgba(var(--brand-rgb),0.4)] transition-all duration-1000"
+                      style={{ width: `${totals.progressToNextLevel}%` }}
+                    >
+                      {/* Inner sheen effect */}
+                      <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)]" />
+                    </div>
+                  </div>
+                  <p className="flex items-center gap-2 text-xs font-bold text-[rgb(var(--brand))]">
+                    <Gamepad2 className="h-4 w-4" />
+                    Play {totals.roundsNeeded} more rounds to rank up!
+                  </p>
+                </div>
               </div>
 
-              <div className="rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/85 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--muted))]">
-                  Total Rounds
+              {/* Play Credits - More "Wallet" style */}
+              <div className="relative overflow-hidden rounded-[32px] border-2 border-white bg-white/60 p-6 shadow-xl shadow-black/5 ring-1 ring-black/[0.02] backdrop-blur-md md:min-w-[200px]">
+                <div className="absolute -right-4 -top-4 opacity-[0.05]">
+                   <Coins className="h-24 w-24 rotate-12" />
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[rgb(var(--muted))]">
+                  GAME WALLET
                 </p>
-                <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.04em] text-[rgb(var(--ink))]">
-                  {totals.roundsPlayed.toLocaleString()}
-                </p>
-              </div>
-
-              <div className="rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/85 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--muted))]">
-                  Best Score
-                </p>
-                <p className="mt-2 inline-flex items-center gap-2 font-display text-2xl font-semibold tracking-[-0.04em] text-[rgb(var(--ink))]">
-                  <Trophy className="h-5 w-5 text-amber-500" />
-                  {totals.bestScore.toLocaleString()}
-                </p>
+                <div className="mt-2 flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                    <Coins className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <p className="font-display text-4xl font-black tracking-tight text-amber-600">
+                      {points.toLocaleString()}
+                    </p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-amber-600/60">LOYALTY COINS</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="relative mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-[rgb(var(--border)/0.9)] bg-white/80 px-4 text-xs font-medium text-[rgb(var(--muted))]">
-                <Clock3 className="h-4 w-4 text-[rgb(var(--brand))]" />
-                Last played: {formatLastPlayed(totals.lastPlayed)}
-              </div>
-              <div className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-[rgb(var(--border)/0.9)] bg-white/80 px-4 text-xs font-medium text-[rgb(var(--muted))]">
-                <Sparkles className="h-4 w-4 text-amber-500" />
-                Top game: {topGame ? topGame.game.name : 'Play a game to unlock'}
-              </div>
+            {/* Quick Stats Banner */}
+            <div className="relative mt-12 grid grid-cols-2 gap-4 rounded-3xl border border-white/50 bg-white/30 p-4 backdrop-blur-sm sm:grid-cols-4 sm:p-6">
+              {[
+                { label: 'CHALLENGES', value: `${totals.playedGames} / ${restaurant.games.length}` },
+                { label: 'TOTAL ROUNDS', value: totals.roundsPlayed.toLocaleString() },
+                { label: 'PERSONAL BEST', value: totals.bestScore.toLocaleString() },
+                { 
+                  label: 'LAST PLAYED', 
+                  value: totals.lastPlayed ? formatLastPlayed(totals.lastPlayed).toUpperCase() : 'NO HISTORY',
+                  isExtraSmall: true
+                }
+              ].map((item, idx) => (
+                <div key={item.label} className={`flex flex-col px-2 ${idx < 3 ? 'sm:border-r border-black/[0.03]' : ''} ${idx % 2 === 0 ? 'border-r border-black/[0.03]' : ''}`}>
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[rgb(var(--muted))]">{item.label}</p>
+                  <p className={`mt-1 font-display ${item.isExtraSmall ? 'text-[10px] truncate mt-2 font-black text-[rgb(var(--brand))] opacity-80' : 'text-2xl font-black text-[rgb(var(--ink))]'}`}>
+                    {item.value}
+                  </p>
+                </div>
+              ))}
             </div>
           </Surface>
 
-          <div className="space-y-2 px-1">
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[rgb(var(--muted))]">
-              Your Game Library
-            </p>
-          </div>
+          {/* Game Library Section */}
+          <div className="space-y-4 px-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="h-4 w-1 rounded-full bg-[rgb(var(--brand))]" />
+                <h2 className="text-[11px] font-black uppercase tracking-[0.25em] text-[rgb(var(--muted))]">
+                  Available Games
+                </h2>
+              </div>
+              <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-[rgb(var(--brand))] shadow-sm ring-1 ring-black/[0.05]">
+                {gameSnapshots.length} Challenges
+              </span>
+            </div>
 
-          <div className="space-y-4">
-            {gameSnapshots.map((snapshot) => (
-              <EatPlayGameStatCard
-                key={snapshot.game.id}
-                game={snapshot.game}
-                stat={snapshot.stat}
-              />
-            ))}
+            <div className="grid gap-4 sm:grid-cols-1">
+              {gameSnapshots.map((snapshot) => (
+                <EatPlayGameStatCard
+                  key={snapshot.game.id}
+                  game={snapshot.game}
+                  stat={snapshot.stat}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </Container>
