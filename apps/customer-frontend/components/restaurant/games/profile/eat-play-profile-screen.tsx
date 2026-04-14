@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
-import { Coins, Gamepad2, Trophy, Clock3, Sparkles } from 'lucide-react';
+import { Coins, Gamepad2, Trophy, Sparkles } from 'lucide-react';
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
 import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';

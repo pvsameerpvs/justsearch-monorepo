@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Trophy, BarChart3, Clock3, Target, Gamepad2, Play } from 'lucide-react';
+import { Trophy, BarChart3, Clock3, Gamepad2, Play } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
 import type { Game } from '@/lib/restaurant-types';
 
