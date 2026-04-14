@@ -28,6 +28,7 @@ const routeTitles: Record<string, string> = {
 const gameTitles: Record<string, string> = {
   'hungry-bird-rush': 'Hungry Bird Rush',
   'vex-runner': 'Jump & Bite',
+  'cheese-chase': 'Cheddar Chase',
 };
 
 function getHeaderTitle(pathname: string) {

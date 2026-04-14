@@ -245,6 +245,20 @@ export const mockRestaurants: Record<string, Restaurant> = {
         isAvailable: true,
         tag: 'NEW',
       },
+      {
+        id: 'cheese-chase',
+        name: 'Cheddar Chase',
+        description: 'Guide the mouse through 50 increasingly complex mazes to reach the cheese.',
+        type: 'local',
+        localGameId: 'cheese-chase',
+        icon: '🧀',
+        coverImageUrl: '/games/cheddar-chase.png',
+        prize: 'Up to 2500 points',
+        communityTopScore: 0,
+        accessLevel: 'public',
+        isAvailable: true,
+        tag: 'PRO',
+      },
     ],
     reviews: [
       {
