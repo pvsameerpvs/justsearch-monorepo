@@ -89,12 +89,6 @@ export function EatPlayProfileScreen() {
     };
   }, [gameSnapshots]);
 
-  const topGame = useMemo(() => {
-    if (gameSnapshots.length === 0) return null;
-    const played = gameSnapshots.filter((snapshot) => snapshot.stat.roundsPlayed > 0);
-    const source = played.length > 0 ? played : gameSnapshots;
-    return [...source].sort((a, b) => b.stat.highScore - a.stat.highScore)[0] ?? null;
-  }, [gameSnapshots]);
 
   return (
     <section className="py-8 sm:py-10">
