@@ -259,6 +259,20 @@ export const mockRestaurants: Record<string, Restaurant> = {
         isAvailable: true,
         tag: 'PRO',
       },
+      {
+        id: 'memory-match',
+        name: 'Gem Match',
+        description: 'Classic card matching game. Test your memory by finding all pairs of gems in the fewest moves.',
+        type: 'local',
+        localGameId: 'memory-match',
+        icon: '🃏',
+        coverImageUrl: '/games/gem-match.png',
+        prize: 'Up to 2000 points',
+        communityTopScore: 0,
+        accessLevel: 'public',
+        isAvailable: true,
+        tag: 'HOT',
+      },
     ],
     reviews: [
       {
