@@ -19,7 +19,9 @@ type RestaurantLayoutManagerProps = {
 export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerProps) {
   const restaurant = useRestaurant();
   const pathname = usePathname();
-  const isGameDetailPage = pathname.startsWith('/eat-play/') && pathname !== '/eat-play';
+  const isGameProfilePage = pathname === '/eat-play/profile';
+  const isGameDetailPage =
+    pathname.startsWith('/eat-play/') && pathname !== '/eat-play' && !isGameProfilePage;
 
   const showRestaurantChrome = pathname !== '/' && !isGameDetailPage;
   const hideBottomNavOnCheckout =

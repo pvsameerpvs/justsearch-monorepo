@@ -6,12 +6,14 @@ import { useMemo } from 'react';
 import { ArrowLeft, User } from 'lucide-react';
 import { useSmartBackNavigation } from '@/components/layout/use-smart-back-navigation';
 import { useMeasuredCssVarHeight } from '@/components/layout/use-measured-css-var-height';
+import { EatPlayHeaderWalletLink } from '@/components/restaurant/games/profile/eat-play-header-wallet-link';
 
 const routeTitles: Record<string, string> = {
   '/menu': 'Menu',
   '/menu/checkout': 'Checkout',
   '/menu/checkout/status': 'Order Status',
   '/eat-play': 'Games',
+  '/eat-play/profile': 'Game Profile',
   '/google-reviews': 'Reviews',
   '/social-media': 'Social',
   '/profile': 'Profile',
@@ -24,6 +26,7 @@ const routeTitles: Record<string, string> = {
 };
 
 const gameTitles: Record<string, string> = {
+  'hungry-bird-rush': 'Hungry Bird Rush',
   'vex-runner': 'Jump & Bite',
 };
 
@@ -92,6 +95,7 @@ export function RestaurantMobileHeader() {
   const goBack = pathname.startsWith('/menu/checkout/status')
     ? () => router.push(backHref)
     : smartBack;
+  const isEatPlayProfileContext = pathname === '/eat-play' || pathname === '/eat-play/profile';
 
   return (
     <div
@@ -115,13 +119,17 @@ export function RestaurantMobileHeader() {
             </p>
           </div>
 
-          <Link
-            href="/profile"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[rgb(var(--border)/0.9)] bg-[rgb(var(--brand-soft)/0.7)] text-[rgb(var(--brand))] shadow-sm transition-all active:scale-90"
-            aria-label="Profile"
-          >
-            <User className="h-5 w-5" />
-          </Link>
+          {isEatPlayProfileContext ? (
+            <EatPlayHeaderWalletLink />
+          ) : (
+            <Link
+              href="/profile"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[rgb(var(--border)/0.9)] bg-[rgb(var(--brand-soft)/0.7)] text-[rgb(var(--brand))] shadow-sm transition-all active:scale-90"
+              aria-label="Profile"
+            >
+              <User className="h-5 w-5" />
+            </Link>
+          )}
         </div>
       </div>
     </div>
