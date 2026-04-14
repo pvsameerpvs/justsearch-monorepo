@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
-import { Coins, Gamepad2, Trophy, Sparkles } from 'lucide-react';
+import { Coins, Gamepad2, Trophy, Sparkles, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
 import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
@@ -9,6 +10,7 @@ import { useUserGameStats } from '@/components/restaurant/use-user-game-stats';
 import { useRestaurant } from '@/components/restaurant/restaurant-context';
 import { useRegistration } from '@/components/auth/registration-context';
 import { EatPlayGameStatCard } from './eat-play-game-stat-card';
+import { getLoyaltyTier, calculatePlayerLevel, getStablePlayerId } from '@/lib/loyalty-utils';
 
 function formatLastPlayed(value: string) {
   if (!value) return 'No game played yet';
@@ -21,27 +23,24 @@ function formatLastPlayed(value: string) {
   }).format(new Date(timestamp));
 }
 
-function getTierDetails(points: number) {
-  if (points >= 2000) return { label: 'PLATINUM', color: 'text-sky-700', bg: 'bg-sky-50', border: 'border-sky-200', iconColor: 'text-sky-500' };
-  if (points >= 1200) return { label: 'GOLD', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', iconColor: 'text-amber-500' };
-  if (points >= 600) return { label: 'SILVER', color: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200', iconColor: 'text-slate-400' };
+function getTierUI(tier: string) {
+  if (tier === 'PLATINUM') return { label: 'PLATINUM', color: 'text-sky-700', bg: 'bg-sky-50', border: 'border-sky-200', iconColor: 'text-sky-500' };
+  if (tier === 'GOLD') return { label: 'GOLD', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', iconColor: 'text-amber-500' };
+  if (tier === 'SILVER') return { label: 'SILVER', color: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200', iconColor: 'text-slate-400' };
   return { label: 'ELITE', color: 'text-[rgb(var(--brand))]', bg: 'bg-[rgb(var(--brand-soft)/0.5)]', border: 'border-[rgb(var(--brand)/0.15)]', iconColor: 'text-[rgb(var(--brand))]' };
 }
 
 export function EatPlayProfileScreen() {
+  const router = useRouter();
   const restaurant = useRestaurant();
   const { points } = useLoyaltyPoints();
   const { getGameStat } = useUserGameStats();
   const { user } = useRegistration();
   const userName = user?.name ?? 'Guest Explorer';
 
-  const [playerId, setPlayerId] = useState<number | null>(null);
-
-  useEffect(() => {
-    setPlayerId(Math.floor(Math.random() * 9000) + 1000);
-  }, []);
-
-  const tier = useMemo(() => getTierDetails(points), [points]);
+  const tierLabel = getLoyaltyTier(points);
+  const tier = useMemo(() => getTierUI(tierLabel), [tierLabel]);
+  const playerId = getStablePlayerId(user?.mobile || userName);
 
   const gameSnapshots = useMemo(() => {
     return restaurant.games
@@ -72,20 +71,12 @@ export function EatPlayProfileScreen() {
       }
     }
 
-    // Level calculation: Every 10 rounds = 1 level
-    const level = Math.floor(roundsPlayed / 10) + 1;
-    const currentLevelRounds = roundsPlayed % 10;
-    const progressToNextLevel = (currentLevelRounds / 10) * 100;
-    const roundsNeeded = 10 - currentLevelRounds;
-
     return {
+      ...calculatePlayerLevel(roundsPlayed),
       roundsPlayed,
       bestScore,
       playedGames,
       lastPlayed,
-      level,
-      progressToNextLevel,
-      roundsNeeded,
     };
   }, [gameSnapshots]);
 
@@ -93,7 +84,10 @@ export function EatPlayProfileScreen() {
   return (
     <section className="py-8 sm:py-10">
       <Container>
-        <div className="space-y-5">
+        <div className="space-y-6">
+          {/* Top Navigation / Exit */}
+         
+
           {/* Gaming Header - Epic Premium Theme */}
           <Surface className="relative overflow-hidden rounded-[40px] border-white/80 bg-[linear-gradient(145deg,rgba(var(--brand-rgb),0.1),rgba(255,255,255,0.98),rgba(var(--accent-rgb),0.08))] p-6 sm:p-12 shadow-xl shadow-black/5 ring-1 ring-black/[0.03]">
             {/* Immersive Decorative Background */}
@@ -125,7 +119,7 @@ export function EatPlayProfileScreen() {
                 <div>
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--muted))]">
-                      ID: PLR_{playerId || '....'}
+                      ID: PLR_{playerId}
                     </span>
                   </div>
                   <h1 className="mt-1 font-display text-4xl font-black tracking-tight text-[rgb(var(--ink))] sm:text-5xl">
@@ -133,7 +127,10 @@ export function EatPlayProfileScreen() {
                   </h1>
                   <div className="mt-4 flex flex-wrap items-center gap-3">
                     <span className={`inline-flex items-center gap-1.5 rounded-full ${tier.bg} px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] ${tier.color} ${tier.border} border shadow-sm transition-all`}>
-                      <Sparkles className={`h-3 w-3 animate-pulse ${tier.iconColor}`} />
+                      <span className="relative flex h-2 w-2 mr-1">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75"></span>
+                        <Sparkles className={`relative inline-flex h-2 w-2 ${tier.iconColor}`} />
+                      </span>
                       {tier.label} MEMBER
                     </span>
                   </div>
@@ -145,7 +142,7 @@ export function EatPlayProfileScreen() {
                     <div className="space-y-0.5">
                       <p className="text-[10px] font-black uppercase tracking-widest text-[rgb(var(--muted))]">XP PROGRESSION</p>
                       <p className="text-sm font-bold text-[rgb(var(--ink))]">
-                        {totals.roundsPlayed.toLocaleString()} <span className="text-[rgb(var(--muted))]">/ { (totals.roundsPlayed + totals.roundsNeeded).toLocaleString() } XP</span>
+                        {totals.totalXP.toLocaleString()} <span className="text-[rgb(var(--muted))]">/ { (totals.totalXP + totals.neededXP).toLocaleString() } XP</span>
                       </p>
                     </div>
                     <div className="text-right">
@@ -156,7 +153,7 @@ export function EatPlayProfileScreen() {
                   <div className="h-4 w-full overflow-hidden rounded-full bg-slate-100 p-1 ring-1 ring-black/[0.05]">
                     <div 
                       className="group relative h-full rounded-full bg-[linear-gradient(90deg,rgb(var(--brand)),rgb(var(--accent)))] shadow-[0_0_15px_rgba(var(--brand-rgb),0.4)] transition-all duration-1000"
-                      style={{ width: `${totals.progressToNextLevel}%` }}
+                      style={{ width: `${totals.progress}%` }}
                     >
                       {/* Inner sheen effect */}
                       <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)]" />
@@ -164,7 +161,7 @@ export function EatPlayProfileScreen() {
                   </div>
                   <p className="flex items-center gap-2 text-xs font-bold text-[rgb(var(--brand))]">
                     <Gamepad2 className="h-4 w-4" />
-                    Play {totals.roundsNeeded} more rounds to rank up!
+                    Play {totals.neededXP} more rounds to rank up!
                   </p>
                 </div>
               </div>
@@ -185,7 +182,9 @@ export function EatPlayProfileScreen() {
                       <p className="font-display text-5xl font-black tracking-tight text-amber-600">
                         {points.toLocaleString()}
                       </p>
-                      <span className="text-xs font-bold text-amber-600/60 uppercase">Coins</span>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-amber-600/60 uppercase">Coins</span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100/80 text-amber-600 shadow-inner">

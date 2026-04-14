@@ -7,47 +7,47 @@ import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
 import { ProfileMenuItem } from '@/components/restaurant/profile/profile-menu-item';
 import { Gamepad2, Gift, HelpCircle, MapPin, Settings, ShoppingBag, Star, Ticket, User } from 'lucide-react';
 import { useRegistration } from '@/components/auth/registration-context';
-
+import { getLoyaltyTier, getStablePlayerId } from '@/lib/loyalty-utils';
 export default function ProfilePage() {
   const { points } = useLoyaltyPoints();
   const { user, isRegistered, openModal } = useRegistration();
 
-  const userName = user?.name ?? 'Guest';
-  const tierLabel =
-    points >= 2000 ? 'Platinum' : points >= 1200 ? 'Gold' : points >= 600 ? 'Silver' : 'Member';
+  const userName = user?.name ?? 'Guest explorer';
+  const tier = getLoyaltyTier(points);
+  const playerId = getStablePlayerId(user?.mobile || userName);
 
   return (
     <section className="py-8 sm:py-10">
       <Container>
         <div className="grid gap-6 lg:grid-cols-[380px_1fr] lg:items-start">
-          <Surface className="rounded-[32px] border-white/70 bg-[linear-gradient(145deg,rgb(var(--brand-soft)/0.35),rgba(255,255,255,0.92),rgb(var(--accent-soft)/0.35))] p-6 sm:p-8">
+          <Surface className="rounded-[32px] border-white/70 bg-[linear-gradient(145deg,rgb(var(--brand-soft)/0.35),rgba(255,255,255,0.92),rgb(var(--accent-soft)/0.35))] p-6 sm:p-8 shadow-xl shadow-black/5 ring-1 ring-black/[0.03]">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-white/80 text-slate-500 shadow-sm">
+                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-white/80 text-slate-500 shadow-sm ring-1 ring-black/[0.05]">
                   <User className="h-7 w-7" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-2xl bg-[rgb(var(--brand))] text-white shadow-lg">
+                <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-2xl bg-[rgb(var(--brand))] text-white shadow-lg ring-2 ring-white">
                   <Star className="h-4 w-4" />
                 </div>
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(var(--brand))]">
-                  Demo profile
-                </p>
-                <h1 className="mt-1 truncate font-display text-2xl font-semibold tracking-[-0.06em] text-[rgb(var(--ink))]">
+                 <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[rgb(var(--brand))]">
+                    PLAYER ID: PLR_{playerId}
+                 </p>
+                <h1 className="mt-1 truncate font-display text-2xl font-black tracking-tight text-[rgb(var(--ink))]">
                   {userName}
                 </h1>
-                <div className="mt-1 space-y-1 text-sm font-medium text-[rgb(var(--muted))]">
-                  <p>Status: {tierLabel} member</p>
+                 <div className="mt-1 space-y-1 text-[11px] font-bold text-[rgb(var(--muted))] uppercase tracking-tight">
+                  <p className="flex items-center gap-1.5"><Star className="h-3 w-3 text-amber-500 fill-current" /> {tier} member</p>
                   {isRegistered && user ? (
-                    <p className="font-mono">{user.mobile}</p>
+                    <p className="font-mono text-[rgb(var(--brand))]">{user.mobile}</p>
                   ) : (
                     <button
                       type="button"
                       onClick={openModal}
-                      className="text-left text-sm font-semibold text-[rgb(var(--brand))] hover:underline"
+                      className="text-left font-black text-[rgb(var(--brand))] hover:underline"
                     >
-                      Verify mobile to play games
+                      Verify mobile to unlock rewards
                     </button>
                   )}
                 </div>
@@ -55,18 +55,25 @@ export default function ProfilePage() {
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/80 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--muted))]">
-                  Points
-                </p>
-                <p className="mt-1 font-display text-2xl font-semibold tracking-[-0.05em] text-[rgb(var(--brand))]">
-                  {points}
-                </p>
-              </div>
               <Link
-                href="/eat-play"
+                href="/eat-play/profile"
+                className="group relative overflow-hidden rounded-[26px] border border-white bg-white/60 p-5 shadow-sm ring-1 ring-black/[0.02] transition-all hover:bg-white"
+              >
+                <p className="text-[10px] font-black uppercase tracking-widest text-[rgb(var(--muted))]">
+                  Wallet Balance
+                </p>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <p className="font-display text-3xl font-black tracking-tight text-[rgb(var(--brand))]">
+                    {points.toLocaleString()}
+                  </p>
+                </div>
+              </Link>
+
+              <Link
+                href="/eat-play/profile"
                 className="flex items-center justify-between rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/80 p-4 transition-all hover:bg-white"
               >
+
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-[rgb(var(--muted))]">
                     Play
