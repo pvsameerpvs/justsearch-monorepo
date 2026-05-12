@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { MenuItem, Restaurant } from '@/lib/restaurant-types';
 
 export type FulfillmentMode = 'dine-in' | 'delivery';

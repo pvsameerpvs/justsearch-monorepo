@@ -121,10 +121,14 @@ export function RegistrationModal() {
         body: JSON.stringify({ name: values.name.trim(), mobile: `+971${values.mobileLocalDigits}` }),
       });
 
-      const payload = (await response.json().catch(() => null)) as any;
+      const payload = (await response.json().catch(() => null)) as unknown;
 
       if (!response.ok) {
-        setError(typeof payload?.error === 'string' ? payload.error : 'Failed to request OTP');
+        const errorMessage =
+          payload && typeof payload === 'object' && typeof (payload as Record<string, unknown>).error === 'string'
+            ? ((payload as Record<string, unknown>).error as string)
+            : 'Failed to request OTP';
+        setError(errorMessage);
         setBusy(false);
         return;
       }
@@ -156,10 +160,14 @@ export function RegistrationModal() {
         }),
       });
 
-      const payload = (await response.json().catch(() => null)) as any;
+      const payload = (await response.json().catch(() => null)) as unknown;
 
       if (!response.ok) {
-        setError(typeof payload?.error === 'string' ? payload.error : 'Failed to verify OTP');
+        const errorMessage =
+          payload && typeof payload === 'object' && typeof (payload as Record<string, unknown>).error === 'string'
+            ? ((payload as Record<string, unknown>).error as string)
+            : 'Failed to verify OTP';
+        setError(errorMessage);
         setBusy(false);
         return;
       }

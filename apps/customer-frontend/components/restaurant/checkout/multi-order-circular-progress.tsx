@@ -1,7 +1,5 @@
 "use client";
 
-import React from 'react';
-
 type OrderProgress = {
   id: string;
   progress: number;

@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Volume2, VolumeX } from 'lucide-react';
+import { AdTimer } from './ad-timer';
+import { AdSkipButton } from './ad-skip-button';
 
 const DEMO_ADS = [
   {
@@ -96,13 +98,7 @@ export function AdOverlay({ onComplete, onSkip }: AdOverlayProps) {
         className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/90 p-4"
       >
         <div className="relative w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
-          {/* Progress bar */}
-          <div className="absolute left-0 right-0 top-0 h-1 bg-slate-200">
-            <motion.div
-              className="h-full bg-amber-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          <AdTimer progress={progress} />
 
           {/* Controls */}
           <div className="absolute right-3 top-3 z-10 flex gap-2">
@@ -133,16 +129,7 @@ export function AdOverlay({ onComplete, onSkip }: AdOverlayProps) {
             </div>
           </div>
 
-          {/* Skip button */}
-          <div className="border-t border-slate-100 p-4">
-            <button
-              type="button"
-              onClick={handleSkip}
-              className="w-full rounded-xl bg-slate-100 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200"
-            >
-              {isLastAd ? 'Play Game' : 'Skip Ad'}
-            </button>
-          </div>
+          <AdSkipButton isLastAd={isLastAd} onSkip={handleSkip} />
         </div>
       </motion.div>
     </AnimatePresence>

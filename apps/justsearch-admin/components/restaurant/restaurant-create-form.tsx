@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@justsearch/ui';
+import { generateSlug, SlugPreview } from '@/lib/slug-utils';
 
 const restaurantSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -19,13 +20,6 @@ type RestaurantCreateFormProps = {
   onSubmit: (data: RestaurantFormData) => void;
   onCancel: () => void;
 };
-
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
 
 export function RestaurantCreateForm({ onSubmit, onCancel }: RestaurantCreateFormProps) {
   const [previewSlug, setPreviewSlug] = useState('');
@@ -59,17 +53,7 @@ export function RestaurantCreateForm({ onSubmit, onCancel }: RestaurantCreateFor
         )}
       </div>
 
-      {previewSlug && (
-        <div className="rounded-lg bg-slate-50 p-3">
-          <p className="text-xs text-slate-500">Auto-generated domains:</p>
-          <p className="mt-1 text-xs font-mono text-slate-700">
-            {previewSlug}.js-restorant.com
-          </p>
-          <p className="text-xs font-mono text-slate-700">
-            {previewSlug}-booking.js-restorant.com
-          </p>
-        </div>
-      )}
+      <SlugPreview slug={previewSlug} />
 
       <div>
         <label className="text-sm font-semibold text-slate-700">City</label>

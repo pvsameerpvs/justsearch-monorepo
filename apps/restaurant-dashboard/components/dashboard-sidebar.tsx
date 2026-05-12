@@ -4,17 +4,12 @@ import { memo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
-  ShoppingBag,
-  UtensilsCrossed,
-  Ticket,
-  Users,
-  BarChart3,
-  Truck,
-  Settings,
-  Menu,
-  X,
+  LayoutDashboard, ShoppingBag, UtensilsCrossed, Ticket,
+  Users, BarChart3, Truck, Settings,
 } from 'lucide-react';
+import { SidebarFooter } from './dashboard-sidebar-footer';
+import { MobileToggle } from './mobile-toggle';
+import { SidebarBrand } from './sidebar-brand';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -31,58 +26,42 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = useCallback(() => setIsOpen((prev) => !prev), []);
-  const closeMenu = useCallback(() => setIsOpen(false), []);
+  const toggle = useCallback(() => setIsOpen((p) => !p), []);
+  const close = useCallback(() => setIsOpen(false), []);
 
   return (
     <>
-      {/* Mobile toggle */}
-      <button
-        type="button"
-        onClick={toggleMenu}
-        className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-md md:hidden"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </button>
+      <MobileToggle isOpen={isOpen} onToggle={toggle} />
 
-      {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={closeMenu}
-          aria-hidden="true"
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
+          onClick={close}
         />
       )}
 
-      {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 h-full w-64 bg-slate-900 text-white transition-transform duration-200 ease-out md:translate-x-0 ${
+        className={`fixed left-0 top-0 z-40 flex h-full w-[260px] flex-col bg-[#0B0F19] text-white transition-transform duration-300 md:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex h-16 items-center border-b border-slate-800 px-6">
-          <h1 className="text-lg font-bold">Restaurant Hub</h1>
-        </div>
+        <SidebarBrand />
 
-        <nav className="p-4">
-          <ul className="space-y-1">
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-2">
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-600">Menu</p>
+          <ul className="space-y-0.5">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-
+              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    onClick={closeMenu}
-                    className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-amber-500 text-white'
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                    }`}
+                    onClick={close}
+                    className={active ? 'sidebar-item-active' : 'sidebar-item-inactive'}
                   >
-                    <Icon className="h-5 w-5 shrink-0" />
+                    <Icon className="h-4 w-4" strokeWidth={active ? 2.5 : 2} />
                     {item.label}
                   </Link>
                 </li>
@@ -91,17 +70,7 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
           </ul>
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-slate-800 p-4">
-          <div className="flex items-center gap-3 rounded-lg bg-slate-800 p-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-xs font-bold">
-              MT
-            </div>
-            <div>
-              <p className="text-sm font-medium">Mosaic Table</p>
-              <p className="text-xs text-slate-400">Admin</p>
-            </div>
-          </div>
-        </div>
+        <SidebarFooter />
       </aside>
     </>
   );

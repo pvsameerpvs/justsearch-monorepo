@@ -9,14 +9,45 @@ const HERE_MAP_SCRIPT_URLS = [
   'https://js.api.here.com/v3/3.1/mapsjs-mapevents.js',
 ];
 
+type HereMapInstance = {
+  screenToGeo: (x: number, y: number) => { lat: number; lng: number } | null;
+  addObject: (obj: unknown) => void;
+  removeEventListener: (type: string, handler: unknown) => void;
+  addEventListener: (type: string, handler: unknown) => void;
+  getViewPort: () => { resize: () => void };
+  setCenter: (center: { lat: number; lng: number }, animate?: boolean) => void;
+  dispose: () => void;
+};
+
+type HereMarkerInstance = {
+  setGeometry: (geo: { lat: number; lng: number }) => void;
+};
+
+type HereBehaviorInstance = unknown;
+
+type HereTapEvent = {
+  currentPointer?: {
+    viewportX: number;
+    viewportY: number;
+  };
+};
+
+type HereDefaultLayers = {
+  vector: {
+    normal: {
+      map: unknown;
+    };
+  };
+};
+
 type HereGlobalWindow = Window & {
   H?: {
-    Map: new (...args: any[]) => any;
-    map: { Marker: new (...args: any[]) => any };
-    service: { Platform: new (...args: any[]) => any };
+    Map: new (...args: unknown[]) => HereMapInstance;
+    map: { Marker: new (...args: unknown[]) => HereMarkerInstance };
+    service: { Platform: new (...args: unknown[]) => { createDefaultLayers: () => HereDefaultLayers } };
     mapevents: {
-      MapEvents: new (...args: any[]) => any;
-      Behavior: new (...args: any[]) => any;
+      MapEvents: new (...args: unknown[]) => unknown;
+      Behavior: new (...args: unknown[]) => HereBehaviorInstance;
     };
   };
   __hereMapsSdkLoaderPromise?: Promise<void>;
@@ -99,10 +130,10 @@ export function useHereInteractiveMap({
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapLoadError, setMapLoadError] = useState<string | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markerRef = useRef<any>(null);
-  const behaviorRef = useRef<any>(null);
-  const mapTapHandlerRef = useRef<((event: any) => void) | null>(null);
+  const mapInstanceRef = useRef<HereMapInstance | null>(null);
+  const markerRef = useRef<HereMarkerInstance | null>(null);
+  const behaviorRef = useRef<HereBehaviorInstance | null>(null);
+  const mapTapHandlerRef = useRef<((event: HereTapEvent) => void) | null>(null);
   const onTapRef = useRef(onTap);
   const centerRef = useRef(center);
 
@@ -152,7 +183,7 @@ export function useHereInteractiveMap({
         mapInstanceRef.current = map;
         markerRef.current = marker;
 
-        const handleTap = async (event: any) => {
+        const handleTap = async (event: HereTapEvent) => {
           if (!mapInstanceRef.current || !markerRef.current || !event.currentPointer) {
             return;
           }

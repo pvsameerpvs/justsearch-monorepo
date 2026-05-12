@@ -35,16 +35,17 @@ function readStoredUser(): RegisteredUser | null {
     if (
       !parsed ||
       typeof parsed !== 'object' ||
-      typeof (parsed as any).name !== 'string' ||
-      typeof (parsed as any).mobile !== 'string' ||
-      typeof (parsed as any).verifiedAt !== 'number'
+      parsed === null ||
+      typeof (parsed as Record<string, unknown>).name !== 'string' ||
+      typeof (parsed as Record<string, unknown>).mobile !== 'string' ||
+      typeof (parsed as Record<string, unknown>).verifiedAt !== 'number'
     ) {
       return null;
     }
     return {
-      name: (parsed as any).name,
-      mobile: (parsed as any).mobile,
-      verifiedAt: (parsed as any).verifiedAt,
+      name: (parsed as Record<string, unknown>).name as string,
+      mobile: (parsed as Record<string, unknown>).mobile as string,
+      verifiedAt: (parsed as Record<string, unknown>).verifiedAt as number,
     };
   } catch {
     return null;
@@ -90,17 +91,18 @@ export function readFreshRegistration() {
     if (
       !parsed ||
       typeof parsed !== 'object' ||
-      typeof (parsed as any).name !== 'string' ||
-      typeof (parsed as any).mobile !== 'string' ||
-      typeof (parsed as any).verifiedAt !== 'number'
+      parsed === null ||
+      typeof (parsed as Record<string, unknown>).name !== 'string' ||
+      typeof (parsed as Record<string, unknown>).mobile !== 'string' ||
+      typeof (parsed as Record<string, unknown>).verifiedAt !== 'number'
     ) {
       return null;
     }
 
     return {
-      name: (parsed as any).name,
-      mobile: (parsed as any).mobile,
-      verifiedAt: (parsed as any).verifiedAt,
+      name: (parsed as Record<string, unknown>).name as string,
+      mobile: (parsed as Record<string, unknown>).mobile as string,
+      verifiedAt: (parsed as Record<string, unknown>).verifiedAt as number,
     } satisfies RegisteredUser;
   } catch {
     return null;

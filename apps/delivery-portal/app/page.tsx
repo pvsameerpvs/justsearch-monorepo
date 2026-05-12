@@ -1,8 +1,10 @@
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, PageHeader } from '@justsearch/ui';
-import { AlertTriangle, Navigation, Sparkles } from 'lucide-react';
+import { Badge, Button, PageHeader } from '@justsearch/ui';
+import { Navigation } from 'lucide-react';
 import { DeliveryAgentPanel } from '@/components/dashboard/delivery-agent-panel';
 import { DeliveryMetricCard } from '@/components/dashboard/delivery-metric-card';
 import { DeliveryOrderCard } from '@/components/dashboard/delivery-order-card';
+import { CompletedOrdersCard } from '@/components/dashboard/completed-orders-card';
+import { DispatchNoteCard } from '@/components/dashboard/dispatch-note-card';
 import { DeliveryPortalShell } from '@/components/layout/delivery-portal-shell';
 import { getCurrentDeliveryPortalSnapshot } from '@/lib/portal-context';
 
@@ -61,49 +63,8 @@ export default async function DeliveryPortalPage() {
             routeChecklist={snapshot.routeChecklist}
           />
 
-          <Card className="rounded-3xl border border-orange-100 bg-white/95 shadow-[0_24px_70px_-38px_rgba(15,23,42,0.38)]">
-            <CardHeader className="space-y-2">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <CardTitle className="text-xl text-slate-950">Completed this shift</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {snapshot.completedOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">{order.code}</p>
-                      <p className="text-xs text-slate-500">{order.customerName}</p>
-                    </div>
-                    <Badge variant="success">Delivered</Badge>
-                  </div>
-                  <p className="mt-2 text-xs text-slate-500">
-                    {order.neighborhood} and handed over {order.orderedAtLabel}.
-                  </p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-3xl border border-amber-200 bg-amber-50/90 shadow-[0_24px_70px_-38px_rgba(15,23,42,0.38)]">
-            <CardHeader className="space-y-2">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
-                <AlertTriangle className="h-5 w-5" />
-              </div>
-              <CardTitle className="text-xl text-slate-950">Dispatch note</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-slate-700">{snapshot.supportNotice}</p>
-              <div className="rounded-2xl border border-amber-200 bg-white/80 px-4 py-3 text-xs text-slate-600">
-                Prioritize rush orders first, then group nearby standard stops to keep
-                average route time low.
-              </div>
-            </CardContent>
-          </Card>
+          <CompletedOrdersCard orders={snapshot.completedOrders} />
+          <DispatchNoteCard notice={snapshot.supportNotice} />
         </aside>
       </div>
     </DeliveryPortalShell>

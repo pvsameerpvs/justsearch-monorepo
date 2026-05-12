@@ -3,24 +3,7 @@ import { Badge, Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui'
 import { Clock3, MapPin, Package2, Wallet } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { DeliveryOrder } from '@/lib/delivery-types';
-
-function getStatusVariant(
-  status: DeliveryOrder['status']
-): 'default' | 'warning' | 'success' {
-  switch (status) {
-    case 'on_route':
-    case 'arrived':
-      return 'warning';
-    case 'delivered':
-      return 'success';
-    default:
-      return 'default';
-  }
-}
-
-function formatStatus(status: DeliveryOrder['status']) {
-  return status.replace(/_/g, ' ');
-}
+import { getDeliveryStatusVariant, formatDeliveryStatus } from '@/lib/delivery-status-helpers';
 
 export function DeliveryOrderCard({ order }: { order: DeliveryOrder }) {
   return (
@@ -29,7 +12,7 @@ export function DeliveryOrderCard({ order }: { order: DeliveryOrder }) {
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <CardTitle className="text-xl text-slate-950">{order.code}</CardTitle>
-            <Badge variant={getStatusVariant(order.status)}>{formatStatus(order.status)}</Badge>
+            <Badge variant={getDeliveryStatusVariant(order.status)}>{formatDeliveryStatus(order.status)}</Badge>
             <Badge variant={order.priority === 'rush' ? 'warning' : 'default'}>
               {order.priority === 'rush' ? 'Rush' : 'Standard'}
             </Badge>

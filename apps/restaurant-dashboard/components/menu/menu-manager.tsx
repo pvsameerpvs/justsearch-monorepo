@@ -1,133 +1,83 @@
 "use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@justsearch/ui';
-import { useMenuStore } from '@/lib/stores/menu-store';
-import { Plus, Trash2, Eye, EyeOff } from 'lucide-react';
-
-const itemSchema = z.object({
-  name: z.string().min(2),
-  description: z.string(),
-  price: z.coerce.number().min(1),
-});
-
-type ItemFormData = z.infer<typeof itemSchema>;
+import { useState } from "react";
+import { useMenuStore } from "@/lib/stores/menu-store";
+import { Plus } from "lucide-react";
+import { MenuItemCard } from "./menu-item-card";
+import { AddMenuItemForm, AddMenuItemButton } from "./menu-item-form";
 
 export function MenuManager() {
   const { categories, addCategory, addItem, removeItem, toggleItem } = useMenuStore();
-  const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id ?? '');
-  const [showItemForm, setShowItemForm] = useState(false);
-  const [newCategoryTitle, setNewCategoryTitle] = useState('');
+  const [active, setActive] = useState(categories[0]?.id ?? "");
+  const [showForm, setShowForm] = useState(false);
+  const [newCat, setNewCat] = useState("");
 
-  const form = useForm<ItemFormData>({
-    resolver: zodResolver(itemSchema),
-    defaultValues: { name: '', description: '', price: 0 },
-  });
-
-  const handleAddItem = (data: ItemFormData) => {
-    if (!activeCategory) return;
-    addItem(activeCategory, { ...data, categoryId: activeCategory, isAvailable: true });
-    form.reset();
-    setShowItemForm(false);
-  };
+  const cat = categories.find((c) => c.id === active);
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-bold text-slate-900">Menu Editor</h3>
-
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {categories.map((cat) => (
+    <div className="space-y-5">
+      {/* Category Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {categories.map((c) => (
           <button
-            key={cat.id}
+            key={c.id}
             type="button"
-            onClick={() => setActiveCategory(cat.id)}
-            className={`shrink-0 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
-              activeCategory === cat.id
-                ? 'bg-amber-500 text-white'
-                : 'bg-slate-100 text-slate-600'
+            onClick={() => setActive(c.id)}
+            className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
+              active === c.id
+                ? "bg-slate-900 text-white shadow-sm"
+                : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300"
             }`}
           >
-            {cat.title}
+            {c.title}
+            <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${active === c.id ? "bg-white/20" : "bg-slate-100"}`}>
+              {c.items.length}
+            </span>
           </button>
         ))}
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <input
-            value={newCategoryTitle}
-            onChange={(e) => setNewCategoryTitle(e.target.value)}
+            value={newCat}
+            onChange={(e) => setNewCat(e.target.value)}
             placeholder="New category"
-            className="w-32 rounded-xl border border-slate-200 px-3 text-sm"
+            className="elegant-input w-32 text-xs"
           />
-          <Button
-            size="sm"
+          <button
+            type="button"
             onClick={() => {
-              if (newCategoryTitle) {
-                addCategory(newCategoryTitle);
-                setNewCategoryTitle('');
-              }
+              if (newCat.trim()) { addCategory(newCat.trim()); setNewCat(""); }
             }}
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white"
           >
             <Plus className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
       </div>
 
-      <div className="space-y-2">
-        {categories
-          .find((c) => c.id === activeCategory)
-          ?.items.map((item) => (
-            <div
-              key={item.id}
-              className={`flex items-center justify-between rounded-xl border p-3 ${
-                item.isAvailable ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-50 opacity-60'
-              }`}
-            >
-              <div>
-                <p className="font-bold text-slate-900">{item.name}</p>
-                <p className="text-xs text-slate-500">{item.description}</p>
-                <p className="text-sm font-bold text-amber-600">AED {item.price}</p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => toggleItem(activeCategory, item.id)}
-                  className="text-slate-400 hover:text-amber-600"
-                >
-                  {item.isAvailable ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => removeItem(activeCategory, item.id)}
-                  className="text-slate-400 hover:text-red-500"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+      {/* Items */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {cat?.items.map((item) => (
+          <MenuItemCard
+            key={item.id}
+            item={item}
+            onToggle={() => toggleItem(active, item.id)}
+            onRemove={() => removeItem(active, item.id)}
+          />
+        ))}
       </div>
 
-      {showItemForm ? (
-        <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
-          <input {...form.register('name')} placeholder="Item name" className="w-full rounded-lg border p-2 text-sm" />
-          <input {...form.register('description')} placeholder="Description" className="w-full rounded-lg border p-2 text-sm" />
-          <input type="number" {...form.register('price')} placeholder="Price (AED)" className="w-full rounded-lg border p-2 text-sm" />
-          <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={() => setShowItemForm(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" size="sm" className="bg-amber-500">
-              Add Item
-            </Button>
-          </div>
-        </form>
+      {/* Add Form */}
+      {showForm ? (
+        <AddMenuItemForm
+          onSubmit={(data) => {
+            if (!active) return;
+            addItem(active, { ...data, categoryId: active, isAvailable: true });
+            setShowForm(false);
+          }}
+          onCancel={() => setShowForm(false)}
+        />
       ) : (
-        <Button variant="outline" className="w-full" onClick={() => setShowItemForm(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Menu Item
-        </Button>
+        <AddMenuItemButton onClick={() => setShowForm(true)} />
       )}
     </div>
   );

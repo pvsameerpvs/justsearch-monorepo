@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3001;
 const startServer = () => {
   try {
     app.listen(PORT, () => {
-      console.log(`🚀 JustSearch Shared Backend running on port ${PORT}`);
+      // Server started successfully
     });
   } catch (error) {
     console.error('SERVER_ERROR:', error);
