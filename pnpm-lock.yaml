@@ -96,6 +96,9 @@ importers:
       tailwind-merge:
         specifier: ^1.14.0
         version: 1.14.0
+      zustand:
+        specifier: ^4.4.0
+        version: 4.5.7(@types/react@18.3.28)(react@18.3.1)
     devDependencies:
       '@types/canvas-confetti':
         specifier: ^1.9.0
@@ -170,6 +173,9 @@ importers:
 
   apps/justsearch-admin:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.3.0
+        version: 3.10.0(react-hook-form@7.72.1(react@18.3.1))
       '@justsearch/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -188,9 +194,18 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+      react-hook-form:
+        specifier: ^7.72.1
+        version: 7.72.1(react@18.3.1)
       tailwind-merge:
         specifier: ^1.14.0
         version: 1.14.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+      zustand:
+        specifier: ^4.4.0
+        version: 4.5.7(@types/react@18.3.28)(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.5.0
@@ -216,6 +231,9 @@ importers:
 
   apps/restaurant-dashboard:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.3.0
+        version: 3.10.0(react-hook-form@7.72.1(react@18.3.1))
       '@justsearch/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -234,9 +252,18 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+      react-hook-form:
+        specifier: ^7.72.1
+        version: 7.72.1(react@18.3.1)
       tailwind-merge:
         specifier: ^1.14.0
         version: 1.14.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+      zustand:
+        specifier: ^4.4.0
+        version: 4.5.7(@types/react@18.3.28)(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.5.0
@@ -304,6 +331,11 @@ packages:
 
   '@emnapi/runtime@1.9.2':
     resolution: {integrity: sha512-3U4+MIWHImeyu1wnmVygh5WlgfYDtyf0k8AbLhMFxOipihf6nrWC4syIm/SwEeec0mNSafiiNnMJwbza/Is6Lw==}
+
+  '@hookform/resolvers@3.10.0':
+    resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1550,6 +1582,11 @@ packages:
     peerDependencies:
       browserslist: '>= 4.21.0'
 
+  use-sync-external-store@1.6.0:
+    resolution: {integrity: sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -1578,6 +1615,21 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zustand@4.5.7:
+    resolution: {integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      '@types/react': '>=16.8'
+      immer: '>=9.0.6'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -1590,6 +1642,10 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
+
+  '@hookform/resolvers@3.10.0(react-hook-form@7.72.1(react@18.3.1))':
+    dependencies:
+      react-hook-form: 7.72.1(react@18.3.1)
 
   '@img/colour@1.1.0':
     optional: true
@@ -2772,6 +2828,10 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
+  use-sync-external-store@1.6.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
   util-deprecate@1.0.2: {}
 
   utils-merge@1.0.1: {}
@@ -2787,3 +2847,10 @@ snapshots:
   yn@3.1.1: {}
 
   zod@3.25.76: {}
+
+  zustand@4.5.7(@types/react@18.3.28)(react@18.3.1):
+    dependencies:
+      use-sync-external-store: 1.6.0(react@18.3.1)
+    optionalDependencies:
+      '@types/react': 18.3.28
+      react: 18.3.1

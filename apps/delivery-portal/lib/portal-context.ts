@@ -6,62 +6,51 @@ const DEFAULT_RESTAURANT_SLUG =
   process.env.NEXT_PUBLIC_DEV_RESTAURANT_SLUG ?? 'mosaic-table';
 
 const DEFAULT_BASE_DOMAIN =
-  process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'mydomain.com';
+  process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'js-restorant.com';
 
 function normalizeHost(host: string): string {
   return host.trim().toLowerCase().replace(/:\d+$/, '');
 }
 
-function stripDeliverySuffix(value: string): string | null {
-  if (!value.endsWith('-delivery')) {
-    return null;
-  }
-
-  return value.slice(0, -'-delivery'.length) || null;
-}
-
-function extractRestaurantSlug(host: string): string | null {
+function extractParts(host: string): { slug: string | null; agentId: string | null } {
   const normalizedHost = normalizeHost(host);
 
-  if (!normalizedHost) {
-    return null;
-  }
+  if (!normalizedHost) return { slug: null, agentId: null };
 
-  if (normalizedHost.endsWith('.localhost')) {
-    const label = normalizedHost.replace(/\.localhost$/, '').split('.').at(0) ?? '';
-    return stripDeliverySuffix(label);
-  }
-
-  if (
-    normalizedHost === DEFAULT_BASE_DOMAIN ||
-    normalizedHost === `www.${DEFAULT_BASE_DOMAIN}`
-  ) {
-    return null;
-  }
-
+  let subdomain = '';
   if (normalizedHost.endsWith(`.${DEFAULT_BASE_DOMAIN}`)) {
-    const subdomain = normalizedHost.slice(0, -(DEFAULT_BASE_DOMAIN.length + 1));
-    return stripDeliverySuffix(subdomain);
+    subdomain = normalizedHost.slice(0, -(DEFAULT_BASE_DOMAIN.length + 1));
+  } else if (normalizedHost.endsWith('.localhost')) {
+    subdomain = normalizedHost.replace(/\.localhost$/, '').split('.').at(0) ?? '';
   }
 
-  const hostParts = normalizedHost.split('.').filter(Boolean);
+  if (!subdomain) return { slug: null, agentId: null };
 
-  if (hostParts.length >= 3) {
-    return stripDeliverySuffix(hostParts[0] ?? '');
-  }
+  // Parse: restaurantname-agentid
+  const lastDashIndex = subdomain.lastIndexOf('-');
+  if (lastDashIndex <= 0) return { slug: null, agentId: null };
 
-  return null;
+  const slug = subdomain.slice(0, lastDashIndex);
+  const agentId = subdomain.slice(lastDashIndex + 1);
+
+  return { slug, agentId };
 }
 
 export const getCurrentDeliveryPortalSnapshot = cache(async () => {
   const headerStore = await headers();
   const forwardedSlug = headerStore.get('x-restaurant-slug');
-  const resolvedSlug =
-    forwardedSlug ??
-    extractRestaurantSlug(
-      headerStore.get('x-forwarded-host') ?? headerStore.get('host') ?? ''
-    ) ??
-    DEFAULT_RESTAURANT_SLUG;
+  const forwardedAgentId = headerStore.get('x-delivery-boy-id');
 
-  return getDeliveryPortalSnapshotBySlug(resolvedSlug);
+  if (forwardedSlug && forwardedAgentId) {
+    const snapshot = getDeliveryPortalSnapshotBySlug(forwardedSlug);
+    return { ...snapshot, agentId: forwardedAgentId };
+  }
+
+  const host = headerStore.get('x-forwarded-host') ?? headerStore.get('host') ?? '';
+  const { slug, agentId } = extractParts(host);
+
+  const resolvedSlug = slug ?? DEFAULT_RESTAURANT_SLUG;
+  const snapshot = getDeliveryPortalSnapshotBySlug(resolvedSlug);
+
+  return { ...snapshot, agentId: agentId ?? 'unknown' };
 });

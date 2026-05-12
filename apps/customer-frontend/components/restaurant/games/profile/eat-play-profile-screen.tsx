@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState, useEffect } from 'react';
-import { Coins, Gamepad2, Trophy, Sparkles, ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+import { Coins, Gamepad2, Trophy, Sparkles } from 'lucide-react';
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
 import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
@@ -31,7 +30,6 @@ function getTierUI(tier: string) {
 }
 
 export function EatPlayProfileScreen() {
-  const router = useRouter();
   const restaurant = useRestaurant();
   const { points } = useLoyaltyPoints();
   const { getGameStat } = useUserGameStats();

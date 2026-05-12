@@ -273,6 +273,21 @@ export const mockRestaurants: Record<string, Restaurant> = {
         isAvailable: true,
         tag: 'HOT',
       },
+      {
+        id: 'slice-master',
+        name: 'Slice Master',
+        description: 'Swipe to slice flying fruits and food! Watch out for bombs. Build combos for massive points.',
+        type: 'local',
+        localGameId: 'slice-master',
+        playerFoodItem: 'random',
+        icon: '🍕',
+        coverImageUrl: '/games/slice-master.png',
+        prize: 'Up to 600 points',
+        communityTopScore: 0,
+        accessLevel: 'public',
+        isAvailable: true,
+        tag: 'NEW',
+      },
     ],
     reviews: [
       {

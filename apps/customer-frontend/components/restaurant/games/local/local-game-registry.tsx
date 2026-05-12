@@ -4,6 +4,7 @@ import { HungryBirdRushGame } from './hungry-bird-rush/hungry-bird-rush-game';
 import { VexRunnerGame } from './vex-runner/vex-runner-game';
 import { CheeseChaseGame } from './cheese-chase/cheese-chase-game';
 import { MemoryMatchGame } from './memory-match/memory-match-game';
+import { SliceMasterGame } from './slice-master/slice-master-game';
 import type { LocalGameRenderer } from './local-game-renderer';
 
 const LOCAL_GAME_REGISTRY: Record<string, LocalGameRenderer> = {
@@ -11,6 +12,7 @@ const LOCAL_GAME_REGISTRY: Record<string, LocalGameRenderer> = {
   'vex-runner': VexRunnerGame,
   'cheese-chase': CheeseChaseGame,
   'memory-match': MemoryMatchGame,
+  'slice-master': SliceMasterGame,
 };
 
 export function getLocalGameRenderer(localGameId: string): LocalGameRenderer | null {
