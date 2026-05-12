@@ -1,6 +1,7 @@
 import { Badge, Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 import { PhoneCall, ShieldCheck, Star, Truck } from 'lucide-react';
 import type { DeliveryAgent } from '@/lib/delivery-types';
+import { AgentChecklist } from './agent-checklist';
 
 function getStatusVariant(
   status: DeliveryAgent['status']
@@ -69,17 +70,7 @@ export function DeliveryAgentPanel({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-orange-100 bg-orange-50/80 p-4">
-          <p className="text-sm font-semibold text-slate-900">Route checklist</p>
-          <ul className="mt-3 space-y-2">
-            {routeChecklist.map((item) => (
-              <li key={item} className="flex gap-3 text-sm text-slate-600">
-                <span className="mt-1 h-2 w-2 rounded-full bg-orange-500" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <AgentChecklist items={routeChecklist} />
       </CardContent>
     </Card>
   );

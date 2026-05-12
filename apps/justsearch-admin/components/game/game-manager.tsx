@@ -13,10 +13,7 @@ export function GameManager() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold text-slate-900">Game Management</h3>
-        <Button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-amber-500 hover:bg-amber-600"
-        >
+        <Button onClick={() => setShowAddForm(!showAddForm)} className="bg-amber-500 hover:bg-amber-600">
           <Plus className="mr-1 h-4 w-4" />
           Add Game
         </Button>

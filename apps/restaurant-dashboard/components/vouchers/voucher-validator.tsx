@@ -8,26 +8,15 @@ import { ValidationResultCard, VoucherListItem } from './voucher-cards';
 export function VoucherValidator() {
   const { vouchers } = useVoucherWallet();
   const [scanCode, setScanCode] = useState('');
-  const [result, setResult] = useState<{
-    valid: boolean;
-    message: string;
-    voucher?: { title: string; discountLabel: string };
-  } | null>(null);
+  const [result, setResult] = useState<{ valid: boolean; message: string; voucher?: { title: string; discountLabel: string } } | null>(null);
 
   const handleValidate = () => {
     const code = scanCode.trim().toUpperCase();
     const voucher = vouchers.find((v: { code: string; isUsed: boolean }) => v.code === code && !v.isUsed);
     if (voucher) {
-      setResult({
-        valid: true,
-        message: 'Voucher validated successfully!',
-        voucher: { title: voucher.title, discountLabel: voucher.discountLabel },
-      });
+      setResult({ valid: true, message: 'Voucher validated successfully!', voucher: { title: voucher.title, discountLabel: voucher.discountLabel } });
     } else {
-      setResult({
-        valid: false,
-        message: 'Invalid or already used voucher code.',
-      });
+      setResult({ valid: false, message: 'Invalid or already used voucher code.' });
     }
   };
 
@@ -35,52 +24,54 @@ export function VoucherValidator() {
 
   return (
     <div className="space-y-6">
-      <div className="card-premium p-6">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50">
-            <ScanLine className="h-5 w-5 text-amber-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-slate-900">Validate Voucher</h3>
-            <p className="text-sm text-slate-500">Enter customer voucher code</p>
-          </div>
-        </div>
+      <VoucherScanForm scanCode={scanCode} onChange={setScanCode} onValidate={handleValidate} result={result} />
+      <VoucherActiveList vouchers={activeVouchers} />
+    </div>
+  );
+}
 
-        <div className="flex gap-3">
-          <div className="relative flex-1">
-            <input
-              value={scanCode}
-              onChange={(e) => setScanCode(e.target.value.toUpperCase())}
-              placeholder="e.g. WELCOME20"
-              className="input-premium w-full font-mono uppercase tracking-wider"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={handleValidate}
-            className="btn-primary px-6"
-          >
-            <Ticket className="mr-2 h-4 w-4" />
-            Validate
-          </button>
+function VoucherScanForm({ scanCode, onChange, onValidate, result }: {
+  scanCode: string;
+  onChange: (val: string) => void;
+  onValidate: () => void;
+  result: { valid: boolean; message: string; voucher?: { title: string; discountLabel: string } } | null;
+}) {
+  return (
+    <div className="card-premium p-6">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50">
+          <ScanLine className="h-5 w-5 text-amber-600" />
         </div>
-
-        {result && <ValidationResultCard result={result} />}
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">Validate Voucher</h3>
+          <p className="text-sm text-slate-500">Enter customer voucher code</p>
+        </div>
       </div>
 
-      <div className="card-premium p-5">
-        <h3 className="text-lg font-bold text-slate-900 mb-4">Active Vouchers</h3>
-        <div className="space-y-3">
-          {activeVouchers.map((v: { id: string; code: string; title: string; discountLabel: string; expiryLabel: string }) => (
-            <VoucherListItem key={v.id} voucher={v} />
-          ))}
-          {activeVouchers.length === 0 && (
-            <div className="text-center py-8 text-slate-400">
-              <Ticket className="mx-auto h-8 w-8 mb-2 opacity-50" />
-              <p className="text-sm">No active vouchers</p>
-            </div>
-          )}
-        </div>
+      <div className="flex gap-3">
+        <input value={scanCode} onChange={(e) => onChange(e.target.value.toUpperCase())} placeholder="e.g. WELCOME20" className="input-premium w-full font-mono uppercase tracking-wider" />
+        <button onClick={onValidate} className="btn-primary px-6 flex items-center gap-2">
+          <Ticket className="h-4 w-4" /> Validate
+        </button>
+      </div>
+
+      {result && <ValidationResultCard result={result} />}
+    </div>
+  );
+}
+
+function VoucherActiveList({ vouchers }: { vouchers: { id: string; code: string; title: string; discountLabel: string; expiryLabel: string }[] }) {
+  return (
+    <div className="card-premium p-5">
+      <h3 className="text-lg font-bold text-slate-900 mb-4">Active Vouchers</h3>
+      <div className="space-y-3">
+        {vouchers.map((v) => <VoucherListItem key={v.id} voucher={v} />)}
+        {vouchers.length === 0 && (
+          <div className="text-center py-8 text-slate-400">
+            <Ticket className="mx-auto h-8 w-8 mb-2 opacity-50" />
+            <p className="text-sm">No active vouchers</p>
+          </div>
+        )}
       </div>
     </div>
   );

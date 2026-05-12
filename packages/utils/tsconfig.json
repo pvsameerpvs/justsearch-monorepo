@@ -1,9 +1,9 @@
 {
   "extends": "../config/typescript/base.json",
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "ESNext",
     "outDir": "dist"
   },
-  "include": ["."],
+  "include": ["index.ts", "qr.ts", "src"],
   "exclude": ["node_modules", "dist"]
 }

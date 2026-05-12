@@ -3,3 +3,4 @@ export const formatDate = (date: Date) => {
 };
 
 export * from './qr';
+export * from './src/mock-restaurants';

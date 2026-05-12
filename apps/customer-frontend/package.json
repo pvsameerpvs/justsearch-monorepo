@@ -12,6 +12,7 @@
   "dependencies": {
     "@justsearch/ui": "workspace:*",
     "@justsearch/utils": "workspace:*",
+    "@justsearch/types": "workspace:*",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.0.0",
     "framer-motion": "^12.38.0",

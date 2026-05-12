@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
-import { Bike, MapPin, Phone, Store } from 'lucide-react';
+import { Bike } from 'lucide-react';
 import type { DeliveryAgent, DeliveryPortalRestaurant } from '@/lib/delivery-types';
 import { AgentInfoCard } from './agent-info-card';
+import { PortalNav } from './portal-nav';
+import { PortalMetaStrip } from './portal-meta-strip';
 
 type DeliveryPortalShellProps = {
   restaurant: DeliveryPortalRestaurant;
@@ -40,31 +42,8 @@ export function DeliveryPortalShell({
             <AgentInfoCard agent={agent} routeHealthLabel={routeHealthLabel} />
           </div>
 
-          <div className="grid gap-4 px-6 py-4 text-sm text-slate-600 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <div className="flex items-center gap-2 font-semibold text-slate-900">
-                <Store className="h-4 w-4 text-orange-500" />
-                Restaurant tenant
-              </div>
-              <p className="mt-2">{restaurant.slug}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <div className="flex items-center gap-2 font-semibold text-slate-900">
-                <MapPin className="h-4 w-4 text-orange-500" />
-                Delivery zone
-              </div>
-              <p className="mt-2">{restaurant.zoneLabel}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <div className="flex items-center gap-2 font-semibold text-slate-900">
-                <Phone className="h-4 w-4 text-orange-500" />
-                Dispatch hotline
-              </div>
-              <p className="mt-2">
-                {restaurant.supportPhone} and {restaurant.deliveryDomain}
-              </p>
-            </div>
-          </div>
+          <PortalNav />
+          <PortalMetaStrip restaurant={restaurant} />
         </section>
 
         {children}

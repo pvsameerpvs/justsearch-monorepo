@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useChatStore } from '@/lib/stores/chat-store';
-import { ChatThreadList, ChatMessageView } from './chat-views';
+import { ChatThreadList } from './chat-thread-list';
+import { ChatMessageView } from './chat-views';
 
 export function ChatManager() {
   const { threads, addMessage, markAsRead } = useChatStore();

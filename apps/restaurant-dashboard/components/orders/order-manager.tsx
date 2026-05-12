@@ -2,35 +2,32 @@
 
 import { useState } from "react";
 import { useOrderStore } from "@/lib/stores/order-store";
-import { Check, X } from "lucide-react";
-import { ORDER_FLOW, OrderStatusBadge } from "./order-status-config";
+import { OrderListItem } from "./order-list-item";
+import { Package } from "lucide-react";
+
+const FILTERS = ["all", "pending", "active", "completed", "cancelled"] as const;
 
 export function OrderManager() {
-  const { orders, updateStatus } = useOrderStore();
-  const [filter, setFilter] = useState<"all" | "pending" | "active">("all");
+  const { orders } = useOrderStore();
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
 
   const filtered = orders.filter((o) => {
     if (filter === "pending") return o.status === "pending";
-    if (filter === "active") return o.status !== "completed" && o.status !== "cancelled";
+    if (filter === "active") return !["completed", "cancelled"].includes(o.status);
+    if (filter === "completed") return o.status === "completed";
+    if (filter === "cancelled") return o.status === "cancelled";
     return true;
   });
 
-  const nextStatus = (id: string, current: string) => {
-    const idx = ORDER_FLOW.findIndex((s) => s.value === current);
-    const next = ORDER_FLOW[idx + 1]?.value;
-    if (next) updateStatus(id, next as never);
-  };
-
   return (
     <div className="space-y-5">
-      <div className="flex gap-2">
-        {(["all", "pending", "active"] as const).map((f) => (
+      <div className="flex flex-wrap gap-2">
+        {FILTERS.map((f) => (
           <button
             key={f}
-            type="button"
             onClick={() => setFilter(f)}
             className={`rounded-lg px-4 py-2 text-sm font-semibold capitalize transition-all ${
-              filter === f ? "bg-slate-900 text-white shadow-sm" : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300"
+              filter === f ? "bg-slate-900 text-white" : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300"
             }`}
           >
             {f}
@@ -38,51 +35,20 @@ export function OrderManager() {
         ))}
       </div>
 
-      <div className="space-y-2">
-        {filtered.map((order) => (
-          <div key={order.id} className="elegant-card p-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-slate-900">{order.code}</span>
-                  <OrderStatusBadge status={order.status} />
-                </div>
-                <p className="mt-1 text-sm text-slate-600">{order.customerName}</p>
-                <p className="text-xs text-slate-400">{order.items} items · AED {order.total}</p>
-              </div>
-              <div className="flex gap-1.5 shrink-0">
-                {order.status === "pending" && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => updateStatus(order.id, "cancelled")}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateStatus(order.id, "confirmed")}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 text-white shadow-sm hover:bg-emerald-600"
-                    >
-                      <Check className="h-4 w-4" />
-                    </button>
-                  </>
-                )}
-                {order.status !== "pending" && order.status !== "completed" && order.status !== "cancelled" && (
-                  <button
-                    type="button"
-                    onClick={() => nextStatus(order.id, order.status)}
-                    className="elegant-btn-primary text-xs"
-                  >
-                    Next
-                  </button>
-                )}
-              </div>
-            </div>
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-12">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50">
+            <Package className="h-6 w-6 text-emerald-500" />
           </div>
-        ))}
-      </div>
+          <p className="mt-3 text-sm font-medium text-slate-600">No orders found</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map((order) => (
+            <OrderListItem key={order.id} order={order} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

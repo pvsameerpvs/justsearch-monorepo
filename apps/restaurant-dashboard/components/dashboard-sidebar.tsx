@@ -10,6 +10,7 @@ import {
 import { SidebarFooter } from './dashboard-sidebar-footer';
 import { MobileToggle } from './mobile-toggle';
 import { SidebarBrand } from './sidebar-brand';
+import type { Restaurant } from '@justsearch/utils';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -22,7 +23,11 @@ const NAV_ITEMS = [
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
-export const DashboardSidebar = memo(function DashboardSidebar() {
+export const DashboardSidebar = memo(function DashboardSidebar({
+  restaurant,
+}: {
+  restaurant: Restaurant;
+}) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -40,14 +45,9 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
         />
       )}
 
-      <aside
-        className={`fixed left-0 top-0 z-40 flex h-full w-[260px] flex-col bg-[#0B0F19] text-white transition-transform duration-300 md:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <SidebarBrand />
+      <aside className={`fixed left-0 top-0 z-40 flex h-full w-[260px] flex-col bg-[#0B0F19] text-white transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <SidebarBrand restaurant={restaurant} />
 
-        {/* Nav */}
         <nav className="flex-1 px-3 py-2">
           <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-600">Menu</p>
           <ul className="space-y-0.5">
@@ -70,7 +70,7 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
           </ul>
         </nav>
 
-        <SidebarFooter />
+        <SidebarFooter restaurant={restaurant} />
       </aside>
     </>
   );

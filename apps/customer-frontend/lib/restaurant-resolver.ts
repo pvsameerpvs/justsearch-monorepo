@@ -1,26 +1,17 @@
 import { headers } from 'next/headers';
 import { cache } from 'react';
-import { getRestaurantBySlug, mockRestaurants } from './mock-restaurants';
-import type { Restaurant } from './restaurant-types';
-
-const DEFAULT_RESTAURANT_SLUG =
-  process.env.NEXT_PUBLIC_DEV_RESTAURANT_SLUG ?? 'mosaic-table';
-
-const DEFAULT_PUBLIC_DOMAIN =
-  process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN ?? 'justsearchrestorant.com';
+import {
+  getRestaurantBySlug,
+  getFallbackRestaurant,
+  type Restaurant,
+} from '@justsearch/utils';
 
 const BASE_DOMAINS = [
   'justsearchrestorant.com',
   'justsearch-restorantactivity.com',
   'justsearchrestaurant.com',
+  'js-restorant.com',
 ];
-
-function getFallbackRestaurant(): Restaurant {
-  return (
-    getRestaurantBySlug(DEFAULT_RESTAURANT_SLUG) ??
-    mockRestaurants['mosaic-table']
-  );
-}
 
 function normalizeHost(host: string): string {
   return host.trim().toLowerCase().replace(/:\d+$/, '');
@@ -73,10 +64,7 @@ export const getCurrentRestaurant = cache(async (): Promise<Restaurant> => {
 
   if (forwardedSlug) {
     const restaurant = getRestaurantBySlug(forwardedSlug);
-
-    if (restaurant) {
-      return restaurant;
-    }
+    if (restaurant) return restaurant;
   }
 
   const host =
@@ -86,7 +74,7 @@ export const getCurrentRestaurant = cache(async (): Promise<Restaurant> => {
 });
 
 export function getRestaurantDomain(restaurant: Restaurant): string {
-  return `${restaurant.subdomain}.${DEFAULT_PUBLIC_DOMAIN}`;
+  return `${restaurant.subdomain}.justsearchrestorant.com`;
 }
 
 export function getRestaurantInitials(name: string): string {

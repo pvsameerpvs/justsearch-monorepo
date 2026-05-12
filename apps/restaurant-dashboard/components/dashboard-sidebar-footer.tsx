@@ -1,11 +1,14 @@
-import { ChefHat } from 'lucide-react';
+import { getRestaurantInitials } from '@justsearch/utils';
+import type { Restaurant } from '@justsearch/utils';
 
-export function SidebarFooter() {
+export function SidebarFooter({ restaurant }: { restaurant: Restaurant }) {
+  const initials = getRestaurantInitials(restaurant.name);
+
   return (
     <div className="border-t border-white/5 p-3">
       <div className="flex items-center gap-3 rounded-lg bg-white/5 p-3">
         <div className="h-8 w-8 rounded-full bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-500">
-          MT
+          {initials}
         </div>
         <div>
           <p className="text-xs font-semibold text-white">Admin</p>

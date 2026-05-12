@@ -3,9 +3,3 @@ export interface User {
   email: string;
   role: 'admin' | 'restaurant' | 'customer';
 }
-
-export interface Restaurant {
-  id: string;
-  name: string;
-  slug: string;
-}
