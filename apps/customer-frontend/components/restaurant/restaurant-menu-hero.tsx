@@ -22,7 +22,7 @@ export function RestaurantMenuHero({
     restaurant.openingHours[0]?.hours ??
     'Open today';
 
-  const backgroundImage = `https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=2070`;
+  const backgroundImage = restaurant.heroImageUrl ?? 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=2070';
 
   return (
     <section className="relative w-full overflow-hidden -mt-[var(--restaurant-mobile-header-height,0px)] pt-[var(--restaurant-mobile-header-height,0px)]">

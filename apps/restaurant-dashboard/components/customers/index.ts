@@ -1,5 +1,5 @@
-export * from './customer-insights';
-export * from './customer-card';
-export * from './customer-header';
-export * from './customer-details';
-export * from './customer-stats';
+export { CustomerCard } from "./customer-card";
+export { CustomerDetails } from "./customer-details";
+export { CustomerHeader } from "./customer-header";
+export { CustomerInsights } from "./customer-insights";
+export { CustomerStats } from "./customer-stats";

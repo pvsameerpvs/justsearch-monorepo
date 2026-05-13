@@ -4,7 +4,8 @@ import { useState } from 'react';
 import type { Restaurant } from '@justsearch/utils';
 import { updateRestaurant } from '@justsearch/utils';
 import { Camera, Plus, Check, X } from 'lucide-react';
-import { SocialRow } from './social-row';
+import { SocialCard } from './social-card';
+import { SocialsHeader } from './socials-header';
 
 export function SettingsSocialsCard({ restaurant }: { restaurant: Restaurant }) {
   const [socials, setSocials] = useState(restaurant.socials);
@@ -25,38 +26,37 @@ export function SettingsSocialsCard({ restaurant }: { restaurant: Restaurant }) 
   const addSocial = () => setSocials([...socials, { platform: 'Instagram', url: '', handle: '' }]);
 
   return (
-    <div className="elegant-card p-5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50">
-            <Camera className="h-5 w-5 text-violet-600" />
-          </div>
-          <h3 className="text-base font-bold text-slate-900">Social Media</h3>
-        </div>
+    <div className="space-y-6">
+      <SocialsHeader restaurant={restaurant} />
+
+      {/* Edit Toggle */}
+      <div className="flex justify-end">
         {isEditing ? (
           <div className="flex gap-2">
-            <button onClick={() => setIsEditing(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100">
-              <X className="h-4 w-4" />
+            <button onClick={() => setIsEditing(false)} className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100">
+              <X className="h-4 w-4" /> Cancel
             </button>
-            <button onClick={handleSave} className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white hover:bg-emerald-600">
-              <Check className="h-4 w-4" />
+            <button onClick={handleSave} className="flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-600">
+              <Check className="h-4 w-4" /> Save
             </button>
           </div>
         ) : (
           <button onClick={() => setIsEditing(true)} className="elegant-btn-secondary text-xs">
-            Edit
+            Edit Social Links
           </button>
         )}
       </div>
 
+      {/* Social Cards - Same format as customer-frontend */}
       {socials.length === 0 && !isEditing ? (
-        <div className="text-center py-8 text-slate-400">
+        <div className="text-center py-12 text-slate-400">
+          <Camera className="mx-auto h-10 w-10 mb-3 opacity-50" />
           <p className="text-sm">No social links configured</p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {socials.map((social, i) => (
-            <SocialRow
+            <SocialCard
               key={i}
               social={social}
               isEditing={isEditing}
@@ -65,8 +65,9 @@ export function SettingsSocialsCard({ restaurant }: { restaurant: Restaurant }) 
             />
           ))}
           {isEditing && (
-            <button onClick={addSocial} className="flex items-center gap-2 rounded-xl border-2 border-dashed border-slate-200 py-2 px-4 text-sm font-medium text-slate-400 hover:border-slate-300 hover:text-slate-600 w-full justify-center">
-              <Plus className="h-4 w-4" /> Add Social Link
+            <button onClick={addSocial} className="flex flex-col items-center justify-center gap-2 rounded-[40px] border-2 border-dashed border-slate-200 p-5 text-slate-400 hover:border-slate-300 hover:text-slate-600 transition-all min-h-[120px]">
+              <Plus className="h-6 w-6" />
+              <span className="text-sm font-semibold">Add Link</span>
             </button>
           )}
         </div>
