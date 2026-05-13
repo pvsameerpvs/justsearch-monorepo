@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { useMenuStore } from "@/lib/stores/menu-store";
 import { PageHeader } from "@justsearch/ui";
-import { MenuHeroEditor } from "@/components/menu/menu-hero-editor";
 import { CategoryEditor } from "@/components/menu/category-editor";
 import { ItemEditorModal } from "@/components/menu/item-editor-modal";
+import { EmojiPicker } from "@/components/ui/emoji-picker";
+import { ViewToggle } from "@/components/ui/view-toggle";
 import { Plus } from "lucide-react";
 
 export default function MenuPage() {
   const { categories, addCategory } = useMenuStore();
+  const [view, setView] = useState<"list" | "grid">("list");
   const [editingItem, setEditingItem] = useState<{
     categoryId: string;
     item?: ReturnType<typeof useMenuStore.getState>["categories"][number]["items"][number];
@@ -20,15 +22,17 @@ export default function MenuPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Menu Editor" description="Build categories, add dishes, set prices and images" />
-
-      <MenuHeroEditor />
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <PageHeader title="Menu Editor" description="Build categories, add dishes, set prices and images" />
+        <ViewToggle view={view} onChange={setView} />
+      </div>
 
       <div className="space-y-4">
         {categories.map((cat) => (
           <CategoryEditor
             key={cat.id}
             category={cat}
+            view={view}
             onEditItem={(item) => setEditingItem({ categoryId: cat.id, item })}
             onAddItem={() => setEditingItem({ categoryId: cat.id })}
           />
@@ -42,15 +46,15 @@ export default function MenuPage() {
           </div>
           <h3 className="text-sm font-bold text-slate-900">Add Category</h3>
         </div>
-        <div className="grid gap-3 sm:grid-cols-4">
-          <input value={newCatTitle} onChange={(e) => setNewCatTitle(e.target.value)} placeholder="Category name" className="elegant-input" />
-          <input value={newCatDesc} onChange={(e) => setNewCatDesc(e.target.value)} placeholder="Description" className="elegant-input" />
-          <input value={newCatEmoji} onChange={(e) => setNewCatEmoji(e.target.value)} placeholder="Emoji" className="elegant-input" />
+        <div className="flex flex-wrap items-center gap-3">
+          <EmojiPicker value={newCatEmoji} onChange={setNewCatEmoji} size="sm" />
+          <input value={newCatTitle} onChange={(e) => setNewCatTitle(e.target.value)} placeholder="Category name" className="elegant-input flex-1 min-w-[160px]" />
+          <input value={newCatDesc} onChange={(e) => setNewCatDesc(e.target.value)} placeholder="Description" className="elegant-input flex-1 min-w-[160px]" />
           <button
             onClick={() => {
               if (newCatTitle.trim()) { addCategory(newCatTitle.trim(), newCatDesc, newCatEmoji); setNewCatTitle(""); setNewCatDesc(""); setNewCatEmoji(""); }
             }}
-            className="elegant-btn-primary"
+            className="elegant-btn-primary shrink-0"
           >
             Add Category
           </button>

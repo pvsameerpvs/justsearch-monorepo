@@ -1,8 +1,7 @@
 export { CategoryEditor } from "./category-editor";
+export { CategoryHeader } from "./category-header";
 export { ItemEditorModal } from "./item-editor-modal";
-export { MenuHeroEditor } from "./menu-hero-editor";
 export { MenuItemCard } from "./menu-item-card";
-export { AddMenuItemForm, AddMenuItemButton } from "./menu-item-form";
-export { MenuManager } from "./menu-manager";
+export { MenuItemActions } from "./menu-item-actions";
 export { MenuItemRow } from "./menu-item-row";
 export { ItemFormFields } from "./item-form-fields";
