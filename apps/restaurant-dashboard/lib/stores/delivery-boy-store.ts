@@ -10,6 +10,8 @@ export type DeliveryBoy = {
   phone: string;
   email: string;
   uniqueId: string;
+  username: string;
+  password: string;
   isActive: boolean;
   status: AgentStatus;
   currentOrderId: string | null;
@@ -18,10 +20,29 @@ export type DeliveryBoy = {
   location: string;
 };
 
+export type UpdateAgentData = {
+  name?: string;
+  phone?: string;
+  email?: string;
+  location?: string;
+  password?: string;
+};
+
+export type AddAgentData = {
+  name: string;
+  phone: string;
+  email: string;
+  location: string;
+  password: string;
+  isActive: boolean;
+};
+
 interface DeliveryBoyStore {
   agents: DeliveryBoy[];
-  addAgent: (agent: { name: string; phone: string; email: string; isActive: boolean }) => void;
+  addAgent: (agent: AddAgentData) => void;
   removeAgent: (id: string) => void;
+  toggleActive: (id: string) => void;
+  updateAgent: (id: string, data: UpdateAgentData) => void;
   setStatus: (id: string, status: AgentStatus, currentOrderId?: string | null) => void;
 }
 
@@ -38,6 +59,8 @@ const INITIAL_AGENTS: DeliveryBoy[] = [
     phone: '+971 55 123 4567',
     email: 'ahmed@delivery.com',
     uniqueId: 'aem-101',
+    username: 'aem-101',
+    password: 'driver123',
     isActive: true,
     status: 'busy',
     currentOrderId: '5',
@@ -51,6 +74,8 @@ const INITIAL_AGENTS: DeliveryBoy[] = [
     phone: '+971 50 987 6543',
     email: 'mohammed@delivery.com',
     uniqueId: 'moh-202',
+    username: 'moh-202',
+    password: 'driver123',
     isActive: true,
     status: 'available',
     currentOrderId: null,
@@ -64,6 +89,8 @@ const INITIAL_AGENTS: DeliveryBoy[] = [
     phone: '+971 52 444 7777',
     email: 'rashid@delivery.com',
     uniqueId: 'ras-303',
+    username: 'ras-303',
+    password: 'driver123',
     isActive: true,
     status: 'busy',
     currentOrderId: '5',
@@ -77,6 +104,8 @@ const INITIAL_AGENTS: DeliveryBoy[] = [
     phone: '+971 54 666 8888',
     email: 'fahad@delivery.com',
     uniqueId: 'fah-404',
+    username: 'fah-404',
+    password: 'driver123',
     isActive: true,
     status: 'offline',
     currentOrderId: null,
@@ -90,6 +119,8 @@ const INITIAL_AGENTS: DeliveryBoy[] = [
     phone: '+971 56 333 9999',
     email: 'saeed@delivery.com',
     uniqueId: 'sae-505',
+    username: 'sae-505',
+    password: 'driver123',
     isActive: true,
     status: 'available',
     currentOrderId: null,
@@ -102,24 +133,42 @@ const INITIAL_AGENTS: DeliveryBoy[] = [
 export const useDeliveryBoyStore = create<DeliveryBoyStore>((set) => ({
   agents: INITIAL_AGENTS,
   addAgent: (agent) =>
-    set((state) => ({
-      agents: [
-        ...state.agents,
-        {
-          ...agent,
-          id: crypto.randomUUID(),
-          uniqueId: generateUniqueId(agent.name),
-          status: 'available' as AgentStatus,
-          currentOrderId: null,
-          totalDeliveries: 0,
-          rating: 5.0,
-          location: 'Unknown',
-        },
-      ],
-    })),
+    set((state) => {
+      const uniqueId = generateUniqueId(agent.name);
+      const newAgent: DeliveryBoy = {
+        id: crypto.randomUUID(),
+        name: agent.name,
+        phone: agent.phone,
+        email: agent.email,
+        uniqueId,
+        username: uniqueId,
+        password: agent.password,
+        isActive: agent.isActive,
+        status: 'available',
+        currentOrderId: null,
+        totalDeliveries: 0,
+        rating: 5.0,
+        location: agent.location,
+      };
+      return {
+        agents: [...state.agents, newAgent],
+      };
+    }),
   removeAgent: (id) =>
     set((state) => ({
       agents: state.agents.filter((a) => a.id !== id),
+    })),
+  toggleActive: (id) =>
+    set((state) => ({
+      agents: state.agents.map((a) =>
+        a.id === id ? { ...a, isActive: !a.isActive } : a
+      ),
+    })),
+  updateAgent: (id, data) =>
+    set((state) => ({
+      agents: state.agents.map((a) =>
+        a.id === id ? { ...a, ...data } : a
+      ),
     })),
   setStatus: (id, status, currentOrderId = null) =>
     set((state) => ({

@@ -1,6 +1,9 @@
+"use client";
+
 import { Badge } from '@justsearch/ui';
-import { Clock3, MapPin, Phone } from 'lucide-react';
+import { Clock3, MapPin, Phone, LogOut } from 'lucide-react';
 import type { DeliveryAgent } from '@/lib/delivery-types';
+import { useDriverAuth } from '@/lib/driver-auth-store';
 
 function getAgentBadgeVariant(
   status: DeliveryAgent['status']
@@ -16,6 +19,8 @@ function getAgentBadgeVariant(
 }
 
 export function AgentInfoCard({ agent, routeHealthLabel }: { agent: DeliveryAgent; routeHealthLabel: string }) {
+  const { logout } = useDriverAuth();
+
   return (
     <div className="rounded-[28px] border border-slate-200 bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-30px_rgba(15,23,42,0.7)]">
       <div className="flex items-start justify-between gap-3">
@@ -44,6 +49,14 @@ export function AgentInfoCard({ agent, routeHealthLabel }: { agent: DeliveryAgen
           <span>{routeHealthLabel}</span>
         </div>
       </div>
+
+      <button
+        onClick={logout}
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-colors"
+      >
+        <LogOut className="h-3.5 w-3.5" />
+        Sign Out
+      </button>
     </div>
   );
 }

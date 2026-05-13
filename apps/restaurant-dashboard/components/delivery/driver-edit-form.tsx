@@ -1,29 +1,45 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   phone: z.string().min(5, "Phone must be at least 5 characters"),
   email: z.string().email("Invalid email"),
   location: z.string().min(1, "Location is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
 });
 
 type FormData = z.infer<typeof schema>;
 
-interface DeliveryAgentFormProps {
-  onSubmit: (data: FormData) => void;
+interface DriverEditFormProps {
+  agent: DeliveryBoy;
+  onSave: (data: FormData) => void;
   onCancel: () => void;
 }
 
-export function DeliveryAgentForm({ onSubmit, onCancel }: DeliveryAgentFormProps) {
-  const form = useForm<FormData>({ resolver: zodResolver(schema) });
+export function DriverEditForm({ agent, onSave, onCancel }: DriverEditFormProps) {
+  const form = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: agent.name,
+      phone: agent.phone,
+      email: agent.email,
+      location: agent.location,
+      password: "",
+    },
+  });
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="elegant-card space-y-3 p-5">
-      <p className="text-sm font-bold text-slate-900">Add Driver</p>
-      <p className="text-xs text-slate-400">Username will be auto-generated from driver ID</p>
+    <form onSubmit={form.handleSubmit(onSave)} className="elegant-card space-y-3 p-5">
+      <p className="text-sm font-bold text-slate-900">Edit Driver</p>
+
+      {/* Username — read only */}
+      <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Username (Login ID)</p>
+        <p className="text-sm font-mono font-bold text-slate-900">{agent.username}</p>
+      </div>
 
       <div>
         <input {...form.register("name")} placeholder="Full Name" className="elegant-input w-full" />
@@ -46,13 +62,13 @@ export function DeliveryAgentForm({ onSubmit, onCancel }: DeliveryAgentFormProps
       </div>
 
       <div>
-        <input type="password" {...form.register("password")} placeholder="Set Password (min 6 chars)" className="elegant-input w-full" />
+        <input type="password" {...form.register("password")} placeholder="New Password (leave empty to keep current)" className="elegant-input w-full" />
         {form.formState.errors.password && <p className="mt-1 text-xs text-red-500">{form.formState.errors.password.message}</p>}
       </div>
 
       <div className="flex gap-2 pt-1">
         <button type="button" className="elegant-btn-secondary flex-1" onClick={onCancel}>Cancel</button>
-        <button type="submit" className="elegant-btn-primary flex-1">Add Driver</button>
+        <button type="submit" className="elegant-btn-primary flex-1">Save Changes</button>
       </div>
     </form>
   );

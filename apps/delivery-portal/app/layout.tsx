@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { DriverAuthProvider } from '@/lib/driver-auth-store';
+import { AuthGuard } from '@/components/layout/auth-guard';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,7 +18,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <DriverAuthProvider>
+          <AuthGuard>{children}</AuthGuard>
+        </DriverAuthProvider>
+      </body>
     </html>
   );
 }
