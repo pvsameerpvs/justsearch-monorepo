@@ -5,11 +5,11 @@ import Link from "next/link";
 import { OrderRow, type Order } from "./dashboard/order-row";
 
 const ORDERS: Order[] = [
-  { id: "#1024", customer: "Amina Hassan", items: 3, total: 142, status: "preparing", time: "2 min ago", type: "dine", avatar: "AH", avatarColor: "bg-rose-100 text-rose-700" },
+  { id: "#1024", customer: "Amina Hassan", items: 3, total: 142, status: "preparing", time: "2 min ago", type: "delivery", avatar: "AH", avatarColor: "bg-rose-100 text-rose-700" },
   { id: "#1023", customer: "Khalid Al Mansoori", items: 2, total: 78, status: "confirmed", time: "8 min ago", type: "delivery", avatar: "KA", avatarColor: "bg-sky-100 text-sky-700" },
-  { id: "#1022", customer: "Priya Nair", items: 4, total: 210, status: "ready", time: "15 min ago", type: "dine", avatar: "PN", avatarColor: "bg-amber-100 text-amber-700" },
+  { id: "#1022", customer: "Priya Nair", items: 4, total: 210, status: "ready", time: "15 min ago", type: "delivery", avatar: "PN", avatarColor: "bg-amber-100 text-amber-700" },
   { id: "#1021", customer: "James Thornton", items: 1, total: 110, status: "out_for_delivery", time: "22 min ago", type: "delivery", avatar: "JT", avatarColor: "bg-emerald-100 text-emerald-700" },
-  { id: "#1020", customer: "Sara Al Farsi", items: 2, total: 64, status: "completed", time: "38 min ago", type: "dine", avatar: "SF", avatarColor: "bg-violet-100 text-violet-700" },
+  { id: "#1020", customer: "Sara Al Farsi", items: 2, total: 64, status: "completed", time: "38 min ago", type: "delivery", avatar: "SF", avatarColor: "bg-violet-100 text-violet-700" },
 ];
 
 export function RecentOrders() {

@@ -1,206 +1,71 @@
-import { Check, Clock3 } from 'lucide-react';
-import { cn } from '@/lib/cn';
 import { formatCurrency } from '@/lib/format';
 import type { MenuItem } from '@/lib/restaurant-types';
 import type { ViewMode } from './restaurant-menu-showcase';
 import type { FulfillmentMode } from './use-restaurant-fulfillment';
+import { MenuItemImage, AvailabilityBadge, ListViewFooter, GridViewFooter } from './menu-item-card-parts';
 
-type RestaurantMenuItemCardProps = {
+interface RestaurantMenuItemCardProps {
   item: MenuItem;
   viewMode?: ViewMode;
   fulfillmentMode?: FulfillmentMode;
   cartQuantity?: number;
   onAddToCart?: (item: MenuItem) => void;
   onUpdateCartQuantity?: (itemId: string, quantity: number) => void;
-};
+}
 
 export function RestaurantMenuItemCard({
   item,
   viewMode = 'grid',
-  fulfillmentMode = 'dine-in',
+  fulfillmentMode = 'delivery',
   cartQuantity = 0,
   onAddToCart,
   onUpdateCartQuantity,
 }: RestaurantMenuItemCardProps) {
   const isList = viewMode === 'list';
   const isDeliveryMode = fulfillmentMode === 'delivery';
-  
-  const imageBackground = item.image
-    ? `linear-gradient(180deg, rgba(15, 23, 42, 0.05), rgba(15, 23, 42, 0.28)), url(${item.image})`
-    : 'linear-gradient(135deg, rgb(var(--brand-soft) / 0.96), rgb(var(--accent-soft) / 0.88))';
 
   return (
-    <article className={`overflow-hidden rounded-[14px] border border-[rgb(var(--border)/0.7)] bg-[rgb(var(--card-surface-muted)/0.92)] shadow-[0_12px_32px_rgba(15,23,42,0.04)] transition-all hover:shadow-[0_18px_44px_rgba(15,23,42,0.06)] ${
-      isList ? 'flex flex-row' : 'flex flex-col'
-    }`}>
-      {/* Image Section */}
-      <div
-        role="img"
-        aria-label={`${item.name} presentation`}
-        className={`relative bg-cover bg-center shrink-0 ${
-          isList 
-            ? 'w-[100px] sm:w-[240px] sm:aspect-[4/3]' 
-            : 'aspect-[4/3] w-full'
-        }`}
-        style={{
-          backgroundImage: imageBackground,
-        }}
-      >
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.2))]" />
-        
-        {/* Tags on Image - Only on Grid or large List */}
-        <div className={`absolute left-4 top-4 flex flex-wrap gap-2 ${isList ? 'hidden sm:flex' : 'flex'}`}>
-          {item.tags?.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-white/22 bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[rgb(var(--ink))]"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+    <article className={`overflow-hidden rounded-[14px] border border-[rgb(var(--border)/0.7)] bg-[rgb(var(--card-surface-muted)/0.92)] shadow-[0_12px_32px_rgba(15,23,42,0.04)] transition-all hover:shadow-[0_18px_44px_rgba(15,23,42,0.06)] ${isList ? 'flex flex-row' : 'flex flex-col'}`}>
+      <MenuItemImage item={item} isList={isList} />
 
-        {/* Price on Image (Grid only) */}
-        {!isList && (
-          <div className="absolute bottom-4 right-4 rounded-full bg-[rgb(var(--surface))] px-4 py-2 shadow-[0_12px_28px_rgba(15,23,42,0.15)]">
-            <p className="font-display text-lg font-bold tracking-tight text-[rgb(var(--ink))]">
-              {formatCurrency(item.price, item.currency)}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Content Section */}
       <div className={`flex flex-1 flex-col justify-between p-4 sm:p-6 ${isList ? 'py-4' : ''}`}>
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
             <div className="flex-1 space-y-1 sm:space-y-2">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="font-display text-base font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl leading-tight">
-                  {item.name}
-                </h3>
+                <h3 className="font-display text-base font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl leading-tight">{item.name}</h3>
                 {isList && (
-                   <span className="font-display text-sm font-bold tracking-tight text-[rgb(var(--brand))] sm:text-xl">
+                  <span className="font-display text-sm font-bold tracking-tight text-[rgb(var(--brand))] sm:text-xl">
                     {formatCurrency(item.price, item.currency)}
                   </span>
                 )}
               </div>
-              <p className="text-[11px] leading-relaxed text-[rgb(var(--muted))] line-clamp-2 sm:text-sm sm:line-clamp-none">
-                {item.description}
-              </p>
+              <p className="text-[11px] leading-relaxed text-[rgb(var(--muted))] line-clamp-2 sm:text-sm sm:line-clamp-none">{item.description}</p>
             </div>
 
-            {!isList && (
-              <span
-                className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] ${
-                  item.isAvailable
-                    ? 'bg-[rgb(var(--brand-soft))] text-[rgb(var(--brand))]'
-                    : 'bg-[rgb(var(--border)/0.78)] text-[rgb(var(--muted))]'
-                }`}
-              >
-                {item.isAvailable ? (
-                  <Check className="h-3.5 w-3.5" />
-                ) : (
-                  <Clock3 className="h-3.5 w-3.5" />
-                )}
-                {item.isAvailable ? 'Available' : 'Limited'}
-              </span>
-            )}
+            {!isList && <AvailabilityBadge available={item.isAvailable} />}
           </div>
         </div>
 
-        {/* Footer info (List only) */}
         {isList && (
-          <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-3 sm:mt-4 sm:pt-4">
-            <span
-              className={`inline-flex items-center gap-2 rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-[0.1em] sm:px-3 sm:py-1.5 sm:text-[10px] ${
-                item.isAvailable
-                  ? 'bg-[rgb(var(--brand-soft))] text-[rgb(var(--brand))]'
-                  : 'bg-[rgb(var(--border)/0.78)] text-[rgb(var(--muted))]'
-              }`}
-            >
-              {item.isAvailable ? (
-                <Check className="h-3 w-3" />
-              ) : (
-                <Clock3 className="h-3 w-3" />
-              )}
-              {item.isAvailable ? 'Available' : 'Limited'}
-            </span>
-            
-            {isDeliveryMode && item.isAvailable && onAddToCart ? (
-              cartQuantity > 0 && onUpdateCartQuantity ? (
-                <div className="inline-flex items-center rounded-full bg-white p-1 shadow-sm">
-                  <button
-                    type="button"
-                    onClick={() => onUpdateCartQuantity(item.id, cartQuantity - 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold text-[rgb(var(--ink))]"
-                  >
-                    -
-                  </button>
-                  <span className="min-w-[1.75rem] text-center text-sm font-bold text-[rgb(var(--ink))]">
-                    {cartQuantity}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => onUpdateCartQuantity(item.id, cartQuantity + 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold text-[rgb(var(--ink))]"
-                  >
-                    +
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => onAddToCart(item)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-2xl font-semibold text-[rgb(var(--ink))] shadow-[0_10px_24px_rgba(15,23,42,0.14)] transition-all hover:brightness-105"
-                >
-                  +
-                </button>
-              )
-            ) : (
-              <button className="text-[9px] font-bold uppercase tracking-widest text-[rgb(var(--brand))] hover:underline sm:text-[10px]">
-                View Details
-              </button>
-            )}
-          </div>
+          <ListViewFooter
+            item={item}
+            isDeliveryMode={isDeliveryMode}
+            cartQuantity={cartQuantity}
+            onAddToCart={onAddToCart}
+            onUpdateCartQuantity={onUpdateCartQuantity}
+          />
         )}
 
-        {!isList && isDeliveryMode && item.isAvailable && onAddToCart ? (
-          <div className="mt-4">
-            {cartQuantity > 0 && onUpdateCartQuantity ? (
-              <div className="inline-flex items-center rounded-full bg-[rgb(var(--card-surface-muted)/0.9)] p-1">
-                <button
-                  type="button"
-                  onClick={() => onUpdateCartQuantity(item.id, cartQuantity - 1)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-[rgb(var(--ink))]"
-                >
-                  -
-                </button>
-                <span className="min-w-[2rem] text-center text-sm font-bold text-[rgb(var(--ink))]">
-                  {cartQuantity}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => onUpdateCartQuantity(item.id, cartQuantity + 1)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-[rgb(var(--ink))]"
-                >
-                  +
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => onAddToCart(item)}
-                className={cn(
-                  'inline-flex h-11 w-full items-center justify-center rounded-[14px] text-sm font-semibold transition-all',
-                  'bg-[rgb(var(--brand))] text-white shadow-[0_16px_28px_rgb(var(--brand)/0.2)] hover:brightness-105',
-                )}
-              >
-                Add to Delivery Cart
-              </button>
-            )}
-          </div>
-        ) : null}
+        {!isList && (
+          <GridViewFooter
+            item={item}
+            isDeliveryMode={isDeliveryMode}
+            cartQuantity={cartQuantity}
+            onAddToCart={onAddToCart}
+            onUpdateCartQuantity={onUpdateCartQuantity}
+          />
+        )}
       </div>
     </article>
   );

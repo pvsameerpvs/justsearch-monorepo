@@ -56,7 +56,7 @@ function getStorageKey(restaurantSlug: string) {
 
 function createDefaultState(): StoredState {
   return {
-    mode: 'dine-in',
+    mode: 'delivery',
     cart: [],
     orders: [],
   };
@@ -67,7 +67,7 @@ function parseStoredState(raw: string | null): StoredState {
   try {
     const parsed = JSON.parse(raw);
     return {
-      mode: parsed.mode || 'dine-in',
+      mode: parsed.mode === 'dine-in' ? 'delivery' : (parsed.mode || 'delivery'),
       cart: parsed.cart || [],
       orders: parsed.orders || [],
     };
@@ -153,9 +153,9 @@ export function FulfillmentProvider({
     cart,
     cartCount,
     subtotal,
-    deliveryFee: 0,
-    deliverySavings: state.mode === 'delivery' && cartCount > 0 ? DELIVERY_BASE_FEE : 0,
-    total: subtotal,
+    deliveryFee: cartCount > 0 ? DELIVERY_BASE_FEE : 0,
+    deliverySavings: 0,
+    total: subtotal + (cartCount > 0 ? DELIVERY_BASE_FEE : 0),
     orders,
     getQuantity: (id) => state.cart.find(i => i.itemId === id)?.quantity ?? 0,
     addToCart: (item) => {
@@ -171,6 +171,7 @@ export function FulfillmentProvider({
     clearCart: () => setState(s => ({ ...s, cart: [] })),
     placeOrder: ({ address, note, promoCode, promoDiscount = 0 }) => {
         const id = `ORD-${Date.now().toString(36).toUpperCase()}`;
+        const fee = cartCount > 0 ? DELIVERY_BASE_FEE : 0;
         const newOrder: StoredOrder = {
             id,
             createdAt: Date.now(),
@@ -179,10 +180,10 @@ export function FulfillmentProvider({
             note,
             riderName: `${restaurant.name} Rider`,
             subtotal,
-            deliveryFee: 0,
+            deliveryFee: fee,
             promoCode,
             promoDiscount,
-            total: Math.max(0, subtotal - promoDiscount),
+            total: Math.max(0, subtotal + fee - promoDiscount),
         };
         setState(s => ({ ...s, cart: [], orders: [newOrder, ...s.orders].slice(0, 10) }));
         return id;

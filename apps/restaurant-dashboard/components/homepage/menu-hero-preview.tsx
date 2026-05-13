@@ -1,6 +1,6 @@
 import { getRestaurantInitials } from "@justsearch/utils";
 import type { RestaurantTheme } from "@justsearch/utils";
-import { Calendar, UtensilsCrossed, Bike } from "lucide-react";
+import { Calendar, Bike } from "lucide-react";
 
 interface MenuHeroPreviewProps {
   heroUrl: string;
@@ -43,13 +43,9 @@ export function MenuHeroPreview({ heroUrl, logoUrl, name, tagline, category, cui
 
       <div className="bg-white p-4 space-y-3">
         <div className="flex justify-center">
-          <div className="inline-flex rounded-xl bg-slate-100 p-1">
-            <span className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold text-teal-700 shadow-sm">
-              <UtensilsCrossed className="h-3 w-3" /> Dine In
-            </span>
-            <span className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold text-slate-400">
-              <Bike className="h-3 w-3" /> Delivery
-            </span>
+          <div className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1.5">
+            <Bike className="h-3 w-3 text-slate-500" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Delivery Only</span>
           </div>
         </div>
 

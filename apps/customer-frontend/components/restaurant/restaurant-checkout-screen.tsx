@@ -1,293 +1,81 @@
 "use client";
 
-import { useMemo, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { ButtonLink } from '@/components/shared/button-link';
 import { Container } from '@/components/shared/container';
-import { EmptyState } from '@/components/shared/empty-state';
 import type { Restaurant } from '@/lib/restaurant-types';
-
-
-/* Modular Components Imported from the Checkout Folder */
 import { CheckoutAddressCard } from './checkout/checkout-address-card';
 import { CheckoutAddressSelectorSheet } from './checkout/checkout-address-selector-sheet';
 import { CheckoutOrderPlacingOverlay } from './checkout/checkout-order-placing-overlay';
 import { CheckoutSummaryCard } from './checkout/checkout-summary-card';
 import { CheckoutStickyFooter } from './checkout/checkout-sticky-footer';
-import { useRestaurantFulfillment } from './use-restaurant-fulfillment';
-import { getVoucherDiscountAmount, useVoucherWallet } from './checkout/use-voucher-wallet';
-import { type SavedAddress, useAddressBook } from './use-address-book';
-
-const ORDER_PLACING_DURATION_MS = 1800;
-
-function getCheckoutLineTotal(item: {
-  price: number;
-  quantity: number;
-  lineTotal?: number;
-}) {
-  return typeof item.lineTotal === 'number' ? item.lineTotal : item.price * item.quantity;
-}
+import { CheckoutEmptyState } from './checkout/checkout-empty-state';
+import { useCheckoutState } from './checkout/use-checkout-state';
 
 export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restaurant }) {
-  const router = useRouter();
-  const {
-    cart,
-    cartCount,
-    total,
-    deliverySavings,
-    placeOrder,
-  } = useRestaurantFulfillment();
-  const { findVoucherByCode, markVoucherUsed } = useVoucherWallet();
+  const state = useCheckoutState();
 
-  const { addresses, addAddress, hydrated: addressesHydrated } = useAddressBook();
-  
-  /* Centralized Checkout State */
-  const [addressTitle, setAddressTitle] = useState('Home');
-  const [address, setAddress] = useState('');
-  const [addressDetails, setAddressDetails] = useState('');
-  const [alternateNumber, setAlternateNumber] = useState('');
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
-  const [isAddressBookOpen, setIsAddressBookOpen] = useState(false);
-  const [handoff, setHandoff] = useState('Hand it to me');
-  const [restaurantNote, setRestaurantNote] = useState('');
-  const [riderNote, setRiderNote] = useState('');
-  const [promoCode, setPromoCode] = useState('');
-  const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
-  const [placingOrder, setPlacingOrder] = useState<{
-    orderId: string;
-    startedAt: number;
-  } | null>(null);
-  const [placingProgress, setPlacingProgress] = useState(0);
-
-  const applySavedAddress = (savedAddress: SavedAddress) => {
-    setSelectedAddressId(savedAddress.id);
-    setAddressTitle(savedAddress.label);
-    setAddress(savedAddress.address);
-    setAddressDetails(savedAddress.details);
-    setAlternateNumber(savedAddress.alternateNumber || '');
-  };
-
-  const applyCurrentLocationAddress = (resolvedAddress: string) => {
-    setSelectedAddressId(null);
-    setAddressTitle('Current location');
-    setAddress(resolvedAddress);
-    setAddressDetails('');
-    setAlternateNumber('');
-  };
-
-  // Sync with first saved address on load
-  useEffect(() => {
-    if (!addressesHydrated || addresses.length === 0) {
-      return;
-    }
-
-    const selectedAddress = addresses.find((item) => item.id === selectedAddressId);
-
-    if (selectedAddress) {
-      return;
-    }
-
-    if (!address || !selectedAddressId) {
-      applySavedAddress(addresses[0]);
-    }
-  }, [address, addresses, addressesHydrated, selectedAddressId]);
-
-  const currency = cart[0]?.currency ?? restaurant.menu[0]?.items[0]?.currency ?? 'AED';
-
-  const displayItems = useMemo(
-    () =>
-      cart.map((item) => ({
-        ...item,
-        lineTotal: getCheckoutLineTotal(item),
-      })),
-    [cart],
-  );
-
-  const appliedVoucher = useMemo(
-    () => (appliedPromoCode ? findVoucherByCode(appliedPromoCode) : null),
-    [appliedPromoCode, findVoucherByCode],
-  );
-
-  const promoDiscountAmount = useMemo(
-    () =>
-      appliedVoucher && !appliedVoucher.isUsed
-        ? getVoucherDiscountAmount(appliedVoucher, total)
-        : 0,
-    [appliedVoucher, total],
-  );
-
-  const displayTotal = Math.max(0, total - promoDiscountAmount);
-  const displaySavings = deliverySavings + promoDiscountAmount;
-
-  useEffect(() => {
-    if (!placingOrder) {
-      setPlacingProgress(0);
-      return;
-    }
-
-    let frameId = 0;
-    const animate = () => {
-      const elapsed = Date.now() - placingOrder.startedAt;
-      const nextProgress = Math.min(1, elapsed / ORDER_PLACING_DURATION_MS);
-      setPlacingProgress(nextProgress);
-
-      if (nextProgress < 1) {
-        frameId = window.requestAnimationFrame(animate);
-      }
-    };
-
-    frameId = window.requestAnimationFrame(animate);
-    const redirectTimer = window.setTimeout(() => {
-      router.push(`/menu/checkout/status/${encodeURIComponent(placingOrder.orderId)}`);
-    }, ORDER_PLACING_DURATION_MS + 1000); // Give 1 second to see the "Order Placed!" state
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      window.clearTimeout(redirectTimer);
-    };
-  }, [placingOrder, router]);
-
-  const onPlaceOrder = () => {
-    if (placingOrder) {
-      return;
-    }
-
-    const combinedAddress = `${addressTitle} - ${address}\n${addressDetails}${alternateNumber ? `\nAlt number: ${alternateNumber}` : ''}\n${handoff}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
-    const promoSnapshot = appliedVoucher && !appliedVoucher.isUsed
-      ? {
-          code: appliedVoucher.code,
-          discount: promoDiscountAmount,
-        }
-      : null;
-
-    const orderId = placeOrder({
-      address: combinedAddress,
-      note: restaurantNote,
-      promoCode: promoSnapshot?.code,
-      promoDiscount: promoSnapshot?.discount,
-    });
-
-    if (!orderId) {
-      setError('Add at least one item and a delivery address before placing the order.');
-      return;
-    }
-
-    if (promoSnapshot) {
-      markVoucherUsed(promoSnapshot.code);
-    }
-
-    setError(null);
-    setPlacedOrderId(orderId);
-    setPlacingOrder({
-      orderId,
-      startedAt: Date.now(),
-    });
-  };
-
-  const applyPromoCode = () => {
-    const normalized = promoCode.trim().toUpperCase();
-    if (!normalized) {
-      setAppliedPromoCode(null);
-      return;
-    }
-
-    const voucher = findVoucherByCode(normalized);
-    if (!voucher || voucher.isUsed) {
-      return;
-    }
-
-    setAppliedPromoCode(voucher.code);
-  };
-
-  /* Empty State View */
-  if (cartCount === 0 && !placingOrder) {
-    return (
-      <section className="py-8 sm:py-10">
-        <Container className="max-w-3xl">
-          <EmptyState
-            title="No delivery items yet"
-            description="Add menu items in delivery mode, then come here to review address, summary, and place the order."
-            action={
-              <ButtonLink href="/menu" variant="primary" size="md">
-                Back to menu
-              </ButtonLink>
-            }
-          />
-        </Container>
-      </section>
-    );
+  if (state.cartCount === 0 && !state.placingOrder) {
+    return <CheckoutEmptyState />;
   }
 
   return (
-    <section 
+    <section
       className="py-6 sm:py-8"
-      style={{ 
-        paddingBottom: 'calc(var(--restaurant-mobile-nav-height,0px) + 140px)' 
-      }}
+      style={{ paddingBottom: 'calc(var(--restaurant-mobile-nav-height,0px) + 140px)' }}
     >
       <Container className="max-w-3xl">
         <div className="space-y-5">
-          
-          {/* 1. Address & Handoff Section */}
-          <CheckoutAddressCard 
-            addressTitle={addressTitle}
-            address={address}
-            addressDetails={addressDetails}
-            alternateNumber={alternateNumber}
-            savedAddressesCount={addresses.length}
-            handoff={handoff}
-            setAlternateNumber={setAlternateNumber}
-            setHandoff={setHandoff}
-            note={riderNote}
-            setNote={setRiderNote}
-            onOpenAddressBook={() => setIsAddressBookOpen(true)}
+          <CheckoutAddressCard
+            addressTitle={state.addressTitle}
+            address={state.address}
+            addressDetails={state.addressDetails}
+            alternateNumber={state.alternateNumber}
+            savedAddressesCount={state.addresses.length}
+            handoff={state.handoff}
+            setAlternateNumber={state.setAlternateNumber}
+            setHandoff={state.setHandoff}
+            note={state.riderNote}
+            setNote={state.setRiderNote}
+            onOpenAddressBook={() => state.setIsAddressBookOpen(true)}
           />
 
-          {/* 2. Order Summary Section */}
-          <CheckoutSummaryCard 
+          <CheckoutSummaryCard
             restaurantName={restaurant.name}
-            displayItems={displayItems}
-            displaySavings={displaySavings}
-            currency={currency}
-            note={restaurantNote}
-            setNote={setRestaurantNote}
-            promoCode={promoCode}
-            setPromoCode={setPromoCode}
-            onApplyPromo={applyPromoCode}
+            displayItems={state.displayItems}
+            displaySavings={state.displaySavings}
+            currency={state.currency}
+            note={state.restaurantNote}
+            setNote={state.setRestaurantNote}
+            promoCode={state.promoCode}
+            setPromoCode={state.setPromoCode}
+            onApplyPromo={state.onApplyPromo}
           />
-          
         </div>
       </Container>
 
-      {/* 4. Sticky Payment Bar */}
-      <CheckoutStickyFooter 
-        total={displayTotal}
-        currency={currency}
-        error={error}
-        latestOrderId={placedOrderId}
-        cartCount={cartCount}
-        isPlacing={Boolean(placingOrder)}
-        onPlaceOrder={onPlaceOrder}
+      <CheckoutStickyFooter
+        total={state.displayTotal}
+        currency={state.currency}
+        error={state.error}
+        latestOrderId={state.placedOrderId}
+        cartCount={state.cartCount}
+        isPlacing={Boolean(state.placingOrder)}
+        onPlaceOrder={state.onPlaceOrder}
       />
 
       <CheckoutAddressSelectorSheet
-        open={isAddressBookOpen}
-        addresses={addresses}
-        selectedAddressId={selectedAddressId ?? undefined}
-        onClose={() => setIsAddressBookOpen(false)}
-        onSelectAddress={applySavedAddress}
+        open={state.isAddressBookOpen}
+        addresses={state.addresses}
+        selectedAddressId={state.selectedAddressId ?? undefined}
+        onClose={() => state.setIsAddressBookOpen(false)}
+        onSelectAddress={state.applySavedAddress}
         onAddAddress={(newAddress) => {
-          const createdAddress = addAddress(newAddress);
-          applySavedAddress(createdAddress);
+          const createdAddress = state.addAddress(newAddress);
+          state.applySavedAddress(createdAddress);
         }}
-        onUseCurrentLocation={applyCurrentLocationAddress}
+        onUseCurrentLocation={state.applyCurrentLocationAddress}
       />
 
-      {placingOrder ? (
-        <CheckoutOrderPlacingOverlay progress={placingProgress} />
-      ) : null}
+      {state.placingOrder && <CheckoutOrderPlacingOverlay progress={state.placingProgress} />}
     </section>
   );
 }
