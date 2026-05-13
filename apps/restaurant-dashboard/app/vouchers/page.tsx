@@ -1,11 +1,10 @@
-import { PageHeader } from '@justsearch/ui';
-import { VoucherValidator } from '@/components/vouchers/voucher-validator';
+import { PageHeader } from "@justsearch/ui";
+import { VoucherManager } from "@/components/vouchers/voucher-manager";
 
 export default function VouchersPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Vouchers" description="Validate and manage customer vouchers" />
-      <VoucherValidator />
+      <VoucherManager />
     </div>
   );
 }
