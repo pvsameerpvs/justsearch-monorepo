@@ -1,12 +1,9 @@
 import { PageHeader } from '@justsearch/ui';
+import { WelcomeBar } from '@/components/dashboard/welcome-bar';
+import { QuickActions } from '@/components/dashboard/quick-actions';
 import { DashboardStats } from '@/components/dashboard-stats';
 import { RecentOrders } from '@/components/recent-orders';
-import { OrderAssignment } from '@/components/orders/order-assignment';
 import { TopMenuItems } from '@/components/top-menu-items';
-import { RestaurantHero } from '@/components/restaurant-hero';
-import { RestaurantInfoCard } from '@/components/restaurant-info-card';
-import { OpeningHoursSection } from '@/components/opening-hours-section';
-import { SocialLinksSection } from '@/components/social-links-section';
 import { getCurrentRestaurant } from '@/lib/get-current-restaurant';
 
 export default async function DashboardPage() {
@@ -14,19 +11,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <RestaurantHero restaurant={restaurant} />
+      <WelcomeBar restaurant={restaurant} />
       <PageHeader title="Dashboard" description={`Overview of ${restaurant.name} today`} />
+      <QuickActions />
       <DashboardStats restaurant={restaurant} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <RestaurantInfoCard restaurant={restaurant} />
-        <div className="space-y-6">
-          <OpeningHoursSection restaurant={restaurant} />
-          <SocialLinksSection restaurant={restaurant} />
-        </div>
-      </div>
-
-      <OrderAssignment />
       <div className="grid gap-6 lg:grid-cols-2">
         <RecentOrders />
         <TopMenuItems />

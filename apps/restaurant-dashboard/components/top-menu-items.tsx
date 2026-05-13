@@ -1,40 +1,40 @@
 "use client";
 
-import { Flame, TrendingUp } from "lucide-react";
+import { Flame, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import { TopItemRow, type TopItem } from "./dashboard/top-item-row";
 
-const ITEMS = [
-  { name: "Whipped Hummus", orders: 42, change: "+15%", icon: "🥗" },
-  { name: "Citrus Grilled Salmon", orders: 38, change: "+8%", icon: "🐟" },
-  { name: "Charred Halloumi", orders: 35, change: "+22%", icon: "🧀" },
-  { name: "Date Cake", orders: 28, change: "+12%", icon: "🍰" },
+const ITEMS: TopItem[] = [
+  { name: "Whipped Hummus", orders: 42, prevOrders: 36, revenue: 588, category: "Starters", emoji: "🥗" },
+  { name: "Citrus Grilled Salmon", orders: 38, prevOrders: 35, revenue: 1140, category: "Mains", emoji: "🐟" },
+  { name: "Charred Halloumi", orders: 35, prevOrders: 28, revenue: 420, category: "Starters", emoji: "🧀" },
+  { name: "Date Cake", orders: 28, prevOrders: 30, revenue: 336, category: "Desserts", emoji: "🍰" },
+  { name: "Truffle Mushroom Risotto", orders: 24, prevOrders: 20, revenue: 720, category: "Mains", emoji: "🍄" },
 ];
+
+const MAX_ORDERS = Math.max(...ITEMS.map((i) => i.orders));
 
 export function TopMenuItems() {
   return (
-    <div className="elegant-card p-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-base font-bold text-slate-900">Top Menu Items</h3>
-          <p className="text-sm text-slate-500">Most ordered today</p>
+    <div className="elegant-card p-0 overflow-hidden">
+      <div className="flex items-center justify-between p-5 pb-0">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
+            <Flame className="h-5 w-5 text-orange-500" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-slate-900">Top Menu Items</h3>
+            <p className="text-sm text-slate-500">Most ordered today</p>
+          </div>
         </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50">
-          <Flame className="h-4 w-4 text-orange-500" />
-        </div>
+        <Link href="/menu" className="flex items-center gap-1 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">
+          Menu <ArrowUpRight className="h-4 w-4" />
+        </Link>
       </div>
 
-      <div className="mt-4 space-y-3">
-        {ITEMS.map((item) => (
-          <div key={item.name} className="flex items-center gap-3 rounded-lg border border-slate-50 bg-slate-50/30 p-3">
-            <span className="text-xl">{item.icon}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900">{item.name}</p>
-              <p className="text-xs text-slate-500">{item.orders} orders</p>
-            </div>
-            <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-600">
-              <TrendingUp className="h-3 w-3" />
-              {item.change}
-            </div>
-          </div>
+      <div className="mt-4 space-y-1 p-5 pt-0">
+        {ITEMS.map((item, idx) => (
+          <TopItemRow key={item.name} item={item} idx={idx} maxOrders={MAX_ORDERS} />
         ))}
       </div>
     </div>
