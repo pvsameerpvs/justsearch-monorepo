@@ -1,4 +1,3 @@
-import { Star, Crown } from "lucide-react";
 import { TIER_CONFIG } from "./types/customer.types";
 
 interface CustomerTierBadgeProps {

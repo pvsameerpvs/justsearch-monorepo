@@ -14,7 +14,7 @@ export default async function DashboardPage() {
       <WelcomeBar restaurant={restaurant} />
       <PageHeader title="Dashboard" description={`Overview of ${restaurant.name} today`} />
       <QuickActions />
-      <DashboardStats restaurant={restaurant} />
+      <DashboardStats />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <RecentOrders />

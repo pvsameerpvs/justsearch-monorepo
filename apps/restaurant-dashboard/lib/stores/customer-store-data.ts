@@ -1,5 +1,5 @@
-import type { Customer } from "@/components/customers/types/customer.types";
 import { customer, addr, game, voucher } from "./customer-store-builders";
+import type { Customer } from "@/components/customers/types/customer.types";
 
 export const INITIAL_CUSTOMERS: Customer[] = [
   customer("c1", "Amina Hassan", "+971 55 111 2222", "amina@email.com", "15 March", "Dubai Marina", 24, 3840, "Gold", 2450, -1, "2025-01-10", [

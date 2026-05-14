@@ -1,13 +1,12 @@
 import { CheckCircle, XCircle, User } from "lucide-react";
-import type { DashboardOrder } from "@/lib/stores/order-store";
-import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 import { useDeliveryBoyStore } from "@/lib/stores/delivery-boy-store";
 import { OrderStatusBadge } from "./order-status-config";
+import type { DashboardOrder } from "@/lib/stores/order-store";
+import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 
-export function HistoryCardHeader({ order, isCompleted, isCancelled }: {
+export function HistoryCardHeader({ order, isCompleted }: {
   order: DashboardOrder;
   isCompleted: boolean;
-  isCancelled: boolean;
 }) {
   return (
     <div className="flex items-start justify-between gap-3">

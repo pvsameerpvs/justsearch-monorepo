@@ -1,6 +1,6 @@
 import { Phone, Mail, MapPin, ShoppingBag, Wallet, CalendarDays, ChevronRight, Coins } from "lucide-react";
-import type { Customer } from "./types/customer.types";
 import { CustomerTierBadge } from "./customer-tier-badge";
+import type { Customer } from "./types/customer.types";
 
 interface CustomerTableRowProps {
   customer: Customer;

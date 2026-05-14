@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import type { Restaurant } from "@justsearch/utils";
 import { updateRestaurant } from "@justsearch/utils";
 import { PageHeader } from "@justsearch/ui";
 import { HomepageEditorForm } from "./homepage-editor-form";
 import { HomepagePreview } from "./homepage-preview";
+import type { Restaurant } from "@justsearch/utils";
 
 export function HomepageEditor({ restaurant }: { restaurant: Restaurant }) {
   const [previewRestaurant, setPreviewRestaurant] = useState(restaurant);

@@ -1,5 +1,5 @@
-import type { MenuItem } from "@/lib/stores/menu-store";
 import { MenuItemActions } from "./menu-item-actions";
+import type { MenuItem } from "@/lib/stores/menu-store";
 
 export function MenuItemCard({
   item,

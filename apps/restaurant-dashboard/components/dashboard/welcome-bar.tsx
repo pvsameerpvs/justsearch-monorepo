@@ -1,7 +1,7 @@
-import type { Restaurant } from "@justsearch/utils";
-import { getRestaurantInitials } from "@justsearch/utils";
-import { Store, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { Store, ArrowUpRight } from "lucide-react";
+import { getRestaurantInitials } from "@justsearch/utils";
+import type { Restaurant } from "@justsearch/utils";
 
 export function WelcomeBar({ restaurant }: { restaurant: Restaurant }) {
   const initials = getRestaurantInitials(restaurant.name);

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Users, Search, Phone, Mail, MapPin, Trash2 } from "lucide-react";
 import { PageHeader } from "@justsearch/ui";
-import { Users, UserCheck, Search, Phone, Mail, MapPin, Trash2 } from "lucide-react";
 
 const DEMO_USERS = [
   { id: "1", name: "Amina Hassan", phone: "+971 55 111 2222", email: "amina@email.com", city: "Dubai", orders: 24, status: "active" },

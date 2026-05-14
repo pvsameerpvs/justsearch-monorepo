@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { getSlugFromHostname, getAuthKey, getRestaurantBySlug } from "./auth-helpers";
 
 interface DashboardAuthContextType {
   isAuthenticated: boolean;
@@ -10,51 +11,6 @@ interface DashboardAuthContextType {
 }
 
 const DashboardAuthContext = createContext<DashboardAuthContextType | null>(null);
-
-function getSlugFromHostname(): string {
-  if (typeof window === "undefined") return "mosaic-table";
-  const host = window.location.hostname.toLowerCase();
-  // Localhost / dev fallback
-  if (host === "localhost" || host === "127.0.0.1") {
-    return "mosaic-table";
-  }
-  if (host.startsWith("admin-")) {
-    return host.replace("admin-", "").split(".")[0];
-  }
-  return host.split(".")[0];
-}
-
-function getAuthKey(slug: string): string {
-  return "restaurant-dashboard-auth-" + slug;
-}
-
-const DEMO_CREDENTIALS: Record<string, { dashboardUsername: string; dashboardPassword: string }> = {
-  "mosaic-table": { dashboardUsername: "js", dashboardPassword: "1234" },
-  "spice-garden": { dashboardUsername: "js", dashboardPassword: "1234" },
-};
-
-function getRestaurantBySlug(slug: string): { dashboardUsername: string; dashboardPassword: string } | null {
-  // Try localStorage first (same-origin only)
-  try {
-    const raw = localStorage.getItem("justsearch-admin-restaurants");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const restaurants = parsed.state?.restaurants ?? [];
-      const found = restaurants.find((r: any) => r.slug === slug || r.subdomain === slug);
-      if (found && found.dashboardUsername && found.dashboardPassword) {
-        return {
-          dashboardUsername: found.dashboardUsername,
-          dashboardPassword: found.dashboardPassword,
-        };
-      }
-    }
-  } catch {
-    // ignore
-  }
-
-  // Fallback to demo credentials (for cross-origin / dev testing)
-  return DEMO_CREDENTIALS[slug] ?? null;
-}
 
 export function DashboardAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

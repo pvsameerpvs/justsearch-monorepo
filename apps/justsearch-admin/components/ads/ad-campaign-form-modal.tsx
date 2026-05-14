@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AdMediaUpload } from "./ad-media-upload";
-import { FormField } from "./ad-form-field";
+import { AdFormField } from "./ad-form-field";
 import { AdGameSelector } from "./ad-game-selector";
 import type { AdCampaign, AdCampaignFormData, AdCampaignType } from "@/lib/stores/ad-campaign-types";
 
@@ -62,10 +62,10 @@ export function AdCampaignFormModal({ campaign, onSave, onCancel }: AdCampaignFo
               </div>
             </div>
 
-            <FormField label="Ad Title" value={form.title} onChange={(v: string) => setForm({ ...form, title: v })} />
-            <FormField label="Client Name" value={form.clientName} onChange={(v: string) => setForm({ ...form, clientName: v })} />
-            <FormField label="Company Name" value={form.companyName} onChange={(v: string) => setForm({ ...form, companyName: v })} />
-            <FormField label="Duration (seconds)" value={String(form.duration)} onChange={(v: string) => setForm({ ...form, duration: Number(v) })} type="number" />
+            <AdFormField label="Ad Title" value={form.title} onChange={(v: string) => setForm({ ...form, title: v })} />
+            <AdFormField label="Client Name" value={form.clientName} onChange={(v: string) => setForm({ ...form, clientName: v })} />
+            <AdFormField label="Company Name" value={form.companyName} onChange={(v: string) => setForm({ ...form, companyName: v })} />
+            <AdFormField label="Duration (seconds)" value={String(form.duration)} onChange={(v: string) => setForm({ ...form, duration: Number(v) })} type="number" />
 
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Campaign Type</label>

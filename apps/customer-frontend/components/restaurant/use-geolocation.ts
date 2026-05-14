@@ -83,8 +83,8 @@ export function useGeolocation() {
                 coords: { latitude, longitude },
               });
             }
-          } catch (err) {
-            console.error("Location error:", err);
+          } catch {
+            // Location error: silently fail and let fallback resolve
             setError("Failed to resolve address.");
             resolve({ address: null, coords: null });
           } finally {

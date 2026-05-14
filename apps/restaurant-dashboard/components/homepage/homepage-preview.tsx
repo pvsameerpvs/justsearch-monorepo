@@ -1,7 +1,7 @@
-import type { Restaurant } from "@justsearch/utils";
 import { Gamepad2, MessagesSquare, Share2, UtensilsCrossed } from "lucide-react";
 import { FeatureCard } from "./feature-card";
 import { PreviewHero } from "./preview-hero";
+import type { Restaurant } from "@justsearch/utils";
 
 function rgb(v: string) {
   return `rgb(${v})`;

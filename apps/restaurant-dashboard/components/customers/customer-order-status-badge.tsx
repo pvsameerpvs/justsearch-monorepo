@@ -16,7 +16,6 @@ const STATUS_META: Record<string, { icon: React.ComponentType<{ className?: stri
 
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
   const m = STATUS_META[status] ?? STATUS_META.pending;
-  const Icon = m.icon;
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold ${m.bg} ${m.color}`}>
       {m.label}

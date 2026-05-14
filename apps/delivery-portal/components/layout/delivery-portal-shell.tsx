@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { Bike } from 'lucide-react';
-import type { DeliveryAgent, DeliveryPortalRestaurant } from '@/lib/delivery-types';
 import { AgentInfoCard } from './agent-info-card';
 import { PortalNav } from './portal-nav';
 import { PortalMetaStrip } from './portal-meta-strip';
+import type { DeliveryAgent, DeliveryPortalRestaurant } from '@/lib/delivery-types';
 
 type DeliveryPortalShellProps = {
   restaurant: DeliveryPortalRestaurant;

@@ -46,16 +46,16 @@ export function CheckoutAddressSelectorSheet({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[10002] bg-black/40 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[10002] flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
       <button type="button" aria-label="Close address selector" className="absolute inset-0 h-full w-full cursor-default" onClick={onClose} />
 
-      <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-3xl">
-        <div className="relative rounded-t-[28px] bg-white shadow-[0_-18px_56px_rgba(15,23,42,0.18)]">
-          <button type="button" onClick={onClose} aria-label="Close" className="absolute left-4 top-0 -translate-y-[calc(100%+12px)] inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-[rgb(var(--ink))] shadow-[0_8px_24px_rgba(15,23,42,0.18)]">
+      <div className="relative z-10 mx-4 w-full max-w-3xl">
+        <div className="relative max-h-[85vh] overflow-hidden rounded-[28px] bg-white shadow-[0_18px_56px_rgba(15,23,42,0.18)]">
+          <button type="button" onClick={onClose} aria-label="Close" className="absolute right-4 top-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-[rgb(var(--ink))]">
             <X className="h-5 w-5" />
           </button>
 
-          <div className="px-5 pb-[calc(env(safe-area-inset-bottom,0px)+20px)] pt-5 sm:px-6">
+          <div className="max-h-[85vh] overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,0px)+20px)] pt-5 sm:px-6">
             {mode === 'add' ? (
               <CheckoutAddAddressForm
                 initialAddress={currentLocationAddress ?? undefined}

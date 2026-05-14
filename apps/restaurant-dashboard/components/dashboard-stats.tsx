@@ -1,7 +1,6 @@
 "use client";
 
 import { ShoppingBag, DollarSign, Users, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import type { Restaurant } from '@justsearch/utils';
 
 interface Stat {
   label: string;
@@ -20,7 +19,7 @@ const STATS: Stat[] = [
   { label: 'Avg Order Value', value: 'AED 160', change: '-3%', changeUp: false, icon: TrendingUp, accent: 'bg-violet-50', iconColor: 'text-violet-600' },
 ];
 
-export function DashboardStats({ restaurant }: { restaurant: Restaurant }) {
+export function DashboardStats() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {STATS.map((s) => {

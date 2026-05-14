@@ -1,10 +1,10 @@
-import type { Restaurant } from "@justsearch/utils";
 import { ImagePlus, Type, Tag, Clock, Calendar } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { SectionCard, FormField } from "@/components/ui/form-field";
 import { MenuHeroPreview } from "./menu-hero-preview";
 import { EditorActions } from "./editor-actions";
 import { useHomepageEditor } from "./use-homepage-editor";
+import type { Restaurant } from "@justsearch/utils";
 
 export function HomepageEditorForm({ restaurant, onUpdate }: {
   restaurant: Restaurant;

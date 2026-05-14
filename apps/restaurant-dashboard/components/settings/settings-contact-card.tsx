@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from 'react';
-import type { Restaurant } from '@justsearch/utils';
-import { updateRestaurant } from '@justsearch/utils';
 import { MapPin, Phone, Mail, Globe, Star, Check, X } from 'lucide-react';
+import { updateRestaurant } from '@justsearch/utils';
 import { ContactRow } from './contact-row';
+import type { Restaurant } from '@justsearch/utils';
 
 export function SettingsContactCard({ restaurant }: { restaurant: Restaurant }) {
   const [isEditing, setIsEditing] = useState(false);

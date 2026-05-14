@@ -1,11 +1,11 @@
 import { X, Phone, CreditCard } from "lucide-react";
-import type { DashboardOrder } from "@/lib/stores/order-store";
 import { OrderStatusBadge } from "./customer-order-status-badge";
 import { OrderItemRow } from "./customer-order-item-row";
 import { OrderTotals } from "./customer-order-totals";
 import { OrderTimeline } from "./customer-order-timeline";
 import { OrderAddressBlock } from "./customer-order-address-block";
 import { InfoItem } from "./customer-detail-info-item";
+import type { DashboardOrder } from "@/lib/stores/order-store";
 
 interface CustomerOrderDetailModalProps {
   order: DashboardOrder | null;

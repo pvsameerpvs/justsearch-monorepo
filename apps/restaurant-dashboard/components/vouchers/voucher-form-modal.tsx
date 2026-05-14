@@ -1,8 +1,8 @@
 "use client";
 
 import { useVoucherForm } from "./hooks/use-voucher-form";
-import type { Voucher, VoucherFormData } from "./types/voucher.types";
 import { VoucherFormFields } from "./voucher-form-fields";
+import type { Voucher, VoucherFormData } from "./types/voucher.types";
 
 interface VoucherFormModalProps {
   voucher: Voucher | null;

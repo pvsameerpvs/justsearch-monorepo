@@ -1,5 +1,5 @@
-import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 import { DeliveryBoyCard } from "./delivery-boy-card";
+import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 
 interface DeliveryBoyListProps {
   agents: DeliveryBoy[];

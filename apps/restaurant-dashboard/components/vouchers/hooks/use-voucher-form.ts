@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { Voucher, VoucherFormData } from "../types/voucher.types";
 import { validateVoucherForm } from "./voucher-form-validator";
+import type { Voucher, VoucherFormData } from "../types/voucher.types";
 
 const EMPTY_FORM: VoucherFormData = {
   code: "", title: "", description: "", type: "percentage",

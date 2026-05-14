@@ -1,7 +1,6 @@
 "use client";
 
 import { PageHeader } from "@justsearch/ui";
-import { useGameStore } from "@/lib/stores/game-store";
 import { GameManager } from "@/components/game/game-manager";
 
 export default function GamesPage() {

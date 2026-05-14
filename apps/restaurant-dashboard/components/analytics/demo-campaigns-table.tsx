@@ -1,4 +1,4 @@
-import { Eye, CheckCircle, XCircle, BarChart3 } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import { DEMO_CAMPAIGNS } from "./demo-campaign-data";
 import { DemoCampaignRow } from "./demo-campaign-row";
 import { DemoStatCard } from "./demo-stat-card";

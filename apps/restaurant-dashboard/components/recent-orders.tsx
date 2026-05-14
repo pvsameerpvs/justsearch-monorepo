@@ -1,7 +1,7 @@
 "use client";
 
-import { ShoppingBag, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { ShoppingBag, ChevronRight } from "lucide-react";
 import { OrderRow, type Order } from "./dashboard/order-row";
 
 const ORDERS: Order[] = [

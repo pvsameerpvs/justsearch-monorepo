@@ -1,8 +1,8 @@
 import { Phone, MapPin, Clock, Package, ChevronRight } from "lucide-react";
-import type { DashboardOrder } from "@/lib/stores/order-store";
 import { OrderStatusBadge } from "./order-status-config";
 import { OrderCardFooter } from "./order-card-footer";
 import { formatTime } from "./time-utils";
+import type { DashboardOrder } from "@/lib/stores/order-store";
 
 const NEXT_STATUS_LABEL: Record<string, string> = {
   pending: "Accept",

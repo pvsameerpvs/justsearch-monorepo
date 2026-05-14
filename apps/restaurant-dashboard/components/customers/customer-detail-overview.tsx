@@ -1,6 +1,6 @@
 import { Phone, Mail, MapPin, CalendarDays, ShoppingBag, Wallet, Coins, Cake, Gamepad2, Ticket, Home } from "lucide-react";
-import type { Customer } from "./types/customer.types";
 import { InfoItem, StatCard } from "./customer-detail-info-item";
+import type { Customer } from "./types/customer.types";
 
 interface CustomerDetailOverviewProps {
   customer: Customer;

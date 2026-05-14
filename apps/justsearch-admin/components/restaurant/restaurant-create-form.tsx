@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Info, MapPin, FileText, ArrowRight, Check } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { generateSlug } from "@/lib/slug-utils";
 import { RestaurantBasicFields } from "./restaurant-basic-fields";
 import { RestaurantLocationFields } from "./restaurant-location-fields";
@@ -43,7 +44,7 @@ type RestaurantCreateFormProps = {
 
 type TabKey = "basic" | "location" | "business";
 
-const TABS: { key: TabKey; label: string; icon: any; desc: string }[] = [
+const TABS: { key: TabKey; label: string; icon: LucideIcon; desc: string }[] = [
   { key: "basic", label: "Basic Info", icon: Info, desc: "Name & contact" },
   { key: "location", label: "Location", icon: MapPin, desc: "Address & cuisine" },
   { key: "business", label: "Business", icon: FileText, desc: "License & tax" },

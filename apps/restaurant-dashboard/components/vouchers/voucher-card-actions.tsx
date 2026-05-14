@@ -1,6 +1,6 @@
 import { Pause, Play, Pencil, Trash2 } from "lucide-react";
-import type { Voucher } from "./types/voucher.types";
 import { VoucherStatusBadge } from "./voucher-status-badge";
+import type { Voucher } from "./types/voucher.types";
 
 function getStatus(v: Voucher): string {
   const today = new Date().toISOString().split("T")[0];

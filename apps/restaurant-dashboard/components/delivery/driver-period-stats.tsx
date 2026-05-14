@@ -1,4 +1,4 @@
-import { Package, CheckCircle, XCircle, TrendingUp } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 import type { DriverDateFilter } from "./use-driver-order-filter";
 
 interface PeriodStats {

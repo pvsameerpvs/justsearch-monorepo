@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import './globals.css';
 import { DriverAuthProvider } from '@/lib/driver-auth-store';
 import { AuthGuard } from '@/components/layout/auth-guard';
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 

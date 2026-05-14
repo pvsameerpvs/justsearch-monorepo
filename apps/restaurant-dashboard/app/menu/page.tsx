@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useMenuStore } from "@/lib/stores/menu-store";
+import { Plus } from "lucide-react";
 import { PageHeader } from "@justsearch/ui";
+import { useMenuStore } from "@/lib/stores/menu-store";
 import { CategoryEditor } from "@/components/menu/category-editor";
 import { ItemEditorModal } from "@/components/menu/item-editor-modal";
 import { EmojiPicker } from "@/components/ui/emoji-picker";
 import { ViewToggle } from "@/components/ui/view-toggle";
-import { Plus } from "lucide-react";
 
 export default function MenuPage() {
   const { categories, addCategory } = useMenuStore();

@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 import { ORDER_FLOW } from "./order-status-config";
-import type { OrderStatus } from "@/lib/stores/order-store";
 import { formatTime, getDurationBetween } from "./time-utils";
+import type { OrderStatus } from "@/lib/stores/order-store";
 
 const STATUS_META: Record<string, { line: string; dot: string; text: string; iconColor: string }> = {
   pending:          { line: "bg-emerald-400", dot: "bg-emerald-500", text: "text-emerald-700", iconColor: "text-white" },

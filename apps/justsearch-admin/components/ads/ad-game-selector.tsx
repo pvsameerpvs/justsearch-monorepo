@@ -1,5 +1,3 @@
-import type { AdCampaignFormData } from "@/lib/stores/ad-campaign-types";
-
 const DEMO_GAMES = [
   { id: "1", name: "Jump & Bite" },
   { id: "2", name: "Hungry Bird Rush" },

@@ -1,6 +1,6 @@
 import { Badge, CardHeader, CardTitle } from '@justsearch/ui';
-import type { DeliveryOrder } from '@/lib/delivery-types';
 import { getDeliveryStatusVariant, formatDeliveryStatus } from '@/lib/delivery-status-helpers';
+import type { DeliveryOrder } from '@/lib/delivery-types';
 
 export function DeliveryOrderCardHeader({ order }: { order: DeliveryOrder }) {
   return (

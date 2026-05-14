@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
 import { computeRestaurantAnalytics } from "@/lib/stores/ad-analytics-utils";
 import { AdPerformanceStats } from "./ad-performance-stats";
 import { AdPerformanceTable } from "./ad-performance-table";
 import { AdRevenueSplit } from "./ad-revenue-split";
+import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
 
 const STORAGE_KEY = "ad-campaign-store";
 

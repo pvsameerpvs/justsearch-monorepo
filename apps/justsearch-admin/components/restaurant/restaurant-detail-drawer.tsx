@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { X, Globe, ExternalLink, FileText, Pencil, Check, ImageIcon, Calendar, Lock, UserCircle, Copy, CheckCheck } from "lucide-react";
+import { X, Globe, ExternalLink, Pencil, Check, ImageIcon, Calendar, Lock, UserCircle, Copy, CheckCheck } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
 import { RestaurantDetailForm } from "./restaurant-detail-form";
 import { RestaurantDetailQr } from "./restaurant-detail-qr";
@@ -211,7 +212,7 @@ function DashboardCredentialsCard({ restaurant }: { restaurant: AdminRestaurant 
   );
 }
 
-function DomainLink({ label, url, icon: Icon }: { label: string; url: string; icon: any }) {
+function DomainLink({ label, url, icon: Icon }: { label: string; url: string; icon: LucideIcon }) {
   return (
     <a
       href={url}

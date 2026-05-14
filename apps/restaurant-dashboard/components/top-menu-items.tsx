@@ -1,7 +1,7 @@
 "use client";
 
-import { Flame, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { Flame, ArrowUpRight } from "lucide-react";
 import { TopItemRow, type TopItem } from "./dashboard/top-item-row";
 
 const ITEMS: TopItem[] = [

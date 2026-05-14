@@ -1,6 +1,6 @@
 import { Pencil, Trash2, Plus, Eye, EyeOff, Image, Video, FileImage, Gamepad2 } from "lucide-react";
-import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
 import { AdCampaignTypeBadge } from "./ad-campaign-type-badge";
+import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
 
 const MEDIA_ICONS = {
   image: Image,

@@ -1,11 +1,11 @@
 "use client";
 
-import { Loader2, LocateFixed, MapPin, Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Loader2, LocateFixed, MapPin, Search } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { useHereInteractiveMap } from './use-here-interactive-map';
 import type { GeolocationCoordinates } from '../use-geolocation';
 import type { SavedAddress } from '../use-address-book';
-import { useHereInteractiveMap } from './use-here-interactive-map';
 
 type MapSelection = { type: 'pinned' } | { type: 'saved'; id: string };
 

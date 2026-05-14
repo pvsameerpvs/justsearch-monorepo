@@ -1,7 +1,7 @@
 "use client";
 
-import type { DashboardOrder } from "@/lib/stores/order-store";
 import { Bell, ShoppingBag, ChefHat, Truck, CheckCircle, XCircle } from "lucide-react";
+import type { DashboardOrder } from "@/lib/stores/order-store";
 
 const STAT_CONFIG = [
   { key: "pending", label: "New", icon: Bell, color: "bg-orange-50 text-orange-600 border-orange-200" },

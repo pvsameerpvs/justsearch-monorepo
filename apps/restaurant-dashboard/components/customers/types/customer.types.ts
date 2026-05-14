@@ -1,4 +1,4 @@
-import { Star, Crown, Gamepad2, Ticket, ShoppingBag, Phone, Mail, MapPin, Calendar, Coins, Trophy } from "lucide-react";
+import { Star, Crown } from "lucide-react";
 import type { ElementType } from "react";
 
 export const TIER_CONFIG: Record<string, { color: string; bg: string; icon: ElementType }> = {

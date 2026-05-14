@@ -1,7 +1,7 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface PasswordInputProps {
   value: string;

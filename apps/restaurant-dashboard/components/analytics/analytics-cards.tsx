@@ -1,5 +1,3 @@
-import { TrendingUp, Gamepad2, Gift, DollarSign, Users, BarChart3, Activity } from 'lucide-react';
-
 export function AnalyticsCard({ label, value, icon: Icon, color }: { label: string; value: string; icon: React.ElementType; color: string }) {
   return (
     <div className="card-premium-hover p-5">

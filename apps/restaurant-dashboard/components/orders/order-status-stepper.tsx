@@ -1,7 +1,7 @@
 import { AlertCircle } from "lucide-react";
 import { ORDER_FLOW } from "./order-status-config";
-import type { OrderStatus } from "@/lib/stores/order-store";
 import { StepperStep } from "./stepper-step";
+import type { OrderStatus } from "@/lib/stores/order-store";
 
 interface OrderStatusStepperProps {
   currentStatus: string;

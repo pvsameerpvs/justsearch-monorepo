@@ -7,6 +7,6 @@ export { AdCampaignTypeBadge } from "./ad-campaign-type-badge";
 export { AdMediaUpload } from "./ad-media-upload";
 export { AdMediaPreview } from "./ad-media-preview";
 export { AdMediaTypeSelector } from "./ad-media-type-selector";
-export { FormField } from "./ad-form-field";
+export { AdFormField } from "./ad-form-field";
 export { AdGameSelector } from "./ad-game-selector";
 export { AdPreviewCard } from "./ad-preview-card";

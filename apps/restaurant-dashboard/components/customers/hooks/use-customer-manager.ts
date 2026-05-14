@@ -3,7 +3,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useCustomerStore, computeCustomerStats } from "@/lib/stores/customer-store";
 import { useOrderStore } from "@/lib/stores/order-store";
-import type { Customer } from "../types/customer.types";
 
 export function useCustomerManager() {
   const { customers } = useCustomerStore();

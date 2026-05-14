@@ -1,7 +1,7 @@
 "use client";
 
+import { Store, Users, Gamepad2, DollarSign, TrendingUp } from "lucide-react";
 import { PageHeader } from "@justsearch/ui";
-import { BarChart3, Store, Users, Gamepad2, DollarSign, TrendingUp } from "lucide-react";
 
 const PLATFORM_STATS = [
   { label: "Total Restaurants", value: "12", icon: Store, color: "bg-blue-100 text-blue-700" },

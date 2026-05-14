@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, User, LogIn, HelpCircle, ArrowLeft, Eye, EyeOff, Copy, Check } from "lucide-react";
 import { useDashboardAuth } from "@/lib/auth-context";
+import type { AdminRestaurant } from "@/lib/types/admin-restaurant";
 
 function getSlugFromHostname(): string {
   if (typeof window === "undefined") return "mosaic-table";
@@ -30,7 +31,7 @@ function getRestaurantCreds(slug: string): { username: string; password: string;
     if (raw) {
       const parsed = JSON.parse(raw);
       const restaurants = parsed.state?.restaurants ?? [];
-      const found = restaurants.find((r: any) => r.slug === slug || r.subdomain === slug);
+      const found = restaurants.find((r: AdminRestaurant) => r.slug === slug || r.subdomain === slug);
       if (found && found.dashboardUsername && found.dashboardPassword) {
         return {
           username: found.dashboardUsername,

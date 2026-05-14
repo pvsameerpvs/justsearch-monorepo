@@ -1,13 +1,13 @@
 "use client";
 
-interface FormFieldProps {
+interface AdFormFieldProps {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
 }
 
-export function FormField({ label, value, onChange, type = "text" }: FormFieldProps) {
+export function AdFormField({ label, value, onChange, type = "text" }: AdFormFieldProps) {
   return (
     <div>
       <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</label>

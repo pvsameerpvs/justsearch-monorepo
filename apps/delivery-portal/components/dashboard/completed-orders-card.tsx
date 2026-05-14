@@ -1,5 +1,5 @@
-import { Badge, Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 import { Sparkles } from 'lucide-react';
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 import type { DeliveryOrder } from '@/lib/delivery-types';
 
 export function CompletedOrdersCard({ orders }: { orders: DeliveryOrder[] }) {

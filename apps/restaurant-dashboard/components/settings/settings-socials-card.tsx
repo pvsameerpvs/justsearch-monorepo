@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from 'react';
-import type { Restaurant } from '@justsearch/utils';
 import { updateRestaurant } from '@justsearch/utils';
 import { Camera, Plus, Check, X } from 'lucide-react';
 import { SocialCard } from './social-card';
 import { SocialsHeader } from './socials-header';
+import type { Restaurant } from '@justsearch/utils';
 
 export function SettingsSocialsCard({ restaurant }: { restaurant: Restaurant }) {
   const [socials, setSocials] = useState(restaurant.socials);

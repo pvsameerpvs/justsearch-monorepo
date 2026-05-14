@@ -1,21 +1,13 @@
-import './globals.css';
+import type { ReactNode } from 'react';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { AppShell } from '@/components/layout/app-shell';
 import { RestaurantLayoutManager } from '@/components/layout/restaurant-layout-manager';
-import type { ReactNode } from 'react';
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans',
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-display',
-});
-
 import { getCurrentRestaurant } from '@/lib/restaurant-resolver';
 import { RestaurantProvider } from '@/components/restaurant/restaurant-context';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' });
 
 export default async function RootLayout({
   children,

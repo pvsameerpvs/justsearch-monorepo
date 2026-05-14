@@ -1,8 +1,8 @@
-import type { ReactNode } from 'react';
 import { Inter } from 'next/font/google';
-import './globals.css';
 import { ClientLayout } from '@/components/client-layout';
 import { getCurrentRestaurant } from '@/lib/get-current-restaurant';
+import type { ReactNode } from 'react';
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 

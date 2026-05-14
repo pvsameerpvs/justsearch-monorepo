@@ -1,8 +1,8 @@
 import { Badge, Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
-import type { DeliveryOrder } from '@/lib/delivery-types';
 import { DeliveryTimelineStep } from './delivery-timeline-step';
 import { OperationalDetailsCard } from './operational-details-card';
 import { DropoffInstructionsCard } from './dropoff-instructions-card';
+import type { DeliveryOrder } from '@/lib/delivery-types';
 
 const deliveryStatusSteps: DeliveryOrder['status'][] = [
   'assigned',

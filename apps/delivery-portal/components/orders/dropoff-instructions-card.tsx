@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 import { MapPin } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 import type { DeliveryOrder } from '@/lib/delivery-types';
 
 interface DropoffInstructionsCardProps {

@@ -3,14 +3,14 @@
 import { ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
 
-interface FormFieldProps {
+interface RestaurantFormFieldProps {
   label: string;
   error?: string;
   icon?: LucideIcon;
   children: ReactNode;
 }
 
-export function FormField({ label, error, icon: Icon, children }: FormFieldProps) {
+export function RestaurantFormField({ label, error, icon: Icon, children }: RestaurantFormFieldProps) {
   return (
     <div className="space-y-1.5">
       <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -31,12 +31,12 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export function FormInput({ label, error, icon: Icon, className = "", ...props }: FormInputProps) {
   return (
-    <FormField label={label} error={error} icon={Icon}>
+    <RestaurantFormField label={label} error={error} icon={Icon}>
       <input
         {...props}
         className={`w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition-all placeholder:text-slate-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 ${className}`}
       />
-    </FormField>
+    </RestaurantFormField>
   );
 }
 
@@ -48,13 +48,13 @@ interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> 
 
 export function FormSelect({ label, error, icon: Icon, children, className = "", ...props }: FormSelectProps) {
   return (
-    <FormField label={label} error={error} icon={Icon}>
+    <RestaurantFormField label={label} error={error} icon={Icon}>
       <select
         {...props}
         className={`w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition-all focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 appearance-none ${className}`}
       >
         {children}
       </select>
-    </FormField>
+    </RestaurantFormField>
   );
 }

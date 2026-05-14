@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { User, Phone, Mail, MapPin, Tag, FileText, Building2, Briefcase, Pencil, Check, X, Lock } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { AdminRestaurant } from "@/lib/types/admin-restaurant";
 
 interface SettingsProfileCardProps {
@@ -71,7 +72,7 @@ export function SettingsProfileCard({ restaurant, onUpdate }: SettingsProfileCar
   );
 }
 
-function ProfileRow({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+function ProfileRow({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white p-3">
       <Icon className="mt-0.5 h-4 w-4 text-slate-400 shrink-0" />
@@ -83,7 +84,7 @@ function ProfileRow({ icon: Icon, label, value }: { icon: any; label: string; va
   );
 }
 
-function EditField({ label, value, onChange, icon: Icon }: { label: string; value: string; onChange: (v: string) => void; icon: any }) {
+function EditField({ label, value, onChange, icon: Icon }: { label: string; value: string; onChange: (v: string) => void; icon: LucideIcon }) {
   return (
     <div className="flex items-center gap-2">
       <Icon className="h-4 w-4 text-slate-400 shrink-0" />

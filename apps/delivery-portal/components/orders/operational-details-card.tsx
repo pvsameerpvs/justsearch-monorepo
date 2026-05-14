@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 import { Clock3, PackageCheck, ShieldCheck, Wallet } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 import type { DeliveryOrder } from '@/lib/delivery-types';
 
 interface OperationalDetailsCardProps {

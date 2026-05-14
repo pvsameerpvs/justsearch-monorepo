@@ -1,6 +1,7 @@
 "use client";
 
 import { Building2, CheckCircle2 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
 
 interface RestaurantStatsBarProps {
@@ -19,7 +20,7 @@ export function RestaurantStatsBar({ restaurants }: RestaurantStatsBarProps) {
   );
 }
 
-function StatCard({ label, value, icon: Icon, color }: { label: string; value: number; icon: any; color: string }) {
+function StatCard({ label, value, icon: Icon, color }: { label: string; value: number; icon: LucideIcon; color: string }) {
   const colors: Record<string, string> = {
     slate: "bg-slate-50 border-slate-200 text-slate-600",
     emerald: "bg-emerald-50 border-emerald-200 text-emerald-600",

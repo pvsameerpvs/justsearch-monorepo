@@ -1,7 +1,7 @@
-import type { DashboardOrder } from "@/lib/stores/order-store";
+import { Package } from "lucide-react";
 import { OrderCard } from "./order-card";
 import { OrderHistoryCard } from "./order-history-card";
-import { Package } from "lucide-react";
+import type { DashboardOrder } from "@/lib/stores/order-store";
 
 interface OrderManagerGridProps {
   orders: DashboardOrder[];

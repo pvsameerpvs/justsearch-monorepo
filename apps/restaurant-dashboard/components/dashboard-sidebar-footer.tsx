@@ -1,9 +1,9 @@
 "use client";
 
-import { getRestaurantInitials } from '@justsearch/utils';
-import type { Restaurant } from '@justsearch/utils';
 import { LogOut } from "lucide-react";
+import { getRestaurantInitials } from '@justsearch/utils';
 import { useDashboardAuth } from "@/lib/auth-context";
+import type { Restaurant } from '@justsearch/utils';
 
 export function SidebarFooter({ restaurant }: { restaurant: Restaurant }) {
   const initials = getRestaurantInitials(restaurant.name);

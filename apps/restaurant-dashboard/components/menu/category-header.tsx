@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useMenuStore, type MenuCategory } from "@/lib/stores/menu-store";
 import { Pencil, Trash2 } from "lucide-react";
+import { useMenuStore } from "@/lib/stores/menu-store";
 import { EmojiPicker } from "@/components/ui/emoji-picker";
+import type { MenuCategory } from "@/lib/stores/menu-store";
 
 interface CategoryHeaderProps {
   category: MenuCategory;
@@ -13,7 +14,7 @@ export function CategoryHeader({ category }: CategoryHeaderProps) {
   const { removeCategory, updateCategory } = useMenuStore();
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(category.title);
-  const [desc, setDesc] = useState(category.description);
+  const desc = category.description;
   const [emoji, setEmoji] = useState(category.emoji ?? "");
 
   const save = () => {

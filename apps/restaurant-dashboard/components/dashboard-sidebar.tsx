@@ -3,7 +3,7 @@
 import { memo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Home, UtensilsCrossed, Settings, ShoppingBag, Truck, Users, BarChart3, Ticket } from 'lucide-react';
+import { LayoutDashboard, Home, UtensilsCrossed, Settings, ShoppingBag, Truck, Users, BarChart3, Ticket, UserCircle } from 'lucide-react';
 import { SidebarFooter } from './dashboard-sidebar-footer';
 import { MobileToggle } from './mobile-toggle';
 import { SidebarBrand } from './sidebar-brand';
@@ -14,7 +14,7 @@ const SECTIONS = [
   { label: 'Your Restaurant', items: [{ href: '/homepage', label: 'Homepage', icon: Home }, { href: '/menu', label: 'Menu', icon: UtensilsCrossed }] },
   { label: 'Operations', items: [{ href: '/orders', label: 'Orders', icon: ShoppingBag }, { href: '/delivery', label: 'Delivery', icon: Truck }, { href: '/vouchers', label: 'Vouchers', icon: Ticket }] },
   { label: 'Growth', items: [{ href: '/customers', label: 'Customers', icon: Users }, { href: '/analytics', label: 'Analytics', icon: BarChart3 }] },
-  { label: 'Settings', items: [{ href: '/settings', label: 'Contact & Socials', icon: Settings }] },
+  { label: 'Account', items: [{ href: '/profile', label: 'Profile', icon: UserCircle }, { href: '/settings', label: 'Contact & Socials', icon: Settings }] },
 ];
 
 export const DashboardSidebar = memo(function DashboardSidebar({ restaurant }: { restaurant: Restaurant }) {

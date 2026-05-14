@@ -2,8 +2,8 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Customer, CustomerStats } from "@/components/customers/types/customer.types";
 import { INITIAL_CUSTOMERS } from "./customer-store-data";
+import type { Customer, CustomerStats } from "@/components/customers/types/customer.types";
 
 interface CustomerStore {
   customers: Customer[];

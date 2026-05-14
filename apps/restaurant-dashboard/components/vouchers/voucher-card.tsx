@@ -1,7 +1,7 @@
 import { Ticket, Calendar, ShoppingBag } from "lucide-react";
-import type { Voucher } from "./types/voucher.types";
 import { VoucherCardActions } from "./voucher-card-actions";
 import { VoucherUsageBar } from "./voucher-usage-bar";
+import type { Voucher } from "./types/voucher.types";
 
 interface VoucherCardProps {
   voucher: Voucher;

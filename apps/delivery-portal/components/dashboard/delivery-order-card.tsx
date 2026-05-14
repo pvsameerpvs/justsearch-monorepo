@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { Card, CardContent } from '@justsearch/ui';
 import { Clock3, MapPin, Package2, Wallet } from 'lucide-react';
+import { Card, CardContent } from '@justsearch/ui';
 import { cn } from '@/lib/cn';
-import type { DeliveryOrder } from '@/lib/delivery-types';
 import { DeliveryOrderCardHeader } from './delivery-order-card-header';
+import type { DeliveryOrder } from '@/lib/delivery-types';
 
 export function DeliveryOrderCard({ order }: { order: DeliveryOrder }) {
   return (

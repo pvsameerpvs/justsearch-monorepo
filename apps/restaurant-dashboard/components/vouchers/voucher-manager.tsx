@@ -18,7 +18,6 @@ export function VoucherManager() {
     setShowForm,
     editingId,
     setEditingId,
-    deletingId,
     setDeletingId,
     editingVoucher,
     deletingVoucher,

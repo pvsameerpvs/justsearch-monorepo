@@ -1,6 +1,6 @@
+import { Calendar, Bike } from "lucide-react";
 import { getRestaurantInitials } from "@justsearch/utils";
 import type { RestaurantTheme } from "@justsearch/utils";
-import { Calendar, Bike } from "lucide-react";
 
 interface MenuHeroPreviewProps {
   heroUrl: string;

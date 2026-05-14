@@ -1,7 +1,7 @@
 import { Phone, Package, MapPin, Calendar } from "lucide-react";
-import type { DashboardOrder } from "@/lib/stores/order-store";
 import { HistoryCardHeader, HistoryCardAgent, HistoryCardFooter } from "./history-card-parts";
 import { formatDateTime } from "./time-utils";
+import type { DashboardOrder } from "@/lib/stores/order-store";
 
 export function OrderHistoryCard({ order, onView }: {
   order: DashboardOrder;
@@ -13,7 +13,7 @@ export function OrderHistoryCard({ order, onView }: {
   return (
     <button onClick={onView} className="elegant-card text-left w-full p-0 overflow-hidden">
       <div className="p-4">
-        <HistoryCardHeader order={order} isCompleted={isCompleted} isCancelled={isCancelled} />
+        <HistoryCardHeader order={order} isCompleted={isCompleted} />
 
         <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
           <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {order.customerPhone}</span>

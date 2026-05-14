@@ -1,10 +1,10 @@
 import { Trash2, Star, ClipboardList, Pencil } from "lucide-react";
-import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 import { EnableToggle } from "./enable-toggle";
 import { STATUS_META } from "./agent-status-meta";
 import { CardDisabledFooter } from "./card-disabled-footer";
 import { CardInfoGrid } from "./card-info-grid";
 import { DriverLoginInfo } from "./driver-login-info";
+import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 
 interface DeliveryBoyCardProps {
   agent: DeliveryBoy;
@@ -56,7 +56,7 @@ export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onVie
         </div>
 
         <CardInfoGrid agent={agent} />
-        <DriverLoginInfo uniqueId={agent.uniqueId} />
+        <DriverLoginInfo uniqueId={agent.uniqueId} password={agent.password} />
       </div>
 
       {/* View Orders Button */}

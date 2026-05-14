@@ -1,6 +1,6 @@
 import { Ticket } from "lucide-react";
-import type { Voucher } from "./types/voucher.types";
 import { VoucherCard } from "./voucher-card";
+import type { Voucher } from "./types/voucher.types";
 
 interface VoucherListProps {
   vouchers: Voucher[];

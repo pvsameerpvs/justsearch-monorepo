@@ -1,9 +1,9 @@
 "use client";
 
-import { Badge } from '@justsearch/ui';
 import { Clock3, MapPin, Phone, LogOut } from 'lucide-react';
-import type { DeliveryAgent } from '@/lib/delivery-types';
+import { Badge } from '@justsearch/ui';
 import { useDriverAuth } from '@/lib/driver-auth-store';
+import type { DeliveryAgent } from '@/lib/delivery-types';
 
 function getAgentBadgeVariant(
   status: DeliveryAgent['status']

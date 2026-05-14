@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { PageHeader } from "@justsearch/ui";
 import { Save, Check } from "lucide-react";
+import { PageHeader } from "@justsearch/ui";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
 import { GeneralSettingsTab } from "@/components/settings/general-settings-tab";
 import { NotificationSettingsTab } from "@/components/settings/notification-settings-tab";

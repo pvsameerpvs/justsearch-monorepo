@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
-import type { Customer } from "./types/customer.types";
 import { CustomerTierBadge } from "./customer-tier-badge";
+import type { Customer } from "./types/customer.types";
 
 interface CustomerDetailHeaderProps {
   customer: Customer;

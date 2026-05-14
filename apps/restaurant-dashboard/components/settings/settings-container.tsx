@@ -1,6 +1,5 @@
 "use client";
 
-import type { Restaurant } from "@justsearch/utils";
 import { useRestaurantProfile } from "@/lib/hooks/use-restaurant-profile";
 import { SettingsProfileCard } from "@/components/settings/settings-profile-card";
 import { SettingsDomainCard } from "@/components/settings/settings-domain-card";
@@ -8,6 +7,7 @@ import { SettingsLicenseCard } from "@/components/settings/settings-license-card
 import { SettingsQrCard } from "@/components/settings/settings-qr-card";
 import { SettingsContactCard } from "@/components/settings/settings-contact-card";
 import { SettingsSocialsCard } from "@/components/settings/settings-socials-card";
+import type { Restaurant } from "@justsearch/utils";
 
 interface SettingsContainerProps {
   restaurant: Restaurant;

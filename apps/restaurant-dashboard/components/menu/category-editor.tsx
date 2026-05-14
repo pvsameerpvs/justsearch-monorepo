@@ -1,10 +1,11 @@
 "use client";
 
-import { useMenuStore, type MenuCategory } from "@/lib/stores/menu-store";
 import { Plus } from "lucide-react";
+import { useMenuStore } from "@/lib/stores/menu-store";
 import { MenuItemRow } from "./menu-item-row";
 import { MenuItemCard } from "./menu-item-card";
 import { CategoryHeader } from "./category-header";
+import type { MenuCategory } from "@/lib/stores/menu-store";
 
 interface CategoryEditorProps {
   category: MenuCategory;

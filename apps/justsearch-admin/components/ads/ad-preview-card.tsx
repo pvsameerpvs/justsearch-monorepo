@@ -1,6 +1,6 @@
-import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
-import { AdCampaignTypeBadge } from "./ad-campaign-type-badge";
 import { Clock, Gamepad2, Eye, CheckCircle, XCircle } from "lucide-react";
+import { AdCampaignTypeBadge } from "./ad-campaign-type-badge";
+import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
 
 interface AdPreviewCardProps {
   campaign: AdCampaign;

@@ -2,13 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { Plus } from "lucide-react";
+import { PageHeader } from "@justsearch/ui";
 import { useRestaurantStore } from "@/lib/stores/restaurant-store";
 import { RestaurantCreateForm, type RestaurantFormData } from "@/components/restaurant/restaurant-create-form";
 import { RestaurantRow } from "@/components/restaurant/restaurant-row";
 import { RestaurantStatsBar } from "@/components/restaurant/restaurant-stats-bar";
 import { RestaurantSearchBar } from "@/components/restaurant/restaurant-search-bar";
 import { RestaurantEmptyState } from "@/components/restaurant/restaurant-empty-state";
-import { PageHeader } from "@justsearch/ui";
 
 export function RestaurantListPage() {
   const { restaurants, addRestaurant, removeRestaurant } = useRestaurantStore();

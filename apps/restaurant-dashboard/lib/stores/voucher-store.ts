@@ -2,8 +2,8 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Voucher, VoucherFormData } from "@/components/vouchers/types/voucher.types";
 import { INITIAL_VOUCHERS, generateVoucherCode } from "./voucher-store-data";
+import type { Voucher, VoucherFormData } from "@/components/vouchers/types/voucher.types";
 
 interface VoucherStore {
   vouchers: Voucher[];

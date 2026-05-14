@@ -1,7 +1,7 @@
-import type { VoucherFormData } from "./types/voucher.types";
 import { VoucherFormBasicFields } from "./voucher-form-basic-fields";
 import { VoucherFormDiscountFields } from "./voucher-form-discount-fields";
 import { VoucherFormMetaFields } from "./voucher-form-meta-fields";
+import type { VoucherFormData } from "./types/voucher.types";
 
 interface VoucherFormFieldsProps {
   form: VoucherFormData;

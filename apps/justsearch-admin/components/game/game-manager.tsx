@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from 'react';
+import { ToggleLeft, ToggleRight, Trash2, Plus } from 'lucide-react';
 import { Button } from '@justsearch/ui';
 import { useGameStore } from '@/lib/stores/game-store';
-import { Gamepad2, ToggleLeft, ToggleRight, Trash2, Plus } from 'lucide-react';
 
 export function GameManager() {
   const { games, toggleAvailability, removeGame } = useGameStore();

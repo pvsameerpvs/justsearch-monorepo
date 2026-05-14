@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowLeft } from 'lucide-react';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
 import type { Game } from '@/lib/restaurant-types';
 import type { GameAwardResult } from './games/game-award';
 import { GameCoinPill } from './games/game-coin-pill';

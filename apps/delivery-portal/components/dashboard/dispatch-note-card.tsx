@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 import { AlertTriangle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@justsearch/ui';
 
 export function DispatchNoteCard({ notice }: { notice: string }) {
   return (

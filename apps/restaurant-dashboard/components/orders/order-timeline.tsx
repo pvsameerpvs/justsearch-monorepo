@@ -1,7 +1,7 @@
 import { Check, X, AlertCircle } from "lucide-react";
-import type { TimelineEvent, OrderStatus } from "@/lib/stores/order-store";
 import { ORDER_FLOW } from "./order-status-config";
 import { formatDateTime, getDurationBetween } from "./time-utils";
+import type { TimelineEvent, OrderStatus } from "@/lib/stores/order-store";
 
 const STATUS_META: Record<OrderStatus, { bg: string; border: string; iconColor: string }> = {
   pending:          { bg: "bg-orange-50",  border: "border-orange-200",  iconColor: "text-orange-600" },

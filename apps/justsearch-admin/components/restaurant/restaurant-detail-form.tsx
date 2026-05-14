@@ -1,6 +1,7 @@
 "use client";
 
 import { User, Phone, Mail, MapPin, Tag, Building2, Briefcase, Lock, UserCircle } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
 
 interface RestaurantDetailFormProps {
@@ -44,7 +45,7 @@ function Field({ label, value, isEditing, onChange, icon: Icon, full, type = "te
   value: string;
   isEditing: boolean;
   onChange: (v: string) => void;
-  icon: any;
+  icon: LucideIcon;
   full?: boolean;
   type?: string;
 }) {

@@ -1,4 +1,4 @@
-import { Megaphone, CheckCircle, XCircle, Eye, Gamepad2, Clock, TrendingUp } from "lucide-react";
+import { Megaphone, CheckCircle, XCircle, Eye, Clock, TrendingUp } from "lucide-react";
 import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
 
 interface AdPerformanceTableProps {

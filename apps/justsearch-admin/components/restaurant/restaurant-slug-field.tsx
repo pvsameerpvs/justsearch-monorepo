@@ -1,6 +1,7 @@
 "use client";
 
 import { Globe, Briefcase, Link2 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface RestaurantSlugFieldProps {
   slug: string;
@@ -35,7 +36,7 @@ export function RestaurantSlugField({ slug, onChange }: RestaurantSlugFieldProps
   );
 }
 
-function UrlPreviewCard({ label, url, icon: Icon, color }: { label: string; url: string; icon: any; color: string }) {
+function UrlPreviewCard({ label, url, icon: Icon, color }: { label: string; url: string; icon: LucideIcon; color: string }) {
   const colorClasses: Record<string, string> = {
     indigo: "bg-indigo-50 text-indigo-700 border-indigo-100",
     slate: "bg-slate-100 text-slate-600 border-slate-200",

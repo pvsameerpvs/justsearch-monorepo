@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Upload, FileText, X, FileCheck } from "lucide-react";
+import { Upload, X, FileCheck } from "lucide-react";
 
 interface RestaurantLicenseUploadProps {
   licenseUrl: string;

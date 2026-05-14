@@ -1,4 +1,4 @@
-import { Phone, MapPin, CreditCard, User, StickyNote } from "lucide-react";
+import { Phone, MapPin, CreditCard, StickyNote } from "lucide-react";
 import type { DashboardOrder } from "@/lib/stores/order-store";
 
 export function OrderCustomerInfo({ order }: { order: DashboardOrder }) {

@@ -1,6 +1,6 @@
 import { Users } from "lucide-react";
-import type { Customer } from "./types/customer.types";
 import { CustomerTableRow } from "./customer-table-row";
+import type { Customer } from "./types/customer.types";
 
 interface CustomerTableProps {
   customers: Customer[];

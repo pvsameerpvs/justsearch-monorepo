@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useVoucherStore } from "@/lib/stores/voucher-store";
-import type { Voucher, VoucherFormData, VoucherStats } from "../types/voucher.types";
 import { getVoucherStatus } from "./voucher-status-helpers";
+import type { VoucherFormData, VoucherStats } from "../types/voucher.types";
 
 export function useVoucherManager() {
   const { vouchers, addVoucher, updateVoucher, deleteVoucher, toggleActive } = useVoucherStore();

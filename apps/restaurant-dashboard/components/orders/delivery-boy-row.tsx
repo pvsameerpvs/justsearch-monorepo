@@ -1,4 +1,4 @@
-import { MapPin, Phone, Star, Package, User } from "lucide-react";
+import { MapPin, Phone, Star, Package } from "lucide-react";
 import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 
 interface DeliveryBoyRowProps {
