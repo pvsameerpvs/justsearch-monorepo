@@ -7,24 +7,17 @@ interface AdPreviewCardProps {
 }
 
 export function AdPreviewCard({ campaign }: AdPreviewCardProps) {
+  const hasUrl = campaign.mediaUrl && campaign.mediaUrl.trim() !== "";
+
   return (
     <div className="elegant-card p-0 overflow-hidden">
-      {/* Media */}
-      <div className="relative aspect-video bg-slate-100">
-        {campaign.mediaType === 'video' ? (
-          <video
-            src={campaign.mediaUrl}
-            className="h-full w-full object-cover"
-            muted
-            loop
-            playsInline
-          />
+      <div className="relative aspect-video bg-slate-100 flex items-center justify-center">
+        {campaign.mediaType === "video" && hasUrl ? (
+          <video src={campaign.mediaUrl} className="h-full w-full object-cover" muted loop playsInline />
+        ) : hasUrl ? (
+          <img src={campaign.mediaUrl} alt={campaign.title} className="h-full w-full object-cover" />
         ) : (
-          <img
-            src={campaign.mediaUrl}
-            alt={campaign.title}
-            className="h-full w-full object-cover"
-          />
+          <span className="text-xs font-bold text-slate-400 uppercase">{campaign.mediaType}</span>
         )}
         <div className="absolute top-2 right-2">
           <AdCampaignTypeBadge type={campaign.type} />
@@ -35,7 +28,6 @@ export function AdPreviewCard({ campaign }: AdPreviewCardProps) {
         </div>
       </div>
 
-      {/* Info */}
       <div className="p-3 space-y-2">
         <div>
           <p className="text-sm font-bold text-slate-900">{campaign.title}</p>

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Upload, X } from "lucide-react";
-import { AdMediaTypeSelector } from "./ad-media-type-selector";
-import { AdMediaPreview } from "./ad-media-preview";
+import { AdMediaTypePills } from "./ad-media-type-pills";
+import { AdMediaDropzoneContent } from "./ad-media-dropzone-content";
 import type { AdMediaType } from "@/lib/stores/ad-campaign-types";
 
 interface AdMediaUploadProps {
@@ -41,14 +40,13 @@ export function AdMediaUpload({ mediaType, mediaUrl, onChange }: AdMediaUploadPr
 
   return (
     <div className="space-y-3">
-      <AdMediaTypeSelector mediaType={mediaType} onChange={(t) => onChange(t, mediaUrl)} />
-
+      <AdMediaTypePills mediaType={mediaType} onChange={(t) => onChange(t, mediaUrl)} />
       <div
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
-        className={`relative rounded-xl border-2 border-dashed p-6 text-center transition-colors ${
-          isDragging ? "border-indigo-500 bg-indigo-50" : "border-slate-200 bg-slate-50"
+        className={`relative rounded-xl border-2 border-dashed p-8 text-center transition-all ${
+          isDragging ? "border-indigo-500 bg-indigo-50 scale-[1.01]" : "border-slate-300 bg-slate-50"
         }`}
       >
         <input
@@ -58,25 +56,13 @@ export function AdMediaUpload({ mediaType, mediaUrl, onChange }: AdMediaUploadPr
           onChange={onFileSelect}
           className="hidden"
         />
-
-        {mediaUrl ? (
-          <div className="space-y-3">
-            <AdMediaPreview type={mediaType} url={mediaUrl} />
-            <div className="flex items-center justify-center gap-2">
-              <button onClick={() => fileInputRef.current?.click()} className="text-xs font-bold text-indigo-600 hover:text-indigo-700">Change file</button>
-              <span className="text-slate-300">|</span>
-              <button onClick={() => onChange(mediaType, "")} className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-600"><X className="h-3 w-3" /> Remove</button>
-            </div>
-          </div>
-        ) : (
-          <button onClick={() => fileInputRef.current?.click()} className="space-y-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 mx-auto">
-              <Upload className="h-5 w-5 text-indigo-600" />
-            </div>
-            <p className="text-xs font-bold text-slate-700">Drop {mediaType} here or click to upload</p>
-            <p className="text-[10px] text-slate-400">{mediaType === "video" ? "MP4, WebM up to 30MB" : mediaType === "gif" ? "GIF up to 5MB" : "PNG, JPG up to 5MB"}</p>
-          </button>
-        )}
+        <AdMediaDropzoneContent
+          mediaType={mediaType}
+          mediaUrl={mediaUrl}
+          isDragging={isDragging}
+          fileInputRef={fileInputRef}
+          onChange={onChange}
+        />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { PageHeader } from "@justsearch/ui";
-import { AdCampaignManager } from "@/components/ads";
+import { AdCampaignContainer } from "@/components/ads";
 
 export default function AdsPage() {
   return (
@@ -8,7 +8,7 @@ export default function AdsPage() {
         title="Ad Campaigns"
         description="Manage advertisement campaigns for restaurants and platform"
       />
-      <AdCampaignManager />
+      <AdCampaignContainer />
     </div>
   );
 }

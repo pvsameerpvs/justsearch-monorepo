@@ -1,8 +1,16 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Megaphone, TrendingUp, Users, DollarSign } from "lucide-react";
 import { useAdCampaignStore } from "@/lib/stores/ad-campaign-store";
 
 export function AdCampaignStatsCards() {
+  const [mounted, setMounted] = useState(false);
   const stats = useAdCampaignStore((s) => s.getStats)();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const items = [
     { label: "Total Campaigns", value: stats.total, icon: Megaphone, color: "text-indigo-700", bg: "bg-indigo-50" },
@@ -21,7 +29,7 @@ export function AdCampaignStatsCards() {
               <Icon className={`h-4 w-4 ${item.color}`} />
               <span className={`text-[10px] font-bold uppercase tracking-wider ${item.color}`}>{item.label}</span>
             </div>
-            <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
+            <p className={`text-2xl font-bold ${item.color}`}>{mounted ? item.value : "—"}</p>
           </div>
         );
       })}
