@@ -1,19 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Truck } from "lucide-react";
 import { DriverCurrentOrderCard } from "./driver-current-order-card";
 import { DriverQueueSection } from "./driver-queue-section";
 import { DriverCompletedSection } from "./driver-completed-section";
+import { DriverRefreshButton } from "./driver-refresh-button";
 import { sortOrdersByUrgency } from "./driver-queue-utils";
 import type { DeliveryOrder, DeliveryOrderStatus } from "@/lib/delivery-types";
 
 type DriverHomeViewProps = {
   orders: DeliveryOrder[];
+  onRefresh: () => void;
+  isRefreshing: boolean;
 };
 
-export function DriverHomeView({ orders: initialOrders }: DriverHomeViewProps) {
+export function DriverHomeView({ orders: initialOrders, onRefresh, isRefreshing }: DriverHomeViewProps) {
   const [orders, setOrders] = useState<DeliveryOrder[]>(initialOrders);
+
+  useEffect(() => {
+    setOrders(initialOrders);
+  }, [initialOrders]);
 
   const updateStatus = (orderId: string, status: DeliveryOrderStatus) => {
     setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
@@ -25,24 +32,23 @@ export function DriverHomeView({ orders: initialOrders }: DriverHomeViewProps) {
 
   return (
     <div className="space-y-4">
-      {/* Status bar */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold text-slate-900">
-            {current ? "Current delivery" : "No active delivery"}
-          </h1>
+          <h1 className="text-lg font-bold text-slate-900">{current ? "Current delivery" : "No active delivery"}</h1>
           <p className="text-xs text-slate-500">
             {activeCount > 0 ? `${activeCount} order${activeCount > 1 ? "s" : ""} in your queue` : "Waiting for new orders"}
           </p>
         </div>
-        {activeCount > 1 && (
-          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600 border border-emerald-100">
-            +{activeCount - 1} queued
-          </span>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          {activeCount > 1 && (
+            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600 border border-emerald-100">
+              +{activeCount - 1} queued
+            </span>
+          )}
+          <DriverRefreshButton onRefresh={onRefresh} isRefreshing={isRefreshing} />
+        </div>
       </div>
 
-      {/* Current order or empty state */}
       {current ? (
         <DriverCurrentOrderCard order={current} onUpdateStatus={updateStatus} />
       ) : (
@@ -55,13 +61,7 @@ export function DriverHomeView({ orders: initialOrders }: DriverHomeViewProps) {
         </div>
       )}
 
-      {/* Queue - just info, no navigation */}
-      <DriverQueueSection
-        orders={orders}
-        currentOrderId={current?.id ?? ""}
-      />
-
-      {/* Completed */}
+      <DriverQueueSection orders={orders} currentOrderId={current?.id ?? ""} />
       <DriverCompletedSection orders={orders} />
     </div>
   );

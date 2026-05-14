@@ -17,4 +17,5 @@ export { DriverPaymentSheet } from './driver-payment-sheet';
 export { DriverPaymentItems } from './driver-payment-items';
 export { DriverStatusStepper } from './driver-status-stepper';
 export { DriverEarningsView } from './driver-earnings-view';
+export { DriverRefreshButton } from './driver-refresh-button';
 export * from './hooks';
