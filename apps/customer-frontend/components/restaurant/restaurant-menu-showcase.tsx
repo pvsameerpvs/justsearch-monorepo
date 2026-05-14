@@ -25,7 +25,6 @@ export function RestaurantMenuShowcase({ restaurant }: RestaurantMenuShowcasePro
         style={{ paddingBottom: state.shouldShowDeliveryCart ? 'calc(var(--restaurant-mobile-nav-height,0px) + 120px)' : undefined }}
       >
         <Container>
-
           <RestaurantMenuNavigation
             restaurant={restaurant}
             availableItemsCount={state.availableItemsCount}
