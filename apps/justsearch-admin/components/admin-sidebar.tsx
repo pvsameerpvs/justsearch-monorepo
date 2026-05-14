@@ -11,6 +11,7 @@ import {
   BarChart3,
   Settings,
   Gamepad2,
+  Megaphone,
   Menu,
   X,
 } from "lucide-react";
@@ -19,6 +20,7 @@ import { AdminSidebarFooter } from "./admin-sidebar-footer";
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/restaurants", label: "Restaurants", icon: Store },
+  { href: "/ads", label: "Ad Campaigns", icon: Megaphone },
   { href: "/games", label: "Games", icon: Gamepad2 },
   { href: "/revenue", label: "Revenue", icon: DollarSign },
   { href: "/users", label: "Users", icon: Users },

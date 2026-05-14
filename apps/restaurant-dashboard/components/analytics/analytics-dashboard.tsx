@@ -4,6 +4,8 @@ import { Gamepad2, Gift, DollarSign, Users } from 'lucide-react';
 import { AnalyticsCard } from './analytics-cards';
 import { GamePerformancePanel } from './game-performance-panel';
 import { RevenueBreakdownPanel } from './revenue-breakdown-panel';
+import { AdAnalyticsContainer } from './ad-analytics-container';
+import { DemoCampaignsTable } from './demo-campaigns-table';
 
 const DATA = {
   totalGamePlays: 15432,
@@ -29,6 +31,23 @@ export function AnalyticsDashboard() {
         <GamePerformancePanel />
         <RevenueBreakdownPanel totalRevenue={totalRevenue} orderRevenue={DATA.totalRevenue} adRevenue={DATA.adRevenue} />
       </div>
+
+      <DemoCampaignsTable />
+
+      <AdAnalyticsSection />
+    </div>
+  );
+}
+
+function AdAnalyticsSection() {
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-2">
+        <div className="h-px flex-1 bg-slate-200" />
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Ad Campaign Analytics</span>
+        <div className="h-px flex-1 bg-slate-200" />
+      </div>
+      <AdAnalyticsContainer />
     </div>
   );
 }

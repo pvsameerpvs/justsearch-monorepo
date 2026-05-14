@@ -4,7 +4,7 @@ interface OrderStatusBadgeProps {
   status: string;
 }
 
-const STATUS_META: Record<string, { icon: any; color: string; bg: string; label: string }> = {
+const STATUS_META: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bg: string; label: string }> = {
   pending: { icon: Clock, color: "text-amber-700", bg: "bg-amber-50", label: "Pending" },
   confirmed: { icon: CheckCircle2, color: "text-blue-700", bg: "bg-blue-50", label: "Confirmed" },
   preparing: { icon: Clock, color: "text-orange-700", bg: "bg-orange-50", label: "Preparing" },

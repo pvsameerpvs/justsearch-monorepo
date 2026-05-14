@@ -10,6 +10,7 @@ import { GameCoinPill } from './games/game-coin-pill';
 import { GameExitConfirmDialog } from './games/game-exit-confirm-dialog';
 import { GameIntroStage } from './games/game-intro-stage';
 import { GamePlayerStage } from './games/game-player-stage';
+import { AdOverlay } from './games/ad-overlay';
 import { useRegistration } from '@/components/auth/registration-context';
 import { useSmartBackNavigation } from '@/components/layout/use-smart-back-navigation';
 import { useLoyaltyPoints } from './use-loyalty-points';
@@ -27,7 +28,12 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
   const { points, addPoints } = useLoyaltyPoints();
   const { updateGameStat, getGameStat } = useUserGameStats();
   const [isExitDialogOpen, setIsExitDialogOpen] = useState(false);
+  const [showAdOnGameEnd, setShowAdOnGameEnd] = useState(false);
+  const [showAdOnBack, setShowAdOnBack] = useState(false);
+  const [pendingAward, setPendingAward] = useState<GameAwardResult | null>(null);
   const isIntro = mode === 'intro';
+  const restaurantId = 'mosaic-table';
+  const gameId = game.id;
   const backFallbackPath = useMemo(
     () => (isIntro ? '/eat-play' : `/eat-play/${game.id}`),
     [game.id, isIntro],
@@ -58,7 +64,7 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
     };
   }, []);
 
-  const onAward = useCallback(
+  const processAward = useCallback(
     (result: GameAwardResult) => {
       addPoints(result.points);
       updateGameStat(game.id, result.score, result.level);
@@ -66,16 +72,55 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
     [addPoints, game.id, updateGameStat],
   );
 
+  // Ad on game fail/end: wrap onAward to show ad first
+  const onAward = useCallback(
+    (result: GameAwardResult) => {
+      setPendingAward(result);
+      setShowAdOnGameEnd(true);
+    },
+    [],
+  );
+
+  const handleGameEndAdComplete = useCallback(() => {
+    setShowAdOnGameEnd(false);
+    if (pendingAward) {
+      processAward(pendingAward);
+      setPendingAward(null);
+    }
+  }, [pendingAward, processAward]);
+
+  const handleGameEndAdSkip = useCallback(() => {
+    setShowAdOnGameEnd(false);
+    if (pendingAward) {
+      processAward(pendingAward);
+      setPendingAward(null);
+    }
+  }, [pendingAward, processAward]);
+
   const handleStart = useCallback(() => {
     if (!isRegistered) {
       openModal();
       return;
     }
-
     router.push(`/eat-play/${game.id}/play`);
-  }, [game.id, isRegistered, openModal, router]);
+  }, [isRegistered, openModal, game.id, router]);
 
+  // Ad on back click from play page
   const handleBackPress = useCallback(() => {
+    if (!isIntro) {
+      setShowAdOnBack(true);
+      return;
+    }
+    setIsExitDialogOpen(true);
+  }, [isIntro]);
+
+  const handleBackAdComplete = useCallback(() => {
+    setShowAdOnBack(false);
+    setIsExitDialogOpen(true);
+  }, []);
+
+  const handleBackAdSkip = useCallback(() => {
+    setShowAdOnBack(false);
     setIsExitDialogOpen(true);
   }, []);
 
@@ -138,6 +183,28 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
         </>
       ) : (
         <GamePlayerStage game={game} onAward={onAward} coins={points} />
+      )}
+
+      {/* Ad on game fail/end */}
+      {showAdOnGameEnd && (
+        <AdOverlay
+          onComplete={handleGameEndAdComplete}
+          onSkip={handleGameEndAdSkip}
+          restaurantId={restaurantId}
+          gameId={gameId}
+          completeLabel="Continue"
+        />
+      )}
+
+      {/* Ad on back click from play page */}
+      {showAdOnBack && (
+        <AdOverlay
+          onComplete={handleBackAdComplete}
+          onSkip={handleBackAdSkip}
+          restaurantId={restaurantId}
+          gameId={gameId}
+          completeLabel="Continue"
+        />
       )}
 
       <GameExitConfirmDialog
