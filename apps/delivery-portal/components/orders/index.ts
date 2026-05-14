@@ -16,4 +16,5 @@ export { DriverSlideCodBadge } from './driver-slide-cod-badge';
 export { DriverPaymentSheet } from './driver-payment-sheet';
 export { DriverPaymentItems } from './driver-payment-items';
 export { DriverStatusStepper } from './driver-status-stepper';
+export { DriverEarningsView } from './driver-earnings-view';
 export * from './hooks';
