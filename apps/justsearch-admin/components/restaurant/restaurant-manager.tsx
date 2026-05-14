@@ -3,22 +3,31 @@
 import { useState } from 'react';
 import { Button } from '@justsearch/ui';
 import { useRestaurantStore } from '@/lib/stores/restaurant-store';
-import { RestaurantCreateForm } from './restaurant-create-form';
+import { RestaurantCreateForm, type RestaurantFormData } from './restaurant-create-form';
 
 export function RestaurantManager() {
   const [showForm, setShowForm] = useState(false);
   const { restaurants, addRestaurant } = useRestaurantStore();
 
-  const handleCreate = (data: { name: string; city: string; plan: 'pool' | 'exclusive'; tables: number }) => {
-    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const handleCreate = (data: RestaurantFormData) => {
     addRestaurant({
       name: data.name,
-      slug,
-      subdomain: slug,
-      plan: data.plan,
+      slug: data.slug,
+      subdomain: data.slug,
       city: data.city,
+      area: data.area,
       tables: data.tables,
-      qrCount: data.tables + 1,
+      ownerName: data.ownerName,
+      contactPhone: data.contactPhone,
+      contactEmail: data.contactEmail,
+      address: data.address,
+      cuisine: data.cuisine,
+      taxNumber: data.taxNumber,
+      businessLicense: data.businessLicense,
+      licenseUrl: data.licenseUrl,
+      photos: data.photos || [],
+      dashboardUsername: data.dashboardUsername,
+      dashboardPassword: data.dashboardPassword,
     });
     setShowForm(false);
   };
@@ -28,10 +37,7 @@ export function RestaurantManager() {
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-bold text-slate-900">Create New Restaurant</h3>
         <div className="mt-4">
-          <RestaurantCreateForm
-            onSubmit={handleCreate}
-            onCancel={() => setShowForm(false)}
-          />
+          <RestaurantCreateForm onSubmit={handleCreate} onCancel={() => setShowForm(false)} />
         </div>
       </div>
     );
@@ -58,9 +64,6 @@ export function RestaurantManager() {
                 {restaurant.subdomain}.js-restorant.com · {restaurant.city}
               </p>
               <div className="mt-1 flex gap-2">
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700">
-                  {restaurant.plan}
-                </span>
                 <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-bold text-green-700">
                   {restaurant.status}
                 </span>
@@ -68,7 +71,7 @@ export function RestaurantManager() {
             </div>
             <div className="text-right">
               <p className="text-sm font-bold text-slate-700">{restaurant.tables} tables</p>
-              <p className="text-xs text-slate-400">{restaurant.qrCount} QR codes</p>
+              <p className="text-xs text-slate-400">1 QR code</p>
             </div>
           </div>
         ))}

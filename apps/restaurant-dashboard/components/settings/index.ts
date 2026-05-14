@@ -1,5 +1,10 @@
 export { SettingsContactCard } from "./settings-contact-card";
 export { SettingsSocialsCard } from "./settings-socials-card";
+export { SettingsProfileCard } from "./settings-profile-card";
+export { SettingsDomainCard } from "./settings-domain-card";
+export { SettingsLicenseCard } from "./settings-license-card";
+export { SettingsQrCard } from "./settings-qr-card";
+export { SettingsContainer } from "./settings-container";
 export { SocialCard } from "./social-card";
 export { SocialsHeader } from "./socials-header";
 export { ContactRow } from "./contact-row";
