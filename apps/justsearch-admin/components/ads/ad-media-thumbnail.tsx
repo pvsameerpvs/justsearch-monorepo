@@ -19,7 +19,7 @@ export function AdMediaThumbnail({ campaign, className = "h-10 w-10" }: AdMediaT
 
   if (campaign.mediaType === "gif") {
     return (
-      <div className={`flex items-center justify-center rounded-lg bg-slate-100 ${className}`}>
+      <div className={`flex items-center justify-center rounded-lg bg-slate-100 overflow-hidden ${className}`}>
         {hasUrl ? (
           <img src={campaign.mediaUrl} alt="" className="h-full w-full object-cover" />
         ) : (

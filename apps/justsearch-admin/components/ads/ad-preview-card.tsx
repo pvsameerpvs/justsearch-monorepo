@@ -10,25 +10,28 @@ export function AdPreviewCard({ campaign }: AdPreviewCardProps) {
   const hasUrl = campaign.mediaUrl && campaign.mediaUrl.trim() !== "";
 
   return (
-    <div className="elegant-card p-0 overflow-hidden">
-      <div className="relative aspect-video bg-slate-100 flex items-center justify-center">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
+      <div className="relative aspect-video bg-slate-100 flex items-center justify-center overflow-hidden">
         {campaign.mediaType === "video" && hasUrl ? (
           <video src={campaign.mediaUrl} className="h-full w-full object-cover" muted loop playsInline />
         ) : hasUrl ? (
           <img src={campaign.mediaUrl} alt={campaign.title} className="h-full w-full object-cover" />
         ) : (
-          <span className="text-xs font-bold text-slate-400 uppercase">{campaign.mediaType}</span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-3xl opacity-20">🖼️</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{campaign.mediaType}</span>
+          </div>
         )}
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-3 right-3">
           <AdCampaignTypeBadge type={campaign.type} />
         </div>
-        <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[10px] font-bold text-white">
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold text-white">
           <Clock className="h-3 w-3" />
           {campaign.duration}s
         </div>
       </div>
 
-      <div className="p-3 space-y-2">
+      <div className="p-4 space-y-3">
         <div>
           <p className="text-sm font-bold text-slate-900">{campaign.title}</p>
           <p className="text-xs text-slate-500">{campaign.companyName}</p>

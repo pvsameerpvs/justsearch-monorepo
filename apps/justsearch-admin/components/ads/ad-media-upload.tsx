@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { AdMediaTypePills } from "./ad-media-type-pills";
-import { AdMediaDropzoneContent } from "./ad-media-dropzone-content";
+import { AdMediaDropzone } from "./ad-media-dropzone";
 import type { AdMediaType } from "@/lib/stores/ad-campaign-types";
 
 interface AdMediaUploadProps {
@@ -13,7 +13,6 @@ interface AdMediaUploadProps {
 
 export function AdMediaUpload({ mediaType, mediaUrl, onChange }: AdMediaUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback((file: File) => {
     const reader = new FileReader();
@@ -41,28 +40,8 @@ export function AdMediaUpload({ mediaType, mediaUrl, onChange }: AdMediaUploadPr
   return (
     <div className="space-y-3">
       <AdMediaTypePills mediaType={mediaType} onChange={(t) => onChange(t, mediaUrl)} />
-      <div
-        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={onDrop}
-        className={`relative rounded-xl border-2 border-dashed p-8 text-center transition-all ${
-          isDragging ? "border-indigo-500 bg-indigo-50 scale-[1.01]" : "border-slate-300 bg-slate-50"
-        }`}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={mediaType === "video" ? "video/*" : mediaType === "gif" ? "image/gif" : "image/*"}
-          onChange={onFileSelect}
-          className="hidden"
-        />
-        <AdMediaDropzoneContent
-          mediaType={mediaType}
-          mediaUrl={mediaUrl}
-          isDragging={isDragging}
-          fileInputRef={fileInputRef}
-          onChange={onChange}
-        />
+      <div onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }} onDragLeave={() => setIsDragging(false)} onDrop={onDrop}>
+        <AdMediaDropzone mediaType={mediaType} mediaUrl={mediaUrl} isDragging={isDragging} onFileSelect={onFileSelect} />
       </div>
     </div>
   );
