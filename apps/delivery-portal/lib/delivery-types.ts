@@ -34,16 +34,31 @@ export type DeliveryMetric = {
   tone: 'default' | 'success' | 'warning';
 };
 
+export type DeliveryOrderItem = {
+  name: string;
+  quantity: number;
+  price: number;
+  currency: string;
+};
+
 export type DeliveryOrder = {
   id: string;
   code: string;
   customerName: string;
+  customerPhone: string;
   neighborhood: string;
   dropoffAddress: string;
+  latitude: number;
+  longitude: number;
   orderedAtLabel: string;
   etaMinutes: number;
   itemCount: number;
   orderValue: string;
+  orderItems: DeliveryOrderItem[];
+  subtotal: number;
+  deliveryFee: number;
+  tax: number;
+  total: number;
   paymentMode: DeliveryPaymentMode;
   status: DeliveryOrderStatus;
   priority: DeliveryPriority;

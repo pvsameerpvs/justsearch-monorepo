@@ -10,14 +10,6 @@ interface UrlInfo {
   driverUniqueId: string | null;
 }
 
-interface LoginFormState {
-  username: string;
-  password: string;
-  error: string | null;
-  isLoading: boolean;
-  urlInfo: UrlInfo;
-}
-
 export function useLoginForm() {
   const router = useRouter();
   const { login } = useDriverAuth();

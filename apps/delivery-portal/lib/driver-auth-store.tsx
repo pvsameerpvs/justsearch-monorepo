@@ -7,6 +7,7 @@ interface AuthState {
   driverId: string | null;
   restaurantSlug: string | null;
   driverName: string | null;
+  hydrated: boolean;
 }
 
 interface AuthContextType extends AuthState {
@@ -22,6 +23,7 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
     driverId: null,
     restaurantSlug: null,
     driverName: null,
+    hydrated: false,
   });
 
   useEffect(() => {
@@ -34,21 +36,24 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
           driverId: parsed.driverId ?? null,
           restaurantSlug: parsed.restaurantSlug ?? null,
           driverName: parsed.driverName ?? null,
+          hydrated: true,
         });
+      } else {
+        setState((prev) => ({ ...prev, hydrated: true }));
       }
     } catch {
-      // ignore
+      setState((prev) => ({ ...prev, hydrated: true }));
     }
   }, []);
 
   const login = (driverId: string, restaurantSlug: string, driverName: string) => {
-    const next = { isLoggedIn: true, driverId, restaurantSlug, driverName };
+    const next = { isLoggedIn: true, driverId, restaurantSlug, driverName, hydrated: true };
     setState(next);
     localStorage.setItem("driver-auth", JSON.stringify(next));
   };
 
   const logout = () => {
-    const next = { isLoggedIn: false, driverId: null, restaurantSlug: null, driverName: null };
+    const next = { isLoggedIn: false, driverId: null, restaurantSlug: null, driverName: null, hydrated: true };
     setState(next);
     localStorage.removeItem("driver-auth");
   };

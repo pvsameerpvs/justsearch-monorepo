@@ -1,8 +1,8 @@
 import { DeliveryPortalShell } from '@/components/layout/delivery-portal-shell';
-import { DriverHomeView } from '@/components/orders/driver-home-view';
+import { DriverCompletedSection } from '@/components/orders/driver-completed-section';
 import { getCurrentDeliveryPortalSnapshot } from '@/lib/portal-context';
 
-export default async function DeliveryPortalPage() {
+export default async function HistoryPage() {
   const snapshot = await getCurrentDeliveryPortalSnapshot();
   const allOrders = [...snapshot.activeOrders, ...snapshot.completedOrders];
 
@@ -11,7 +11,13 @@ export default async function DeliveryPortalPage() {
       restaurant={snapshot.restaurant}
       agent={snapshot.agent}
     >
-      <DriverHomeView orders={allOrders} />
+      <div className="space-y-4">
+        <div>
+          <h1 className="text-lg font-bold text-slate-900">Order history</h1>
+          <p className="text-xs text-slate-500">All your completed deliveries</p>
+        </div>
+        <DriverCompletedSection orders={allOrders} />
+      </div>
     </DeliveryPortalShell>
   );
 }

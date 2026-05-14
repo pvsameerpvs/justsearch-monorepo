@@ -1,0 +1,26 @@
+import type { DeliveryOrder } from "@/lib/delivery-types";
+
+export const statusColors: Record<string, string> = {
+  assigned: "bg-slate-100 text-slate-700",
+  picked_up: "bg-blue-50 text-blue-700",
+  on_route: "bg-amber-50 text-amber-700",
+  arrived: "bg-violet-50 text-violet-700",
+  delivered: "bg-emerald-50 text-emerald-700",
+};
+
+const STATUS_PRIORITY: Record<string, number> = {
+  arrived: 1,
+  on_route: 2,
+  picked_up: 3,
+  assigned: 4,
+};
+
+export function sortOrdersByUrgency(orders: DeliveryOrder[]): DeliveryOrder[] {
+  return [...orders].sort((a, b) => {
+    if (a.status === 'delivered' && b.status !== 'delivered') return 1;
+    if (b.status === 'delivered' && a.status !== 'delivered') return -1;
+    const pa = STATUS_PRIORITY[a.status] ?? 99;
+    const pb = STATUS_PRIORITY[b.status] ?? 99;
+    return pa - pb;
+  });
+}

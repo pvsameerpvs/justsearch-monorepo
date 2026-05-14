@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'js-restorant.com';
-
 export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
   const normalizedHost = host.replace(/:\d+$/, '').toLowerCase();
