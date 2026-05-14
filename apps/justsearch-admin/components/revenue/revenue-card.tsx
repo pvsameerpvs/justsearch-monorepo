@@ -1,5 +1,3 @@
-"use client";
-
 import type { ElementType } from 'react';
 
 interface RevenueCardProps {
