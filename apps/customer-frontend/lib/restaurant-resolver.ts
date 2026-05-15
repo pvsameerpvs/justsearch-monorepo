@@ -13,6 +13,8 @@ const BASE_DOMAINS = [
   'js-restorant.com',
 ];
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+
 function normalizeHost(host: string): string {
   return host.trim().toLowerCase().replace(/:\d+$/, '');
 }
@@ -48,6 +50,42 @@ function extractSubdomain(host: string): string | null {
   return null;
 }
 
+async function fetchRestaurantFromApi(host: string): Promise<Restaurant | null> {
+  try {
+    const response = await fetch(`${API_BASE}/restaurants/current`, {
+      headers: { host: normalizeHost(host) },
+      cache: 'no-store',
+      next: { revalidate: 0 },
+    });
+
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as {
+      id: string;
+      slug: string;
+      subdomain: string;
+      name: string;
+      status: string;
+      theme: Record<string, string>;
+      settings: Record<string, unknown>;
+    };
+
+    // Merge API data with mock data for fields not yet in DB
+    const mock = getRestaurantBySlug(data.slug) ?? getFallbackRestaurant();
+
+    return {
+      ...mock,
+      id: data.id,
+      slug: data.slug,
+      subdomain: data.subdomain,
+      name: data.name,
+      theme: { ...mock.theme, ...data.theme },
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function resolveRestaurantFromHost(host: string): Restaurant {
   const subdomain = extractSubdomain(host);
 
@@ -69,6 +107,10 @@ export const getCurrentRestaurant = cache(async (): Promise<Restaurant> => {
 
   const host =
     headerStore.get('x-forwarded-host') ?? headerStore.get('host') ?? '';
+
+  // Try backend API first, fall back to mock data
+  const apiRestaurant = await fetchRestaurantFromApi(host);
+  if (apiRestaurant) return apiRestaurant;
 
   return resolveRestaurantFromHost(host);
 });

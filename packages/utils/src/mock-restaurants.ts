@@ -104,6 +104,7 @@ export type PartyPackage = {
 };
 
 export type Restaurant = {
+  id?: string;
   slug: string;
   subdomain: string;
   name: string;
