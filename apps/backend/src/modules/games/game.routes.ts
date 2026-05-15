@@ -34,10 +34,17 @@ router.get('/active', async (_req, res, next) => {
   }
 });
 
-// PATCH /api/v1/games/:id — toggle active/inactive (super-admin only)
+// PATCH /api/v1/games/:id — toggle active/inactive, update config (super-admin only)
 router.patch('/:id', authMiddleware, requireRole('super_admin'), async (req, res, next) => {
   try {
     const body = updateSchema.parse(req.body);
+    if (body.config) {
+      const [existing] = await db.select({ config: games.config }).from(games).where(eq(games.id, req.params.id)).limit(1);
+      if (existing) {
+        const merged = { ...(existing.config as Record<string, unknown>), ...body.config };
+        body.config = merged;
+      }
+    }
     const [updated] = await db
       .update(games)
       .set(body)

@@ -1,6 +1,6 @@
 import { X, Pencil, Check } from "lucide-react";
 import { RestaurantStatusBadge } from "./restaurant-status-badge";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
 interface RestaurantDetailHeaderProps {
   restaurant: AdminRestaurant;

@@ -2,25 +2,18 @@
 
 import { useState } from "react";
 import { Globe, Briefcase, ExternalLink } from "lucide-react";
-import { useRestaurantStore } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 import { RestaurantDetailDrawer } from "./restaurant-detail-drawer";
 import { RestaurantRowInfo } from "./restaurant-row-info";
 import { RestaurantRowActions } from "./restaurant-row-actions";
 
-type Restaurant = ReturnType<typeof useRestaurantStore.getState>["restaurants"][number];
-
 interface RestaurantRowProps {
-  restaurant: Restaurant;
+  restaurant: AdminRestaurant;
   onRemove: () => void;
 }
 
 export function RestaurantRow({ restaurant, onRemove }: RestaurantRowProps) {
   const [detailOpen, setDetailOpen] = useState(false);
-  const { updateRestaurant } = useRestaurantStore();
-
-  const handleUpdate = (updates: Partial<Restaurant>) => {
-    updateRestaurant(restaurant.id, updates);
-  };
 
   const domains = [
     { label: "Customer Site", url: `https://${restaurant.subdomain}.js-restorant.com`, icon: Globe },
@@ -60,7 +53,6 @@ export function RestaurantRow({ restaurant, onRemove }: RestaurantRowProps) {
         restaurant={restaurant}
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
-        onUpdate={handleUpdate}
         onRemove={onRemove}
       />
     </>

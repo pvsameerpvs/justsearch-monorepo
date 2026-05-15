@@ -1,4 +1,4 @@
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
 export interface RestaurantTableRow {
   id: string;

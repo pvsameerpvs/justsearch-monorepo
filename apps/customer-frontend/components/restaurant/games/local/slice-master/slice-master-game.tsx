@@ -46,7 +46,7 @@ export function SliceMasterGame({
         <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-3 px-6">
           <div className="text-center">
             <p className="text-2xl font-black text-white drop-shadow-lg">
-              {score} Points
+              {score} Score
             </p>
           </div>
           <button

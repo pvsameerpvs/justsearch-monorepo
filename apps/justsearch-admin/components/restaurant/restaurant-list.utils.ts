@@ -1,4 +1,4 @@
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
 export function mapApiToAdmin(r: { id: string; slug: string; subdomain: string; name: string; status: string; createdAt: string }): AdminRestaurant {
   return {

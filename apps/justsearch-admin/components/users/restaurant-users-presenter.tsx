@@ -1,7 +1,7 @@
 import { ArrowLeft, Store } from "lucide-react";
 import { UserPointsTable } from "./user-points-table";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
-import type { RestaurantUser } from "@/lib/stores/user-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
+import type { RestaurantUser } from "@/lib/types/user.types";
 
 interface RestaurantUsersPresenterProps {
   restaurant: AdminRestaurant;

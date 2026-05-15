@@ -11,7 +11,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 
-import type { AnalyticsSummary } from "@/lib/stores/analytics-store";
+import type { AnalyticsResponse } from "@/lib/hooks/use-analytics-admin-query";
 
 const STAT_META = [
   { label: "Restaurants", key: "totalRestaurants" as const, sub: "activeRestaurants" as const, icon: Store, gradient: "from-blue-500 to-sky-500", text: "text-blue-700" },
@@ -22,14 +22,14 @@ const STAT_META = [
   { label: "Orders", key: "totalOrders" as const, sub: "totalViews" as const, icon: ShoppingBag, gradient: "from-rose-500 to-pink-500", text: "text-rose-700" },
 ];
 
-function formatStatValue(key: keyof AnalyticsSummary, value: number): string {
+function formatStatValue(key: keyof AnalyticsResponse, value: number): string {
   if (key === "totalAdRevenue") return `AED ${value.toLocaleString()}`;
   if (key === "totalGamePoints") return value.toLocaleString();
   return String(value);
 }
 
 function formatStatSubLabel(
-  key: keyof AnalyticsSummary,
+  key: keyof AnalyticsResponse,
   subValue: number
 ): string {
   if (key === "totalCampaigns") return `${subValue} active`;
@@ -40,7 +40,7 @@ function formatStatSubLabel(
 }
 
 interface AnalyticsStatsCardsProps {
-  summary: AnalyticsSummary;
+  summary: AnalyticsResponse;
 }
 
 export function AnalyticsStatsCards({ summary }: AnalyticsStatsCardsProps) {

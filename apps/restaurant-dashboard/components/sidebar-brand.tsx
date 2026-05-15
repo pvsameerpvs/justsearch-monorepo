@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { ChefHat } from 'lucide-react';
 import type { Restaurant } from '@justsearch/utils';
 
@@ -5,9 +6,11 @@ export function SidebarBrand({ restaurant }: { restaurant: Restaurant }) {
   return (
     <div className="flex items-center gap-3 px-5 py-6">
       {restaurant.logoUrl ? (
-        <img
+        <Image
           src={restaurant.logoUrl}
           alt={restaurant.name}
+          width={36}
+          height={36}
           className="h-9 w-9 rounded-lg object-cover"
         />
       ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 import { RestaurantDetailHeader } from "./restaurant-detail-header";
 import { RestaurantDetailContent } from "./restaurant-detail-content";
 
@@ -9,7 +9,7 @@ interface RestaurantDetailDrawerProps {
   restaurant: AdminRestaurant;
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (updates: Partial<AdminRestaurant>) => void;
+  onUpdate?: (updates: Partial<AdminRestaurant>) => void;
   onRemove: () => void;
 }
 
@@ -20,7 +20,7 @@ export function RestaurantDetailDrawer({ restaurant, isOpen, onClose, onUpdate, 
   if (!isOpen) return null;
 
   const handleSave = () => {
-    onUpdate(form);
+    onUpdate?.(form);
     setIsEditing(false);
     setForm({});
   };
@@ -41,7 +41,7 @@ export function RestaurantDetailDrawer({ restaurant, isOpen, onClose, onUpdate, 
 
   const handlePhotosChange = (photos: string[]) => {
     setForm((prev) => ({ ...prev, photos }));
-    if (!isEditing) onUpdate({ photos });
+    if (!isEditing) onUpdate?.({ photos });
   };
 
   const handleRemove = () => {
@@ -67,7 +67,7 @@ export function RestaurantDetailDrawer({ restaurant, isOpen, onClose, onUpdate, 
           form={form}
           onChange={handleChange}
           onPhotosChange={handlePhotosChange}
-          onUpdate={onUpdate}
+          onUpdate={onUpdate ?? (() => {})}
           onRemove={handleRemove}
         />
       </div>

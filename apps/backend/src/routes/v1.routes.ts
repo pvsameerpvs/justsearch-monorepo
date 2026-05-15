@@ -12,6 +12,7 @@ import voucherRoutes from '../modules/vouchers/voucher.routes';
 import userRoutes from '../modules/users/user.routes';
 import userAdminRoutes from '../modules/users/user-admin.routes';
 import gameRoutes from '../modules/games/game.routes';
+import gameSessionRoutes from '../modules/games/game-session.routes';
 import adRoutes from '../modules/ads/ad.routes';
 import revenueRoutes from '../modules/revenue/revenue.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
@@ -55,6 +56,7 @@ router.use('/admin/users', userAdminRoutes);
 
 // Games (super-admin)
 router.use('/games', gameRoutes);
+router.use('/games', gameSessionRoutes);
 
 // Advertisements (super-admin)
 router.use('/advertisements', adRoutes);

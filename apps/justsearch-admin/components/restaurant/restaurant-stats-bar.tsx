@@ -2,7 +2,7 @@
 
 import { Building2, CheckCircle2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
 interface RestaurantStatsBarProps {
   restaurants: AdminRestaurant[];

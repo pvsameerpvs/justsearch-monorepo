@@ -2,6 +2,7 @@ export { useRestaurantsQuery } from "./use-restaurants-query";
 export type { ApiRestaurant } from "./use-restaurants-query";
 
 export { useGamesQuery, useUpdateGameMutation } from "./use-games-query";
+export type { ScoringConfig } from "@/lib/types/game.types";
 
 export { useAdsQuery, useCreateAdMutation, useUpdateAdMutation, useDeleteAdMutation } from "./use-ads-query";
 export type { AdCampaign, AdCampaignFormData } from "@/lib/stores/ad-campaign-types";

@@ -1,5 +1,5 @@
 import { Trophy } from "lucide-react";
-import type { UserGamePoints } from "@/lib/stores/user-store";
+import type { UserGamePoints } from "@/lib/types/user.types";
 
 interface UserGamePointsBarProps {
   gamePoints: UserGamePoints;

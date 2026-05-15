@@ -1,7 +1,7 @@
-import type { MonthlyDataPoint } from "@/lib/stores/analytics-store";
+import type { MonthlyDataPoint } from "@/lib/hooks/use-analytics-admin-query";
 import type { RestaurantRevenue } from "@/lib/constants/revenue.constants";
 import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
-import type { RestaurantUser } from "@/lib/stores/user-store";
+import type { RestaurantUser } from "@/lib/types/user.types";
 
 export interface DashboardStats {
   restaurants: number;

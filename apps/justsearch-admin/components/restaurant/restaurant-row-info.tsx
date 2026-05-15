@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { FileText, ImageIcon, Calendar } from "lucide-react";
 import { RestaurantRowStatus } from "./restaurant-row-status";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
 interface RestaurantRowInfoProps {
   restaurant: AdminRestaurant;

@@ -12,7 +12,7 @@ import {
 
 import { TrendingUp } from "lucide-react";
 
-import type { MonthlyDataPoint } from "@/lib/stores/analytics-store";
+import type { MonthlyDataPoint } from "@/lib/hooks/use-analytics-admin-query";
 
 interface AnalyticsRevenueChartProps {
   data: MonthlyDataPoint[];

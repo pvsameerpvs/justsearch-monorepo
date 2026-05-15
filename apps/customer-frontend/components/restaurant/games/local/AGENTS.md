@@ -158,12 +158,34 @@ When a game ends, it calls `onAward` with:
 
 ```typescript
 type GameAwardResult = {
-  points: number;      // Points awarded to user
-  score: number;       // Raw game score
+  points: number;      // Points awarded (from scoring formula)
+  score: number;       // Raw game score (internal only)
   label: string;       // Readable result (e.g. "Amazing!", "Good job!")
   level?: number;      // Level reached (if applicable)
 };
 ```
+
+### Points Calculation
+
+Each game sends its raw score to the **scoring formula** (defined in `games.config` JSONB):
+
+```
+points = min(BASE_POINTS + floor(rawScore ^ EXPONENT × MULTIPLIER), MAX_PER_PLAY)
+```
+
+See `scoring/AGENTS.md` for the complete formula reference and per-game config.
+
+**IMPORTANT**: Users see `points`, not `score`. The `score` field is for internal tracking only.
+
+### Per-Game Scoring Reference
+
+| Game | Raw Score | Base | Exponent | Multiplier | Max/Play |
+|------|-----------|------|----------|------------|----------|
+| Jump & Bite | distance (0-500) | 10 | 0.7 | 2.5 | 500 |
+| Hungry Bird Rush | pipes (0-100) | 10 | 0.6 | 2.5 | 500 |
+| Cheddar Chase | cheese (0-50) | 10 | 0.8 | 2.5 | 500 |
+| Gem Match | pairs (0-30) | 10 | 0.9 | 2.5 | 500 |
+| Slice Master | fruits (0-100) | 10 | 0.7 | 2.5 | 500 |
 
 Points are added to the user's loyalty points store and displayed with `GameCoinPill`.
 
@@ -176,4 +198,6 @@ Points are added to the user's loyalty points store and displayed with `GameCoin
 - [ ] Game ends gracefully → calls `onAward` with valid result
 - [ ] `LocalGameFallback` shown for unregistered game IDs
 - [ ] Canvas properly cleaned up on unmount (cancelAnimationFrame)
-- [ ] No `console.log`
+- [x] No `console.log`
+- [x] Game sends `rawScore` → `onAward` receives derived `points` (via submitScore API)
+- [x] Scoring config matches `scoring/AGENTS.md` reference

@@ -1,5 +1,5 @@
 import { Calendar, Globe, ExternalLink, ImageIcon } from "lucide-react";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 import { DomainLink } from "./restaurant-domain-link";
 import { DashboardCredentialsCard } from "./restaurant-dashboard-credentials";
 import { RestaurantDetailForm } from "./restaurant-detail-form";

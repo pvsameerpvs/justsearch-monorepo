@@ -11,6 +11,7 @@ import { GameExitConfirmDialog } from './games/game-exit-confirm-dialog';
 import { GameIntroStage } from './games/game-intro-stage';
 import { GamePlayerStage } from './games/game-player-stage';
 import { AdOverlay } from './games/ad-overlay';
+import { submitScore } from './games/use-submit-score';
 import { useRegistration } from '@/components/auth/registration-context';
 import { useSmartBackNavigation } from '@/components/layout/use-smart-back-navigation';
 import { useLoyaltyPoints } from './use-loyalty-points';
@@ -65,9 +66,10 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
   }, []);
 
   const processAward = useCallback(
-    (result: GameAwardResult) => {
-      addPoints(result.points);
-      updateGameStat(game.id, result.score, result.level);
+    async (result: GameAwardResult) => {
+      const { pointsAwarded } = await submitScore(game.id, result.score, result.level);
+      addPoints(pointsAwarded);
+      updateGameStat(game.id, result.score, pointsAwarded, result.level);
     },
     [addPoints, game.id, updateGameStat],
   );
@@ -81,18 +83,18 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
     [],
   );
 
-  const handleGameEndAdComplete = useCallback(() => {
+  const handleGameEndAdComplete = useCallback(async () => {
     setShowAdOnGameEnd(false);
     if (pendingAward) {
-      processAward(pendingAward);
+      await processAward(pendingAward);
       setPendingAward(null);
     }
   }, [pendingAward, processAward]);
 
-  const handleGameEndAdSkip = useCallback(() => {
+  const handleGameEndAdSkip = useCallback(async () => {
     setShowAdOnGameEnd(false);
     if (pendingAward) {
-      processAward(pendingAward);
+      await processAward(pendingAward);
       setPendingAward(null);
     }
   }, [pendingAward, processAward]);

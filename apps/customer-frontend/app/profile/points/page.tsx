@@ -20,23 +20,16 @@ export default function ProfilePointsPage() {
               {points}
             </h1>
             <p className="mt-3 text-sm leading-6 text-[rgb(var(--muted))]">
-              Points are earned by playing games. In this demo, points are stored in your browser.
+              Points are earned by playing games. Each game awards points based on your performance using a scoring formula.
             </p>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => resetPoints(1250)}
-                className="inline-flex w-full items-center justify-center rounded-full bg-[rgb(var(--brand))] px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
-              >
-                Reset to 1250
-              </button>
+            <div className="mt-6 grid gap-3 sm:grid-cols-1 max-w-[200px]">
               <button
                 type="button"
                 onClick={() => resetPoints(0)}
                 className="inline-flex w-full items-center justify-center rounded-full border border-[rgb(var(--border)/0.9)] bg-white/70 px-4 py-2.5 text-sm font-medium text-[rgb(var(--ink))] transition-all hover:bg-white"
               >
-                Clear to 0
+                Reset points
               </button>
             </div>
           </Surface>

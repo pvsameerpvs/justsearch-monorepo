@@ -2,7 +2,7 @@
 
 import { User, Phone, Mail, MapPin, Tag, Building2, Briefcase, Lock, UserCircle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
 interface RestaurantDetailFormProps {
   restaurant: AdminRestaurant;

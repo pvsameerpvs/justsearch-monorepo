@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { cn } from '@/lib/cn';
 import { getRestaurantInitials } from '@/lib/restaurant-utils';
 import type { Restaurant } from '@/lib/restaurant-types';
@@ -29,10 +30,12 @@ export function RestaurantLogoBadge({
       )}
     >
       {restaurant.logoUrl ? (
-        <img
+        <Image
           src={restaurant.logoUrl}
           alt={`${restaurant.name} logo`}
-          className="h-full w-full object-cover"
+          fill
+          sizes="(max-width: 640px) 56px, 112px"
+          className="object-cover"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(145deg,rgb(var(--logo-from)),rgb(var(--logo-to)/0.92))] font-display font-semibold tracking-[-0.08em] text-white">

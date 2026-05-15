@@ -4,3 +4,4 @@ export { GameList } from "./game-list";
 export { GameCard } from "./game-card";
 export { GameEmpty } from "./game-empty";
 export { GameHeader } from "./game-header";
+export { GameScoringEditor } from "./game-scoring-editor";

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'justsearch:loyaltyPoints';
 const UPDATED_EVENT = 'justsearch:loyaltyPointsUpdated';
-const DEFAULT_POINTS = 1250;
+const DEFAULT_POINTS = 0;
 
 function parsePoints(value: string | null) {
   if (!value) return null;

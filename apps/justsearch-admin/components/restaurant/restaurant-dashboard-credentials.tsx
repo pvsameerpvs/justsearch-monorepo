@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Lock, UserCircle, Copy, CheckCheck } from "lucide-react";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
 interface DashboardCredentialsCardProps {
   restaurant: AdminRestaurant;

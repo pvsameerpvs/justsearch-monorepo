@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { Surface } from '@/components/shared/surface';
+import Image from 'next/image';
 import type { Game } from '@/lib/restaurant-types';
 import { useRegistration } from '@/components/auth/registration-context';
 import { AdOverlay } from './games/ad-overlay';
@@ -49,11 +50,12 @@ export function RestaurantGamePreviewCard({
           <div className="bg-white p-3">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[14px] border border-[rgb(var(--border)/0.9)] bg-[rgb(var(--card-surface-muted)/0.9)]">
               {coverImageUrl ? (
-                <img
+                <Image
                   src={coverImageUrl}
                   alt={game.name}
-                  loading="lazy"
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 640px) 50vw, 160px"
+                  className="object-cover"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(140deg,rgb(var(--brand-soft)/0.55),rgb(var(--accent-soft)/0.45))] text-6xl">

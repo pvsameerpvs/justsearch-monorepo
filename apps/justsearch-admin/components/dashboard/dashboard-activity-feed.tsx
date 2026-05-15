@@ -1,5 +1,5 @@
 import { Trophy } from "lucide-react";
-import type { RestaurantUser } from "@/lib/stores/user-store";
+import type { RestaurantUser } from "@/lib/types/user.types";
 
 interface DashboardUserRowProps {
   user: RestaurantUser;

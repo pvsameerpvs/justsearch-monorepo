@@ -7,9 +7,9 @@ export type LoyaltyTier = 'ELITE' | 'SILVER' | 'GOLD' | 'PLATINUM';
 
 export const LOYALTY_CONFIG = {
   TIERS: {
-    PLATINUM: { min: 2000, label: 'PLATINUM' },
-    GOLD: { min: 1200, label: 'GOLD' },
-    SILVER: { min: 600, label: 'SILVER' },
+    PLATINUM: { min: 10000, label: 'PLATINUM' },
+    GOLD: { min: 5000, label: 'GOLD' },
+    SILVER: { min: 1000, label: 'SILVER' },
     ELITE: { min: 0, label: 'ELITE' },
   },
   XP_PER_LEVEL: 10, // rounds per level

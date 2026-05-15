@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { FileText, Upload } from "lucide-react";
-import type { AdminRestaurant } from "@/lib/stores/restaurant-store";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 import { RestaurantLicenseMeta } from "./restaurant-license-meta";
 import { RestaurantLicensePreview } from "./restaurant-license-preview";
 

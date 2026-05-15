@@ -13,7 +13,7 @@ import {
 import { TrendingUp } from "lucide-react";
 
 import { DASHBOARD_CHART_GRADIENT_ID } from "@/components/dashboard/constants/dashboard-constants";
-import type { MonthlyDataPoint } from "@/lib/stores/analytics-store";
+import type { MonthlyDataPoint } from "@/lib/hooks/use-analytics-admin-query";
 
 interface DashboardRevenueChartProps {
   data: MonthlyDataPoint[];

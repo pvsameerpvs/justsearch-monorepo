@@ -7,7 +7,7 @@ import { Phone, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { UserStatusBadge } from "./user-status-badge";
 import { UserGamePointsBar } from "./user-game-points-bar";
 import { UserEmpty } from "./user-empty";
-import type { RestaurantUser } from "@/lib/stores/user-store";
+import type { RestaurantUser } from "@/lib/types/user.types";
 
 interface UserPointsTableProps {
   users: RestaurantUser[];

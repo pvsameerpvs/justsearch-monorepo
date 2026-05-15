@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { QrCode, Copy, Check, Download } from "lucide-react";
 
 interface SettingsQrCardProps {
@@ -47,9 +48,11 @@ export function SettingsQrCard({ subdomain }: SettingsQrCardProps) {
 
       <div className="flex items-start gap-4">
         <div className="shrink-0">
-          <img
+          <Image
             src={qrImageUrl}
             alt="Restaurant QR Code"
+            width={96}
+            height={96}
             className="h-24 w-24 rounded-xl border border-slate-200 bg-white object-contain"
           />
         </div>

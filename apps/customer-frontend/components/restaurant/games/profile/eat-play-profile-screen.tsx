@@ -52,17 +52,15 @@ export function EatPlayProfileScreen() {
 
   const totals = useMemo(() => {
     let roundsPlayed = 0;
-    let bestScore = 0;
+    let totalPoints = 0;
     let playedGames = 0;
     let lastPlayed = '';
 
     for (const snapshot of gameSnapshots) {
       roundsPlayed += snapshot.stat.roundsPlayed;
+      totalPoints += snapshot.stat.totalPoints;
       if (snapshot.stat.roundsPlayed > 0) {
         playedGames += 1;
-      }
-      if (snapshot.stat.highScore > bestScore) {
-        bestScore = snapshot.stat.highScore;
       }
       if (snapshot.stat.lastPlayed && snapshot.stat.lastPlayed > lastPlayed) {
         lastPlayed = snapshot.stat.lastPlayed;
@@ -72,7 +70,7 @@ export function EatPlayProfileScreen() {
     return {
       ...calculatePlayerLevel(roundsPlayed),
       roundsPlayed,
-      bestScore,
+      totalPoints,
       playedGames,
       lastPlayed,
     };
@@ -216,7 +214,7 @@ export function EatPlayProfileScreen() {
               {[
                 { label: 'CHALLENGES', value: `${totals.playedGames} / ${restaurant.games.length}` },
                 { label: 'TOTAL ROUNDS', value: totals.roundsPlayed.toLocaleString() },
-                { label: 'PERSONAL BEST', value: totals.bestScore.toLocaleString() },
+                { label: 'TOTAL POINTS', value: totals.totalPoints.toLocaleString() },
                 { 
                   label: 'LAST PLAYED', 
                   value: totals.lastPlayed ? formatLastPlayed(totals.lastPlayed).toUpperCase() : 'NO HISTORY',

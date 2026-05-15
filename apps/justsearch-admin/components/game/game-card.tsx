@@ -1,19 +1,21 @@
 import { ToggleLeft, ToggleRight } from 'lucide-react';
-import type { AdminGame } from '@/lib/stores/game-store';
+import type { AdminGame } from '@/lib/types/game.types';
+import { GameScoringEditor } from './game-scoring-editor';
 
 interface GameCardProps {
   game: AdminGame;
   onToggleAvailability: () => void;
+  onSaveScoring: (id: string, config: Record<string, unknown>) => void;
 }
 
-export function GameCard({ game, onToggleAvailability }: GameCardProps) {
+export function GameCard({ game, onToggleAvailability, onSaveScoring }: GameCardProps) {
   return (
     <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-xl">
           {game.icon}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="font-bold text-slate-900">{game.name}</p>
           <p className="text-xs text-slate-500">{game.description}</p>
           <p className="mt-1 text-xs font-medium text-amber-600">{game.prize}</p>
@@ -33,6 +35,11 @@ export function GameCard({ game, onToggleAvailability }: GameCardProps) {
           {game.isActive ? <ToggleRight className="h-6 w-6 text-green-500" /> : <ToggleLeft className="h-6 w-6 text-slate-300" />}
         </button>
       </div>
+
+      <GameScoringEditor
+        config={game.scoringConfig || { basePoints: 10, exponent: 0.7, multiplier: 2.5, maxPerPlay: 500, scoringVersion: 'v1' }}
+        onSave={(scoring) => onSaveScoring(game.id, { config: { scoring } })}
+      />
     </div>
   );
 }

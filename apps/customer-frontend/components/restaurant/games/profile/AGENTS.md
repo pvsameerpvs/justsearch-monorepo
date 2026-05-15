@@ -56,12 +56,81 @@ eat-play-profile-screen.tsx
 
 Game stats are stored client-side via `useUserGameStats` hook (local state, no backend API for game sessions yet).
 
+### GameStat Type (with points tracking)
+
+```typescript
+type GameStat = {
+  highScore: number;    // Best raw score for this game
+  lastScore: number;    // Last raw score
+  lastPoints: number;   // Points earned from last play
+  totalPoints: number;  // Total points accumulated for this game
+  maxLevel: number;
+  roundsPlayed: number;
+  lastPlayed: string;
+};
+```
+
+### Points Flow
+
+```
+Game ends → onAward(rawScore)
+  → submitScore(gameId, rawScore) → POST /api/v1/games/sessions
+  → Backend returns pointsAwarded (via scoring formula)
+  → addPoints(pointsAwarded) → updates total in useLoyaltyPoints
+  → updateGameStat(gameId, rawScore, pointsAwarded, level)
+  → Profile shows totalPoints per game + total loyalty points
+```
+
+### Loyalty Tiers (Updated)
+
+| Tier | Points Needed | Reward Value |
+|------|-------------|--------------|
+| ELITE | 0 | — |
+| SILVER | 1,000 | 10 AED scratch card |
+| GOLD | 5,000 | 50 AED scratch card |
+| PLATINUM | 10,000 | 120 AED scratch card |
+
+### Default Starting Points
+
+`DEFAULT_POINTS = 0` (was 1250 mock value). Players start from zero and earn through gameplay.
+
 ---
 
-## 4. Build Checklist
+## 4. Point Redemption
+
+When a user accumulates enough points, they can redeem scratch cards:
+
+| Total Points | Reward | Shown In |
+|-------------|--------|----------|
+| 1,000 | 10 AED scratch card | Profile page |
+| 5,000 | 50 AED scratch card | Profile page |
+| 10,000 | 120 AED scratch card | Profile page |
+
+### UI Concept
+
+```
+┌──────────────────────────────────────┐
+│  Total Points: 2,450                  │
+│                                       │
+│  ┌─ Rewards ──────────────────────┐  │
+│  │ 10 AED  <progress 24%>  1000   │  │
+│  │ 50 AED   <locked>      5000    │  │
+│  │ 120 AED  <locked>      10000   │  │
+│  └──────────────────────────────────┘  │
+│         [Redeem Available]             │
+└──────────────────────────────────────┘
+```
+
+Redemption deducts points from the user's total. Each threshold is a one-time reward per user.
+
+---
+
+## 5. Build Checklist
 
 - [ ] All user game stats displayed per game
 - [ ] Total points counter updates after gameplay
+- [ ] Scratch card redemption UI at 1000/5000/10000 thresholds
+- [ ] Redemption deducts points from total
 - [ ] Links to wallet page work
 - [ ] Responsive grid layout
 - [ ] No `console.log`

@@ -232,7 +232,24 @@ GamePlayerStage
 
 ---
 
-## 7. Local Canvas Games
+## 7. Scoring System
+
+See `scoring/AGENTS.md` for complete scoring documentation.
+
+**TL;DR**: Every game uses this universal formula:
+```
+points = min(10 + floor(rawScore ^ 0.7 × 2.5), 500)
+```
+
+- Users see **points**, not raw scores  
+- Daily hard cap: **2,000 points per user**  
+- Admin tunes each game's formula independently  
+- Scratch cards redeem at 1,000 / 5,000 / 10,000 points  
+- Future games follow the same pattern — just add scoring config
+
+---
+
+## 8. Local Canvas Games
 
 See `local/AGENTS.md` for detailed documentation of each canvas game.
 
@@ -252,7 +269,7 @@ type LocalGameRenderer = (props: { game: LocalGame; onAward: GameAwardHandler; c
 
 ---
 
-## 8. Profile & Stats
+## 9. Profile & Stats
 
 See `profile/AGENTS.md` for detailed documentation.
 
@@ -261,7 +278,7 @@ See `profile/AGENTS.md` for detailed documentation.
 
 ---
 
-## 9. Cross-Platform Links
+## 10. Cross-Platform Links
 
 ### Link 1: justsearch-admin → customer-frontend
 ```
@@ -272,17 +289,28 @@ Admin toggles game inactive (PATCH /games/:id)
   → Game hidden from customer
 ```
 
-### Link 2: customer-frontend → backend (future)
+### Link 2: customer-frontend → backend (scoring)
 ```
-Customer plays game → score earned
-  → (future) POST /api/v1/game-sessions
-  → game_sessions table records: restaurantId, gameId, score, pointsAwarded
-  → (future) Admin analytics shows game performance
+Customer plays game
+  → rawScore sent to POST /api/v1/game-sessions
+  → Backend applies formula: min(10 + floor(rawScore ^ 0.7 × 2.5), 500)
+  → Enforces daily hard cap (2000 pts/user)
+  → Returns pointsAwarded
+  → Frontend displays points, not raw score
+```
+
+### Link 3: customer-frontend → profile (redemption)
+```
+User accumulates points
+  → At 1,000 pts: 10 AED scratch card available
+  → At 5,000 pts: 50 AED scratch card available
+  → At 10,000 pts: 120 AED scratch card available
+  → Redeemed in /eat-play/profile page
 ```
 
 ---
 
-## 10. Build Checklist
+## 11. Build Checklist
 
 - [ ] No component exceeds 80 lines (except restaurant-game-screen.tsx — flagged for split)
 - [ ] Game definitions in constants match seed data names
@@ -290,4 +318,10 @@ Customer plays game → score earned
 - [ ] URL validation in `ad-media-renderer.tsx` prevents Image crashes
 - [ ] Empty state shown when no games active
 - [ ] `tsc --noEmit` passes
-- [ ] No `console.log`
+- [x] No `console.log`
+- [x] Scoring config exists for every game in `games.config` JSONB
+- [x] Users see points, not raw scores (submitScore API)
+- [x] Daily hard cap enforced (2000 pts/user/day when customerId provided)
+- [x] Admin scoring editor in justsearch-admin game card
+- [ ] Scratch card redemption at 1000/5000/10000 thresholds
+- [ ] Future games follow `scoring/AGENTS.md` template
