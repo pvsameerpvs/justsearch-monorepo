@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { signToken } from '../../utils/jwt';
 import { findSuperAdmin, findDeliveryAgent, findStaffMember } from './auth-login.services';
+import { MOCK_AUTH_ENABLED, findMockUser } from '../../lib/mock-auth';
 
 const router = Router();
 
@@ -18,17 +19,30 @@ router.post('/', async (req, res, next) => {
     let user: { id: string; name: string; role: string; restaurantId?: string } | null = null;
     let userType: 'staff' | 'delivery' | 'super_admin' = 'staff';
 
-    if (type === 'super_admin') {
-      user = await findSuperAdmin(username, password);
-      userType = 'super_admin';
-    } else if (type === 'delivery') {
-      if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
-      user = await findDeliveryAgent(req.tenant.id, username, password);
-      userType = 'delivery';
+    if (MOCK_AUTH_ENABLED) {
+      const mockUser = findMockUser(username, password, type);
+      if (mockUser) {
+        user = {
+          id: mockUser.id,
+          name: mockUser.name,
+          role: mockUser.role,
+          restaurantId: mockUser.restaurantId,
+        };
+        userType = mockUser.type;
+      }
     } else {
-      if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
-      user = await findStaffMember(req.tenant.id, username, password);
-      userType = 'staff';
+      if (type === 'super_admin') {
+        user = await findSuperAdmin(username, password);
+        userType = 'super_admin';
+      } else if (type === 'delivery') {
+        if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
+        user = await findDeliveryAgent(req.tenant.id, username, password);
+        userType = 'delivery';
+      } else {
+        if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
+        user = await findStaffMember(req.tenant.id, username, password);
+        userType = 'staff';
+      }
     }
 
     if (!user) {
@@ -45,7 +59,7 @@ router.post('/', async (req, res, next) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });
 

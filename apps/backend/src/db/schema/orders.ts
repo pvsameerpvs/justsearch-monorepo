@@ -4,6 +4,7 @@ import { users } from './users';
 import {
   orderStatusEnum,
   paymentStatusEnum,
+  paymentMethodEnum,
   fulfillmentTypeEnum,
   orderSourceEnum,
 } from './enums';
@@ -30,6 +31,7 @@ export const orders = pgTable('orders', {
   lng: decimal('lng', { precision: 10, scale: 8 }),
   notes: text('notes'),
   driverId: uuid('driver_id'),
+  paymentMethod: paymentMethodEnum('payment_method'),
   etaMinutes: integer('eta_minutes'),
   tableId: uuid('table_id'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

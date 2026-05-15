@@ -1,121 +1,53 @@
-"use client";
-
-import {
-  ORDER_STATUS_DELIVERED_MS,
-} from '../fulfillment/fulfillment.constants';
-import type {
-  DeliveryOrder,
-  DeliveryOrderStatus,
-} from '../fulfillment/fulfillment.types';
+export function getCheckoutStageIndex(status: string): number {
+  const stageMap: Record<string, number> = {
+    pending: 0,
+    confirmed: 0,
+    preparing: 1,
+    ready: 1,
+    out_for_delivery: 2,
+    completed: 3,
+    cancelled: 0,
+  };
+  return stageMap[status] ?? 0;
+}
 
 export type CheckoutLiveStage = {
-  id: 'accepted' | 'ready' | 'assigned' | 'completed';
+  id: string;
   label: string;
   description: string;
 };
 
-export const CHECKOUT_STAGE_READY_MS = 90 * 1000;
-export const CHECKOUT_STAGE_ASSIGNED_MS = 3 * 60 * 1000;
-export const CHECKOUT_STAGE_COMPLETED_MS = ORDER_STATUS_DELIVERED_MS;
+export function getCheckoutLiveStages(riderName: string): CheckoutLiveStage[] {
+  return [
+    { id: 'accepted', label: 'Order accepted', description: 'The restaurant confirmed your order.' },
+    { id: 'ready', label: 'Order ready', description: 'Your food is packed and waiting.' },
+    { id: 'assigned', label: 'Delivery assigned', description: `${riderName} is heading to pick up your order.` },
+    { id: 'completed', label: 'Delivery completed', description: 'Your order was delivered successfully.' },
+  ];
+}
 
+// Legacy exports for backward compatibility
 export type CheckoutActiveOrderSummary = {
   id: string;
   progress: number;
   isOnTheWay: boolean;
 };
 
-export function getCheckoutStageIndex(
-  createdAt: number,
-  now: number,
-  orderStatus?: DeliveryOrderStatus,
-) {
-  const elapsed = now - createdAt;
-
-  if (orderStatus === 'delivered' || elapsed >= CHECKOUT_STAGE_COMPLETED_MS) {
-    return 3;
-  }
-
-  if (elapsed >= CHECKOUT_STAGE_ASSIGNED_MS) {
-    return 2;
-  }
-
-  if (elapsed >= CHECKOUT_STAGE_READY_MS) {
-    return 1;
-  }
-
-  return 0;
+export function getActiveCheckoutOrders<T extends { status: string }>(orders: T[], _now?: number): T[] {
+  return orders.filter((order) => order.status !== 'completed' && order.status !== 'cancelled');
 }
 
-export function getCheckoutLiveStages(riderName: string): CheckoutLiveStage[] {
-  return [
-    {
-      id: 'accepted',
-      label: 'Order accepted',
-      description: 'The restaurant confirmed your order and started preparation.',
-    },
-    {
-      id: 'ready',
-      label: 'Order ready',
-      description: 'Your food is packed and waiting for handover.',
-    },
-    {
-      id: 'assigned',
-      label: 'Delivery boy assigned',
-      description: `${riderName} is assigned and heading to pick up your order.`,
-    },
-    {
-      id: 'completed',
-      label: 'Delivery completed',
-      description: 'Your order was delivered successfully. Enjoy your meal.',
-    },
-  ];
-}
-
-export function getActiveCheckoutOrders(
-  orders: DeliveryOrder[],
-  now: number,
-) {
-  return orders
-    .filter((order) => getCheckoutStageIndex(order.createdAt, now, order.status) < 3)
-    .sort((a, b) => a.createdAt - b.createdAt);
-}
-
-export function getCheckoutOrderSummaries(
-  orders: DeliveryOrder[],
-  now: number,
-): CheckoutActiveOrderSummary[] {
-  return getActiveCheckoutOrders(orders, now).map((order) => ({
-    id: order.id,
-    progress: Math.min(1, (now - order.createdAt) / CHECKOUT_STAGE_COMPLETED_MS),
-    isOnTheWay: !!order.riderName,
-  }));
-}
-
-export function buildFallbackRiderPhone(orderId: string) {
-  const digits = orderId.replace(/\D/g, '');
-  const seeded = digits.slice(-7).padStart(7, '4');
-  return `+971 5${seeded}`;
-}
-
-export function normalizeTelValue(phone: string) {
-  return phone.replace(/[^\d+]/g, '');
-}
-
-export function formatOrderStageEta(createdAt: number) {
-  const etaDate = new Date(createdAt + 28 * 60 * 1000);
-  const hh = etaDate.getHours().toString().padStart(2, '0');
-  const mm = etaDate.getMinutes().toString().padStart(2, '0');
-  return `${hh}:${mm}`;
+export function getCheckoutOrderSummaries(orders: { id: string; status: string }[]): CheckoutActiveOrderSummary[] {
+  return getActiveCheckoutOrders(orders)
+    .map((order) => ({
+      id: order.id,
+      progress: 0.5,
+      isOnTheWay: order.status === 'out_for_delivery',
+    }));
 }
 
 export function getCheckoutStatusHref(orderIds: string[]) {
-  if (orderIds.length === 0) {
-    return null;
-  }
-
-  if (orderIds.length > 1) {
-    return '/menu/checkout/status';
-  }
-
+  if (orderIds.length === 0) return null;
+  if (orderIds.length > 1) return '/menu/checkout/status';
   return `/menu/checkout/status/${encodeURIComponent(orderIds[0])}`;
 }

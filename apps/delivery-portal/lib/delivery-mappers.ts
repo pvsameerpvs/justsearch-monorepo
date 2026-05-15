@@ -1,5 +1,5 @@
 import type { DeliveryOrder, DeliveryOrderStatus } from '@/lib/delivery-types';
-import type { ApiOrder } from '@/lib/hooks/use-delivery-orders-query';
+import type { ApiOrder } from '@/lib/hooks/use-driver-orders-query';
 
 const STATUS_MAP: Record<string, DeliveryOrderStatus> = {
   pending: 'assigned',
@@ -30,7 +30,7 @@ export function mapApiOrderToDelivery(o: ApiOrder): DeliveryOrder {
     deliveryFee: 0,
     tax: 0,
     total: Number(o.total),
-    paymentMode: 'cash_on_delivery',
+    paymentMode: o.paymentMethod === 'card' ? 'prepaid' : 'cash_on_delivery',
     status: STATUS_MAP[o.status] || 'assigned',
     priority: 'standard',
   };

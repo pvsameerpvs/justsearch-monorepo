@@ -31,7 +31,7 @@ export function RestaurantHomeHero({ restaurant }: RestaurantHomeHeroProps) {
 
   const activeOrders = useMemo(() => {
     if (!hydrated) return [];
-    return getCheckoutOrderSummaries(orders, now);
+    return getCheckoutOrderSummaries(orders);
   }, [hydrated, orders, now]);
 
   const showProgress = activeOrders.length > 0;

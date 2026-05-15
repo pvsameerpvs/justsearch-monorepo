@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { apiClient } from "@/lib/api-client";
+import { useState, useEffect } from 'react';
+import { apiClient } from '@/lib/api-client';
 
 export interface ApiOrder {
   id: string;
@@ -10,20 +10,21 @@ export interface ApiOrder {
   customerName: string;
   customerPhone: string;
   total: string;
+  paymentMethod: string | null;
   createdAt: string;
-  fulfillmentType: string;
 }
 
-export function useDeliveryOrdersQuery() {
+export function useDriverOrdersQuery(driverId?: string | null) {
   const [orders, setOrders] = useState<ApiOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchOrders = async () => {
+    if (!driverId) return;
     try {
-      const res = await apiClient<{ orders: ApiOrder[] }>("/orders");
+      const res = await apiClient<{ orders: ApiOrder[] }>(`/orders?driverId=${driverId}`);
       setOrders(res.orders);
     } catch {
-      // silent fail
+      // silent
     } finally {
       setIsLoading(false);
     }
@@ -31,9 +32,9 @@ export function useDeliveryOrdersQuery() {
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 10000);
+    const interval = setInterval(fetchOrders, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [driverId]);
 
   return { orders, isLoading, refetch: fetchOrders };
 }

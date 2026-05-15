@@ -4,15 +4,17 @@ import { useState, useCallback } from "react";
 import { DeliveryPortalShell } from '@/components/layout/delivery-portal-shell';
 import { DriverHomeView } from '@/components/orders/driver-home-view';
 import { useDriverAuth } from '@/lib/driver-auth-store';
-import { useDeliveryOrdersQuery } from '@/lib/hooks/use-delivery-orders-query';
+import { useDriverOrdersQuery } from '@/lib/hooks/use-driver-orders-query';
 import { mapApiOrderToDelivery } from '@/lib/delivery-mappers';
 import type { DeliveryPortalSnapshot } from '@/lib/delivery-types';
+
+import type { ApiOrder } from '@/lib/hooks/use-driver-orders-query';
 
 function buildSnapshot(
   restaurantSlug: string | null,
   driverName: string | null,
-  activeOrders: ReturnType<typeof useDeliveryOrdersQuery>['orders'],
-  completedOrders: ReturnType<typeof useDeliveryOrdersQuery>['orders']
+  activeOrders: ApiOrder[],
+  completedOrders: ApiOrder[]
 ): DeliveryPortalSnapshot {
   return {
     restaurant: {
@@ -42,8 +44,8 @@ function buildSnapshot(
 }
 
 export default function DeliveryPortalPage() {
-  const { driverName, restaurantSlug } = useDriverAuth();
-  const { orders, isLoading, refetch } = useDeliveryOrdersQuery();
+  const { driverName, restaurantSlug, driverId } = useDriverAuth();
+  const { orders, isLoading, refetch } = useDriverOrdersQuery(driverId);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -52,8 +54,8 @@ export default function DeliveryPortalPage() {
     setTimeout(() => setIsRefreshing(false), 500);
   }, [refetch]);
 
-  const activeOrders = orders.filter((o) => !['completed', 'cancelled'].includes(o.status));
-  const completedOrders = orders.filter((o) => ['completed', 'cancelled'].includes(o.status));
+  const activeOrders = orders.filter((o: ApiOrder) => !['completed', 'cancelled'].includes(o.status));
+  const completedOrders = orders.filter((o: ApiOrder) => ['completed', 'cancelled'].includes(o.status));
 
   const snapshot = buildSnapshot(restaurantSlug, driverName, activeOrders, completedOrders);
 

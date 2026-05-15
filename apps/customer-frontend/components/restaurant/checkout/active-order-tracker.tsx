@@ -18,7 +18,7 @@ export function ActiveOrderTracker() {
 
   const activeOrders = useMemo(() => {
     if (!hydrated) return [];
-    return getCheckoutOrderSummaries(orders, now);
+    return getCheckoutOrderSummaries(orders);
   }, [hydrated, orders, now]);
 
   if (activeOrders.length === 0) return null;

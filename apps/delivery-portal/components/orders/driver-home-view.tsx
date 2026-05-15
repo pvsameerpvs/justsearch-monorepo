@@ -7,6 +7,7 @@ import { DriverQueueSection } from "./driver-queue-section";
 import { DriverCompletedSection } from "./driver-completed-section";
 import { DriverRefreshButton } from "./driver-refresh-button";
 import { sortOrdersByUrgency } from "./driver-queue-utils";
+import { useUpdateDeliveryStatus } from "@/lib/hooks/use-update-delivery-status";
 import type { DeliveryOrder, DeliveryOrderStatus } from "@/lib/delivery-types";
 
 type DriverHomeViewProps = {
@@ -17,6 +18,7 @@ type DriverHomeViewProps = {
 
 export function DriverHomeView({ orders: initialOrders, onRefresh, isRefreshing }: DriverHomeViewProps) {
   const [orders, setOrders] = useState<DeliveryOrder[]>(initialOrders);
+  const { mutate: updateStatusApi } = useUpdateDeliveryStatus();
 
   useEffect(() => {
     setOrders(initialOrders);
@@ -24,6 +26,7 @@ export function DriverHomeView({ orders: initialOrders, onRefresh, isRefreshing 
 
   const updateStatus = (orderId: string, status: DeliveryOrderStatus) => {
     setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
+    updateStatusApi({ orderId, status });
   };
 
   const sorted = sortOrdersByUrgency(orders);

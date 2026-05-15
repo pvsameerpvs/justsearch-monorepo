@@ -1,9 +1,11 @@
 "use client";
 
+import { useCallback } from "react";
 import { motion, AnimatePresence, animate } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { Banknote, CreditCard } from "lucide-react";
 import { DriverPaymentItems } from "./driver-payment-items";
+import { useRecordPayment } from "@/lib/hooks/use-record-payment";
 import type { DeliveryOrder, DeliveryOrderStatus } from "@/lib/delivery-types";
 
 type DriverPaymentSheetProps = {
@@ -15,6 +17,17 @@ type DriverPaymentSheetProps = {
 };
 
 export function DriverPaymentSheet({ order, open, onConfirm, onCancel, xMotionValue }: DriverPaymentSheetProps) {
+  const { mutate: recordPayment } = useRecordPayment();
+
+  const handleConfirm = useCallback(async (paymentMethod: 'cash' | 'card') => {
+    try {
+      await recordPayment({ orderId: order.id, paymentMethod });
+    } catch {
+      // Proceed with status update even if payment recording fails
+    }
+    onConfirm("delivered");
+  }, [order.id, recordPayment, onConfirm]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -44,11 +57,11 @@ export function DriverPaymentSheet({ order, open, onConfirm, onCancel, xMotionVa
               </div>
               <DriverPaymentItems order={order} />
               <div className="grid grid-cols-2 gap-3">
-                <motion.button type="button" whileTap={{ scale: 0.97 }} onClick={() => onConfirm("delivered")} className="flex flex-col items-center gap-2 rounded-[18px] border border-emerald-200 bg-emerald-50 p-4 active:bg-emerald-100 transition">
+                <motion.button type="button" whileTap={{ scale: 0.97 }} onClick={() => handleConfirm('cash')} className="flex flex-col items-center gap-2 rounded-[18px] border border-emerald-200 bg-emerald-50 p-4 active:bg-emerald-100 transition">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100"><Banknote className="h-6 w-6 text-emerald-600" /></div>
                   <span className="text-sm font-bold text-emerald-800">Cash</span>
                 </motion.button>
-                <motion.button type="button" whileTap={{ scale: 0.97 }} onClick={() => onConfirm("delivered")} className="flex flex-col items-center gap-2 rounded-[18px] border border-emerald-200 bg-emerald-50 p-4 active:bg-emerald-100 transition">
+                <motion.button type="button" whileTap={{ scale: 0.97 }} onClick={() => handleConfirm('card')} className="flex flex-col items-center gap-2 rounded-[18px] border border-emerald-200 bg-emerald-50 p-4 active:bg-emerald-100 transition">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100"><CreditCard className="h-6 w-6 text-emerald-600" /></div>
                   <span className="text-sm font-bold text-emerald-800">Card</span>
                 </motion.button>

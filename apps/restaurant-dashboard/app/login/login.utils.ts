@@ -9,8 +9,8 @@ export function getSlugFromHostname(): string {
 }
 
 const DEMO_RESTAURANTS: Record<string, { name: string; username: string; password: string }> = {
-  "mosaic-table": { name: "Mosaic Table", username: "js", password: "1234" },
-  "spice-garden": { name: "Spice Garden", username: "js", password: "1234" },
+  "mosaic-table": { name: "Mosaic Table", username: "owner_mosaic", password: "owner123" },
+  "spice-garden": { name: "Spice Garden", username: "owner_mosaic", password: "owner123" },
 };
 
 export function getRestaurantCreds(slug: string): { username: string; password: string; name: string } | null {

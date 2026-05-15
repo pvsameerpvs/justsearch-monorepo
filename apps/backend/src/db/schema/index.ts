@@ -22,3 +22,4 @@ export * from './table-sessions';
 export * from './game-sessions';
 export * from './audit-logs';
 export * from './otp-requests';
+export * from './daily-closeouts';

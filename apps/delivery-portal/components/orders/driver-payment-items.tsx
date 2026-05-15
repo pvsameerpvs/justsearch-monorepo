@@ -17,7 +17,7 @@ export function DriverPaymentItems({ order }: DriverPaymentItemsProps) {
         Order items ({order.itemCount})
       </div>
       {order.orderItems.map((item, i) => (
-        <div key={`${item.name}-${i}`} className="flex items-center justify-between">
+        <div key={`${order.id}-${item.name}-${i}`} className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-bold text-slate-600 border border-slate-200">
               {item.quantity}

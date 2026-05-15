@@ -3,6 +3,7 @@
 import { X, Users, AlertCircle } from "lucide-react";
 import { useDeliveryBoyStore } from "@/lib/stores/delivery-boy-store";
 import { useOrderStore } from "@/lib/stores/order-store";
+import { useAssignDriver } from "@/lib/hooks/use-assign-driver";
 import { DeliveryBoyRow } from "./delivery-boy-row";
 
 interface DeliveryBoyPickerProps {
@@ -13,6 +14,7 @@ interface DeliveryBoyPickerProps {
 export function DeliveryBoyPicker({ orderId, onClose }: DeliveryBoyPickerProps) {
   const { agents } = useDeliveryBoyStore();
   const { orders, assignAgent } = useOrderStore();
+  const { mutate: assignDriver } = useAssignDriver();
 
   const order = orders.find((o) => o.id === orderId);
   const availableCount = agents.filter((a) => a.status === "available").length;
@@ -23,7 +25,8 @@ export function DeliveryBoyPicker({ orderId, onClose }: DeliveryBoyPickerProps) 
   };
 
   const handleAssign = (agentId: string) => {
-    assignAgent(orderId, agentId);
+    assignAgent(orderId, agentId); // local store update
+    assignDriver({ orderId, driverId: agentId }); // API call
     onClose();
   };
 

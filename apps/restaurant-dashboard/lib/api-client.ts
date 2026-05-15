@@ -1,5 +1,16 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
+function getRestaurantSlug(): string | null {
+  if (typeof window === 'undefined') return null;
+  const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
+  let first = host.split('.')[0];
+  if (!first || first === 'localhost' || first === 'admin') return null;
+  if (first.endsWith('-admin')) first = first.slice(0, -6);
+  if (first.endsWith('-delivery')) first = first.slice(0, -9);
+  if (first.startsWith('admin-')) first = first.slice(6);
+  return first || null;
+}
+
 export async function apiClient<T>(
   path: string,
   options: RequestInit = {}
@@ -12,6 +23,11 @@ export async function apiClient<T>(
   }
 
   headers.set('host', typeof window !== 'undefined' ? window.location.host : '');
+
+  const slug = getRestaurantSlug();
+  if (slug) {
+    headers.set('x-restaurant-slug', slug);
+  }
 
   const response = await fetch(url, {
     ...options,

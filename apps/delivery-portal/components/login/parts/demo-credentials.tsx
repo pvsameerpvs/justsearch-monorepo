@@ -4,14 +4,10 @@ import { useState } from "react";
 import { HelpCircle, ChevronDown, ChevronUp, Copy, Check } from "lucide-react";
 
 const DRIVERS = [
-  { username: "aem-101", name: "Ahmed Hassan" },
-  { username: "moh-202", name: "Mohammed Ali" },
-  { username: "ras-303", name: "Rashid Khan" },
-  { username: "fah-404", name: "Fahad Ibrahim" },
-  { username: "sae-505", name: "Saeed Omar" },
+  { username: "samira_khan", name: "Samira Khan" },
 ];
 
-const PASSWORD = "driver123";
+const PASSWORD = "rider123";
 
 export function DemoCredentials() {
   const [expanded, setExpanded] = useState(false);

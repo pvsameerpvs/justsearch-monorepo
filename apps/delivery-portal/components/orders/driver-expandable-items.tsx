@@ -41,7 +41,7 @@ export function DriverExpandableItems({ order }: DriverExpandableItemsProps) {
             <div className="px-4 pb-3 border-t border-slate-100 pt-3">
               <div className="space-y-1.5">
                 {order.orderItems.map((item, i) => (
-                  <div key={`${item.name}-${i}`} className="flex items-center justify-between gap-2">
+                  <div key={`${order.id}-${item.name}-${i}`} className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold text-slate-600">{item.quantity}</span>
                       <p className="text-xs font-medium text-slate-700 truncate">{item.name}</p>

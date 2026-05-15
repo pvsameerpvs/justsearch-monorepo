@@ -5,6 +5,9 @@ import { menus, menuItems, menuCategories } from '../db/schema';
 import { eq, and } from 'drizzle-orm';
 import authRoutes from '../modules/auth/auth.routes';
 import orderRoutes from '../modules/orders/order.routes';
+import orderDriverRoutes from '../modules/orders/order-driver.routes';
+import orderPaymentRoutes from '../modules/orders/order-payment.routes';
+import orderCloseoutRoutes from '../modules/orders/order-closeout.routes';
 import restaurantAdminRoutes from '../modules/restaurants/restaurant.routes';
 
 const router = Router();
@@ -22,6 +25,11 @@ router.use('/restaurants', restaurantAdminRoutes);
 
 // Order routes (authenticated)
 router.use('/orders', orderRoutes);
+router.use('/orders', orderDriverRoutes);
+router.use('/orders', orderPaymentRoutes);
+
+// Close-of-day routes
+router.use('/close-day', orderCloseoutRoutes);
 
 // GET /api/v1/restaurants/current — resolve by subdomain
 router.get('/restaurants/current', async (req, res, next) => {
