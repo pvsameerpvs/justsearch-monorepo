@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { apiClient } from "@/lib/api-client";
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
 
 export interface ApiRestaurant {
   id: string;
@@ -10,29 +10,33 @@ export interface ApiRestaurant {
   name: string;
   status: string;
   createdAt: string;
+  city?: string;
+  area?: string;
+  cuisine?: string;
+  ownerName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  address?: string;
+  taxNumber?: string;
+  businessLicense?: string;
+  licenseUrl?: string;
+  photos?: string[];
+  tables?: number;
+  dashboardUsername?: string;
+  dashboardPassword?: string;
+}
+
+const RESTAURANTS_KEY = ['restaurants'] as const;
+
+async function fetchRestaurants(): Promise<ApiRestaurant[]> {
+  const res = await apiClient<{ restaurants: ApiRestaurant[] }>('/restaurants');
+  return res.restaurants;
 }
 
 export function useRestaurantsQuery() {
-  const [restaurants, setRestaurants] = useState<ApiRestaurant[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchRestaurants = async () => {
-    try {
-      setIsLoading(true);
-      const res = await apiClient<{ restaurants: ApiRestaurant[] }>("/restaurants");
-      setRestaurants(res.restaurants);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRestaurants();
-  }, []);
-
-  return { restaurants, isLoading, error, refetch: fetchRestaurants };
+  const { data: restaurants = [], isLoading, error, refetch } = useQuery({
+    queryKey: RESTAURANTS_KEY,
+    queryFn: fetchRestaurants,
+  });
+  return { restaurants, isLoading, error, refetch };
 }

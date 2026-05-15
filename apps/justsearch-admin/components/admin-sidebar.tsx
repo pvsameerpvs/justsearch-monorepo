@@ -16,17 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { AdminSidebarFooter } from "./admin-sidebar-footer";
-
-const NAV_ITEMS = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/restaurants", label: "Restaurants", icon: Store },
-  { href: "/ads", label: "Ad Campaigns", icon: Megaphone },
-  { href: "/games", label: "Games", icon: Gamepad2 },
-  { href: "/revenue", label: "Revenue", icon: DollarSign },
-  { href: "/users", label: "Users", icon: Users },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
+import { NAV_ITEMS } from "./admin-sidebar-items";
 
 export function AdminSidebar() {
   const pathname = usePathname();

@@ -32,6 +32,7 @@ export interface AdCampaignFormData {
   restaurantId: string | null;
   restaurantName: string | null;
   assignedGames: string[];
+  isActive?: boolean;
 }
 
 export interface AdCampaignStats {

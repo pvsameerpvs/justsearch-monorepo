@@ -1,37 +1,47 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import { useRestaurantStore } from "@/lib/stores/restaurant-store";
-import { useUserStore } from "@/lib/stores/user-store";
-import { useRevenueStore } from "@/lib/stores/revenue-store";
-import { useAdCampaignStore } from "@/lib/stores/ad-campaign-store";
-import { useAnalyticsStore } from "@/lib/stores/analytics-store";
+import { useRestaurantsQuery } from '@/lib/hooks/use-restaurants-query';
+import { useUsersAdminQuery } from '@/lib/hooks/use-users-admin-query';
+import { useRevenueAdminQuery } from '@/lib/hooks/use-revenue-admin-query';
+import { useAdsQuery } from '@/lib/hooks/use-ads-query';
+import { useAnalyticsAdminQuery } from '@/lib/hooks/use-analytics-admin-query';
 
-import {
-  buildSummary,
-  computeRestaurantRows,
-  computeGameStats,
-  computeTopAdCampaigns,
-} from "@/lib/utils/analytics.utils";
+import { computeRestaurantRows, computeGameStats, computeTopAdCampaigns } from '@/lib/utils/analytics.utils';
 
-import { AnalyticsPresenter } from "./analytics-presenter";
+import { AnalyticsPresenter } from './analytics-presenter';
 
 export function AnalyticsContainer() {
-  const restaurants = useRestaurantStore((s) => s.restaurants);
-  const { users } = useUserStore();
-  const revenue = useRevenueStore();
-  const campaigns = useAdCampaignStore((s) => s.campaigns);
-  const { monthlyData } = useAnalyticsStore();
+  const { restaurants } = useRestaurantsQuery();
+  const { users } = useUsersAdminQuery();
+  const { restaurants: revenueRestaurants, isLoading: revenueLoading } = useRevenueAdminQuery();
+  const { ads: campaigns } = useAdsQuery();
+  const { analytics, isLoading: analyticsLoading } = useAnalyticsAdminQuery();
 
-  const summary = useMemo(
-    () => buildSummary(restaurants, users, revenue, campaigns),
-    [restaurants, users, revenue, campaigns]
-  );
+  const isLoading = revenueLoading || analyticsLoading;
+
+  const summary = analytics ?? {
+    totalRestaurants: 0,
+    activeRestaurants: 0,
+    totalUsers: 0,
+    activeUsers: 0,
+    totalGamePoints: 0,
+    totalAdRevenue: 0,
+    totalAdImpressions: 0,
+    activeCampaigns: 0,
+    totalCampaigns: 0,
+    totalOrders: 0,
+    totalViews: 0,
+    avgPointsPerUser: 0,
+    monthlyData: [],
+  };
+
+  const monthlyData = analytics?.monthlyData ?? [];
 
   const restaurantRows = useMemo(
-    () => computeRestaurantRows(revenue.restaurants, restaurants, users),
-    [revenue, restaurants, users]
+    () => computeRestaurantRows(revenueRestaurants, restaurants, users),
+    [revenueRestaurants, restaurants, users]
   );
 
   const topRestaurants = useMemo(
@@ -42,8 +52,10 @@ export function AnalyticsContainer() {
     [restaurantRows]
   );
 
-  const gameStats = useMemo(() => computeGameStats(users), [users]);
+  const gameStats = useMemo(() => computeGameStats(), []);
   const adStats = useMemo(() => computeTopAdCampaigns(campaigns), [campaigns]);
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <AnalyticsPresenter

@@ -4,10 +4,11 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@justsearch/ui";
 import { useRestaurantsQuery } from "@/lib/hooks/use-restaurants-query";
-import { apiClient } from "@/lib/api-client";
-import { RestaurantCreateForm, type RestaurantFormData } from "@/components/restaurant/restaurant-create-form";
+import { RestaurantCreateForm } from "@/components/restaurant/restaurant-create-form";
+import { useCreateRestaurant } from "@/lib/hooks/use-create-restaurant";
 import { RestaurantStatsBar } from "@/components/restaurant/restaurant-stats-bar";
 import { RestaurantListContent } from "./restaurant-list-content";
+import { RestaurantLoading } from "./restaurant-loading";
 import { mapApiToAdmin } from "./restaurant-list.utils";
 
 export function RestaurantListPage() {
@@ -15,26 +16,9 @@ export function RestaurantListPage() {
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleCreate = async (data: RestaurantFormData) => {
-    try {
-      await apiClient("/restaurants", {
-        method: "POST",
-        body: JSON.stringify({ slug: data.slug, subdomain: data.slug, name: data.name }),
-      });
-      refetch();
-      setShowForm(false);
-    } catch {
-      alert("Failed to create restaurant");
-    }
-  };
+  const handleCreate = useCreateRestaurant(refetch, () => setShowForm(false));
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
-      </div>
-    );
-  }
+  if (isLoading) return <RestaurantLoading />;
 
   return (
     <div className="space-y-5">
@@ -46,7 +30,7 @@ export function RestaurantListPage() {
         )}
       </PageHeader>
 
-      {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-xs font-bold text-red-600">{error}</div>}
+      {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-xs font-bold text-red-600">{error.message}</div>}
 
       <RestaurantStatsBar restaurants={restaurants.map(mapApiToAdmin)} />
 

@@ -10,7 +10,12 @@ import menuCategoryRoutes from '../modules/menu/menu-category.routes';
 import deliveryAgentRoutes from '../modules/delivery/delivery.routes';
 import voucherRoutes from '../modules/vouchers/voucher.routes';
 import userRoutes from '../modules/users/user.routes';
+import userAdminRoutes from '../modules/users/user-admin.routes';
+import gameRoutes from '../modules/games/game.routes';
+import adRoutes from '../modules/ads/ad.routes';
+import revenueRoutes from '../modules/revenue/revenue.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
+import analyticsAdminRoutes from '../modules/analytics/analytics-admin.routes';
 
 const router = Router();
 
@@ -45,8 +50,21 @@ router.use('/vouchers', voucherRoutes);
 // Customers / users (authenticated)
 router.use('/users', userRoutes);
 
+// Admin users (super-admin, platform-wide)
+router.use('/admin/users', userAdminRoutes);
+
+// Games (super-admin)
+router.use('/games', gameRoutes);
+
+// Advertisements (super-admin)
+router.use('/advertisements', adRoutes);
+
+// Revenue (super-admin)
+router.use('/revenue', revenueRoutes);
+
 // Analytics (authenticated)
 router.use('/analytics', analyticsRoutes);
+router.use('/analytics', analyticsAdminRoutes);
 
 // Close-of-day routes (authenticated inside closeout router)
 router.use('/close-day', orderCloseoutRoutes);

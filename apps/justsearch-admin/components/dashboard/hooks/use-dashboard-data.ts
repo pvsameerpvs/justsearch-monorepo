@@ -29,7 +29,7 @@ export function useDashboardData(): DashboardData {
       activeCampaigns: campaigns.filter((c) => c.isActive).length,
       totalCampaigns: campaigns.length,
       totalImpressions: campaigns.reduce((sum, c) => sum + c.impressions, 0),
-      activeGames: games.filter((g) => g.isAvailable).length,
+      activeGames: games.filter((g) => g.isActive).length,
       totalGames: games.length,
       totalPoints: users.reduce((sum, u) => sum + u.totalPoints, 0),
     }),

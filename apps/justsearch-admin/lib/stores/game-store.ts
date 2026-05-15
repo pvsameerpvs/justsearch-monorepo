@@ -10,7 +10,7 @@ export type AdminGame = {
   icon: string;
   prize: string;
   maxPoints: number;
-  isAvailable: boolean;
+  isActive: boolean;
   tag: string;
   sponsorAd: boolean;
 };
@@ -27,7 +27,7 @@ export const useGameStore = create<GameStore>()(
       toggleAvailability: (id) =>
         set((state) => ({
           games: state.games.map((g) =>
-            g.id === id ? { ...g, isAvailable: !g.isAvailable } : g
+            g.id === id ? { ...g, isActive: !g.isActive } : g
           ),
         })),
     }),

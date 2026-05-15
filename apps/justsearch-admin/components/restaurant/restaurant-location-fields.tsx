@@ -3,7 +3,7 @@
 import type { UseFormReturn } from "react-hook-form";
 import { MapPin, UtensilsCrossed } from "lucide-react";
 import { FormInput, FormSelect } from "./restaurant-form-field";
-import type { RestaurantFormData } from "./restaurant-create-form";
+import type { RestaurantFormData } from "./restaurant-create-schema";
 
 interface RestaurantLocationFieldsProps {
   form: UseFormReturn<RestaurantFormData>;

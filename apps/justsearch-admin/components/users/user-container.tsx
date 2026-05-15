@@ -1,23 +1,33 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
-import { useRestaurantStore } from "@/lib/stores/restaurant-store";
-import { useUserStore } from "@/lib/stores/user-store";
-import { RestaurantUserTable } from "./restaurant-user-table";
+import { useMemo, useState } from 'react';
+import { useRestaurantsQuery } from '@/lib/hooks/use-restaurants-query';
+import { useUsersAdminQuery } from '@/lib/hooks/use-users-admin-query';
+import { RestaurantUserTable } from './restaurant-user-table';
 
 export function UserContainer() {
-  const restaurants = useRestaurantStore((s) => s.restaurants);
-  const { getUsersByRestaurant, getTotalPointsByRestaurant } = useUserStore();
-  const [search, setSearch] = useState("");
+  const { restaurants, isLoading: restaurantsLoading } = useRestaurantsQuery();
+  const { users, isLoading: usersLoading } = useUsersAdminQuery();
+  const [search, setSearch] = useState('');
+
+  const isLoading = restaurantsLoading || usersLoading;
 
   const rows = useMemo(
     () =>
-      restaurants.map((r) => ({
-        ...r,
-        userCount: getUsersByRestaurant(r.id).length,
-        totalPoints: getTotalPointsByRestaurant(r.id),
-      })),
-    [restaurants, getUsersByRestaurant, getTotalPointsByRestaurant]
+      restaurants.map((r) => {
+        const restaurantUsers = users.filter((u) => u.restaurantId === r.id);
+        return {
+          id: r.id,
+          name: r.name,
+          city: r.city ?? '',
+          area: r.area ?? '',
+          cuisine: r.cuisine ?? '',
+          status: r.status as 'active' | 'draft' | 'suspended',
+          userCount: restaurantUsers.length,
+          totalPoints: 0,
+        };
+      }),
+    [restaurants, users]
   );
 
   const filtered = useMemo(
@@ -30,6 +40,8 @@ export function UserContainer() {
       ),
     [rows, search]
   );
+
+  if (isLoading) return <div>Loading...</div>;
 
   return <RestaurantUserTable rows={filtered} search={search} onSearch={setSearch} />;
 }

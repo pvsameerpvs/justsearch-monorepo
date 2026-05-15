@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { RestaurantPhotoGrid } from "./restaurant-photo-grid";
+import { RestaurantUploadTrigger } from "./restaurant-upload-trigger";
 
 interface RestaurantPhotoUploadProps {
   photos: string[];
@@ -17,10 +18,10 @@ export function RestaurantPhotoUpload({ photos, onChange }: RestaurantPhotoUploa
     const fileArray = Array.from(files);
     const remainingSlots = MAX_PHOTOS - photos.length;
     const toProcess = fileArray.slice(0, remainingSlots);
-    
+
     let newPhotos: string[] = [];
     let processed = 0;
-    
+
     toProcess.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (ev) => {
@@ -44,31 +45,9 @@ export function RestaurantPhotoUpload({ photos, onChange }: RestaurantPhotoUploa
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {photos.map((photo, index) => (
-          <div key={index} className="relative aspect-square rounded-xl border border-slate-200 overflow-hidden group">
-            <img src={photo} alt={"Restaurant photo " + (index + 1)} className="h-full w-full object-cover" />
-            <button
-              type="button"
-              onClick={() => handleRemove(index)}
-              className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <X className="h-3 w-3" />
-            </button>
-            <span className="absolute bottom-1.5 left-1.5 rounded-full bg-black/50 px-1.5 py-0.5 text-[10px] font-bold text-white">
-              {index + 1}
-            </span>
-          </div>
-        ))}
+        <RestaurantPhotoGrid photos={photos} onRemove={handleRemove} />
         {remaining > 0 && (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex aspect-square flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/50 text-slate-400 hover:border-amber-400 hover:bg-amber-50/30 hover:text-amber-600 transition-all"
-          >
-            <ImagePlus className="h-6 w-6" />
-            <span className="text-[10px] font-bold">Add Photo</span>
-            <span className="text-[10px]">{remaining} left</span>
-          </button>
+          <RestaurantUploadTrigger remaining={remaining} onClick={() => fileInputRef.current?.click()} />
         )}
       </div>
       <input

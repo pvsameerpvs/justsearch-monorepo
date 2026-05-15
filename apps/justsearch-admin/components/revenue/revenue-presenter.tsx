@@ -5,12 +5,12 @@ import { RevenueTopRestaurants } from './revenue-top-restaurants';
 import { RevenueAdSplit } from './revenue-ad-split';
 import { RevenueCampaignList } from './revenue-campaign-list';
 import type { RestaurantRevenue } from '@/lib/constants/revenue.constants';
-import type { RevenueSummary } from '@/lib/stores/revenue-store';
+import type { RevenueResponse } from '@/lib/hooks/use-revenue-admin-query';
 import type { AdCampaign } from '@/lib/stores/ad-campaign-types';
 import type { AdSplitData } from './types/revenue.types';
 
 interface RevenuePresenterProps {
-  summary: RevenueSummary;
+  summary: RevenueResponse;
   restaurants: RestaurantRevenue[];
   topRestaurants: RestaurantRevenue[];
   recentCampaigns: AdCampaign[];

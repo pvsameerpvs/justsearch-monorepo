@@ -4,11 +4,11 @@ import { AnalyticsTopRestaurants } from "./analytics-top-restaurants";
 import { AnalyticsTopGames } from "./analytics-top-games";
 import { AnalyticsAdPerformance } from "./analytics-ad-performance";
 
-import type { AnalyticsSummary, MonthlyDataPoint } from "@/lib/stores/analytics-store";
+import type { AnalyticsResponse, MonthlyDataPoint } from "@/lib/hooks/use-analytics-admin-query";
 import type { ComputedRestaurantRow, GameStat, AdStat } from "./types/analytics.types";
 
 interface AnalyticsPresenterProps {
-  summary: AnalyticsSummary;
+  summary: AnalyticsResponse;
   monthlyData: MonthlyDataPoint[];
   topRestaurants: ComputedRestaurantRow[];
   gameStats: GameStat[];

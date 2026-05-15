@@ -6,14 +6,15 @@ interface GamePresenterProps {
   games: AdminGame[];
   activeCount: number;
   totalCount: number;
-  onToggleAvailability: (id: string) => void;
+  onToggleAvailability: (id: string, isActive: boolean) => void;
+  onDelete: (id: string) => void;
 }
 
-export function GamePresenter({ games, activeCount, totalCount, onToggleAvailability }: GamePresenterProps) {
+export function GamePresenter({ games, activeCount, totalCount, onToggleAvailability, onDelete }: GamePresenterProps) {
   return (
     <div className="space-y-4">
       <GameHeader activeCount={activeCount} totalCount={totalCount} />
-      <GameList games={games} onToggleAvailability={onToggleAvailability} />
+      <GameList games={games} onToggleAvailability={onToggleAvailability} onDelete={onDelete} />
     </div>
   );
 }

@@ -1,13 +1,15 @@
-"use client";
+'use client';
 
-import { useRevenueStore } from '@/lib/stores/revenue-store';
-import { useAdCampaignStore } from '@/lib/stores/ad-campaign-store';
+import { useRevenueAdminQuery } from '@/lib/hooks/use-revenue-admin-query';
+import { useAdsQuery } from '@/lib/hooks/use-ads-query';
 import { AD_SPLIT_RESTAURANT_BROUGHT, AD_SPLIT_PLATFORM_BROUGHT } from '@/lib/constants/revenue.constants';
 import { RevenuePresenter } from './revenue-presenter';
 
 export function RevenueContainer() {
-  const { restaurants, summary } = useRevenueStore();
-  const { campaigns } = useAdCampaignStore();
+  const { summary, restaurants, isLoading } = useRevenueAdminQuery();
+  const { ads: campaigns } = useAdsQuery();
+
+  if (isLoading || !summary) return <div>Loading...</div>;
 
   const topRestaurants = [...restaurants]
     .filter((r) => r.status === 'active')

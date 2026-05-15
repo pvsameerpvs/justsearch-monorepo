@@ -4,7 +4,7 @@ import type { UseFormReturn } from "react-hook-form";
 import { FileText, Hash, Armchair, Lock, UserCircle, KeyRound } from "lucide-react";
 import { FormInput } from "./restaurant-form-field";
 import { RestaurantLicenseUpload } from "./restaurant-license-upload";
-import type { RestaurantFormData } from "./restaurant-create-form";
+import type { RestaurantFormData } from "./restaurant-create-schema";
 
 interface RestaurantBusinessFieldsProps {
   form: UseFormReturn<RestaurantFormData>;
