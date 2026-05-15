@@ -1,20 +1,32 @@
 "use client";
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import type { StoredState } from './fulfillment.types';
 
 export function useCartActions(setState: React.Dispatch<React.SetStateAction<StoredState>>) {
+  const stateRef = useRef<StoredState | null>(null);
+
+  const setStateWithRef: React.Dispatch<React.SetStateAction<StoredState>> = useCallback(
+    (action) => {
+      setState((prev) => {
+        const next = typeof action === 'function' ? action(prev) : action;
+        stateRef.current = next;
+        return next;
+      });
+    },
+    [setState],
+  );
+
   const getQuantity = useCallback(
     (id: string) => {
-      let qty = 0;
-      setState((s) => { qty = s.cart.find((i) => i.itemId === id)?.quantity ?? 0; return s; });
-      return qty;
+      const current = stateRef.current;
+      return current?.cart.find((i) => i.itemId === id)?.quantity ?? 0;
     },
-    [setState]
+    [],
   );
 
   const addToCart = useCallback((item: { id: string; name: string; price: number; currency: string; image?: string }) => {
-    setState((current) => {
+    setStateWithRef((current) => {
       const existing = current.cart.find((i) => i.itemId === item.id);
       if (existing) {
         return {
@@ -24,22 +36,19 @@ export function useCartActions(setState: React.Dispatch<React.SetStateAction<Sto
       }
       return {
         ...current,
-        cart: [
-          ...current.cart,
-          { itemId: item.id, quantity: 1, name: item.name, price: item.price, currency: item.currency, image: item.image },
-        ],
+        cart: [...current.cart, { itemId: item.id, quantity: 1, name: item.name, price: item.price, currency: item.currency, image: item.image }],
       };
     });
-  }, [setState]);
+  }, [setStateWithRef]);
 
   const updateQuantity = useCallback((id: string, q: number) => {
-    setState((s) => ({
+    setStateWithRef((s) => ({
       ...s,
       cart: q <= 0 ? s.cart.filter((i) => i.itemId !== id) : s.cart.map((i) => (i.itemId === id ? { ...i, quantity: q } : i)),
     }));
-  }, [setState]);
+  }, [setStateWithRef]);
 
-  const clearCart = useCallback(() => setState((s) => ({ ...s, cart: [] })), [setState]);
+  const clearCart = useCallback(() => setStateWithRef((s) => ({ ...s, cart: [] })), [setStateWithRef]);
 
   return { getQuantity, addToCart, updateQuantity, clearCart };
 }

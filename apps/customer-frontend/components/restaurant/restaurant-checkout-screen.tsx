@@ -43,11 +43,9 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             displayItems={state.displayItems}
             displaySavings={state.displaySavings}
             currency={state.currency}
-            note={state.restaurantNote}
-            setNote={state.setRestaurantNote}
-            promoCode={state.promoCode}
-            setPromoCode={state.setPromoCode}
             onApplyPromo={state.onApplyPromo}
+            promoDiscount={state.promoDiscount}
+            appliedPromoCode={state.appliedPromoCode}
           />
         </div>
       </Container>

@@ -16,14 +16,27 @@ export function useCheckoutState() {
   const [handoff, setHandoff] = useState('Hand it to me');
   const [restaurantNote, setRestaurantNote] = useState('');
   const [riderNote, setRiderNote] = useState('');
+  const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
 
   const displayItems = useMemo(
     () => cart.map((item) => ({ ...item, lineTotal: getCheckoutLineTotal(item) })),
     [cart]
   );
 
-  const displayTotal = Math.max(0, total - promo.discount);
-  const displaySavings = deliverySavings + promo.discount;
+  const promoDiscount = promo.discount;
+  const displayTotal = Math.max(0, total - promoDiscount);
+  const displaySavings = deliverySavings + promoDiscount;
+
+  const onApplyPromo = (code: string) => {
+    if (!code) {
+      setAppliedPromoCode(null);
+      promo.setPromoCode('');
+      return;
+    }
+    promo.setPromoCode(code);
+    promo.applyPromoCode();
+    setAppliedPromoCode(code);
+  };
 
   const onPlaceOrder = async () => {
     if (place.placingOrder) return;
@@ -60,9 +73,9 @@ export function useCheckoutState() {
     displayItems,
     displaySavings,
     displayTotal,
-    promoCode: promo.promoCode,
-    setPromoCode: promo.setPromoCode,
-    onApplyPromo: promo.applyPromoCode,
+    promoDiscount: promo.discount,
+    appliedPromoCode,
+    onApplyPromo,
     error: place.error,
     placedOrderId: place.placedOrderId,
     placingOrder: place.placingOrder,

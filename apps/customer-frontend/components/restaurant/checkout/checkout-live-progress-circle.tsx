@@ -1,6 +1,5 @@
 "use client";
 
-import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { AnimatedStatusEmoji } from './animated-status-emoji';
 import { MultiOrderCircularProgress } from './multi-order-circular-progress';
@@ -21,7 +20,6 @@ export function CheckoutLiveProgressCircle({
   }
 
   const primaryOrder = orders[0];
-  const isDone = primaryOrder.progress >= 1;
   const statusHref = getCheckoutStatusHref(orders.map((order) => order.id));
 
   const content = (
@@ -31,22 +29,13 @@ export function CheckoutLiveProgressCircle({
           orders={orders} 
           radii={[30, 24, 18, 12]} 
           viewBox={64}
-          size={undefined} // rely on className
+          size={undefined}
           className="h-full w-full"
         />
       </div>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        {isDone ? (
-          <div className="rounded-full bg-green-500 p-1 text-white">
-            <Check className="h-4 w-4" strokeWidth={3} />
-          </div>
-        ) : (
-          <AnimatedStatusEmoji 
-            isOnTheWay={primaryOrder.isOnTheWay} 
-            className="text-xl" 
-          />
-        )}
+        <AnimatedStatusEmoji isOnTheWay={primaryOrder.isOnTheWay} className="text-xl" />
       </div>
     </div>
   );
