@@ -1,0 +1,14 @@
+export default function Loading() {
+  return (
+    <div className="space-y-4 p-4">
+      <div className="animate-pulse bg-gray-200 rounded h-8 w-48" />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="animate-pulse bg-gray-200 rounded h-24" />
+        <div className="animate-pulse bg-gray-200 rounded h-24" />
+        <div className="animate-pulse bg-gray-200 rounded h-24" />
+        <div className="animate-pulse bg-gray-200 rounded h-24" />
+      </div>
+      <div className="animate-pulse bg-gray-200 rounded h-96" />
+    </div>
+  );
+}

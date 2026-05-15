@@ -1,14 +1,27 @@
 "use client";
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
-export function useAssignDriver() {
-  const mutate = async ({ orderId, driverId }: { orderId: string; driverId: string }) => {
-    await apiClient(`/orders/${orderId}/driver`, {
-      method: 'PATCH',
-      body: JSON.stringify({ driverId }),
-    });
-  };
+interface AssignDriverVars {
+  orderId: string;
+  driverId: string;
+}
 
-  return { mutate };
+async function assignDriver({ orderId, driverId }: AssignDriverVars) {
+  return apiClient(`/orders/${orderId}/driver`, {
+    method: 'PATCH',
+    body: JSON.stringify({ driverId }),
+  });
+}
+
+export function useAssignDriver() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: assignDriver,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
 }

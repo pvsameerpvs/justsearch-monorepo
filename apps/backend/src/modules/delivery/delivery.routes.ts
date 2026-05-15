@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, desc } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { db } from '../../db';
 import { deliveryAgents } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
@@ -82,7 +82,7 @@ router.patch('/:id', requireRole('owner', 'manager'), async (req, res, next) => 
     const [updated] = await db
       .update(deliveryAgents)
       .set({ ...body, updatedAt: new Date() })
-      .where(eq(deliveryAgents.id, agentId))
+      .where(and(eq(deliveryAgents.id, agentId), eq(deliveryAgents.restaurantId, req.tenant.id)))
       .returning();
 
     if (!updated) return res.status(404).json({ error: 'Agent not found' });
@@ -99,7 +99,9 @@ router.delete('/:id', requireRole('owner', 'manager'), async (req, res, next) =>
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
     const agentId = req.params.id;
-    await db.delete(deliveryAgents).where(eq(deliveryAgents.id, agentId));
+    await db.delete(deliveryAgents).where(
+      and(eq(deliveryAgents.id, agentId), eq(deliveryAgents.restaurantId, req.tenant.id))
+    );
 
     res.status(204).send();
   } catch (error) {

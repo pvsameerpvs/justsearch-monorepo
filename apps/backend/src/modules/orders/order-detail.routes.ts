@@ -19,7 +19,9 @@ router.get('/:id', async (req, res, next) => {
 
     if (!order) return res.status(404).json({ error: 'Order not found' });
 
-    const items = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+    const items = await db.select().from(orderItems).where(
+      and(eq(orderItems.orderId, orderId), eq(orderItems.restaurantId, req.tenant.id))
+    );
     res.json({ order, items });
   } catch (error) {
     next(error);

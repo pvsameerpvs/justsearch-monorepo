@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useOrderStore, type DashboardOrder, type OrderStatus } from "@/lib/stores/order-store";
-import { useOrdersQuery } from "@/lib/hooks/use-orders-query";
+import { useOrdersQuery, useUpdateOrderStatusMutation } from "@/lib/hooks/use-orders-query";
 import { useOrderSound } from "./use-order-sound";
 import { useOrderHistory } from "./use-order-history";
-import { apiClient } from "@/lib/api-client";
 import { mapApiOrderToDashboard } from "./orders.utils";
 
 type Tab = "active" | "history";
@@ -18,6 +17,7 @@ const DEFAULT_HISTORY_DATE = new Date(Date.UTC(2026, 4, 13));
 export function useOrderManager() {
   const updateStoreStatus = useOrderStore((s) => s.updateStatus);
   const { orders: apiOrders, isLoading: apiLoading, error: apiError, refetch } = useOrdersQuery();
+  const { mutate: updateStatusApi } = useUpdateOrderStatusMutation();
   const [tab, setTab] = useState<Tab>("active");
   const [filter, setFilter] = useState<string>("all");
   const [historyView, setHistoryView] = useState<"day" | "month" | "all">("day");
@@ -41,16 +41,13 @@ export function useOrderManager() {
   const visibleOrders: DashboardOrder[] = isActiveTab ? filteredActive : filteredHistory;
   const statsOrders = isActiveTab ? activeOrders : historyOrders;
 
-  const updateStatus = async (id: string, status: OrderStatus) => {
-    try {
-      await apiClient(`/orders/${id}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
-      });
-      refetch();
-    } catch {
-      updateStoreStatus(id, status);
-    }
+  const updateStatus = (id: string, status: OrderStatus) => {
+    updateStatusApi(
+      { orderId: id, status },
+      {
+        onError: () => updateStoreStatus(id, status),
+      }
+    );
   };
 
   return {

@@ -1,14 +1,15 @@
 export default function Loading() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="space-y-4 w-full max-w-md px-4">
-        <div className="animate-pulse bg-gray-200 rounded h-8 w-3/4" />
-        <div className="animate-pulse bg-gray-200 rounded h-4 w-1/2" />
+    <div className="space-y-4 p-4">
+      <div className="animate-pulse bg-gray-200 rounded h-8 w-48" />
+      <div className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-2">
           <div className="animate-pulse bg-gray-200 rounded h-12 w-full" />
           <div className="animate-pulse bg-gray-200 rounded h-12 w-full" />
           <div className="animate-pulse bg-gray-200 rounded h-12 w-full" />
+          <div className="animate-pulse bg-gray-200 rounded h-12 w-full" />
         </div>
+        <div className="animate-pulse bg-gray-200 rounded h-96" />
       </div>
     </div>
   );

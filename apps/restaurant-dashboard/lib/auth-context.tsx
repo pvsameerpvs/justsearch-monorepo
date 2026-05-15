@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
-import { apiClient } from "./api-client";
+import { createContext, useContext, useCallback, type ReactNode } from "react";
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuthMeQuery, useLoginMutation } from "./hooks/use-auth-query";
 
 interface DashboardAuthContextType {
   isAuthenticated: boolean;
@@ -14,48 +15,27 @@ interface DashboardAuthContextType {
 const DashboardAuthContext = createContext<DashboardAuthContextType | null>(null);
 
 export function DashboardAuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{ id: string; name: string; role: string } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: me, isLoading: meLoading } = useAuthMeQuery();
+  const { mutateAsync: doLogin } = useLoginMutation();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const me = await apiClient<{ id: string; name: string; role: string }>('/auth/me');
-        setUser(me);
-        setIsAuthenticated(true);
-      } catch {
-        setIsAuthenticated(false);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    checkAuth();
-  }, []);
+  const user = me ?? null;
+  const isAuthenticated = !!user;
+  const isLoading = meLoading;
 
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
     try {
-      const res = await apiClient<{ token: string; user: { id: string; name: string; role: string } }>('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ username, password, type: 'staff' }),
-      });
-      setUser(res.user);
-      setIsAuthenticated(true);
+      await doLogin({ username, password, type: 'staff' });
       return true;
     } catch {
-      setIsAuthenticated(false);
-      setUser(null);
       return false;
     }
-  }, []);
+  }, [doLogin]);
 
   const logout = useCallback(() => {
-    setIsAuthenticated(false);
-    setUser(null);
-    // Cookie cleared server-side or naturally expires
+    queryClient.clear();
     window.location.href = '/login';
-  }, []);
+  }, [queryClient]);
 
   return (
     <DashboardAuthContext.Provider value={{ isAuthenticated, user, login, logout, isLoading }}>

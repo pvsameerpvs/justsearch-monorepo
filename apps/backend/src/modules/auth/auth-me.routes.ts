@@ -27,11 +27,11 @@ router.get('/', async (req, res, next) => {
         };
       }
     } else {
-      if (type === 'customer') {
+      if (type === 'customer' && restaurantId) {
         const [user] = await db
           .select()
           .from(users)
-          .where(eq(users.id, userId))
+          .where(and(eq(users.id, userId), eq(users.restaurantId, restaurantId)))
           .limit(1);
         if (user) {
           profile = { id: user.id, name: user.name, phone: user.phone, email: user.email, role: user.role, restaurantId: user.restaurantId };
