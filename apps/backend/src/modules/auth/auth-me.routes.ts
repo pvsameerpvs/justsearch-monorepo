@@ -1,7 +1,7 @@
 import { Router } from 'express';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
 import { users, superAdmins, staff, deliveryAgents } from '../../db/schema';
-import { eq, and } from 'drizzle-orm';
 import { MOCK_AUTH_ENABLED, MOCK_USERS } from '../../lib/mock-auth';
 
 const router = Router();

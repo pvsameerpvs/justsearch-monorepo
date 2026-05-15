@@ -39,8 +39,6 @@ export const errorHandler = (
     }
   }
 
-  console.error(`[ERROR] ${req.method} ${req.url}:`, err);
-
   res.status(statusCode).json({
     success: false,
     message,

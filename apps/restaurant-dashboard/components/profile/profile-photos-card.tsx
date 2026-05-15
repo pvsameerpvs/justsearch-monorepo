@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { ImageIcon, X } from "lucide-react";
 import type { AdminRestaurant } from "@/lib/types/admin-restaurant";
 
@@ -47,7 +48,7 @@ export function ProfilePhotosCard({ restaurant, onUpdate }: ProfilePhotosCardPro
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {photos.map((photo, index) => (
           <div key={index} className="relative aspect-square rounded-xl border border-slate-200 overflow-hidden group">
-            <img src={photo} alt={`Restaurant photo ${index + 1}`} className="h-full w-full object-cover" />
+            <Image src={photo} alt={`Restaurant photo ${index + 1}`} fill className="object-cover" sizes="(max-width: 640px) 50vw, 25vw" />
             {onUpdate && (
               <button
                 onClick={() => handleRemove(index)}

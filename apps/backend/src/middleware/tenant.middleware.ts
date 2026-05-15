@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { db } from '../db';
-import { restaurants } from '../db/schema/restaurants';
-import { eq } from 'drizzle-orm';
 import { MOCK_AUTH_ENABLED, MOCK_RESTAURANT } from '../lib/mock-auth';
+import { resolveSubdomain } from './tenant-resolver';
+import { lookupTenant } from './tenant-lookup';
 
 export interface TenantContext {
   id: string;
@@ -25,44 +24,10 @@ export async function tenantMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const host =
-    (req.headers['x-forwarded-host'] as string) ||
-    req.headers.host ||
-    '';
+  const subdomain = resolveSubdomain(req);
 
-  const baseDomain =
-    process.env.NEXT_PUBLIC_BASE_DOMAIN || 'mydomain.com';
-
-  let subdomain = '';
-  const normalizedHost = host.toLowerCase().replace(/:\d+$/, '');
-
-  if (normalizedHost.endsWith(`.${baseDomain}`)) {
-    subdomain = normalizedHost.replace(`.${baseDomain}`, '').split('.').pop() || '';
-  } else if (normalizedHost.endsWith('.localhost')) {
-    subdomain = normalizedHost.replace('.localhost', '').split('.').pop() || '';
-  }
-
-  // Fallback: explicit restaurant slug from frontend custom header
-  const slugHeader = (req.headers['x-restaurant-slug'] as string)?.trim().toLowerCase();
-  if (slugHeader && !subdomain) {
-    subdomain = slugHeader;
-  }
-
-  if (!subdomain || normalizedHost === baseDomain) {
-    // Allow localhost / direct API calls to resolve tenant via explicit header
-    const slugHeader = (req.headers['x-restaurant-slug'] as string)?.trim().toLowerCase();
-    if (slugHeader) {
-      subdomain = slugHeader;
-    } else {
-      return next();
-    }
-  }
-
-  // Strip portal suffixes for admin and delivery subdomains
-  if (subdomain.endsWith('-admin')) {
-    subdomain = subdomain.slice(0, -6);
-  } else if (subdomain.endsWith('-delivery')) {
-    subdomain = subdomain.slice(0, -9);
+  if (!subdomain) {
+    return next();
   }
 
   if (MOCK_AUTH_ENABLED) {
@@ -77,32 +42,21 @@ export async function tenantMiddleware(
   }
 
   try {
-    const [restaurant] = await db
-      .select()
-      .from(restaurants)
-      .where(eq(restaurants.subdomain, subdomain))
-      .limit(1);
+    const tenant = await lookupTenant(subdomain);
 
-    if (!restaurant) {
+    if (!tenant) {
       return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    if (restaurant.status === 'suspended') {
+    if (tenant.status === 'suspended') {
       return res.status(403).json({ error: 'Restaurant is suspended' });
     }
 
-    if (restaurant.status === 'inactive' || restaurant.status === 'draft') {
+    if (tenant.status === 'inactive' || tenant.status === 'draft') {
       return res.status(403).json({ error: 'Restaurant is not active' });
     }
 
-    req.tenant = {
-      id: restaurant.id,
-      slug: restaurant.slug,
-      subdomain: restaurant.subdomain,
-      schemaName: restaurant.schemaName,
-      status: restaurant.status,
-    };
-
+    req.tenant = tenant;
     next();
   } catch (error) {
     next(error);

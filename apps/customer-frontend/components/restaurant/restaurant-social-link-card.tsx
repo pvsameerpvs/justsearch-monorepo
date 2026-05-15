@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
 import type { SocialLink } from '@/lib/restaurant-types';
@@ -35,11 +36,13 @@ export function RestaurantSocialLinkCard({
         <Surface className="rounded-[40px] border-white/70 bg-white/90 p-5 transition-all group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] group-active:scale-[0.98] border border-slate-100">
             <div className="flex items-center gap-5">
                 {/* OFFICIAL BRAND LOGO (REAL IMAGE FROM CDN) */}
-                <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-[28px] ${config.bg} shadow-inner overflow-hidden border border-white/40 p-3.5`}>
-                    <img 
-                        src={config.icon} 
-                        alt={social.platform} 
-                        className="h-full w-full object-contain"
+                <div className={`relative flex h-16 w-16 shrink-0 items-center justify-center rounded-[28px] ${config.bg} shadow-inner overflow-hidden border border-white/40 p-3.5`}>
+                    <Image
+                        src={config.icon}
+                        alt={social.platform}
+                        fill
+                        className="object-contain p-3.5"
+                        sizes="64px"
                     />
                 </div>
 

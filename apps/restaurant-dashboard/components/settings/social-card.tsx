@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { ExternalLink, Trash2 } from "lucide-react";
 
 const BRAND_CONFIG: Record<string, { color: string; bg: string; icon: string }> = {
@@ -31,8 +32,8 @@ export function SocialCard({ social, isEditing, onUpdate, onRemove }: SocialCard
       <div className="rounded-[40px] border border-slate-200 bg-white p-5 shadow-sm">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[24px] ${config.bg} overflow-hidden p-2.5`}>
-              <img src={config.icon} alt={social.platform} className="h-full w-full object-contain" />
+            <div className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[24px] ${config.bg} overflow-hidden p-2.5`}>
+              <Image src={config.icon} alt={social.platform} fill className="object-contain p-2.5" sizes="48px" />
             </div>
             <select value={social.platform} onChange={(e) => onUpdate("platform", e.target.value)} className="elegant-input flex-1 text-sm">
               {PLATFORMS.map((p) => (<option key={p} value={p}>{p}</option>))}
@@ -52,8 +53,8 @@ export function SocialCard({ social, isEditing, onUpdate, onRemove }: SocialCard
     <a href={social.url || "#"} target="_blank" rel="noopener noreferrer" className="block group">
       <div className="rounded-[40px] border border-slate-200 bg-white p-5 transition-all group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] group-active:scale-[0.98]">
         <div className="flex items-center gap-4">
-          <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[24px] ${config.bg} overflow-hidden p-2.5 border border-slate-100`}>
-            <img src={config.icon} alt={social.platform} className="h-full w-full object-contain" />
+          <div className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-[24px] ${config.bg} overflow-hidden p-2.5 border border-slate-100`}>
+            <Image src={config.icon} alt={social.platform} fill className="object-contain p-2.5" sizes="56px" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-0.5">{social.platform}</p>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { Trash2, X } from 'lucide-react';
 import { formatCurrency } from '@/lib/format';
 import { useCheckoutGate } from './use-checkout-gate';
@@ -100,7 +101,9 @@ export function RestaurantDeliveryCartSheet({
                   <div className="w-[92px] shrink-0">
                     <div className="overflow-hidden rounded-[18px] border border-[rgb(var(--border)/0.75)] bg-[rgb(var(--card-surface-muted)/0.8)]">
                       {item.image ? (
-                        <img src={item.image} alt={item.name} className="h-[84px] w-full object-cover" />
+                        <div className="relative h-[84px] w-full">
+                          <Image src={item.image} alt={item.name} fill className="object-cover" sizes="100px" />
+                        </div>
                       ) : (
                         <div className="flex h-[84px] items-center justify-center text-sm text-[rgb(var(--muted))]">
                           Item

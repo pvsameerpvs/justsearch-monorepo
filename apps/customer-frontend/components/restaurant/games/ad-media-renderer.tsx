@@ -1,5 +1,7 @@
 "use client";
 
+import Image from 'next/image';
+
 interface AdMediaRendererProps {
   mediaType: string;
   mediaUrl: string;
@@ -22,7 +24,11 @@ export function AdMediaRenderer({ mediaType, mediaUrl, isMuted, onEnded }: AdMed
     );
   }
   if (mediaType === "image" || mediaType === "gif") {
-    return <img src={mediaUrl} alt="Ad" className="h-full w-full object-cover" />;
+    return (
+      <div className="relative h-full w-full">
+        <Image src={mediaUrl} alt="Ad" fill className="object-cover" sizes="100vw" />
+      </div>
+    );
   }
   return <div className="flex h-full items-center justify-center text-6xl">{mediaUrl}</div>;
 }

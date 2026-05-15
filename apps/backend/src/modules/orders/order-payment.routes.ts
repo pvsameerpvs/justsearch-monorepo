@@ -1,13 +1,16 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
 import { orders } from '../../db/schema';
-import { eq, and } from 'drizzle-orm';
+import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
 
+router.use(authMiddleware);
+
 // PATCH /api/v1/orders/:id/payment — driver records payment mode
-router.patch('/:id/payment', async (req, res, next) => {
+router.patch('/:id/payment', requireRole('owner', 'manager', 'cashier', 'driver'), async (req, res, next) => {
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 

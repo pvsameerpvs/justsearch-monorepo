@@ -1,20 +1,17 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { db } from '../../db';
-import { restaurants, staff, deliveryAgents, superAdmins } from '../../db/schema';
 import { eq } from 'drizzle-orm';
-import { hashPassword } from '../../lib/hash';
-import { signToken } from '../../utils/jwt';
+import { db } from '../../db';
+import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
 
+router.use(authMiddleware);
+
 // POST /api/v1/restaurants — create new restaurant (super-admin only)
-router.post('/', authMiddleware, async (req, res, next) => {
+router.post('/', requireRole('super_admin'), async (req, res, next) => {
   try {
-    if (req.auth?.type !== 'super_admin') {
-      return res.status(403).json({ error: 'Super admin access required' });
-    }
 
     const schema = z.object({
       slug: z.string().min(3).max(64),
@@ -45,12 +42,8 @@ router.post('/', authMiddleware, async (req, res, next) => {
 });
 
 // GET /api/v1/restaurants — list all (super-admin only)
-router.get('/', authMiddleware, async (req, res, next) => {
+router.get('/', requireRole('super_admin'), async (req, res, next) => {
   try {
-    if (req.auth?.type !== 'super_admin') {
-      return res.status(403).json({ error: 'Super admin access required' });
-    }
-
     const allRestaurants = await db.select().from(restaurants);
     res.json({ restaurants: allRestaurants });
   } catch (error) {

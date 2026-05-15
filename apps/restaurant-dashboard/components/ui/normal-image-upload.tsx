@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useRef, useState } from "react";
 import { Upload, X, Link } from "lucide-react";
 
@@ -36,7 +37,7 @@ export function NormalImageUpload({ value, onChange, label = "Image", aspect = "
     <div className="space-y-2">
       {value ? (
         <div className={`relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 max-h-48 ${aspect === "landscape" ? "aspect-video" : "aspect-square max-w-48"}`}>
-          <img src={value} alt={label} className="h-full w-full object-cover" />
+          <Image src={value} alt={label} fill className="object-cover" sizes={aspect === "landscape" ? "400px" : "200px"} />
           <button onClick={handleRemove} className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm hover:bg-white hover:text-red-500 transition-colors">
             <X className="h-4 w-4" />
           </button>

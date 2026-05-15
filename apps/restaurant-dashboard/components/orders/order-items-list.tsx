@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { OrderItem } from "@/lib/stores/order-store";
 
 export function OrderItemsList({ items }: { items: OrderItem[] }) {
@@ -8,7 +9,9 @@ export function OrderItemsList({ items }: { items: OrderItem[] }) {
         {items.map((item) => (
           <div key={item.id} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
             {item.image ? (
-              <img src={item.image} alt={item.name} className="h-14 w-14 rounded-lg object-cover shrink-0" />
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
+                <Image src={item.image} alt={item.name} fill className="object-cover" sizes="56px" />
+              </div>
             ) : (
               <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-slate-100 shrink-0 text-xs font-bold text-slate-400">
                 {item.name.slice(0, 2).toUpperCase()}

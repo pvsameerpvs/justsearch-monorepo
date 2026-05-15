@@ -1,6 +1,6 @@
+import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
 import { otpRequests, users } from '../../db/schema';
-import { eq, and } from 'drizzle-orm';
 import { OTP_TTL_MS, MAX_ATTEMPTS } from './auth.utils';
 
 export async function validateOtpRequest(

@@ -1,14 +1,28 @@
 "use client";
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
-export function useRecordPayment() {
-  const mutate = async ({ orderId, paymentMethod }: { orderId: string; paymentMethod: 'cash' | 'card' }) => {
-    await apiClient(`/orders/${orderId}/payment`, {
-      method: 'PATCH',
-      body: JSON.stringify({ paymentMethod, paymentStatus: 'paid' }),
-    });
-  };
+interface RecordPaymentVars {
+  orderId: string;
+  paymentMethod: 'cash' | 'card';
+}
 
-  return { mutate };
+async function recordPayment({ orderId, paymentMethod }: RecordPaymentVars) {
+  return apiClient(`/orders/${orderId}/payment`, {
+    method: 'PATCH',
+    body: JSON.stringify({ paymentMethod, paymentStatus: 'paid' }),
+  });
+}
+
+export function useRecordPayment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: recordPayment,
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['driverOrders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', vars.orderId] });
+    },
+  });
 }

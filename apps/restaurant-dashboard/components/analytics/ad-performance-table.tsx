@@ -1,3 +1,4 @@
+import NextImage from 'next/image';
 import { Megaphone, CheckCircle, XCircle, Eye, Clock, TrendingUp, Gamepad2, Image, Video, FileImage } from "lucide-react";
 import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
 
@@ -67,7 +68,7 @@ export function AdPerformanceTable({ campaigns }: AdPerformanceTableProps) {
                         ) : c.mediaType === 'gif' ? (
                           <FileImage className="h-4 w-4 text-purple-500" />
                         ) : c.mediaUrl ? (
-                          <img src={c.mediaUrl} alt="" className="h-full w-full object-cover" />
+                          <NextImage src={c.mediaUrl} alt="" fill className="object-cover" sizes="36px" />
                         ) : (
                           <Image className="h-4 w-4 text-slate-500" />
                         )}

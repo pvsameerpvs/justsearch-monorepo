@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { DriverAuthProvider } from '@/lib/driver-auth-store';
 import { AuthGuard } from '@/components/layout/auth-guard';
+import { ReactQueryProvider } from '@/components/providers/react-query-provider';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -19,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <DriverAuthProvider>
-          <AuthGuard>{children}</AuthGuard>
-        </DriverAuthProvider>
+        <ReactQueryProvider>
+          <DriverAuthProvider>
+            <AuthGuard>{children}</AuthGuard>
+          </DriverAuthProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

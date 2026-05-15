@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { MenuItemActions } from "./menu-item-actions";
 import type { MenuItem } from "@/lib/stores/menu-store";
 
@@ -39,8 +40,8 @@ export function MenuItemCard({
       </div>
 
       {item.image && (
-        <div className="mt-3 aspect-video overflow-hidden rounded-lg bg-slate-100">
-          <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+        <div className="relative mt-3 aspect-video overflow-hidden rounded-lg bg-slate-100">
+          <Image src={item.image} alt={item.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 300px" />
         </div>
       )}
 

@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 import { useRef, useState } from "react";
 import { Upload, X, Link, ImageIcon } from "lucide-react";
 
@@ -31,7 +32,7 @@ export function CompactImageUpload({ value, onChange, label = "Image", aspect = 
     return (
       <div className="flex items-center gap-3">
         <div className={`relative shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 ${isSquare ? "h-20 w-20" : "h-16 w-28"}`}>
-          <img src={value} alt={label} className="h-full w-full object-cover" />
+          <Image src={value} alt={label} fill className="object-cover" sizes={isSquare ? "80px" : "112px"} />
         </div>
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2">

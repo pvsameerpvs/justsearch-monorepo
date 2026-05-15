@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useMenuStore } from "@/lib/stores/menu-store";
 import { MenuItemActions } from "./menu-item-actions";
 
@@ -25,7 +26,9 @@ export function MenuItemRow({ categoryId, item, onEdit }: MenuItemRowProps) {
   return (
     <div className={`flex items-center gap-3 rounded-xl border p-3 transition-all ${item.isAvailable ? "border-slate-200 bg-white" : "border-slate-100 bg-slate-50/50 opacity-50"}`}>
       {item.image ? (
-        <img src={item.image} alt={item.name} className="h-14 w-14 rounded-lg object-cover shrink-0" />
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
+          <Image src={item.image} alt={item.name} fill className="object-cover" sizes="56px" />
+        </div>
       ) : (
         <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-slate-100 shrink-0 text-xs font-bold text-slate-400">{item.name.slice(0, 2).toUpperCase()}</div>
       )}

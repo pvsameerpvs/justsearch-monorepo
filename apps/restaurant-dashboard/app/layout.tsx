@@ -1,7 +1,8 @@
+import type { ReactNode } from 'react';
 import { Inter } from 'next/font/google';
 import { ClientLayout } from '@/components/client-layout';
 import { getCurrentRestaurant } from '@/lib/get-current-restaurant';
-import type { ReactNode } from 'react';
+import { ReactQueryProvider } from '@/components/providers/react-query-provider';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -12,9 +13,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ClientLayout restaurant={restaurant}>
-          {children}
-        </ClientLayout>
+        <ReactQueryProvider>
+          <ClientLayout restaurant={restaurant}>
+            {children}
+          </ClientLayout>
+        </ReactQueryProvider>
       </body>
     </html>
   );

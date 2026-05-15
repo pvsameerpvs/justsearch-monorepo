@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from "next/link";
 import { Store, ArrowUpRight } from "lucide-react";
 import { getRestaurantInitials } from "@justsearch/utils";
@@ -9,9 +10,9 @@ export function WelcomeBar({ restaurant }: { restaurant: Restaurant }) {
 
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl overflow-hidden border border-slate-200">
+      <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl overflow-hidden border border-slate-200">
         {restaurant.logoUrl ? (
-          <img src={restaurant.logoUrl} alt="" className="h-full w-full object-cover" />
+          <Image src={restaurant.logoUrl} alt="" fill className="object-cover" sizes="48px" />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-sm font-bold text-white" style={{ background: `linear-gradient(145deg, rgb(${t.logoGradientFrom ?? "99,102,241"}), rgb(${t.logoGradientTo ?? "168,85,247"}))` }}>
             {initials}

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { signToken } from '../../utils/jwt';
-import { findSuperAdmin, findDeliveryAgent, findStaffMember } from './auth-login.services';
-import { MOCK_AUTH_ENABLED, findMockUser } from '../../lib/mock-auth';
+import { resolveUser } from './auth-login.utils';
 
 const router = Router();
 
@@ -16,34 +15,9 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'Username and password required' });
     }
 
-    let user: { id: string; name: string; role: string; restaurantId?: string } | null = null;
-    let userType: 'staff' | 'delivery' | 'super_admin' = 'staff';
-
-    if (MOCK_AUTH_ENABLED) {
-      const mockUser = findMockUser(username, password, type);
-      if (mockUser) {
-        user = {
-          id: mockUser.id,
-          name: mockUser.name,
-          role: mockUser.role,
-          restaurantId: mockUser.restaurantId,
-        };
-        userType = mockUser.type;
-      }
-    } else {
-      if (type === 'super_admin') {
-        user = await findSuperAdmin(username, password);
-        userType = 'super_admin';
-      } else if (type === 'delivery') {
-        if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
-        user = await findDeliveryAgent(req.tenant.id, username, password);
-        userType = 'delivery';
-      } else {
-        if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
-        user = await findStaffMember(req.tenant.id, username, password);
-        userType = 'staff';
-      }
-    }
+    const loginResult = await resolveUser(username, password, type, req.tenant);
+    const user = loginResult.user;
+    const userType = loginResult.userType;
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });

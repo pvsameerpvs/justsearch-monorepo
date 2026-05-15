@@ -25,7 +25,7 @@ export function CheckoutLiveOrderStatusScreen({
     );
   }
 
-  if (!data?.order) {
+  if (!data) {
     return (
       <section className="py-4 sm:py-6">
         <div className="mx-auto max-w-2xl text-center">
@@ -35,5 +35,5 @@ export function CheckoutLiveOrderStatusScreen({
     );
   }
 
-  return <CheckoutLiveOrderStatusPresenter order={data.order} restaurant={restaurant} />;
+  return <CheckoutLiveOrderStatusPresenter order={data} restaurant={restaurant} />;
 }

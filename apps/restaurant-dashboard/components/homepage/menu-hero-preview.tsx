@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Calendar, Bike } from "lucide-react";
 import { getRestaurantInitials } from "@justsearch/utils";
 import type { RestaurantTheme } from "@justsearch/utils";
@@ -20,15 +21,15 @@ export function MenuHeroPreview({ heroUrl, logoUrl, name, tagline, category, cui
     <div className="overflow-hidden rounded-3xl border border-slate-200 shadow-lg">
       <div className="relative h-48">
         {heroUrl ? (
-          <img src={heroUrl} alt="Menu hero" className="h-full w-full object-cover" />
+          <Image src={heroUrl} alt="Menu hero" fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
         ) : (
           <div className="h-full w-full bg-slate-200" />
         )}
         <div className="absolute inset-0 bg-black/35" />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white">
-          <div className="mb-2 h-16 w-16 overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.3)]">
+          <div className="relative mb-2 h-16 w-16 overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.3)]">
             {logoUrl ? (
-              <img src={logoUrl} alt="Logo" className="h-full w-full object-cover" />
+              <Image src={logoUrl} alt="Logo" fill className="object-cover" sizes="64px" />
             ) : (
               <div className="flex h-full w-full items-center justify-center font-bold text-xl" style={{ background: `linear-gradient(145deg, rgb(${theme.logoGradientFrom ?? "99,102,241"}), rgb(${theme.logoGradientTo ?? "168,85,247"}))` }}>
                 {initials}

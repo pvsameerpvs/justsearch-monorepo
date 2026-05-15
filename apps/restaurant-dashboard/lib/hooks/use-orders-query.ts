@@ -1,7 +1,5 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { apiClient } from "@/lib/api-client";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
 
 export interface ApiOrder {
   id: string;
@@ -14,29 +12,44 @@ export interface ApiOrder {
   fulfillmentType: string;
 }
 
+const POLLING_INTERVAL = 10_000;
+const STALE_TIME = 30_000;
+
+interface OrdersResponse {
+  orders: ApiOrder[];
+}
+
+async function fetchOrders(): Promise<OrdersResponse> {
+  return apiClient<OrdersResponse>('/orders');
+}
+
 export function useOrdersQuery() {
-  const [orders, setOrders] = useState<ApiOrder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['orders'],
+    queryFn: fetchOrders,
+    staleTime: STALE_TIME,
+    refetchInterval: POLLING_INTERVAL,
+  });
 
-  const fetchOrders = async () => {
-    try {
-      setIsLoading(true);
-      const res = await apiClient<{ orders: ApiOrder[] }>("/orders");
-      setOrders(res.orders);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch orders");
-    } finally {
-      setIsLoading(false);
-    }
+  return {
+    orders: data?.orders ?? [],
+    isLoading,
+    error: error ? (error instanceof Error ? error.message : 'Failed to fetch orders') : null,
+    refetch,
   };
+}
 
-  useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 10000);
-    return () => clearInterval(interval);
-  }, []);
+export function useUpdateOrderStatusMutation() {
+  const queryClient = useQueryClient();
 
-  return { orders, isLoading, error, refetch: fetchOrders };
+  return useMutation({
+    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
+      apiClient(`/orders/${orderId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
 }

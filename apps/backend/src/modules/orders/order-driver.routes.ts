@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
 import { orders } from '../../db/schema';
-import { eq, and } from 'drizzle-orm';
-import { requireRole } from '../../middleware/auth.middleware';
+import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 // PATCH /api/v1/orders/:id/driver — assign driver + set status out_for_delivery
 router.patch('/:id/driver', requireRole('owner', 'manager', 'cashier'), async (req, res, next) => {

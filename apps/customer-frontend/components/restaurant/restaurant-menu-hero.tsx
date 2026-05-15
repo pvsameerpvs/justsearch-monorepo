@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { Container } from '@/components/shared/container';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantLogoBadge } from './restaurant-logo-badge';
@@ -21,7 +22,7 @@ export function RestaurantMenuHero({ restaurant }: RestaurantMenuHeroProps) {
   return (
     <section className="relative w-full overflow-hidden -mt-[var(--restaurant-mobile-header-height,0px)] pt-[var(--restaurant-mobile-header-height,0px)]">
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <img src={backgroundImage} alt="Menu Hero Background" className="h-full w-full object-cover brightness-[0.45] animate-subtle-zoom" />
+        <Image src={backgroundImage} alt="Menu Hero Background" fill className="object-cover brightness-[0.45] animate-subtle-zoom" sizes="100vw" priority />
         <div className="absolute inset-0 bg-black/40" />
       </div>
 

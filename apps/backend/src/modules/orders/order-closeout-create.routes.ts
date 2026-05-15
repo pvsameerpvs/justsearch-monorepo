@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { eq, and, gte, lte } from 'drizzle-orm';
 import { db } from '../../db';
 import { orders, dailyCloseouts } from '../../db/schema';
-import { eq, and, gte, lte } from 'drizzle-orm';
-import { requireRole } from '../../middleware/auth.middleware';
+import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 // POST /api/v1/close-day — create daily closeout
 router.post('/', requireRole('owner', 'manager', 'cashier'), async (req, res, next) => {

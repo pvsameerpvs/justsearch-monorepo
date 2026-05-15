@@ -9,8 +9,8 @@ interface OrderPresenterProps {
     id: string;
     code: string;
     status: string;
-    total: string;
-    paymentMethod: string | null;
+    total: number;
+    paymentMode: string | null;
   };
   restaurant: Restaurant;
 }
@@ -27,7 +27,7 @@ export function CheckoutLiveOrderStatusPresenter({ order }: OrderPresenterProps)
       <div className="mx-auto max-w-2xl space-y-3">
         <StatusCard code={order.code} headline={headline} supportText={supportText} />
         <CheckoutOrderTimeline stages={liveStages} stageIndex={stageIndex} />
-        <TotalCard total={order.total} paymentMethod={order.paymentMethod} />
+        <TotalCard total={order.total} paymentMode={order.paymentMode} />
         {isDelivered && <OrderAgainButton />}
       </div>
     </section>
@@ -48,7 +48,7 @@ function StatusCard({ code, headline, supportText }: { code: string; headline: s
   );
 }
 
-function TotalCard({ total, paymentMethod }: { total: string; paymentMethod: string | null }) {
+function TotalCard({ total, paymentMode }: { total: number; paymentMode: string | null }) {
   return (
     <div className="rounded-[24px] border border-[rgb(var(--border)/0.56)] bg-white p-5 sm:p-6">
       <div className="flex items-center justify-between">
@@ -56,9 +56,9 @@ function TotalCard({ total, paymentMethod }: { total: string; paymentMethod: str
           <p className="text-sm font-medium text-slate-500">Total</p>
           <p className="text-xl font-bold text-[rgb(var(--ink))]">AED {total}</p>
         </div>
-        {paymentMethod && (
+        {paymentMode && (
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
-            {paymentMethod === 'cash' ? '💵 Cash' : '💳 Card'}
+            {paymentMode === 'cash' ? '💵 Cash' : '💳 Card'}
           </span>
         )}
       </div>

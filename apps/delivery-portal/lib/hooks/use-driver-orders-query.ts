@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
 export interface ApiOrder {
@@ -14,27 +12,44 @@ export interface ApiOrder {
   createdAt: string;
 }
 
+const POLLING_INTERVAL = 10_000;
+const STALE_TIME = 30_000;
+
+interface DriverOrdersResponse {
+  orders: ApiOrder[];
+}
+
+async function fetchDriverOrders(driverId: string): Promise<DriverOrdersResponse> {
+  return apiClient<DriverOrdersResponse>(`/orders?driverId=${driverId}`);
+}
+
 export function useDriverOrdersQuery(driverId?: string | null) {
-  const [orders, setOrders] = useState<ApiOrder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['driverOrders', driverId],
+    queryFn: () => fetchDriverOrders(driverId || ''),
+    staleTime: STALE_TIME,
+    refetchInterval: POLLING_INTERVAL,
+    enabled: Boolean(driverId),
+  });
 
-  const fetchOrders = async () => {
-    if (!driverId) return;
-    try {
-      const res = await apiClient<{ orders: ApiOrder[] }>(`/orders?driverId=${driverId}`);
-      setOrders(res.orders);
-    } catch {
-      // silent
-    } finally {
-      setIsLoading(false);
-    }
+  return {
+    orders: data?.orders ?? [],
+    isLoading,
+    refetch,
   };
+}
 
-  useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 5000);
-    return () => clearInterval(interval);
-  }, [driverId]);
+export function useUpdateDeliveryStatusMutation() {
+  const queryClient = useQueryClient();
 
-  return { orders, isLoading, refetch: fetchOrders };
+  return useMutation({
+    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
+      apiClient(`/orders/${orderId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['driverOrders'] });
+    },
+  });
 }

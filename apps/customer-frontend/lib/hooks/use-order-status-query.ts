@@ -1,39 +1,20 @@
-"use client";
-
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import type { Order } from '@justsearch/types';
 
-export interface ApiOrder {
-  id: string;
-  code: string;
-  status: string;
-  customerName: string;
-  customerPhone: string;
-  total: string;
-  paymentMethod: string | null;
-  createdAt: string;
+const POLLING_INTERVAL = 5_000;
+const STALE_TIME = 30_000;
+
+async function fetchOrderStatus(orderId: string): Promise<Order> {
+  return apiClient<Order>(`/orders/${orderId}`);
 }
 
 export function useOrderStatusQuery(orderId: string) {
-  const [data, setData] = useState<{ order: ApiOrder } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchOrder = async () => {
-    try {
-      const res = await apiClient<{ order: ApiOrder }>(`/orders/${orderId}`);
-      setData(res);
-    } catch {
-      // silent
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrder();
-    const interval = setInterval(fetchOrder, 5000);
-    return () => clearInterval(interval);
-  }, [orderId]);
-
-  return { data, isLoading };
+  return useQuery({
+    queryKey: ['order', orderId],
+    queryFn: () => fetchOrderStatus(orderId),
+    staleTime: STALE_TIME,
+    refetchInterval: POLLING_INTERVAL,
+    enabled: Boolean(orderId),
+  });
 }

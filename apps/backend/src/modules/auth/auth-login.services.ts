@@ -1,6 +1,6 @@
-import { db } from '../../db';
-import { superAdmins, deliveryAgents, staff } from '../../db/schema';
 import { eq, and } from 'drizzle-orm';
+import { db } from '../../db';
+import { superAdmins, staff, deliveryAgents } from '../../db/schema';
 import { comparePassword } from '../../lib/hash';
 
 export async function findSuperAdmin(username: string, password: string) {
