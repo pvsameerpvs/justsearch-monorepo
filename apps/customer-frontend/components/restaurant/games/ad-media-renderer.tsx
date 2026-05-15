@@ -24,6 +24,10 @@ export function AdMediaRenderer({ mediaType, mediaUrl, isMuted, onEnded }: AdMed
     );
   }
   if (mediaType === "image" || mediaType === "gif") {
+    const isValidUrl = mediaUrl.startsWith("http://") || mediaUrl.startsWith("https://") || mediaUrl.startsWith("/");
+    if (!isValidUrl) {
+      return <div className="flex h-full items-center justify-center text-6xl">{mediaUrl}</div>;
+    }
     return (
       <div className="relative h-full w-full">
         <Image src={mediaUrl} alt="Ad" fill className="object-cover" sizes="100vw" />

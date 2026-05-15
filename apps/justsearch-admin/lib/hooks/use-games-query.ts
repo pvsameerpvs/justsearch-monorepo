@@ -38,28 +38,11 @@ export function useGamesQuery() {
   return { games, isLoading, error };
 }
 
-export function useCreateGameMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: { name: string; type: string; config?: Record<string, unknown>; isActive?: boolean }) =>
-      apiClient<AdminGame>('/games', { method: 'POST', body: JSON.stringify(data) }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: GAMES_KEY }),
-  });
-}
-
 export function useUpdateGameMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<{ name: string; type: string; config?: Record<string, unknown>; isActive?: boolean }> }) =>
-      apiClient<AdminGame>(`/games/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: GAMES_KEY }),
-  });
-}
-
-export function useDeleteGameMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => apiClient<void>(`/games/${id}`, { method: 'DELETE' }),
+    mutationFn: ({ id, data }: { id: string; data: { isActive?: boolean } }) =>
+      apiClient<{ game: AdminGame }>(`/games/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: GAMES_KEY }),
   });
 }

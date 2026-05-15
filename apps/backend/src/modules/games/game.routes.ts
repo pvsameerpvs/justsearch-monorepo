@@ -6,17 +6,15 @@ import { games } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
-router.use(authMiddleware);
 
-const createSchema = z.object({
-  name: z.string().min(1),
-  type: z.string().min(1),
+const updateSchema = z.object({
+  name: z.string().min(1).optional(),
+  type: z.string().min(1).optional(),
   config: z.record(z.unknown()).optional(),
   isActive: z.boolean().optional(),
 });
 
-const updateSchema = createSchema.partial();
-
+// GET /api/v1/games — list all games (super-admin only)
 router.get('/', requireRole('super_admin'), async (_req, res, next) => {
   try {
     const list = await db.select().from(games).orderBy(desc(games.createdAt));
@@ -26,20 +24,18 @@ router.get('/', requireRole('super_admin'), async (_req, res, next) => {
   }
 });
 
-router.post('/', requireRole('super_admin'), async (req, res, next) => {
+// GET /api/v1/games/active — list active games (public, no auth)
+router.get('/active', async (_req, res, next) => {
   try {
-    const body = createSchema.parse(req.body);
-    const [game] = await db
-      .insert(games)
-      .values({ ...body, createdBy: req.auth?.userId })
-      .returning();
-    res.status(201).json({ game });
+    const list = await db.select().from(games).where(eq(games.isActive, true));
+    res.json({ games: list });
   } catch (error) {
     next(error);
   }
 });
 
-router.patch('/:id', requireRole('super_admin'), async (req, res, next) => {
+// PATCH /api/v1/games/:id — toggle active/inactive (super-admin only)
+router.patch('/:id', authMiddleware, requireRole('super_admin'), async (req, res, next) => {
   try {
     const body = updateSchema.parse(req.body);
     const [updated] = await db
@@ -49,15 +45,6 @@ router.patch('/:id', requireRole('super_admin'), async (req, res, next) => {
       .returning();
     if (!updated) return res.status(404).json({ error: 'Game not found' });
     res.json({ game: updated });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.delete('/:id', requireRole('super_admin'), async (req, res, next) => {
-  try {
-    await db.delete(games).where(eq(games.id, req.params.id));
-    res.status(204).send();
   } catch (error) {
     next(error);
   }

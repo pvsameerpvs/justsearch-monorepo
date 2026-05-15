@@ -4,10 +4,9 @@ import type { AdminGame } from '@/lib/stores/game-store';
 interface GameCardProps {
   game: AdminGame;
   onToggleAvailability: () => void;
-  onDelete: (id: string) => void;
 }
 
-export function GameCard({ game, onToggleAvailability, onDelete }: GameCardProps) {
+export function GameCard({ game, onToggleAvailability }: GameCardProps) {
   return (
     <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4">
       <div className="flex items-start gap-3">
@@ -25,24 +24,14 @@ export function GameCard({ game, onToggleAvailability, onDelete }: GameCardProps
         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${game.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
           {game.isActive ? 'Active' : 'Inactive'}
         </span>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onToggleAvailability}
-            aria-label={game.isActive ? 'Deactivate game' : 'Activate game'}
-            className="text-slate-400 transition-colors hover:text-amber-600"
-          >
-            {game.isActive ? <ToggleRight className="h-6 w-6 text-green-500" /> : <ToggleLeft className="h-6 w-6 text-slate-300" />}
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(game.id)}
-            aria-label="Delete game"
-            className="text-xs text-red-400 hover:text-red-600"
-          >
-            Delete
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onToggleAvailability}
+          aria-label={game.isActive ? 'Deactivate game' : 'Activate game'}
+          className="text-slate-400 transition-colors hover:text-amber-600"
+        >
+          {game.isActive ? <ToggleRight className="h-6 w-6 text-green-500" /> : <ToggleLeft className="h-6 w-6 text-slate-300" />}
+        </button>
       </div>
     </div>
   );

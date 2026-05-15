@@ -7,14 +7,13 @@ interface GamePresenterProps {
   activeCount: number;
   totalCount: number;
   onToggleAvailability: (id: string, isActive: boolean) => void;
-  onDelete: (id: string) => void;
 }
 
-export function GamePresenter({ games, activeCount, totalCount, onToggleAvailability, onDelete }: GamePresenterProps) {
+export function GamePresenter({ games, activeCount, totalCount, onToggleAvailability }: GamePresenterProps) {
   return (
     <div className="space-y-4">
       <GameHeader activeCount={activeCount} totalCount={totalCount} />
-      <GameList games={games} onToggleAvailability={onToggleAvailability} onDelete={onDelete} />
+      <GameList games={games} onToggleAvailability={onToggleAvailability} />
     </div>
   );
 }

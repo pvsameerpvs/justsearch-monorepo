@@ -3,6 +3,7 @@ import { seedRestaurant } from './seed/seed.restaurant';
 import { seedStaff, seedDeliveryAgent, seedTable } from './seed/seed.staff';
 import { seedMenu } from './seed/seed.menu';
 import { seedCustomer, seedSuperAdmin } from './seed/seed.users';
+import { seedGames } from './seed/seed.games';
 
 async function seed() {
   console.log('Seeding database...');
@@ -14,6 +15,7 @@ async function seed() {
   await seedMenu(restaurantId);
   await seedCustomer(restaurantId);
   await seedSuperAdmin();
+  await seedGames();
 
   console.log('Seeding completed successfully');
   await client.end();
