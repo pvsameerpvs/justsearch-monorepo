@@ -1,442 +1,516 @@
-# Customer Frontend Agent Guide
+# Customer Frontend N-Points Agent Guide
 
 > **App**: `apps/customer-frontend`
-> **Domain**: `[restaurant].mydomain.com`
+> **Total N-Points**: 22
 > **Type**: Next.js App Router (RSC + Client Components)
-> **Scope**: Public restaurant site for diners, gamers, and loyalty members
-
-This agent handles all customer-facing functionality: restaurant landing, menu browsing, game playing, checkout, order tracking, and profile management.
+> **Domain**: `[restaurant].localhost`
 
 ---
 
-## 1. Architecture Overview
+## N-Point Directory
 
-```
-Request Flow:
-subdomain (mosaic-table.mydomain.com)
-    → middleware.ts (extracts subdomain, sets x-restaurant-slug header)
-    → layout.tsx (async RootLayout)
-        → getCurrentRestaurant() (RSC, caches per request)
-            → Tries: GET /api/v1/restaurants/current (backend)
-            → Falls back: mock-restaurants.ts
-    → page.tsx (Server Component or Client Component)
-        → RestaurantProvider (React Context)
-        → AppShell (mobile bottom nav)
-        → Feature components
-```
+### NP-01: `/` — Home Page
 
-**Key principle**: Every page is subdomain-aware. The same `/` route renders a completely different restaurant based on the `Host` header.
+**Function name = npont**: `HomePage`
+**Name = npont**: Home / Landing
 
----
-
-## 2. Golden Rules
-
-1. **Never bypass tenant resolution.** Always use `getCurrentRestaurant()` or `req.tenant`. Never hardcode restaurant data.
-2. **Every API call needs the `host` header.** Backend resolves tenant from `Host` header. Without it, backend returns 400.
-3. **Auth is JWT cookie-based.** After OTP verify, the backend sets `token` cookie. Frontend sends it via `credentials: 'include'`.
-4. **Cart is client-side only.** Use Zustand `cart-store.ts`. Do not sync cart to backend until checkout.
-5. **Game scores must persist to backend.** On game over, call `POST /api/v1/game-sessions`. Never rely only on localStorage.
-6. **Order status must poll.** After placing order, poll `GET /api/v1/orders/:id` every 5 seconds for real-time updates.
-7. **Mobile-first design.** All layouts must work at 375px width. Touch targets minimum 44px.
-
----
-
-## 3. File Structure Standards
-
-```
-app/
-├── page.tsx                    # Home: hero + feature grid (Server Component)
-├── layout.tsx                  # Root layout: fonts, providers, tenant context
-├── loading.tsx                 # Global loading UI
-├── error.tsx                   # Global error boundary
-├── menu/
-│   └── page.tsx                # Menu showcase (Server Component, fetches menu)
-├── eat-play/
-│   ├── page.tsx                # Games listing
-│   └── [gameId]/
-│       └── play/
-│           └── page.tsx        # Game player (Client Component, canvas)
-├── profile/
-│   └── page.tsx                # User profile + order history + loyalty
-├── google-reviews/
-│   └── page.tsx                # Reviews display
-├── social-media/
-│   └── page.tsx                # Social links
-├── party-booking/
-│   └── page.tsx                # Party packages
-└── api/
-    └── auth/
-        └── otp/
-            ├── request/
-            │   └── route.ts    # Proxy to backend /api/v1/auth/otp/request
-            └── verify/
-                └── route.ts    # Proxy to backend /api/v1/auth/otp/verify
-
-components/
-├── layout/
-│   ├── app-shell.tsx           # Mobile bottom nav + top bar
-│   ├── restaurant-layout-manager.tsx
-│   └── restaurant-context.tsx  # React Context for restaurant data
-├── restaurant/
-│   ├── restaurant-home-hero.tsx
-│   ├── restaurant-feature-grid.tsx
-│   ├── restaurant-menu-showcase.tsx
-│   ├── restaurant-eat-play-showcase.tsx
-│   ├── games/
-│   │   ├── local-game-player.tsx       # Canvas game wrapper
-│   │   ├── game-intro-stage.tsx
-│   │   ├── game-player-stage.tsx
-│   │   ├── game-award.ts               # Award calculation
-│   │   ├── profile/
-│   │   │   └── eat-play-profile-screen.tsx
-│   │   └── local/
-│   │       ├── local-game-registry.tsx
-│   │       ├── vex-runner/
-│   │       ├── hungry-bird-rush/
-│   │       ├── cheese-chase/
-│   │       └── memory-match/
-│   ├── checkout/
-│   │   ├── checkout-summary-card.tsx   # Cart + place order button
-│   │   ├── checkout-address-card.tsx
-│   │   ├── checkout-add-address-form.tsx
-│   │   ├── checkout-map-address-picker.tsx
-│   │   └── ...
-│   └── profile/
-│       └── sections/
-│           └── profile-add-address-form.tsx
-├── shared/
-│   ├── container.tsx
-│   └── surface.tsx
-└── auth/
-    └── registration-modal.tsx   # OTP flow UI
-
-lib/
-├── restaurant-resolver.ts      # Subdomain → restaurant resolution
-├── restaurant-utils.ts
-├── restaurant-types.ts
-├── mock-restaurants.ts         # Fallback data (Mosaic Table demo)
-├── api-client.ts               # Fetch wrapper with host header + cookies
-└── server/
-    └── otp-store.ts           # ⚠️ IN-MEMORY ONLY: Will be removed once OTP routes proxy to backend
-
-stores/
-└── cart-store.ts               # Zustand: cart items, totals, mode (delivery/dine-in/pickup)
-
-public/
-└── games/
-    ├── jump&bite.png
-    ├── hungry-bird-rush-model.png
-    ├── cheddar-chase.png
-    └── gem-match.png
-```
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/page.tsx` | Page Component | Route entry point |
+| 2 | `app/layout.tsx` | Layout Component | Root layout wrapper |
+| 3 | `components/layout/app-shell.tsx` | Component | Mobile bottom nav + top bar |
+| 4 | `components/layout/restaurant-layout-manager.tsx` | Component | Restaurant context provider |
+| 5 | `components/layout/restaurant-context.tsx` | Context | Restaurant data context |
+| 6 | `components/restaurant/restaurant-home-hero.tsx` | Component | Hero section with logo + banner |
+| 7 | `components/restaurant/restaurant-feature-grid.tsx` | Component | Feature cards grid |
+| 8 | `components/restaurant/restaurant-feature-card.tsx` | Component | Single feature card |
+| 9 | `components/restaurant/restaurant-menu-showcase.tsx` | Component | Menu preview section |
+| 10 | `components/restaurant/restaurant-eat-play-showcase.tsx` | Component | Games preview section |
+| 11 | `components/restaurant/restaurant-reviews-showcase.tsx` | Component | Reviews preview section |
+| 12 | `components/restaurant/restaurant-social-media-showcase.tsx` | Component | Social links preview |
+| 13 | `components/restaurant/restaurant-logo-badge.tsx` | Component | Restaurant logo display |
+| 14 | `components/restaurant/restaurant-mobile-header.tsx` | Component | Mobile header bar |
+| 15 | `components/restaurant/restaurant-mobile-nav.tsx` | Component | Mobile navigation |
+| 16 | `components/restaurant/opening-today-card.tsx` | Component | Opening hours card |
+| 17 | `lib/restaurant-resolver.ts` | Utility | Subdomain → restaurant resolution |
+| 18 | `lib/restaurant-utils.ts` | Utility | Restaurant helper functions |
+| 19 | `lib/restaurant-types.ts` | Types | TypeScript definitions |
+| 20 | `middleware.ts` | Middleware | Subdomain extraction |
 
 ---
 
-## 4. Component Rules (Max 80 Lines)
+### NP-02: `/menu` — Menu Page
 
-Follow the project-wide 80-line rule strictly:
+**Function name = npont**: `MenuPage`
+**Name = npont**: Menu Showcase
 
-| Type | Max Lines | Example |
-|------|-----------|---------|
-| Page | 30 | `app/menu/page.tsx` → imports + data fetch + returns container |
-| Container | 60 | `RestaurantMenuShowcase` → state + logic + delegates to presenters |
-| Presenter | 50 | `RestaurantMenuHero` → props-only rendering |
-| Card | 40 | `MenuItemCard` → single item display |
-| List | 50 | `MenuSectionsList` → maps over array |
-| Form | 60 | `CheckoutAddAddressForm` → inputs + validation |
-| Empty | 25 | `MenuEmpty` → illustration + text |
-| Skeleton | 25 | `MenuSkeleton` → loading placeholder |
-
-If a component exceeds 80 lines, split it into smaller pieces immediately.
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/menu/page.tsx` | Page Component | Menu route entry |
+| 2 | `components/restaurant/restaurant-menu-showcase.tsx` | Container | Menu showcase container |
+| 3 | `components/restaurant/restaurant-menu-hero.tsx` | Component | Menu hero section |
+| 4 | `components/restaurant/restaurant-menu-category-card.tsx` | Component | Category card |
+| 5 | `components/restaurant/restaurant-menu-item-card.tsx` | Component | Menu item card |
+| 6 | `components/restaurant/menu-item-card-parts.tsx` | Component | Card sub-components |
+| 7 | `components/restaurant/menu-sections-list.tsx` | Component | Menu sections list |
+| 8 | `components/restaurant/restaurant-menu-subcategory-section.tsx` | Component | Subcategory section |
+| 9 | `components/restaurant/category-scroll-list.tsx` | Component | Horizontal category scroll |
+| 10 | `components/restaurant/restaurant-menu-navigation.tsx` | Component | Menu navigation tabs |
+| 11 | `components/restaurant/use-menu-showcase-state.ts` | Hook | Menu state management |
+| 12 | `components/restaurant/view-mode-toggle.tsx` | Component | Grid/list view toggle |
+| 13 | `components/restaurant/delivery-badge.tsx` | Component | Delivery availability badge |
+| 14 | `components/restaurant/delivery-cart-section.tsx` | Component | Cart section in menu |
+| 15 | `components/restaurant/restaurant-delivery-cart-bar.tsx` | Component | Bottom cart bar |
+| 16 | `components/restaurant/restaurant-delivery-cart-sheet.tsx` | Component | Cart sheet/drawer |
+| 17 | `components/restaurant/fulfillment/use-cart-actions.ts` | Hook | Cart add/remove actions |
+| 18 | `components/restaurant/fulfillment/use-fulfillment-state.ts` | Hook | Fulfillment mode state |
+| 19 | `components/restaurant/fulfillment/fulfillment-provider.tsx` | Provider | Fulfillment context |
+| 20 | `components/restaurant/fulfillment/fulfillment.types.ts` | Types | Fulfillment type defs |
+| 21 | `components/restaurant/fulfillment/fulfillment.constants.ts` | Constants | Fulfillment constants |
 
 ---
 
-## 5. API Integration Rules
+### NP-03: `/menu/checkout` — Checkout Page
 
-### 5.1 Required Headers
-Every API call MUST include:
-```typescript
-fetch(`${API_BASE}/endpoint`, {
-  headers: {
-    'Content-Type': 'application/json',
-    'host': window.location.host,  // ← CRITICAL for tenant resolution
-  },
-  credentials: 'include',  // ← Sends JWT cookie
-});
-```
+**Function name = npont**: `CheckoutPage`
+**Name = npont**: Checkout / Cart Review
 
-### 5.2 API Base URL
-```typescript
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
-```
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/menu/checkout/page.tsx` | Page Component | Checkout route entry |
+| 2 | `components/restaurant/restaurant-checkout-screen.tsx` | Container | Checkout screen container |
+| 3 | `components/restaurant/checkout/checkout-summary-card.tsx` | Component | Order summary + place order |
+| 4 | `components/restaurant/checkout/checkout-address-card.tsx` | Component | Selected address display |
+| 5 | `components/restaurant/checkout/checkout-address-card-content.tsx` | Component | Address card content |
+| 6 | `components/restaurant/checkout/checkout-empty-state.tsx` | Component | Empty cart state |
+| 7 | `components/restaurant/checkout/checkout-sticky-footer.tsx` | Component | Bottom sticky footer |
+| 8 | `components/restaurant/checkout/payment-gateway.tsx` | Component | Payment method selector |
+| 9 | `components/restaurant/checkout/scratch-card.tsx` | Component | Reward scratch card |
+| 10 | `components/restaurant/checkout/reward-manager.tsx` | Component | Reward management |
+| 11 | `components/restaurant/checkout/reward-offers.ts` | Utility | Reward offer definitions |
+| 12 | `components/restaurant/checkout/reward-storage.ts` | Utility | Reward local storage |
+| 13 | `components/restaurant/checkout/reward-types.ts` | Types | Reward type definitions |
+| 14 | `components/restaurant/checkout/use-checkout-state.ts` | Hook | Checkout state management |
+| 15 | `components/restaurant/checkout/use-checkout-promo.ts` | Hook | Promo code handling |
+| 16 | `components/restaurant/checkout/use-voucher-wallet.ts` | Hook | Voucher wallet state |
+| 17 | `components/restaurant/fulfillment/use-place-order.ts` | Hook | Place order action |
+| 18 | `components/restaurant/use-checkout-gate.ts` | Hook | Checkout validation gate |
+| 19 | `lib/loyalty-utils.ts` | Utility | Loyalty calculation helpers |
 
-### 5.3 Backend Endpoints (What Exists)
-| Endpoint | Status | Usage |
+---
+
+### NP-04: `/menu/checkout/status` — Checkout Status
+
+**Function name = npont**: `CheckoutStatusPage`
+**Name = npont**: Checkout Status List
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/menu/checkout/status/page.tsx` | Page Component | Status list route entry |
+| 2 | `components/restaurant/checkout/checkout-order-status-list-screen.tsx` | Container | Order status list container |
+| 3 | `components/restaurant/checkout/checkout-tracking-card.tsx` | Component | Order tracking card |
+| 4 | `components/restaurant/checkout/checkout-order-timeline.tsx` | Component | Order timeline display |
+| 5 | `components/restaurant/checkout/multi-order-circular-progress.tsx` | Component | Multi-order progress |
+| 6 | `components/restaurant/checkout/checkout-status-constants.ts` | Constants | Status step definitions |
+| 7 | `lib/hooks/use-order-status-query.ts` | Hook | Order status React Query |
+
+---
+
+### NP-05: `/menu/checkout/status/[orderId]` — Order Status Detail
+
+**Function name = npont**: `OrderStatusDetailPage`
+**Name = npont**: Live Order Tracking
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/menu/checkout/status/[orderId]/page.tsx` | Page Component | Order status detail route |
+| 2 | `components/restaurant/checkout/checkout-live-order-status-screen.tsx` | Container | Live status screen |
+| 3 | `components/restaurant/checkout/checkout-live-order-status-presenter.tsx` | Presenter | Live status UI |
+| 4 | `components/restaurant/checkout/checkout-live-progress-circle.tsx` | Component | Animated progress circle |
+| 5 | `components/restaurant/checkout/animated-status-emoji.tsx` | Component | Status emoji animation |
+| 6 | `components/restaurant/checkout/active-order-tracker.tsx` | Component | Active order tracker |
+| 7 | `components/restaurant/checkout/checkout-live-status-utils.ts` | Utility | Status calculation utils |
+| 8 | `components/restaurant/restaurant-delivery-status-badge.tsx` | Component | Delivery status badge |
+| 9 | `lib/hooks/use-order-status-query.ts` | Hook | Order status polling (5s) |
+
+---
+
+### NP-06: `/eat-play` — Games Listing
+
+**Function name = npont**: `GamesListingPage`
+**Name = npont**: Eat & Play Games List
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/eat-play/page.tsx` | Page Component | Games listing route |
+| 2 | `components/restaurant/restaurant-eat-play-showcase.tsx` | Component | Games showcase section |
+| 3 | `components/restaurant/restaurant-game-screen.tsx` | Component | Games screen container |
+| 4 | `components/restaurant/restaurant-game-preview-card.tsx` | Component | Game preview card |
+| 5 | `components/restaurant/games/game-coin-pill.tsx` | Component | Coin reward pill |
+| 6 | `components/restaurant/games/game-intro-stage.tsx` | Component | Game intro screen |
+| 7 | `components/restaurant/games/game-exit-confirm-dialog.tsx` | Component | Exit confirmation dialog |
+| 8 | `components/restaurant/games/local/local-game-registry.tsx` | Registry | Game registration map |
+| 9 | `components/restaurant/games/local/local-game-renderer.ts` | Utility | Game renderer dispatcher |
+| 10 | `components/restaurant/games/local/local-game-fallback.tsx` | Component | Fallback for unknown games |
+| 11 | `components/restaurant/use-user-game-stats.ts` | Hook | User game statistics |
+
+---
+
+### NP-07: `/eat-play/[gameId]` — Game Detail
+
+**Function name = npont**: `GameDetailPage`
+**Name = npont**: Game Detail / Preview
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/eat-play/[gameId]/page.tsx` | Page Component | Game detail route |
+| 2 | `app/eat-play/[gameId]/_lib/get-game-by-id.ts` | Utility | Get game metadata by ID |
+| 3 | `components/restaurant/games/game-intro-stage.tsx` | Component | Game intro/preview stage |
+| 4 | `components/restaurant/games/game-player-stage.tsx` | Component | Game player stage wrapper |
+| 5 | `components/restaurant/games/game-coin-pill.tsx` | Component | Coin reward indicator |
+| 6 | `components/restaurant/games/game-exit-confirm-dialog.tsx` | Component | Exit confirmation |
+| 7 | `components/restaurant/games/embedded-game-player.tsx` | Component | Embedded player wrapper |
+| 8 | `components/restaurant/games/local/local-game-registry.tsx` | Registry | Game lookup registry |
+
+---
+
+### NP-08: `/eat-play/[gameId]/play` — Game Player
+
+**Function name = npont**: `GamePlayerPage`
+**Name = npont**: Active Game Canvas Player
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/eat-play/[gameId]/play/page.tsx` | Page Component | Game play route |
+| 2 | `components/restaurant/games/game-player-stage.tsx` | Container | Game stage container |
+| 3 | `components/restaurant/games/local/local-game-player.tsx` | Component | Canvas game wrapper |
+| 4 | `components/restaurant/games/game-intro-stage.tsx` | Component | Pre-game intro overlay |
+| 5 | `components/restaurant/games/game-exit-confirm-dialog.tsx` | Component | Exit confirmation |
+| 6 | `components/restaurant/games/game-award.ts` | Types | Game award types |
+| 7 | `components/restaurant/games/game-coin-pill.tsx` | Component | Coin display |
+
+**Local Canvas Games (5 games):**
+| # | Game ID | Engine Hook | Canvas Art | Game Component | Model |
+|---|---|---|---|---|---|
+| 8 | `vex-runner` | `use-vex-runner-engine.ts` | `vex-runner-canvas-art.ts` | `vex-runner-game.tsx` | `vex-runner-model.ts` |
+| 9 | `hungry-bird-rush` | `use-hungry-bird-rush-engine.ts` | `hungry-bird-rush-canvas-art.ts` | `hungry-bird-rush-game.tsx` | `hungry-bird-rush-model.ts` |
+| 10 | `cheese-chase` | `use-cheese-chase-engine.ts` | `cheese-chase-canvas-art.ts` | `cheese-chase-game.tsx` | `cheese-chase-model.ts` |
+| 11 | `memory-match` | `use-memory-match-engine.ts` | `memory-match-canvas-art.ts` | `memory-match-game.tsx` | `memory-match-model.ts` |
+| 12 | `slice-master` | `use-slice-master-engine.ts` | `slice-master-canvas-art.ts` | `slice-master-game.tsx` | `slice-master-model.ts` |
+
+---
+
+### NP-09: `/eat-play/profile` — Eat & Play Profile
+
+**Function name = npont**: `EatPlayProfilePage`
+**Name = npont**: Game Stats & Profile
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/eat-play/profile/page.tsx` | Page Component | E&P profile route |
+| 2 | `components/restaurant/games/profile/eat-play-profile-screen.tsx` | Container | E&P profile container |
+| 3 | `components/restaurant/games/profile/eat-play-game-stat-card.tsx` | Component | Game stat card |
+| 4 | `components/restaurant/games/profile/eat-play-header-wallet-link.tsx` | Component | Wallet link header |
+| 5 | `components/restaurant/games/profile/index.ts` | Barrel Export | Profile exports |
+| 6 | `components/restaurant/use-user-game-stats.ts` | Hook | Game stats hook |
+
+---
+
+### NP-10: `/profile` — User Profile
+
+**Function name = npont**: `ProfilePage`
+**Name = npont**: User Profile Dashboard
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/page.tsx` | Page Component | Profile route entry |
+| 2 | `components/restaurant/profile/profile-section-layout.tsx` | Component | Profile layout shell |
+| 3 | `components/restaurant/profile/profile-menu-item.tsx` | Component | Profile menu item |
+| 4 | `components/restaurant/profile/registration-settings-card.tsx` | Component | Registration settings |
+| 5 | `components/restaurant/profile/vip-tier-card.tsx` | Component | VIP tier display |
+| 6 | `components/restaurant/profile/use-vip-tier.ts` | Hook | VIP tier logic |
+| 7 | `components/restaurant/profile/referral-system.tsx` | Component | Referral system UI |
+| 8 | `components/auth/registration-context.tsx` | Context | Auth registration context |
+| 9 | `components/auth/registration-modal.tsx` | Component | OTP registration modal |
+| 10 | `components/auth/registration-route-guard.tsx` | Component | Route guard for auth |
+| 11 | `components/auth/registered-user.ts` | Types | Registered user types |
+| 12 | `lib/stores/referral-store.ts` | Zustand Store | Referral state |
+
+---
+
+### NP-11: `/profile/orders` — Order History
+
+**Function name = npont**: `OrderHistoryPage`
+**Name = npont**: Past Orders List
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/orders/page.tsx` | Page Component | Orders list route |
+| 2 | `components/restaurant/profile/orders/profile-orders-screen.tsx` | Container | Orders screen container |
+| 3 | `components/restaurant/profile/orders/profile-order-list-item.tsx` | Component | Order list item |
+| 4 | `components/restaurant/profile/orders/profile-order-details-screen.tsx` | Component | Order detail view |
+| 5 | `components/restaurant/profile/orders/profile-order-utils.ts` | Utility | Order formatting utils |
+| 6 | `components/restaurant/profile/orders/use-profile-orders.ts` | Hook | Orders fetch hook |
+| 7 | `components/restaurant/profile/orders/index.ts` | Barrel Export | Orders exports |
+
+---
+
+### NP-12: `/profile/orders/[orderId]` — Order Detail
+
+**Function name = npont**: `OrderDetailPage`
+**Name = npont**: Single Order Detail
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/orders/[orderId]/page.tsx` | Page Component | Order detail route |
+| 2 | `components/restaurant/profile/orders/profile-order-details-screen.tsx` | Container | Order details container |
+| 3 | `components/restaurant/profile/orders/profile-order-list-item.tsx` | Component | Order item display |
+| 4 | `components/restaurant/profile/orders/profile-order-utils.ts` | Utility | Order data formatting |
+| 5 | `components/restaurant/profile/orders/use-profile-orders.ts` | Hook | Order data hook |
+| 6 | `lib/hooks/use-order-status-query.ts` | Hook | Order status query |
+
+---
+
+### NP-13: `/profile/addresses` — Address Book
+
+**Function name = npont**: `AddressBookPage`
+**Name = npont**: Saved Addresses
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/addresses/page.tsx` | Page Component | Addresses route |
+| 2 | `components/restaurant/profile/sections/profile-address-list.tsx` | Component | Address list display |
+| 3 | `components/restaurant/profile/sections/profile-address-card.tsx` | Component | Single address card |
+| 4 | `components/restaurant/profile/sections/profile-add-address-form.tsx` | Component | Add address form |
+| 5 | `components/restaurant/profile/sections/index.ts` | Barrel Export | Sections exports |
+| 6 | `components/restaurant/use-address-book.ts` | Hook | Address book state |
+| 7 | `components/restaurant/use-geolocation.ts` | Hook | GPS geolocation |
+| 8 | `components/restaurant/checkout/use-address-selector.ts` | Hook | Address selection |
+| 9 | `components/restaurant/checkout/checkout-address-selector-sheet.tsx` | Component | Address selector sheet |
+| 10 | `components/restaurant/checkout/checkout-address-selector-item.tsx` | Component | Address selector item |
+| 11 | `components/restaurant/checkout/checkout-map-address-picker.tsx` | Component | Map address picker |
+| 12 | `components/restaurant/checkout/use-here-interactive-map.ts` | Hook | HERE Maps integration |
+| 13 | `components/restaurant/checkout/checkout-add-address-form.tsx` | Component | Checkout add address |
+
+---
+
+### NP-14: `/profile/vouchers` — Voucher Wallet
+
+**Function name = npont**: `VoucherWalletPage`
+**Name = npont**: Promo Codes & Vouchers
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/vouchers/page.tsx` | Page Component | Vouchers route |
+| 2 | `components/restaurant/profile/sections/profile-voucher-wallet.tsx` | Component | Voucher wallet display |
+| 3 | `components/restaurant/checkout/use-voucher-wallet.ts` | Hook | Voucher state management |
+| 4 | `components/restaurant/checkout/use-checkout-promo.ts` | Hook | Promo code application |
+
+---
+
+### NP-15: `/profile/settings` — Profile Settings
+
+**Function name = npont**: `ProfileSettingsPage`
+**Name = npont**: User Settings
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/settings/page.tsx` | Page Component | Settings route |
+| 2 | `components/restaurant/profile/registration-settings-card.tsx` | Component | Registration settings |
+| 3 | `components/auth/registered-user.ts` | Types | User type definitions |
+| 4 | `components/auth/registration-context.tsx` | Context | Registration state |
+
+---
+
+### NP-16: `/profile/points` — Loyalty Points
+
+**Function name = npont**: `LoyaltyPointsPage`
+**Name = npont**: Points & Rewards Balance
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/points/page.tsx` | Page Component | Points route |
+| 2 | `components/restaurant/profile/vip-tier-card.tsx` | Component | VIP tier card |
+| 3 | `components/restaurant/profile/use-vip-tier.ts` | Hook | VIP tier calculation |
+| 4 | `components/restaurant/use-loyalty-points.ts` | Hook | Loyalty points state |
+| 5 | `lib/loyalty-utils.ts` | Utility | Points calculation |
+| 6 | `components/restaurant/checkout/reward-manager.tsx` | Component | Reward manager |
+| 7 | `components/restaurant/checkout/scratch-card.tsx` | Component | Scratch card reward |
+
+---
+
+### NP-17: `/profile/how-to-play` — How To Play
+
+**Function name = npont**: `HowToPlayPage`
+**Name = npont**: Game Instructions
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/how-to-play/page.tsx` | Page Component | How-to-play route |
+| 2 | `components/restaurant/games/game-intro-stage.tsx` | Component | Reusable game intro |
+
+---
+
+### NP-18: `/profile/rewards` — Rewards Page
+
+**Function name = npont**: `RewardsPage`
+**Name = npont**: Rewards & Offers
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/profile/rewards/page.tsx` | Page Component | Rewards route |
+| 2 | `components/restaurant/checkout/reward-manager.tsx` | Component | Rewards manager |
+| 3 | `components/restaurant/checkout/scratch-card.tsx` | Component | Scratch card game |
+| 4 | `components/restaurant/checkout/reward-offers.ts` | Utility | Reward definitions |
+| 5 | `components/restaurant/checkout/reward-storage.ts` | Utility | Reward persistence |
+| 6 | `components/restaurant/checkout/reward-types.ts` | Types | Reward type defs |
+| 7 | `lib/stores/referral-store.ts` | Zustand Store | Referral rewards |
+
+---
+
+### NP-19: `/google-reviews` — Google Reviews
+
+**Function name = npont**: `GoogleReviewsPage`
+**Name = npont**: Customer Reviews Display
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/google-reviews/page.tsx` | Page Component | Reviews route |
+| 2 | `components/restaurant/restaurant-reviews-showcase.tsx` | Component | Reviews showcase |
+| 3 | `components/restaurant/restaurant-review-card.tsx` | Component | Single review card |
+| 4 | `components/restaurant/restaurant-review-summary-card.tsx` | Component | Review summary |
+
+---
+
+### NP-20: `/social-media` — Social Media Links
+
+**Function name = npont**: `SocialMediaPage`
+**Name = npont**: Social Links Display
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/social-media/page.tsx` | Page Component | Social media route |
+| 2 | `components/restaurant/restaurant-social-media-showcase.tsx` | Component | Social showcase |
+| 3 | `components/restaurant/restaurant-social-link-card.tsx` | Component | Social link card |
+
+---
+
+### NP-21: `/api/auth/otp/request` — OTP Request API
+
+**Function name = npont**: `OtpRequestRoute`
+**Name = npont**: OTP Request Proxy
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/api/auth/otp/request/route.ts` | API Route | Proxies to backend `/api/v1/auth/otp/request` |
+| 2 | `lib/api-client.ts` | Utility | Fetch wrapper with host header |
+| 3 | `lib/server/otp-store.ts` | Server Utility | ⚠️ IN-MEMORY store (to be removed) |
+
+---
+
+### NP-22: `/api/auth/otp/verify` — OTP Verify API
+
+**Function name = npont**: `OtpVerifyRoute`
+**Name = npont**: OTP Verify Proxy
+
+**Components & Functions Under This N-Point:**
+| # | File Path | Export Type | Purpose |
+|---|---|---|---|
+| 1 | `app/api/auth/otp/verify/route.ts` | API Route | ⚠️ Currently in-memory, needs backend proxy |
+| 2 | `lib/api-client.ts` | Utility | Fetch wrapper |
+| 3 | `lib/server/otp-store.ts` | Server Utility | ⚠️ IN-MEMORY OTP verification (replace with backend call) |
+| 4 | `components/auth/registration-modal.tsx` | Component | OTP input UI |
+| 5 | `components/auth/registration-context.tsx` | Context | Auth state management |
+
+---
+
+## Shared Components (Used Across Multiple N-Points)
+
+| # | File Path | Used By N-Points |
 |---|---|---|
-| `GET /api/v1/restaurants/current` | ✅ Ready | Home page, layout |
-| `GET /api/v1/menus` | ✅ Ready | Menu page |
-| `POST /api/v1/auth/otp/request` | ✅ Ready | OTP request |
-| `POST /api/v1/auth/otp/verify` | ✅ Ready | OTP verify |
-| `GET /api/v1/auth/me` | ✅ Ready | Profile page |
-| `POST /api/v1/orders` | ✅ Ready | Checkout |
-| `GET /api/v1/orders/:id` | ✅ Ready | Order status |
-| `POST /api/v1/game-sessions` | ❌ Not ready | Save game score |
-| `GET /api/v1/game-sessions` | ❌ Not ready | Leaderboard |
-| `GET /api/v1/loyalty-points` | ❌ Not ready | Points balance |
-
-### 5.4 Frontend API Routes (Proxies)
-These Next.js API routes proxy to the backend:
-```
-app/api/auth/otp/request/route.ts   → POST /api/v1/auth/otp/request
-app/api/auth/otp/verify/route.ts    → POST /api/v1/auth/otp/verify
-```
-
-**Why proxies?** The frontend needs to:
-1. Pass `host` header for tenant resolution
-2. Set the `token` cookie securely (httpOnly, SameSite)
-3. Handle CORS between different ports/hosts
+| 1 | `components/shared/container.tsx` | All pages |
+| 2 | `components/shared/surface.tsx` | All pages |
+| 3 | `components/shared/button-link.tsx` | All pages |
+| 4 | `components/shared/empty-state.tsx` | NP-03, NP-04, NP-11, NP-13 |
+| 5 | `components/shared/index.ts` | All pages |
+| 6 | `lib/cn.ts` | All components |
+| 7 | `lib/format.ts` | NP-03, NP-05, NP-11, NP-16 |
+| 8 | `lib/theme-vars.ts` | NP-01 |
+| 9 | `lib/stores/ad-analytics-store.ts` | NP-01, NP-06 |
 
 ---
 
-## 6. Authentication Flow
+## Summary Table
 
-```
-1. User opens registration modal
-2. Enters name + mobile
-3. Frontend calls POST /api/auth/otp/request
-   → Proxies to backend POST /api/v1/auth/otp/request
-   → Backend creates otp_requests row (5-min TTL)
-   → Returns { requestId, demoOtp: "1234" } (demoOtp only in dev)
-4. User enters OTP
-5. Frontend calls POST /api/auth/otp/verify
-   → Proxies to backend POST /api/v1/auth/otp/verify
-   → Backend verifies OTP, creates/finds user
-   → Returns { verified: true, token, user }
-   → Frontend sets cookie: token={jwt}
-6. User is now authenticated
-   → All subsequent API calls include cookie via credentials: 'include'
-7. On page reload:
-   → Frontend calls GET /api/v1/auth/me (uses cookie)
-   → Returns current user profile
-```
-
----
-
-## 7. Cart & Checkout Flow
-
-```
-1. User browses menu, adds items to cart
-   → Zustand cart-store updates
-   → AppShell shows cart badge
-2. User taps cart → checkout page opens
-3. User selects address (delivery) or table (dine-in)
-4. User enters promo code (optional)
-5. User taps "Place Order"
-   → Frontend calls POST /api/v1/orders
-   → Backend creates order + order_items rows
-   → Returns { order: { id, code, status, total } }
-   → Frontend redirects to /orders/{orderId}
-6. Order status page polls every 5s
-   → Shows real-time status updates
-   → ETA countdown
-```
+| N-Point # | Route | Component Count | Hook Count | API Route | Status |
+|---|---|---|---|---|---|
+| NP-01 | `/` | 15 | 2 | No | ✅ Complete |
+| NP-02 | `/menu` | 18 | 4 | No | ✅ Complete |
+| NP-03 | `/menu/checkout` | 12 | 5 | No | ✅ Complete |
+| NP-04 | `/menu/checkout/status` | 5 | 1 | No | ✅ Complete |
+| NP-05 | `/menu/checkout/status/[orderId]` | 6 | 1 | No | ✅ Complete |
+| NP-06 | `/eat-play` | 8 | 1 | No | ✅ Complete |
+| NP-07 | `/eat-play/[gameId]` | 6 | 0 | No | ✅ Complete |
+| NP-08 | `/eat-play/[gameId]/play` | 7 + 5 games | 5 | No | ✅ Complete |
+| NP-09 | `/eat-play/profile` | 3 | 1 | No | ✅ Complete |
+| NP-10 | `/profile` | 10 | 2 | No | ✅ Complete |
+| NP-11 | `/profile/orders` | 5 | 1 | No | ✅ Complete |
+| NP-12 | `/profile/orders/[orderId]` | 4 | 2 | No | ✅ Complete |
+| NP-13 | `/profile/addresses` | 10 | 4 | No | ✅ Complete |
+| NP-14 | `/profile/vouchers` | 2 | 2 | No | ✅ Complete |
+| NP-15 | `/profile/settings` | 2 | 0 | No | ✅ Complete |
+| NP-16 | `/profile/points` | 5 | 3 | No | ✅ Complete |
+| NP-17 | `/profile/how-to-play` | 1 | 0 | No | ✅ Complete |
+| NP-18 | `/profile/rewards` | 5 | 0 | No | ✅ Complete |
+| NP-19 | `/google-reviews` | 3 | 0 | No | ✅ Complete |
+| NP-20 | `/social-media` | 2 | 0 | No | ✅ Complete |
+| NP-21 | `/api/auth/otp/request` | 1 | 0 | Yes ✅ | ✅ Complete |
+| NP-22 | `/api/auth/otp/verify` | 2 | 0 | Yes 🚨 | ⚠️ Broken — uses in-memory |
 
 ---
 
-## 8. Game Integration Rules
+## Critical Fix Required
 
-### 8.1 Game Architecture
-Every game follows the 4-file pattern:
-```
-components/restaurant/games/local/{game-id}/
-  ├── {game-id}-model.ts        # Types, constants, score mapping
-  ├── {game-id}-canvas-art.ts   # Canvas drawing functions
-  ├── use-{game-id}-engine.ts   # Physics, collisions, game loop
-  └── {game-id}-game.tsx        # React component (canvas + HUD)
-```
+**NP-22** (`/api/auth/otp/verify`) must be updated to proxy to the backend instead of using `lib/server/otp-store.ts`. This is the #1 blocker for real user authentication.
 
-### 8.2 Adding a New Game
-1. Create the 4 files above
-2. Add game metadata to `mock-restaurants.ts` (games array)
-3. Register in `local-game-registry.tsx`
-4. Run `pnpm --filter customer-frontend typecheck`
-
-### 8.3 Score Persistence
-On game over, the engine calls:
+**Fix:**
 ```typescript
-onAward({ points, score, label }) => {
-  // 1. Save to backend
-  apiClient('/game-sessions', {
+// app/api/auth/otp/verify/route.ts
+import { apiClient } from '@/lib/api-client';
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const response = await apiClient('/auth/otp/verify', {
     method: 'POST',
-    body: {
-      gameId: game.localGameId,
-      score,
-      pointsAwarded: points,
-      scoringVersion: '1.0',
-    },
+    body,
   });
-
-  // 2. Update local state
-  setAward({ points, score, label });
-};
+  return Response.json(response);
+}
 ```
+
+Then **delete** `lib/server/otp-store.ts`.
 
 ---
 
-## 9. Build Checklist
-
-Before marking any customer-frontend feature complete:
-
-- [ ] No component exceeds 80 lines
-- [ ] All API calls use `credentials: 'include'`
-- [ ] All API calls pass `host` header
-- [ ] `tsc --noEmit` passes (`pnpm --filter customer-frontend typecheck`)
-- [ ] Mobile responsive (test at 375px)
-- [ ] Touch targets minimum 44px
-- [ ] Loading states handled (skeleton or spinner)
-- [ ] Empty states handled (illustration + text)
-- [ ] Error states handled (toast or inline error)
-- [ ] No `console.log` in production code
-- [ ] `next/image` used for all images (with proper sizes)
-- [ ] Animations use extracted variants (not inline config)
-- [ ] Zustand stores use `persist` middleware where needed
-
----
-
-## 10. Testing Commands
-
-```bash
-# TypeScript check
-pnpm --filter customer-frontend typecheck
-
-# Dev server (port 3000)
-pnpm --filter customer-frontend dev
-
-# Build for production
-pnpm --filter customer-frontend build
-
-# Lint
-pnpm --filter customer-frontend lint
-```
-
----
-
-## 11. Common Pitfalls
-
-1. **Forgetting `host` header** → Backend returns "Tenant context required"
-2. **Missing `credentials: 'include'`** → JWT cookie not sent, 401 Unauthorized
-3. **Not handling API fallback** → When backend is down, page crashes instead of showing mock data
-4. **Server Component calling client API** → `window` is undefined in RSC. Use `"use client"` or pass data as props.
-5. **Zustand hydration mismatch** → Use `useStore` pattern with `typeof window !== 'undefined'` check.
-6. **Game canvas not responsive** → Canvas must resize with `ResizeObserver` or `window resize` event.
-7. **OTP modal not closing after verify** → Always call `onClose()` after successful verification.
-
----
-
-## 12. Cross-Platform Links (How Customer Frontend Connects to Other Portals)
-
-### Link 1: justsearch-admin → customer-frontend
-```
-justsearch-admin creates restaurant (POST /api/v1/restaurants)
-    → Backend creates public.restaurants row
-    → Customer visits [restaurant].mydomain.com
-    → customer-frontend fetches GET /api/v1/restaurants/current
-    → Renders restaurant landing page
-```
-**Data flow:** Restaurant name, theme, logo, menu, games — all set by admin, displayed by customer-frontend.
-
-### Link 2: restaurant-dashboard → customer-frontend
-```
-restaurant-dashboard staff edits menu (PATCH /api/v1/menu-items/:id)
-    → Backend updates menu_items table
-    → Customer refreshes menu page
-    → customer-frontend fetches GET /api/v1/menus
-    → Sees updated prices / availability immediately
-```
-**Data flow:** Menu changes made in dashboard are instantly visible to customers.
-
-### Link 3: customer-frontend → restaurant-dashboard
-```
-Customer places order (POST /api/v1/orders from checkout)
-    → Backend creates orders + order_items rows
-    → restaurant-dashboard polls GET /api/v1/orders every 10s
-    → New order appears in dashboard with "pending" status
-    → Sound notification plays
-```
-**Data flow:** Customer order immediately appears in staff dashboard.
-
-### Link 4: customer-frontend → delivery-portal
-```
-Customer places delivery order
-    → restaurant-dashboard assigns driver (PATCH /orders/:id/driver)
-    → delivery-portal polls GET /api/v1/orders?driverId=...
-    → Order appears in rider queue
-    → Rider updates status (picked_up → in_transit → delivered)
-    → customer-frontend polls GET /api/v1/orders/:id
-    → Customer sees "On the way" → "Delivered"
-```
-**Data flow:** Order status changes in delivery portal are visible to customer in real-time.
-
-### Link 5: justsearch-admin → customer-frontend (Games)
-```
-justsearch-admin creates game (POST /api/v1/games)
-    → Backend creates games row in public schema
-    → admin links game to restaurant via restaurant_games junction
-    → customer-frontend fetches games list
-    → Game appears in /eat-play page
-```
-**Data flow:** Platform-level games activated per restaurant by admin.
-
----
-
-## 13. Environment Variables
-
-```
-NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
-NEXT_PUBLIC_BASE_DOMAIN=mydomain.com
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-
-**Note**: Only variables prefixed with `NEXT_PUBLIC_` are available in client-side code.
-
-## 13. Build Roadmap (What to Do Next)
-
-### Phase 1: Connect OTP to Backend (Critical)
-| # | File | Action | Backend Needed |
-|---|---|---|---|
-| 1.1 | `lib/api-client.ts` | Add `credentials: 'include'` | None |
-| 1.2 | `app/api/auth/otp/request/route.ts` | Replace with proxy to `POST /api/v1/auth/otp/request` | ✅ Exists |
-| 1.3 | `app/api/auth/otp/verify/route.ts` | Replace with proxy to `POST /api/v1/auth/otp/verify` | ✅ Exists |
-| 1.4 | `lib/server/otp-store.ts` | **Delete** after proxy works | N/A |
-
-### Phase 2: Connect Checkout
-| # | File | Action | Backend Needed |
-|---|---|---|---|
-| 2.1 | `components/checkout/checkout-summary-card.tsx` | Add `onPlaceOrder` → `POST /api/v1/orders` | ✅ Exists |
-| 2.2 | `app/orders/[orderId]/page.tsx` | **Create** — fetch `GET /api/v1/orders/:id` | ✅ Exists |
-| 2.3 | `components/orders/order-status-timeline.tsx` | **Create** — visual stepper | None |
-
-### Phase 3: Connect Game Sessions
-| # | File | Action | Backend Needed |
-|---|---|---|---|
-| 3.1 | `app/api/game-sessions/route.ts` | **Create** — proxy `POST /api/v1/game-sessions` | ❌ Needs route |
-| 3.2 | `components/games/local-game-player.tsx` | Add save score call | ✅ Proxy ready |
-| 3.3 | `components/games/profile/eat-play-profile-screen.tsx` | Fetch `GET /api/v1/game-sessions` | ❌ Needs route |
-
-### Phase 4: Connect Profile & Loyalty
-| # | File | Action | Backend Needed |
-|---|---|---|---|
-| 4.1 | `app/profile/page.tsx` | Fetch `GET /api/v1/auth/me` | ✅ Exists |
-| 4.2 | `components/profile/profile-loyalty-card.tsx` | **Create** — fetch points | ❌ Needs route |
-| 4.3 | `components/profile/profile-order-history.tsx` | **Create** — fetch orders | ❌ Needs route |
-
-### Phase 5: Connect Address Management
-| # | File | Action | Backend Needed |
-|---|---|---|---|
-| 5.1 | `components/checkout/checkout-add-address-form.tsx` | Save to backend | ❌ Needs table + route |
-| 5.2 | `app/api/addresses/route.ts` | **Create** — proxy to backend | ❌ Needs backend route |
-
----
-
-End of Customer Frontend Agent Guide.
+*Generated for Customer Frontend — 22 N-Points mapped with all functions listed*
