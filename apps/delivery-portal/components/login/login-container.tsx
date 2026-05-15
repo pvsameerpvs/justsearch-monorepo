@@ -14,7 +14,6 @@ export function LoginContainer() {
     setPassword,
     error,
     isLoading,
-    urlInfo,
     onSubmit,
   } = useLoginForm();
 
@@ -23,10 +22,6 @@ export function LoginContainer() {
       <div className="w-full max-w-sm">
         <LoginLogo />
 
-        {urlInfo.driverUniqueId && (
-          <LoginDriverBanner driverUniqueId={urlInfo.driverUniqueId} />
-        )}
-
         <LoginFormPresenter
           username={username}
           onUsernameChange={setUsername}
@@ -34,7 +29,7 @@ export function LoginContainer() {
           onPasswordChange={setPassword}
           error={error}
           isLoading={isLoading}
-          showUsernameHint={!urlInfo.driverUniqueId}
+          showUsernameHint={true}
           onSubmit={onSubmit}
         />
 

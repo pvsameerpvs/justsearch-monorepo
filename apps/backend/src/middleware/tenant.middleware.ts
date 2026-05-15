@@ -45,6 +45,13 @@ export async function tenantMiddleware(
     return next();
   }
 
+  // Strip portal suffixes for admin and delivery subdomains
+  if (subdomain.endsWith('-admin')) {
+    subdomain = subdomain.slice(0, -6);
+  } else if (subdomain.endsWith('-delivery')) {
+    subdomain = subdomain.slice(0, -9);
+  }
+
   try {
     const [restaurant] = await db
       .select()

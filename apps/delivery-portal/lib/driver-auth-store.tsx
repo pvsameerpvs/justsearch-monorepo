@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { apiClient } from "./api-client";
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -11,7 +12,7 @@ interface AuthState {
 }
 
 interface AuthContextType extends AuthState {
-  login: (driverId: string, restaurantSlug: string, driverName: string) => void;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -27,35 +28,51 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("driver-auth");
-      if (raw) {
-        const parsed = JSON.parse(raw);
+    async function checkAuth() {
+      try {
+        const me = await apiClient<{ id: string; name: string; restaurantId: string }>('/auth/me');
         setState({
-          isLoggedIn: parsed.isLoggedIn ?? false,
-          driverId: parsed.driverId ?? null,
-          restaurantSlug: parsed.restaurantSlug ?? null,
-          driverName: parsed.driverName ?? null,
+          isLoggedIn: true,
+          driverId: me.id,
+          restaurantSlug: me.restaurantId,
+          driverName: me.name,
           hydrated: true,
         });
-      } else {
+      } catch {
         setState((prev) => ({ ...prev, hydrated: true }));
       }
-    } catch {
-      setState((prev) => ({ ...prev, hydrated: true }));
     }
+    checkAuth();
   }, []);
 
-  const login = (driverId: string, restaurantSlug: string, driverName: string) => {
-    const next = { isLoggedIn: true, driverId, restaurantSlug, driverName, hydrated: true };
-    setState(next);
-    localStorage.setItem("driver-auth", JSON.stringify(next));
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const res = await apiClient<{ token: string; user: { id: string; name: string; restaurantId: string } }>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password, type: 'delivery' }),
+      });
+      setState({
+        isLoggedIn: true,
+        driverId: res.user.id,
+        restaurantSlug: res.user.restaurantId,
+        driverName: res.user.name,
+        hydrated: true,
+      });
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const logout = () => {
-    const next = { isLoggedIn: false, driverId: null, restaurantSlug: null, driverName: null, hydrated: true };
-    setState(next);
-    localStorage.removeItem("driver-auth");
+    setState({
+      isLoggedIn: false,
+      driverId: null,
+      restaurantSlug: null,
+      driverName: null,
+      hydrated: true,
+    });
+    window.location.href = '/login';
   };
 
   return (

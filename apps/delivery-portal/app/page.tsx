@@ -1,31 +1,69 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { DeliveryPortalShell } from '@/components/layout/delivery-portal-shell';
 import { DriverHomeView } from '@/components/orders/driver-home-view';
-import { getCurrentDeliveryPortalSnapshot } from '@/lib/portal-context';
+import { useDriverAuth } from '@/lib/driver-auth-store';
+import { useDeliveryOrdersQuery } from '@/lib/hooks/use-delivery-orders-query';
+import { mapApiOrderToDelivery } from '@/lib/delivery-mappers';
 import type { DeliveryPortalSnapshot } from '@/lib/delivery-types';
 
-export default function DeliveryPortalPage() {
-  const [snapshot, setSnapshot] = useState<DeliveryPortalSnapshot | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+function buildSnapshot(
+  restaurantSlug: string | null,
+  driverName: string | null,
+  activeOrders: ReturnType<typeof useDeliveryOrdersQuery>['orders'],
+  completedOrders: ReturnType<typeof useDeliveryOrdersQuery>['orders']
+): DeliveryPortalSnapshot {
+  return {
+    restaurant: {
+      slug: restaurantSlug || 'restaurant',
+      name: restaurantSlug || 'Restaurant',
+      deliveryDomain: `${restaurantSlug || 'restaurant'}-delivery.localhost`,
+      zoneLabel: 'Zone A',
+      supportPhone: '+971 4 000 0000',
+    },
+    agent: {
+      id: 'driver-1',
+      name: driverName || 'Driver',
+      phone: '+971 50 000 0000',
+      vehicleType: 'Scooter',
+      shiftLabel: 'Active',
+      status: 'online',
+      rating: 4.9,
+      completedToday: completedOrders.length,
+    },
+    metrics: [],
+    activeOrders: activeOrders.map(mapApiOrderToDelivery),
+    completedOrders: completedOrders.map(mapApiOrderToDelivery),
+    routeChecklist: [],
+    routeHealthLabel: 'Good',
+    supportNotice: '',
+  };
+}
 
-  const load = useCallback(async () => {
-    const data = await getCurrentDeliveryPortalSnapshot();
-    setSnapshot(data);
-  }, []);
+export default function DeliveryPortalPage() {
+  const { driverName, restaurantSlug } = useDriverAuth();
+  const { orders, isLoading, refetch } = useDeliveryOrdersQuery();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const refresh = useCallback(async () => {
     setIsRefreshing(true);
-    await load();
+    await refetch();
     setTimeout(() => setIsRefreshing(false), 500);
-  }, [load]);
+  }, [refetch]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  const activeOrders = orders.filter((o) => !['completed', 'cancelled'].includes(o.status));
+  const completedOrders = orders.filter((o) => ['completed', 'cancelled'].includes(o.status));
 
-  if (!snapshot) return null;
+  const snapshot = buildSnapshot(restaurantSlug, driverName, activeOrders, completedOrders);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   const allOrders = [...snapshot.activeOrders, ...snapshot.completedOrders];
 

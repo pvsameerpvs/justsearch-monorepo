@@ -1,15 +1,11 @@
 "use client";
 
-import { useDashboardAuth } from "@/lib/auth-context";
+import { useAdminAuth } from "@/lib/auth-store";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-export function DashboardAuthGuard({ children }: { children: React.ReactNode }) {
-  return <AuthGuard>{children}</AuthGuard>;
-}
-
-export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useDashboardAuth();
+export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAdminAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -22,7 +18,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
       </div>
     );
   }

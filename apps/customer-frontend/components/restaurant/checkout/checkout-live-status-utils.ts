@@ -2,9 +2,11 @@
 
 import {
   ORDER_STATUS_DELIVERED_MS,
-  type DeliveryOrder,
-  type DeliveryOrderStatus,
-} from '../use-restaurant-fulfillment';
+} from '../fulfillment/fulfillment.constants';
+import type {
+  DeliveryOrder,
+  DeliveryOrderStatus,
+} from '../fulfillment/fulfillment.types';
 
 export type CheckoutLiveStage = {
   id: 'accepted' | 'ready' | 'assigned' | 'completed';

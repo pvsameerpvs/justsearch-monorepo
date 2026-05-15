@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useOrderStore, type DashboardOrder } from "@/lib/stores/order-store";
+import { useOrderStore, type DashboardOrder, type OrderStatus } from "@/lib/stores/order-store";
+import { useOrdersQuery } from "@/lib/hooks/use-orders-query";
 import { useOrderSound } from "./use-order-sound";
 import { useOrderHistory } from "./use-order-history";
+import { apiClient } from "@/lib/api-client";
+import { mapApiOrderToDashboard } from "./orders.utils";
 
 type Tab = "active" | "history";
 
@@ -13,13 +16,16 @@ const HISTORY_FILTERS = ["all", "completed", "cancelled"] as const;
 const DEFAULT_HISTORY_DATE = new Date(Date.UTC(2026, 4, 13));
 
 export function useOrderManager() {
-  const { orders, updateStatus } = useOrderStore();
+  const { orders: storeOrders, updateStatus: updateStoreStatus } = useOrderStore();
+  const { orders: apiOrders, isLoading: apiLoading, refetch } = useOrdersQuery();
   const [tab, setTab] = useState<Tab>("active");
   const [filter, setFilter] = useState<string>("all");
   const [historyView, setHistoryView] = useState<"day" | "month" | "all">("day");
   const [historyDate, setHistoryDate] = useState<Date>(DEFAULT_HISTORY_DATE);
   const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
   const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
+
+  const orders = apiOrders.length > 0 ? apiOrders.map(mapApiOrderToDashboard) : storeOrders;
 
   useOrderSound(orders);
 
@@ -34,6 +40,18 @@ export function useOrderManager() {
 
   const visibleOrders: DashboardOrder[] = isActiveTab ? filteredActive : filteredHistory;
   const statsOrders = isActiveTab ? activeOrders : historyOrders;
+
+  const updateStatus = async (id: string, status: OrderStatus) => {
+    try {
+      await apiClient(`/orders/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
+      refetch();
+    } catch {
+      updateStoreStatus(id, status);
+    }
+  };
 
   return {
     tab,
@@ -53,5 +71,6 @@ export function useOrderManager() {
     filters,
     visibleOrders,
     statsOrders,
+    isLoading: apiLoading,
   };
 }
