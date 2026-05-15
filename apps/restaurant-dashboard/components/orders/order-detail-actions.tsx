@@ -1,4 +1,4 @@
-import { useOrderStore } from "@/lib/stores/order-store";
+import { useUpdateOrderStatusMutation } from "@/lib/hooks/use-orders-query";
 import { ORDER_FLOW } from "./order-status-config";
 
 interface OrderDetailActionsProps {
@@ -26,20 +26,24 @@ const ACTION_META: Record<string, { label: string; color: string; hover: string 
 };
 
 export function OrderDetailActions({ orderId, status, type, hasAgent, onAssign }: OrderDetailActionsProps) {
-  const { updateStatus } = useOrderStore();
+  const { mutate: updateStatus } = useUpdateOrderStatusMutation();
   const next = NEXT_STATUS[status];
   const meta = ACTION_META[status];
 
   const nextLabel = ORDER_FLOW.find((s) => s.value === next)?.label ?? "Next";
 
+  const handleStatusChange = (newStatus: string) => {
+    updateStatus({ orderId, status: newStatus });
+  };
+
   return (
     <div className="border-t border-slate-100 p-4 space-y-2">
       {status === "pending" && (
         <div className="grid grid-cols-2 gap-2">
-          <button onClick={() => updateStatus(orderId, "cancelled")} className="rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-bold text-red-600 hover:bg-red-100">
+          <button onClick={() => handleStatusChange("cancelled")} className="rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-bold text-red-600 hover:bg-red-100">
             Reject
           </button>
-          <button onClick={() => updateStatus(orderId, "confirmed")} className="rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-white hover:bg-emerald-600">
+          <button onClick={() => handleStatusChange("confirmed")} className="rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-white hover:bg-emerald-600">
             {meta?.label ?? "Accept"}
           </button>
         </div>
@@ -51,7 +55,7 @@ export function OrderDetailActions({ orderId, status, type, hasAgent, onAssign }
             Next: {nextLabel}
           </p>
           <button
-            onClick={() => updateStatus(orderId, next as never)}
+            onClick={() => handleStatusChange(next)}
             className={`w-full rounded-xl py-2.5 text-sm font-bold text-white transition-colors ${meta.color} ${meta.hover}`}
           >
             {meta.label}

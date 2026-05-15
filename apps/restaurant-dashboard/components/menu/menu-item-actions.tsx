@@ -1,13 +1,26 @@
+"use client";
+
 import { Trash2, Eye, EyeOff, Pencil } from "lucide-react";
+import { useUpdateMenuItemMutation, useDeleteMenuItemMutation } from "@/lib/hooks/use-menu-query";
 
 interface MenuItemActionsProps {
+  itemId: string;
   isAvailable: boolean;
   onEdit?: () => void;
-  onToggle: () => void;
-  onRemove: () => void;
 }
 
-export function MenuItemActions({ isAvailable, onEdit, onToggle, onRemove }: MenuItemActionsProps) {
+export function MenuItemActions({ itemId, isAvailable, onEdit }: MenuItemActionsProps) {
+  const updateItem = useUpdateMenuItemMutation();
+  const deleteItem = useDeleteMenuItemMutation();
+
+  const handleToggle = () => {
+    updateItem.mutate({ id: itemId, data: { isAvailable: !isAvailable } });
+  };
+
+  const handleRemove = () => {
+    deleteItem.mutate(itemId);
+  };
+
   return (
     <div className="flex gap-1">
       {onEdit && (
@@ -21,7 +34,7 @@ export function MenuItemActions({ isAvailable, onEdit, onToggle, onRemove }: Men
       )}
       <button
         type="button"
-        onClick={onToggle}
+        onClick={handleToggle}
         className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
           isAvailable ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-400"
         }`}
@@ -30,7 +43,7 @@ export function MenuItemActions({ isAvailable, onEdit, onToggle, onRemove }: Men
       </button>
       <button
         type="button"
-        onClick={onRemove}
+        onClick={handleRemove}
         className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
       >
         <Trash2 className="h-4 w-4" />

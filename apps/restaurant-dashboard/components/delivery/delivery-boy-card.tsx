@@ -4,10 +4,10 @@ import { STATUS_META } from "./agent-status-meta";
 import { CardDisabledFooter } from "./card-disabled-footer";
 import { CardInfoGrid } from "./card-info-grid";
 import { DriverLoginInfo } from "./driver-login-info";
-import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
+import type { DeliveryAgent } from "@/lib/hooks/use-delivery-agents-query";
 
 interface DeliveryBoyCardProps {
-  agent: DeliveryBoy;
+  agent: DeliveryAgent;
   onToggleActive: () => void;
   onRemove: () => void;
   onEdit: () => void;
@@ -15,7 +15,7 @@ interface DeliveryBoyCardProps {
 }
 
 export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onViewOrders }: DeliveryBoyCardProps) {
-  const meta = STATUS_META[agent.status];
+  const meta = STATUS_META[agent.status as keyof typeof STATUS_META] ?? STATUS_META.offline;
   const isDisabled = !agent.isActive;
 
   return (
@@ -46,7 +46,7 @@ export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onVie
             </div>
             <div>
               <p className="text-sm font-bold text-slate-900">{agent.name}</p>
-              <p className="text-[10px] font-mono text-slate-500">ID: {agent.uniqueId}</p>
+              <p className="text-[10px] font-mono text-slate-500">ID: {agent.username}</p>
             </div>
           </div>
           <div className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1">
@@ -56,7 +56,7 @@ export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onVie
         </div>
 
         <CardInfoGrid agent={agent} />
-        <DriverLoginInfo uniqueId={agent.uniqueId} password={agent.password} />
+        <DriverLoginInfo uniqueId={agent.username} password={agent.password} />
       </div>
 
       {/* View Orders Button */}

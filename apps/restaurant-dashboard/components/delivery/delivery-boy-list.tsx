@@ -1,8 +1,8 @@
 import { DeliveryBoyCard } from "./delivery-boy-card";
-import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
+import type { DeliveryAgent } from "@/lib/hooks/use-delivery-agents-query";
 
 interface DeliveryBoyListProps {
-  agents: DeliveryBoy[];
+  agents: DeliveryAgent[];
   onToggleActive: (id: string) => void;
   onRemove: (id: string) => void;
   onEdit: (id: string) => void;

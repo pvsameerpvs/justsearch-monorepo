@@ -19,4 +19,6 @@ export { OrderTotals } from "./customer-order-totals";
 export { OrderAddressBlock } from "./customer-order-address-block";
 export { InfoItem, StatCard } from "./customer-detail-info-item";
 export { useCustomerManager } from "./hooks/use-customer-manager";
+export { CustomerSkeleton } from "./customer-skeleton";
+export { CustomerError } from "./customer-error";
 export type { Customer, CustomerStats, CustomerAddress, GameActivity, VoucherUsage } from "./types/customer.types";

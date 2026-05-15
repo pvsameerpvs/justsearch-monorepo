@@ -1,8 +1,8 @@
 import { Bike, Users, CheckCircle, Clock, XCircle } from "lucide-react";
-import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
+import type { DeliveryAgent } from "@/lib/hooks/use-delivery-agents-query";
 
 interface DeliveryBoyStatsProps {
-  agents: DeliveryBoy[];
+  agents: DeliveryAgent[];
 }
 
 const STAT_CONFIG = [

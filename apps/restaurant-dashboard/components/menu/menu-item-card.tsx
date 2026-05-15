@@ -1,16 +1,12 @@
-import Image from 'next/image';
+import Image from "next/image";
 import { MenuItemActions } from "./menu-item-actions";
 import type { MenuItem } from "@/lib/stores/menu-store";
 
 export function MenuItemCard({
   item,
-  onToggle,
-  onRemove,
   onEdit,
 }: {
   item: MenuItem;
-  onToggle: () => void;
-  onRemove: () => void;
   onEdit?: () => void;
 }) {
   return (
@@ -56,7 +52,7 @@ export function MenuItemCard({
       )}
 
       <div className="mt-3">
-        <MenuItemActions isAvailable={item.isAvailable} onEdit={onEdit} onToggle={onToggle} onRemove={onRemove} />
+        <MenuItemActions itemId={item.id} isAvailable={item.isAvailable} onEdit={onEdit} />
       </div>
     </div>
   );

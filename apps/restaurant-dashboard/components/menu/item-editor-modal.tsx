@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { X } from "lucide-react";
-import { useMenuStore } from "@/lib/stores/menu-store";
-import { ItemFormFields } from "./item-form-fields";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useCreateMenuItemMutation, useUpdateMenuItemMutation } from "@/lib/hooks/use-menu-query";
+import { ItemFormFields, itemEditorSchema, type ItemEditorFormData } from "./item-form-fields";
+import type { MenuItem } from "@/lib/stores/menu-store";
 
 export function ItemEditorModal({
   categoryId,
@@ -11,18 +14,24 @@ export function ItemEditorModal({
   onClose,
 }: {
   categoryId: string;
-  item?: { id: string; name: string; description: string; price: number; currency: string; image?: string; tags?: string[]; subcategory?: string; isAvailable: boolean };
+  item?: MenuItem;
   onClose: () => void;
 }) {
-  const { addItem, updateItem } = useMenuStore();
-  const [name, setName] = useState(item?.name ?? "");
-  const [description, setDescription] = useState(item?.description ?? "");
-  const [price, setPrice] = useState(item?.price ?? 0);
-  const [currency, setCurrency] = useState(item?.currency ?? "AED");
-  const [image, setImage] = useState(item?.image ?? "");
-  const [tags, setTags] = useState(item?.tags?.join(", ") ?? "");
-  const [subcategory, setSubcategory] = useState(item?.subcategory ?? "");
-  const [isAvailable, setIsAvailable] = useState(item?.isAvailable ?? true);
+  const createItem = useCreateMenuItemMutation();
+  const updateItem = useUpdateMenuItemMutation();
+  const form = useForm<ItemEditorFormData>({
+    resolver: zodResolver(itemEditorSchema),
+    defaultValues: {
+      name: item?.name ?? "",
+      description: item?.description ?? "",
+      price: item?.price ?? 0,
+      currency: item?.currency ?? "AED",
+      image: item?.image ?? "",
+      tags: item?.tags?.join(", ") ?? "",
+      subcategory: item?.subcategory ?? "",
+      isAvailable: item?.isAvailable ?? true,
+    },
+  });
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -30,15 +39,16 @@ export function ItemEditorModal({
     return () => window.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  const handleSave = () => {
-    const tagList = tags.split(",").map((t) => t.trim()).filter(Boolean);
+  const onSubmit = form.handleSubmit((data) => {
+    const tagList = data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
+    const payload = { ...data, categoryId, tags: tagList };
     if (item) {
-      updateItem(categoryId, item.id, { name, description, price, currency, image: image || undefined, tags: tagList, subcategory: subcategory || undefined, isAvailable });
+      updateItem.mutate({ id: item.id, data: payload });
     } else {
-      addItem(categoryId, { name, description, price, currency, image: image || undefined, tags: tagList, subcategory: subcategory || undefined, isAvailable });
+      createItem.mutate(payload);
     }
     onClose();
-  };
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -50,22 +60,13 @@ export function ItemEditorModal({
             <X className="h-4 w-4" />
           </button>
         </div>
-
-        <ItemFormFields
-          name={name} setName={setName}
-          description={description} setDescription={setDescription}
-          price={price} setPrice={setPrice}
-          currency={currency} setCurrency={setCurrency}
-          image={image} setImage={setImage}
-          tags={tags} setTags={setTags}
-          subcategory={subcategory} setSubcategory={setSubcategory}
-          isAvailable={isAvailable} setIsAvailable={setIsAvailable}
-        />
-
-        <div className="mt-6 flex gap-3">
-          <button onClick={onClose} className="elegant-btn-secondary flex-1">Cancel</button>
-          <button onClick={handleSave} className="elegant-btn-primary flex-1">{item ? "Update" : "Add"} Item</button>
-        </div>
+        <form onSubmit={onSubmit}>
+          <ItemFormFields form={form} />
+          <div className="mt-6 flex gap-3">
+            <button type="button" onClick={onClose} className="elegant-btn-secondary flex-1">Cancel</button>
+            <button type="submit" className="elegant-btn-primary flex-1">{item ? "Update" : "Add"} Item</button>
+          </div>
+        </form>
       </div>
     </div>
   );

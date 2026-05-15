@@ -1,4 +1,4 @@
-import type { AgentStatus } from "@/lib/stores/delivery-boy-store";
+type AgentStatus = "available" | "busy" | "offline";
 
 export const STATUS_META: Record<AgentStatus, { label: string; dot: string; bg: string; text: string; border: string }> = {
   available: { label: "Available", dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" },

@@ -1,11 +1,9 @@
 "use client";
 
-import Image from 'next/image';
-import { useMenuStore } from "@/lib/stores/menu-store";
+import Image from "next/image";
 import { MenuItemActions } from "./menu-item-actions";
 
 interface MenuItemRowProps {
-  categoryId: string;
   item: {
     id: string;
     name: string;
@@ -20,9 +18,7 @@ interface MenuItemRowProps {
   onEdit: () => void;
 }
 
-export function MenuItemRow({ categoryId, item, onEdit }: MenuItemRowProps) {
-  const { toggleItem, removeItem } = useMenuStore();
-
+export function MenuItemRow({ item, onEdit }: MenuItemRowProps) {
   return (
     <div className={`flex items-center gap-3 rounded-xl border p-3 transition-all ${item.isAvailable ? "border-slate-200 bg-white" : "border-slate-100 bg-slate-50/50 opacity-50"}`}>
       {item.image ? (
@@ -45,12 +41,7 @@ export function MenuItemRow({ categoryId, item, onEdit }: MenuItemRowProps) {
           {item.subcategory && <span className="text-[10px] text-slate-400">• {item.subcategory}</span>}
         </div>
       </div>
-      <MenuItemActions
-        isAvailable={item.isAvailable}
-        onEdit={onEdit}
-        onToggle={() => toggleItem(categoryId, item.id)}
-        onRemove={() => removeItem(categoryId, item.id)}
-      />
+      <MenuItemActions itemId={item.id} isAvailable={item.isAvailable} onEdit={onEdit} />
     </div>
   );
 }

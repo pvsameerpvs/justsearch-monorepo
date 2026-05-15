@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMenuStore } from "@/lib/stores/menu-store";
 import { EmojiPicker } from "@/components/ui/emoji-picker";
+import { useUpdateMenuCategoryMutation, useDeleteMenuCategoryMutation } from "@/lib/hooks/use-menu-query";
 import type { MenuCategory } from "@/lib/stores/menu-store";
 
 interface CategoryHeaderProps {
@@ -11,14 +11,15 @@ interface CategoryHeaderProps {
 }
 
 export function CategoryHeader({ category }: CategoryHeaderProps) {
-  const { removeCategory, updateCategory } = useMenuStore();
+  const updateCategory = useUpdateMenuCategoryMutation();
+  const deleteCategory = useDeleteMenuCategoryMutation();
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(category.title);
   const desc = category.description;
   const [emoji, setEmoji] = useState(category.emoji ?? "");
 
   const save = () => {
-    updateCategory(category.id, { title, description: desc, emoji: emoji || undefined });
+    updateCategory.mutate({ id: category.id, data: { name: title, description: desc } });
     setIsEditing(false);
   };
 
@@ -46,7 +47,7 @@ export function CategoryHeader({ category }: CategoryHeaderProps) {
             <Pencil className="h-3.5 w-3.5" />
           </button>
         )}
-        <button onClick={() => removeCategory(category.id)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500">
+        <button onClick={() => deleteCategory.mutate(category.id)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500">
           <Trash2 className="h-3.5 w-3.5" />
         </button>
       </div>

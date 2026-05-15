@@ -1,63 +1,61 @@
 "use client";
 
+import type { ComponentPropsWithoutRef } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
 import { ImageUpload } from "@/components/ui/image-upload";
 
+export const itemEditorSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  description: z.string().max(200, "Description too long").optional(),
+  price: z.coerce.number().positive("Price must be positive"),
+  currency: z.string().default("AED"),
+  image: z.string().optional(),
+  tags: z.string().optional(),
+  subcategory: z.string().optional(),
+  isAvailable: z.boolean().default(true),
+});
+
+export type ItemEditorFormData = z.infer<typeof itemEditorSchema>;
+
 interface ItemFormFieldsProps {
-  name: string;
-  setName: (v: string) => void;
-  description: string;
-  setDescription: (v: string) => void;
-  price: number;
-  setPrice: (v: number) => void;
-  currency: string;
-  setCurrency: (v: string) => void;
-  image: string;
-  setImage: (v: string) => void;
-  tags: string;
-  setTags: (v: string) => void;
-  subcategory: string;
-  setSubcategory: (v: string) => void;
-  isAvailable: boolean;
-  setIsAvailable: (v: boolean) => void;
+  form: UseFormReturn<ItemEditorFormData>;
 }
 
-export function ItemFormFields(props: ItemFormFieldsProps) {
-  const { name, setName, description, setDescription, price, setPrice, currency, setCurrency, image, setImage, tags, setTags, subcategory, setSubcategory, isAvailable, setIsAvailable } = props;
+export function ItemFormFields({ form }: ItemFormFieldsProps) {
+  const { register, formState: { errors }, watch, setValue } = form;
 
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Name" value={name} onChange={setName} />
-        <Field label="Price" value={String(price)} onChange={(v) => setPrice(Number(v))} type="number" />
+        <Field label="Name" error={errors.name?.message} {...register("name")} placeholder="Item name" />
+        <Field label="Price" error={errors.price?.message} {...register("price", { valueAsNumber: true })} type="number" placeholder="0.00" />
       </div>
       <div>
         <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Description</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="elegant-input w-full mt-1" />
+        <textarea {...register("description")} rows={2} className="elegant-input w-full mt-1" />
+        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description.message}</p>}
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Currency" value={currency} onChange={setCurrency} />
-        <Field label="Subcategory" value={subcategory} onChange={setSubcategory} placeholder="e.g. Chef Selection" />
+        <Field label="Currency" {...register("currency")} placeholder="AED" />
+        <Field label="Subcategory" {...register("subcategory")} placeholder="e.g. Chef Selection" />
       </div>
-
-      <ImageUpload value={image} onChange={setImage} label="Item Image" aspect="landscape" />
-
-      <Field label="Tags (comma separated)" value={tags} onChange={setTags} placeholder="Popular, Vegetarian, Spicy" />
-
+      <ImageUpload value={watch("image") ?? ""} onChange={(v) => setValue("image", v)} label="Item Image" aspect="landscape" />
+      <Field label="Tags (comma separated)" {...register("tags")} placeholder="Popular, Vegetarian, Spicy" />
       <label className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
-        <input type="checkbox" checked={isAvailable} onChange={(e) => setIsAvailable(e.target.checked)} className="h-4 w-4 rounded" />
+        <input {...register("isAvailable")} type="checkbox" className="h-4 w-4 rounded" />
         <span className="text-sm font-medium text-slate-700">Item is available</span>
       </label>
     </div>
   );
 }
 
-function Field({ label, value, onChange, type = "text", placeholder }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string;
-}) {
+function Field({ label, error, ...props }: { label: string; error?: string } & ComponentPropsWithoutRef<"input">) {
   return (
     <div>
       <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="elegant-input w-full mt-1" />
+      <input {...props} className="elegant-input w-full mt-1" />
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   );
 }

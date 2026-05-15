@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
+import type { DeliveryAgent } from "@/lib/hooks/use-delivery-agents-query";
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -10,65 +10,50 @@ const schema = z.object({
   location: z.string().min(1, "Location is required"),
   password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
 });
-
 type FormData = z.infer<typeof schema>;
 
 interface DriverEditFormProps {
-  agent: DeliveryBoy;
+  agent: DeliveryAgent;
   onSave: (data: FormData) => void;
   onCancel: () => void;
+  isPending?: boolean;
 }
 
-export function DriverEditForm({ agent, onSave, onCancel }: DriverEditFormProps) {
+export function DriverEditForm({ agent, onSave, onCancel, isPending }: DriverEditFormProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      name: agent.name,
-      phone: agent.phone,
-      email: agent.email,
-      location: agent.location,
-      password: "",
-    },
+    defaultValues: { name: agent.name, phone: agent.phone, email: agent.email, location: agent.location, password: "" },
   });
-
   return (
     <form onSubmit={form.handleSubmit(onSave)} className="elegant-card space-y-3 p-5">
       <p className="text-sm font-bold text-slate-900">Edit Driver</p>
-
-      {/* Username — read only */}
       <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Username (Login ID)</p>
         <p className="text-sm font-mono font-bold text-slate-900">{agent.username}</p>
       </div>
-
       <div>
         <input {...form.register("name")} placeholder="Full Name" className="elegant-input w-full" />
         {form.formState.errors.name && <p className="mt-1 text-xs text-red-500">{form.formState.errors.name.message}</p>}
       </div>
-
       <div>
         <input {...form.register("phone")} placeholder="Phone Number" className="elegant-input w-full" />
         {form.formState.errors.phone && <p className="mt-1 text-xs text-red-500">{form.formState.errors.phone.message}</p>}
       </div>
-
       <div>
         <input {...form.register("email")} placeholder="Email Address" className="elegant-input w-full" />
         {form.formState.errors.email && <p className="mt-1 text-xs text-red-500">{form.formState.errors.email.message}</p>}
       </div>
-
       <div>
         <input {...form.register("location")} placeholder="Base Location (e.g. Marina, JLT)" className="elegant-input w-full" />
         {form.formState.errors.location && <p className="mt-1 text-xs text-red-500">{form.formState.errors.location.message}</p>}
       </div>
-
       <div>
         <input type="password" {...form.register("password")} placeholder="New Password (leave empty to keep current)" className="elegant-input w-full" />
         {form.formState.errors.password && <p className="mt-1 text-xs text-red-500">{form.formState.errors.password.message}</p>}
       </div>
-
       <div className="flex gap-2 pt-1">
         <button type="button" className="elegant-btn-secondary flex-1" onClick={onCancel}>Cancel</button>
-        <button type="submit" className="elegant-btn-primary flex-1">Save Changes</button>
+        <button type="submit" className="elegant-btn-primary flex-1" disabled={isPending}>{isPending ? "Saving..." : "Save Changes"}</button>
       </div>
     </form>
   );

@@ -16,8 +16,8 @@ const HISTORY_FILTERS = ["all", "completed", "cancelled"] as const;
 const DEFAULT_HISTORY_DATE = new Date(Date.UTC(2026, 4, 13));
 
 export function useOrderManager() {
-  const { orders: storeOrders, updateStatus: updateStoreStatus } = useOrderStore();
-  const { orders: apiOrders, isLoading: apiLoading, refetch } = useOrdersQuery();
+  const updateStoreStatus = useOrderStore((s) => s.updateStatus);
+  const { orders: apiOrders, isLoading: apiLoading, error: apiError, refetch } = useOrdersQuery();
   const [tab, setTab] = useState<Tab>("active");
   const [filter, setFilter] = useState<string>("all");
   const [historyView, setHistoryView] = useState<"day" | "month" | "all">("day");
@@ -25,7 +25,7 @@ export function useOrderManager() {
   const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
   const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
 
-  const orders = apiOrders.length > 0 ? apiOrders.map(mapApiOrderToDashboard) : storeOrders;
+  const orders = apiOrders.map(mapApiOrderToDashboard);
 
   useOrderSound(orders);
 
@@ -72,5 +72,7 @@ export function useOrderManager() {
     visibleOrders,
     statsOrders,
     isLoading: apiLoading,
+    error: apiError,
+    refetch,
   };
 }

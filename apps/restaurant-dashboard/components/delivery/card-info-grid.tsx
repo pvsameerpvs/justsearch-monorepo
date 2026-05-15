@@ -1,8 +1,8 @@
 import { MapPin, Package, Bike } from "lucide-react";
-import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
+import type { DeliveryAgent } from "@/lib/hooks/use-delivery-agents-query";
 
 interface CardInfoGridProps {
-  agent: DeliveryBoy;
+  agent: DeliveryAgent;
 }
 
 export function CardInfoGrid({ agent }: CardInfoGridProps) {
@@ -14,7 +14,7 @@ export function CardInfoGrid({ agent }: CardInfoGridProps) {
       </div>
       <div className="flex items-center gap-1.5 text-slate-500">
         <Package className="h-3 w-3 text-slate-400" />
-        <span className="font-medium">{agent.totalDeliveries} deliveries</span>
+        <span className="font-medium">{agent.completedToday} deliveries today</span>
       </div>
       <div className="flex items-center gap-1.5 text-slate-500">
         <MapPin className="h-3 w-3 text-slate-400" />
@@ -22,7 +22,7 @@ export function CardInfoGrid({ agent }: CardInfoGridProps) {
       </div>
       <div className="flex items-center gap-1.5 text-slate-500">
         <Bike className="h-3 w-3 text-slate-400" />
-        <span className="font-medium">{agent.status === "busy" && agent.currentOrderId ? `Order ${agent.currentOrderId}` : "No order"}</span>
+        <span className="font-medium">{agent.status === "busy" ? "On delivery" : "No order"}</span>
       </div>
     </div>
   );

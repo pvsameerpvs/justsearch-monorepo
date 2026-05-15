@@ -1,45 +1,63 @@
+"use client";
+
 import { Hash, CalendarDays } from "lucide-react";
+import { Controller } from "react-hook-form";
 import { FormField } from "./voucher-form-field";
-import type { VoucherFormData } from "./types/voucher.types";
+import type { VoucherFormData } from "@/lib/validations/dashboard.schema";
+import type { Control } from "react-hook-form";
 
 interface MetaFieldsProps {
-  form: VoucherFormData;
-  errors: Record<string, string>;
-  onChange: <K extends keyof VoucherFormData>(field: K, value: VoucherFormData[K]) => void;
+  control: Control<VoucherFormData>;
 }
 
-export function VoucherFormMetaFields({ form, errors, onChange }: MetaFieldsProps) {
+export function VoucherFormMetaFields({ control }: MetaFieldsProps) {
   return (
     <div className="space-y-3">
-      <FormField label="Usage Limit" icon={Hash} error={errors.usageLimit}>
-        <input
-          type="number"
-          min={1}
-          value={form.usageLimit}
-          onChange={(e) => onChange("usageLimit", Number(e.target.value))}
-          placeholder="100"
-          className={`elegant-input w-full ${errors.usageLimit ? "border-red-300" : ""}`}
-        />
-      </FormField>
+      <Controller
+        name="usageLimit"
+        control={control}
+        render={({ field, fieldState }) => (
+          <FormField label="Usage Limit" icon={Hash} error={fieldState.error?.message}>
+            <input
+              type="number"
+              min={1}
+              {...field}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+              placeholder="100"
+              className={`elegant-input w-full ${fieldState.error ? "border-red-300" : ""}`}
+            />
+          </FormField>
+        )}
+      />
 
       <div className="grid grid-cols-2 gap-3">
-        <FormField label="Start Date" icon={CalendarDays} error={errors.startDate}>
-          <input
-            type="date"
-            value={form.startDate}
-            onChange={(e) => onChange("startDate", e.target.value)}
-            className={`elegant-input w-full ${errors.startDate ? "border-red-300" : ""}`}
-          />
-        </FormField>
+        <Controller
+          name="startDate"
+          control={control}
+          render={({ field, fieldState }) => (
+            <FormField label="Start Date" icon={CalendarDays} error={fieldState.error?.message}>
+              <input
+                type="date"
+                {...field}
+                className={`elegant-input w-full ${fieldState.error ? "border-red-300" : ""}`}
+              />
+            </FormField>
+          )}
+        />
 
-        <FormField label="End Date" icon={CalendarDays} error={errors.endDate}>
-          <input
-            type="date"
-            value={form.endDate}
-            onChange={(e) => onChange("endDate", e.target.value)}
-            className={`elegant-input w-full ${errors.endDate ? "border-red-300" : ""}`}
-          />
-        </FormField>
+        <Controller
+          name="endDate"
+          control={control}
+          render={({ field, fieldState }) => (
+            <FormField label="End Date" icon={CalendarDays} error={fieldState.error?.message}>
+              <input
+                type="date"
+                {...field}
+                className={`elegant-input w-full ${fieldState.error ? "border-red-300" : ""}`}
+              />
+            </FormField>
+          )}
+        />
       </div>
     </div>
   );

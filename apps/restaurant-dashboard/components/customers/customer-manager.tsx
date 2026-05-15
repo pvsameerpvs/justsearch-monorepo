@@ -6,45 +6,29 @@ import { CustomerStatsCards } from "./customer-stats-cards";
 import { CustomerTableHeader } from "./customer-table-header";
 import { CustomerTable, CustomerEmpty } from "./customer-table";
 import { CustomerDetailDrawer } from "./customer-detail-drawer";
+import type { User } from "@/lib/hooks/use-users-query";
 
-export function CustomerManager() {
+interface CustomerManagerProps {
+  users: User[];
+}
+
+export function CustomerManager({ users }: CustomerManagerProps) {
   const {
-    customers,
-    stats,
-    search,
-    setSearch,
-    selectedCustomer,
-    customerOrders,
-    selectedOrder,
-    setSelectedOrderId,
-    activeTab,
-    setActiveTab,
-    setSelectedId,
-    onClose,
-    onCloseOrder,
-  } = useCustomerManager();
+    filteredUsers, stats, search, setSearch, selectedCustomer,
+    customerOrders, selectedOrder, setSelectedOrderId, activeTab,
+    setActiveTab, setSelectedId, onClose, onCloseOrder, allOrders,
+  } = useCustomerManager(users);
 
   return (
     <div className="space-y-5">
-      <PageHeader
-        title="Customers"
-        description="View customer profiles, addresses, orders, games, and vouchers"
-      />
-
+      <PageHeader title="Customers" description="View customer profiles, addresses, orders, games, and vouchers" />
       <CustomerStatsCards stats={stats} />
-
-      <CustomerTableHeader
-        search={search}
-        onSearchChange={setSearch}
-        total={customers.length}
-      />
-
-      {customers.length === 0 ? (
+      <CustomerTableHeader search={search} onSearchChange={setSearch} total={filteredUsers.length} />
+      {filteredUsers.length === 0 ? (
         <CustomerEmpty />
       ) : (
-        <CustomerTable customers={customers} onSelect={setSelectedId} />
+        <CustomerTable users={filteredUsers} orders={allOrders} onSelect={setSelectedId} />
       )}
-
       <CustomerDetailDrawer
         customer={selectedCustomer}
         orders={customerOrders}

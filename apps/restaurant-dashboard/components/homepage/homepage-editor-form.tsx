@@ -6,56 +6,51 @@ import { EditorActions } from "./editor-actions";
 import { useHomepageEditor } from "./use-homepage-editor";
 import type { Restaurant } from "@justsearch/utils";
 
-export function HomepageEditorForm({ restaurant, onUpdate }: {
+interface HomepageEditorFormProps {
   restaurant: Restaurant;
   onUpdate: (updates: Partial<Restaurant>) => void;
-}) {
+  isSaving?: boolean;
+}
+
+export function HomepageEditorForm({ restaurant, onUpdate, isSaving }: HomepageEditorFormProps) {
+  const { watch, setValue, handleSubmit, formState, reset, buildUpdate } = useHomepageEditor(restaurant);
   const t = restaurant.theme;
-  const { heroUrl, setHeroUrl, logoUrl, setLogoUrl, name, setName, tagline, setTagline, category, setCategory, cuisine, setCuisine, hours, setHours, hasChanges, buildUpdate, reset } = useHomepageEditor(restaurant);
+  const onSubmit = () => onUpdate(buildUpdate());
+  const hero = watch("heroImageUrl") || "", logo = watch("logoUrl") || "", name = watch("name"), tagline = watch("tagline"), category = watch("category"), cuisine = watch("cuisine"), hours = watch("hours");
 
   return (
-    <div className="space-y-5">
-      <MenuHeroPreview heroUrl={heroUrl} logoUrl={logoUrl} name={name} tagline={tagline} category={category} cuisine={cuisine} hours={hours} theme={t} />
-
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <MenuHeroPreview heroUrl={hero} logoUrl={logo} name={name} tagline={tagline} category={category} cuisine={cuisine} hours={hours} theme={t} />
       <SectionCard icon={ImagePlus} title="Menu Background Image" accent={`rgb(${t.brandColor})`}>
-        <ImageUpload value={heroUrl} onChange={setHeroUrl} label="Menu Hero" aspect="landscape" />
-        <p className="mt-1.5 text-[11px] text-slate-400">This image appears behind your restaurant name on the menu page</p>
+        <ImageUpload value={hero} onChange={(v) => setValue("heroImageUrl", v, { shouldDirty: true })} label="Menu Hero" aspect="landscape" />
       </SectionCard>
-
       <SectionCard icon={ImagePlus} title="Logo" accent={`rgb(${t.brandColor})`}>
-        <ImageUpload value={logoUrl} onChange={setLogoUrl} label="Restaurant Logo" aspect="square" size="compact" />
+        <ImageUpload value={logo} onChange={(v) => setValue("logoUrl", v, { shouldDirty: true })} label="Restaurant Logo" aspect="square" size="compact" />
       </SectionCard>
-
       <SectionCard icon={Type} title="Restaurant Name & Tagline" accent={`rgb(${t.brandColor})`}>
         <div className="space-y-3">
-          <FormField label="Name" value={name} onChange={setName} placeholder="e.g. Mosaic Table" />
-          <FormField label="Tagline" value={tagline} onChange={setTagline} placeholder="e.g. Where every meal becomes a memory" />
+          <FormField label="Name" value={name} onChange={(v) => setValue("name", v, { shouldDirty: true })} placeholder="e.g. Mosaic Table" />
+          {formState.errors.name && <p className="text-xs text-red-500">{formState.errors.name.message}</p>}
+          <FormField label="Tagline" value={tagline} onChange={(v) => setValue("tagline", v, { shouldDirty: true })} placeholder="e.g. Where every meal becomes a memory" />
+          {formState.errors.tagline && <p className="text-xs text-red-500">{formState.errors.tagline.message}</p>}
         </div>
       </SectionCard>
-
       <SectionCard icon={Tag} title="Menu Header Labels" accent={`rgb(${t.accentColor})`}>
         <div className="space-y-3">
-          <FormField label="Category Eyebrow" value={category} onChange={setCategory} placeholder="e.g. Fine Dining" />
-          <p className="text-[11px] text-slate-400">Small text above restaurant name on menu page</p>
+          <FormField label="Category Eyebrow" value={category} onChange={(v) => setValue("category", v, { shouldDirty: true })} placeholder="e.g. Fine Dining" />
           <div>
             <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cuisine Tags (comma separated)</label>
-            <input value={cuisine} onChange={(e) => setCuisine(e.target.value)} placeholder="Mediterranean, Middle Eastern, Modern European" className="elegant-input w-full mt-1" />
+            <input value={cuisine} onChange={(e) => setValue("cuisine", e.target.value, { shouldDirty: true })} placeholder="Mediterranean, Middle Eastern, Modern European" className="elegant-input w-full mt-1" />
           </div>
-          <p className="text-[11px] text-slate-400">Shown as pills below tagline on menu page</p>
         </div>
       </SectionCard>
-
       <SectionCard icon={Clock} title="Opening Today" accent={`rgb(${t.brandColor})`}>
         <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-50 text-teal-600 shrink-0">
-            <Calendar className="h-4 w-4" />
-          </div>
-          <input value={hours} onChange={(e) => setHours(e.target.value)} placeholder="09:00 – 00:00" className="elegant-input flex-1" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-50 text-teal-600 shrink-0"><Calendar className="h-4 w-4" /></div>
+          <input value={hours} onChange={(e) => setValue("hours", e.target.value, { shouldDirty: true })} placeholder="09:00 – 00:00" className="elegant-input flex-1" />
         </div>
-        <p className="mt-1.5 text-[11px] text-slate-400">Displayed in &quot;Opening Today&quot; card on menu page</p>
       </SectionCard>
-
-      <EditorActions hasChanges={hasChanges} onReset={reset} onSave={() => onUpdate(buildUpdate())} />
-    </div>
+      <EditorActions hasChanges={formState.isDirty} onReset={reset} onSave={handleSubmit(onSubmit)} isSaving={isSaving} />
+    </form>
   );
 }

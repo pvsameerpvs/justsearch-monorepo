@@ -7,15 +7,32 @@ export interface ApiOrder {
   status: string;
   customerName: string;
   customerPhone: string;
+  subtotal: string;
+  deliveryFee: string;
+  tax: string;
   total: string;
   createdAt: string;
   fulfillmentType: string;
+  deliveryAddress: string | null;
+  paymentMethod: string | null;
+  driverId: string | null;
+  notes: string | null;
+  items?: number;
+}
+
+export interface ApiOrderItem {
+  id: string;
+  orderId: string;
+  name: string;
+  quantity: number;
+  price: string;
+  currency: string;
 }
 
 const POLLING_INTERVAL = 10_000;
 const STALE_TIME = 30_000;
 
-interface OrdersResponse {
+export interface OrdersResponse {
   orders: ApiOrder[];
 }
 
@@ -39,6 +56,19 @@ export function useOrdersQuery() {
   };
 }
 
+async function fetchOrderDetail(orderId: string): Promise<{ order: ApiOrder; items: ApiOrderItem[] }> {
+  return apiClient(`/orders/${orderId}`);
+}
+
+export function useOrderDetailQuery(orderId: string) {
+  return useQuery({
+    queryKey: ['order', orderId],
+    queryFn: () => fetchOrderDetail(orderId),
+    staleTime: STALE_TIME,
+    enabled: Boolean(orderId),
+  });
+}
+
 export function useUpdateOrderStatusMutation() {
   const queryClient = useQueryClient();
 
@@ -48,8 +78,9 @@ export function useUpdateOrderStatusMutation() {
         method: 'PATCH',
         body: JSON.stringify({ status }),
       }),
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', vars.orderId] });
     },
   });
 }

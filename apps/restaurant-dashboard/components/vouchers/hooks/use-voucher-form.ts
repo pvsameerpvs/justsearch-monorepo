@@ -1,54 +1,50 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { validateVoucherForm } from "./voucher-form-validator";
-import type { Voucher, VoucherFormData } from "../types/voucher.types";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { voucherSchema } from "@/lib/validations/dashboard.schema";
+import type { VoucherFormData } from "@/lib/validations/dashboard.schema";
+import type { Voucher } from "../types/voucher.types";
 
-const EMPTY_FORM: VoucherFormData = {
-  code: "", title: "", description: "", type: "percentage",
-  value: 10, minOrderValue: 0, maxDiscount: 0,
-  usageLimit: 100, startDate: "", endDate: "",
+const EMPTY_VALUES: VoucherFormData = {
+  code: "",
+  title: "",
+  description: "",
+  type: "percentage",
+  value: 10,
+  minOrderValue: 0,
+  maxDiscount: 0,
+  usageLimit: 100,
+  startDate: "",
+  endDate: "",
 };
 
-export function useVoucherForm(voucher: Voucher | null, onSave: (data: VoucherFormData) => void) {
-  const [form, setForm] = useState<VoucherFormData>(EMPTY_FORM);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+export function useVoucherForm(voucher: Voucher | null) {
+  const form = useForm<VoucherFormData>({
+    resolver: zodResolver(voucherSchema),
+    defaultValues: EMPTY_VALUES,
+  });
 
   useEffect(() => {
     if (voucher) {
-      setForm({
-        code: voucher.code, title: voucher.title, description: voucher.description,
-        type: voucher.type, value: voucher.value, minOrderValue: voucher.minOrderValue,
-        maxDiscount: voucher.maxDiscount, usageLimit: voucher.usageLimit,
-        startDate: voucher.startDate, endDate: voucher.endDate,
+      form.reset({
+        code: voucher.code,
+        title: voucher.title,
+        description: voucher.description,
+        type: voucher.type,
+        value: voucher.value,
+        minOrderValue: voucher.minOrderValue,
+        maxDiscount: voucher.maxDiscount,
+        usageLimit: voucher.usageLimit,
+        startDate: voucher.startDate,
+        endDate: voucher.endDate,
       });
     } else {
       const today = new Date().toISOString().split("T")[0];
-      setForm({ ...EMPTY_FORM, startDate: today, endDate: today });
+      form.reset({ ...EMPTY_VALUES, startDate: today, endDate: today });
     }
-    setErrors({});
-  }, [voucher]);
+  }, [voucher, form]);
 
-  const setField = useCallback(
-    <K extends keyof VoucherFormData>(field: K, value: VoucherFormData[K]) => {
-      setForm((prev) => ({ ...prev, [field]: value }));
-      setErrors((prev) => {
-        if (!prev[field]) return prev;
-        const next = { ...prev };
-        delete next[field];
-        return next;
-      });
-    },
-    []
-  );
-
-  const onSubmit = useCallback(() => {
-    const nextErrors = validateVoucherForm(form);
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length === 0) {
-      onSave(form);
-    }
-  }, [form, onSave]);
-
-  return { form, setField, errors, onSubmit };
+  return form;
 }

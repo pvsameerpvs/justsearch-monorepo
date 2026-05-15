@@ -1,7 +1,8 @@
 "use client";
 
-import { useOrderStore } from "@/lib/stores/order-store";
 import { useDeliveryBoyStore } from "@/lib/stores/delivery-boy-store";
+import { useOrderDetailQuery } from "@/lib/hooks/use-orders-query";
+import { mapApiOrderDetailToDashboard } from "./orders.utils";
 import { OrderDetailHeader } from "./order-detail-header";
 import { OrderCustomerInfo } from "./order-customer-info";
 import { OrderItemsList } from "./order-items-list";
@@ -17,12 +18,24 @@ interface OrderDetailDrawerProps {
 }
 
 export function OrderDetailDrawer({ orderId, onClose, onAssign }: OrderDetailDrawerProps) {
-  const { orders } = useOrderStore();
+  const { data, isLoading } = useOrderDetailQuery(orderId);
   const { agents } = useDeliveryBoyStore();
 
-  const order = orders.find((o) => o.id === orderId);
-  if (!order) return null;
+  if (isLoading || !data) {
+    return (
+      <div className="fixed inset-0 z-50 flex justify-end">
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative w-full max-w-md bg-white shadow-2xl flex flex-col h-full overflow-hidden p-5 space-y-4">
+          <div className="h-6 w-32 bg-slate-200 rounded animate-pulse" />
+          <div className="h-24 w-full bg-slate-200 rounded animate-pulse" />
+          <div className="h-24 w-full bg-slate-200 rounded animate-pulse" />
+          <div className="h-24 w-full bg-slate-200 rounded animate-pulse" />
+        </div>
+      </div>
+    );
+  }
 
+  const order = mapApiOrderDetailToDashboard(data.order, data.items);
   const assignedAgent = agents.find((a) => a.id === order.assignedAgentId);
 
   return (

@@ -8,6 +8,8 @@ import { OrderManagerGrid } from "./order-manager-grid";
 import { OrderDateFilter } from "./order-date-filter";
 import { DeliveryBoyPicker } from "./delivery-boy-picker";
 import { OrderDetailDrawer } from "./order-detail-drawer";
+import { OrderSkeleton } from "./order-skeleton";
+import { OrderError } from "./order-error";
 
 export function OrderManager() {
   const {
@@ -17,6 +19,7 @@ export function OrderManager() {
     viewingOrderId, setViewingOrderId,
     updateStatus,
     isActiveTab, filters, visibleOrders, statsOrders,
+    isLoading, error, refetch,
   } = useOrderManager();
 
   return (
@@ -36,13 +39,19 @@ export function OrderManager() {
 
       <OrderManagerFilters filters={filters} activeFilter={filter} onFilterChange={setFilter} />
 
-      <OrderManagerGrid
-        orders={visibleOrders}
-        isActiveTab={isActiveTab}
-        onAccept={(id) => updateStatus(id, "confirmed")}
-        onAssign={setAssigningOrderId}
-        onView={setViewingOrderId}
-      />
+      {isLoading && <OrderSkeleton />}
+      {error && <OrderError message={error} onRetry={refetch} />}
+
+      {!isLoading && !error && (
+        <OrderManagerGrid
+          orders={visibleOrders}
+          isActiveTab={isActiveTab}
+          onAccept={(id) => updateStatus(id, "confirmed")}
+          onReject={(id) => updateStatus(id, "cancelled")}
+          onAssign={setAssigningOrderId}
+          onView={setViewingOrderId}
+        />
+      )}
 
       {assigningOrderId && (
         <DeliveryBoyPicker orderId={assigningOrderId} onClose={() => setAssigningOrderId(null)} />

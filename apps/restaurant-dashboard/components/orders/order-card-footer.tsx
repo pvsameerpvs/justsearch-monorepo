@@ -4,14 +4,15 @@ interface OrderCardFooterProps {
   isPending: boolean;
   hasAgent: boolean;
   onAccept: () => void;
+  onReject: () => void;
   onAssign: () => void;
 }
 
-export function OrderCardFooter({ isPending, hasAgent, onAccept, onAssign }: OrderCardFooterProps) {
+export function OrderCardFooter({ isPending, hasAgent, onAccept, onReject, onAssign }: OrderCardFooterProps) {
   if (isPending) {
     return (
       <div className="flex border-t border-slate-100">
-        <button onClick={() => {}} className="flex-1 py-3 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors border-r border-slate-100">
+        <button onClick={(e) => { e.stopPropagation(); onReject(); }} className="flex-1 py-3 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors border-r border-slate-100">
           Reject
         </button>
         <button onClick={(e) => { e.stopPropagation(); onAccept(); }} className="flex-1 py-3 text-sm font-semibold text-emerald-600 hover:bg-emerald-50 transition-colors">

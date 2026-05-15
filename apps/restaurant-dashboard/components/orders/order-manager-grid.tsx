@@ -7,11 +7,12 @@ interface OrderManagerGridProps {
   orders: DashboardOrder[];
   isActiveTab: boolean;
   onAccept: (id: string) => void;
+  onReject: (id: string) => void;
   onAssign: (id: string) => void;
   onView: (id: string) => void;
 }
 
-export function OrderManagerGrid({ orders, isActiveTab, onAccept, onAssign, onView }: OrderManagerGridProps) {
+export function OrderManagerGrid({ orders, isActiveTab, onAccept, onReject, onAssign, onView }: OrderManagerGridProps) {
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-12">
@@ -33,6 +34,7 @@ export function OrderManagerGrid({ orders, isActiveTab, onAccept, onAssign, onVi
               key={order.id}
               order={order}
               onAccept={() => onAccept(order.id)}
+              onReject={() => onReject(order.id)}
               onAssign={() => onAssign(order.id)}
               onView={() => onView(order.id)}
             />

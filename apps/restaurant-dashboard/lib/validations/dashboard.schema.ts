@@ -18,12 +18,15 @@ export const categorySchema = z.object({
 
 export const voucherSchema = z.object({
   code: z.string().min(4, 'Code must be at least 4 characters'),
-  discountType: z.enum(['fixed', 'percentage']),
-  discountValue: z.number().positive(),
-  minOrderValue: z.number().nonnegative().optional(),
-  maxDiscount: z.number().positive().optional(),
-  expiryDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  usageLimit: z.number().int().nonnegative().optional(),
+  title: z.string().min(2, 'Title is required'),
+  description: z.string().max(200).optional().default(''),
+  type: z.enum(['fixed', 'percentage']),
+  value: z.number().positive('Value must be positive'),
+  minOrderValue: z.number().nonnegative().default(0),
+  maxDiscount: z.number().nonnegative().default(0),
+  usageLimit: z.number().int().nonnegative().default(100),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
 });
 
 export const deliveryAgentSchema = z.object({

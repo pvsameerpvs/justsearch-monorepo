@@ -1,13 +1,15 @@
 import { Users } from "lucide-react";
 import { CustomerTableRow } from "./customer-table-row";
-import type { Customer } from "./types/customer.types";
+import type { User } from "@/lib/hooks/use-users-query";
+import type { DashboardOrder } from "@/lib/stores/order-store";
 
 interface CustomerTableProps {
-  customers: Customer[];
+  users: User[];
+  orders: DashboardOrder[];
   onSelect: (id: string) => void;
 }
 
-export function CustomerTable({ customers, onSelect }: CustomerTableProps) {
+export function CustomerTable({ users, orders, onSelect }: CustomerTableProps) {
   return (
     <div className="elegant-card overflow-hidden">
       <div className="overflow-x-auto">
@@ -16,15 +18,15 @@ export function CustomerTable({ customers, onSelect }: CustomerTableProps) {
             <tr className="border-b border-slate-100 bg-slate-50/50">
               <th className="px-4 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Customer</th>
               <th className="px-4 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Contact</th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Tier</th>
+              <th className="px-4 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Role</th>
               <th className="px-4 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Activity</th>
-              <th className="px-4 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Location</th>
+              <th className="px-4 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Joined</th>
               <th className="px-4 py-2 text-right text-[10px] font-bold uppercase tracking-wider text-slate-400"></th>
             </tr>
           </thead>
           <tbody>
-            {customers.map((c) => (
-              <CustomerTableRow key={c.id} customer={c} onClick={() => onSelect(c.id)} />
+            {users.map((u) => (
+              <CustomerTableRow key={u.id} user={u} orders={orders} onClick={() => onSelect(u.id)} />
             ))}
           </tbody>
         </table>

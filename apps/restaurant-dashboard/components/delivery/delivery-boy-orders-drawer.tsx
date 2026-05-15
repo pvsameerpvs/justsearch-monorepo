@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useOrderStore } from "@/lib/stores/order-store";
-import { useDeliveryBoyStore } from "@/lib/stores/delivery-boy-store";
+import { useDeliveryAgentsQuery } from "@/lib/hooks/use-delivery-agents-query";
 import { OrderDetailDrawer } from "@/components/orders/order-detail-drawer";
 import { DeliveryBoyOrdersTable } from "./delivery-boy-orders-table";
 import { DriverOrderDateFilter } from "./driver-order-date-filter";
@@ -18,7 +18,8 @@ interface DeliveryBoyOrdersDrawerProps {
 
 export function DeliveryBoyOrdersDrawer({ agentId, onClose }: DeliveryBoyOrdersDrawerProps) {
   const { orders } = useOrderStore();
-  const { agents } = useDeliveryBoyStore();
+  const { data } = useDeliveryAgentsQuery();
+  const agents = data?.agents ?? [];
   const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
 
   const agent = agents.find((a) => a.id === agentId);

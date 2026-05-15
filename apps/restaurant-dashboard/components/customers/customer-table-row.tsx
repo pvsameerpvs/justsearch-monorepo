@@ -1,13 +1,19 @@
-import { Phone, Mail, MapPin, ShoppingBag, Wallet, CalendarDays, ChevronRight, Coins } from "lucide-react";
-import { CustomerTierBadge } from "./customer-tier-badge";
-import type { Customer } from "./types/customer.types";
+import { Phone, Mail, ShoppingBag, Wallet, CalendarDays, ChevronRight, UserCircle } from "lucide-react";
+import type { User } from "@/lib/hooks/use-users-query";
+import type { DashboardOrder } from "@/lib/stores/order-store";
 
 interface CustomerTableRowProps {
-  customer: Customer;
+  user: User;
+  orders: DashboardOrder[];
   onClick: () => void;
 }
 
-export function CustomerTableRow({ customer, onClick }: CustomerTableRowProps) {
+export function CustomerTableRow({ user, orders, onClick }: CustomerTableRowProps) {
+  const userOrders = orders.filter((o) => o.customerPhone === user.phone || o.customerName === user.name);
+  const totalOrders = userOrders.length;
+  const totalSpent = userOrders.reduce((sum, o) => sum + o.total, 0);
+  const joinedDate = user.createdAt.slice(0, 10);
+
   return (
     <tr
       onClick={onClick}
@@ -16,11 +22,11 @@ export function CustomerTableRow({ customer, onClick }: CustomerTableRowProps) {
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-sm font-bold text-indigo-700">
-            {customer.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+            {user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-900">{customer.name}</p>
-            <p className="text-[10px] font-mono text-slate-500">{customer.id}</p>
+            <p className="text-sm font-bold text-slate-900">{user.name}</p>
+            <p className="text-[10px] font-mono text-slate-500">{user.id}</p>
           </div>
         </div>
       </td>
@@ -28,43 +34,38 @@ export function CustomerTableRow({ customer, onClick }: CustomerTableRowProps) {
         <div className="space-y-0.5">
           <div className="flex items-center gap-1 text-xs text-slate-600">
             <Phone className="h-3 w-3 text-slate-400" />
-            {customer.phone}
+            {user.phone}
           </div>
-          <div className="flex items-center gap-1 text-xs text-slate-600">
-            <Mail className="h-3 w-3 text-slate-400" />
-            {customer.email}
-          </div>
+          {user.email && (
+            <div className="flex items-center gap-1 text-xs text-slate-600">
+              <Mail className="h-3 w-3 text-slate-400" />
+              {user.email}
+            </div>
+          )}
         </div>
       </td>
       <td className="px-4 py-3">
-        <CustomerTierBadge tier={customer.vipTier} />
-        <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-500">
-          <Coins className="h-3 w-3" />
-          {customer.points.toLocaleString()} pts
+        <div className="flex items-center gap-1 text-xs text-slate-600">
+          <UserCircle className="h-3 w-3 text-slate-400" />
+          {user.role}
         </div>
       </td>
       <td className="px-4 py-3">
         <div className="space-y-0.5">
           <div className="flex items-center gap-1 text-xs text-slate-700 font-bold">
             <ShoppingBag className="h-3 w-3 text-slate-400" />
-            {customer.totalOrders} orders
+            {totalOrders} orders
           </div>
           <div className="flex items-center gap-1 text-xs text-slate-600">
             <Wallet className="h-3 w-3 text-slate-400" />
-            AED {customer.totalSpent.toLocaleString()}
+            AED {totalSpent.toLocaleString()}
           </div>
         </div>
       </td>
       <td className="px-4 py-3">
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-1 text-xs text-slate-600">
-            <MapPin className="h-3 w-3 text-slate-400" />
-            {customer.location}
-          </div>
-          <div className="flex items-center gap-1 text-xs text-slate-500">
-            <CalendarDays className="h-3 w-3 text-slate-400" />
-            {customer.lastVisit}
-          </div>
+        <div className="flex items-center gap-1 text-xs text-slate-500">
+          <CalendarDays className="h-3 w-3 text-slate-400" />
+          {joinedDate}
         </div>
       </td>
       <td className="px-4 py-3 text-right">

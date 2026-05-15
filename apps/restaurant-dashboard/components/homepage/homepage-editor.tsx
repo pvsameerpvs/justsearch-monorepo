@@ -1,29 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { updateRestaurant } from "@justsearch/utils";
-import { PageHeader } from "@justsearch/ui";
+import { useEffect, useState } from "react";
+import { useUpdateRestaurantMutation } from "@/lib/hooks/use-restaurant-query";
 import { HomepageEditorForm } from "./homepage-editor-form";
 import { HomepagePreview } from "./homepage-preview";
+import { HomepageError } from "./homepage-error";
 import type { Restaurant } from "@justsearch/utils";
 
-export function HomepageEditor({ restaurant }: { restaurant: Restaurant }) {
-  const [previewRestaurant, setPreviewRestaurant] = useState(restaurant);
+interface HomepageEditorProps {
+  restaurant: Restaurant;
+}
+
+export function HomepageEditor({ restaurant }: HomepageEditorProps) {
+  const [preview, setPreview] = useState(restaurant);
+  const { mutate, isPending, error, reset } = useUpdateRestaurantMutation();
+
+  useEffect(() => { setPreview(restaurant); }, [restaurant]);
 
   const handleUpdate = (updates: Partial<Restaurant>) => {
-    const updated = { ...previewRestaurant, ...updates };
-    setPreviewRestaurant(updated);
-    updateRestaurant(restaurant.slug, updates);
+    setPreview((p) => ({ ...p, ...updates }));
+    if (restaurant.id) mutate({ id: restaurant.id, data: updates });
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Homepage" description="Edit what customers see on your homepage" />
-
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(360px,480px)]">
-        <HomepageEditorForm restaurant={previewRestaurant} onUpdate={handleUpdate} />
-        <HomepagePreview restaurant={previewRestaurant} />
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(360px,480px)]">
+      <div className="space-y-5">
+        {error && <HomepageError error={error} onRetry={reset} />}
+        <HomepageEditorForm restaurant={preview} onUpdate={handleUpdate} isSaving={isPending} />
       </div>
+      <HomepagePreview restaurant={preview} />
     </div>
   );
 }
