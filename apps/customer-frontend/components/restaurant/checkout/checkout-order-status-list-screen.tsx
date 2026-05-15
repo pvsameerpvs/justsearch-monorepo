@@ -23,7 +23,7 @@ export function CheckoutOrderStatusListScreen() {
       return [];
     }
 
-    return getActiveCheckoutOrders(orders, now);
+    return getActiveCheckoutOrders(orders);
   }, [hydrated, now, orders]);
 
   useEffect(() => {
