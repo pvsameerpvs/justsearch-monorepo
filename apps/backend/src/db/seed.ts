@@ -9,22 +9,20 @@ import { seedCustomer, seedSuperAdmin } from './seed/seed.users';
 import { seedGames } from './seed/seed.games';
 
 async function seed() {
-  console.log('Seeding database...');
-
-  const restaurantId = await seedRestaurant();
-  await seedStaff(restaurantId);
-  await seedDeliveryAgent(restaurantId);
-  await seedTable(restaurantId);
-  await seedMenu(restaurantId);
-  await seedCustomer(restaurantId);
-  await seedSuperAdmin();
-  await seedGames();
-
-  console.log('Seeding completed successfully');
-  await client.end();
+  try {
+    const restaurantId = await seedRestaurant();
+    await seedStaff(restaurantId);
+    await seedDeliveryAgent(restaurantId);
+    await seedTable(restaurantId);
+    await seedMenu(restaurantId);
+    await seedCustomer(restaurantId);
+    await seedSuperAdmin();
+    await seedGames();
+  } finally {
+    await client.end();
+  }
 }
 
-seed().catch((err) => {
-  console.error('Seeding failed:', err);
+seed().catch(() => {
   process.exit(1);
 });

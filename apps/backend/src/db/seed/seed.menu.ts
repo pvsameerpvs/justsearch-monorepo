@@ -11,7 +11,6 @@ export async function seedMenu(restaurantId: string) {
       { restaurantId, name: 'Drinks', description: 'Beverages', sortOrder: 4 },
     ])
     .returning();
-  console.log('Created', categories.length, 'menu categories');
 
   const [menu] = await db
     .insert(menus)
@@ -22,10 +21,10 @@ export async function seedMenu(restaurantId: string) {
       sortOrder: 1,
     })
     .returning();
-  console.log('Created menu:', menu.name);
 
   const categoryMap = new Map(categories.map((c) => [c.name, c.id]));
-  const items = await db
+
+  await db
     .insert(menuItems)
     .values([
       {
@@ -85,5 +84,4 @@ export async function seedMenu(restaurantId: string) {
       },
     ])
     .returning();
-  console.log('Created', items.length, 'menu items');
 }

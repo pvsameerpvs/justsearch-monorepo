@@ -2,8 +2,10 @@ import bcrypt from 'bcrypt';
 import { db } from '../index';
 import { users, superAdmins } from '../schema';
 
+const DEFAULT_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'admin123';
+
 export async function seedCustomer(restaurantId: string) {
-  const [customer] = await db
+  await db
     .insert(users)
     .values({
       restaurantId,
@@ -13,19 +15,17 @@ export async function seedCustomer(restaurantId: string) {
       isActive: true,
     })
     .returning();
-  console.log('Created customer:', customer.name);
 }
 
 export async function seedSuperAdmin() {
-  const [superAdmin] = await db
+  await db
     .insert(superAdmins)
     .values({
       name: 'Platform Admin',
       username: 'admin',
-      passwordHash: await bcrypt.hash('admin123', 12),
+      passwordHash: await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 12),
       email: 'admin@justsearch.com',
       isActive: true,
     })
     .returning();
-  console.log('Created super admin:', superAdmin.name);
 }

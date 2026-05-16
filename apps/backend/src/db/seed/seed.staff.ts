@@ -2,9 +2,12 @@ import bcrypt from 'bcrypt';
 import { db } from '../index';
 import { staff, deliveryAgents, restaurantTables } from '../schema';
 
+const DEFAULT_STAFF_PASSWORD = process.env.SEED_STAFF_PASSWORD || 'owner123';
+const DEFAULT_RIDER_PASSWORD = process.env.SEED_RIDER_PASSWORD || 'rider123';
+
 export async function seedStaff(restaurantId: string) {
-  const hashedPassword = await bcrypt.hash('owner123', 12);
-  const [owner] = await db
+  const hashedPassword = await bcrypt.hash(DEFAULT_STAFF_PASSWORD, 12);
+  await db
     .insert(staff)
     .values({
       restaurantId,
@@ -15,12 +18,11 @@ export async function seedStaff(restaurantId: string) {
       permissions: JSON.stringify({ all: true }),
     })
     .returning();
-  console.log('Created staff:', owner.name);
 }
 
 export async function seedDeliveryAgent(restaurantId: string) {
-  const agentPassword = await bcrypt.hash('rider123', 12);
-  const [agent] = await db
+  const agentPassword = await bcrypt.hash(DEFAULT_RIDER_PASSWORD, 12);
+  await db
     .insert(deliveryAgents)
     .values({
       restaurantId,
@@ -35,11 +37,10 @@ export async function seedDeliveryAgent(restaurantId: string) {
       shiftLabel: '12:00 PM to 8:00 PM',
     })
     .returning();
-  console.log('Created delivery agent:', agent.name);
 }
 
 export async function seedTable(restaurantId: string) {
-  const [table] = await db
+  await db
     .insert(restaurantTables)
     .values({
       restaurantId,
@@ -48,5 +49,4 @@ export async function seedTable(restaurantId: string) {
       status: 'available',
     })
     .returning();
-  console.log('Created table:', table.tableNumber);
 }

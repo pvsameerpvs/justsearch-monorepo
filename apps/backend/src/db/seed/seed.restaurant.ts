@@ -19,6 +19,5 @@ export async function seedRestaurant() {
     })
     .returning();
 
-  console.log('Created restaurant:', mosaic.name);
   return mosaic.id;
 }

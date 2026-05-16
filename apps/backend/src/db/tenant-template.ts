@@ -23,6 +23,9 @@ const TENANT_TABLES = [
   'daily_closeouts',
 ];
 
+const DEFAULT_OWNER_PASSWORD = process.env.SEED_STAFF_PASSWORD || 'owner123';
+const DEFAULT_RIDER_PASSWORD = process.env.SEED_RIDER_PASSWORD || 'rider123';
+
 export async function createTenantSchema(schemaName: string): Promise<void> {
   await client.unsafe(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
 
@@ -37,9 +40,8 @@ export async function seedTenantSchema(
   schemaName: string,
   restaurantId: string
 ): Promise<void> {
-  const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'mydomain.com';
-  const ownerHash = await bcrypt.hash('owner123', 12);
-  const riderHash = await bcrypt.hash('rider123', 12);
+  const ownerHash = await bcrypt.hash(DEFAULT_OWNER_PASSWORD, 12);
+  const riderHash = await bcrypt.hash(DEFAULT_RIDER_PASSWORD, 12);
 
   await client.unsafe(
     `INSERT INTO "${schemaName}"."staff" (restaurant_id, name, username, password_hash, role, permissions, is_active) VALUES ($1, $2, $3, $4, $5, $6, true)`,
@@ -59,6 +61,20 @@ export async function seedTenantSchema(
   await client.unsafe(
     `INSERT INTO "${schemaName}"."users" (restaurant_id, phone, name, role, is_active) VALUES ($1, $2, $3, $4, true)`,
     [restaurantId, '+971 50 111 1111', 'Guest Customer', 'customer']
+  );
+
+  await client.unsafe(
+    `INSERT INTO "${schemaName}"."menu_categories" (restaurant_id, name, description, sort_order, status) VALUES ` +
+    `($1, 'Starters', 'Appetizers and small bites', 1, 'active'),` +
+    `($1, 'Mains', 'Main course dishes', 2, 'active'),` +
+    `($1, 'Desserts', 'Sweet treats', 3, 'active'),` +
+    `($1, 'Drinks', 'Beverages and refreshments', 4, 'active')`,
+    [restaurantId]
+  );
+
+  await client.unsafe(
+    `INSERT INTO "${schemaName}"."menus" (restaurant_id, name, description, status, sort_order) VALUES ($1, $2, $3, $4, $5)`,
+    [restaurantId, 'Main Menu', 'Our complete menu', 'active', 1]
   );
 }
 
