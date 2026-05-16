@@ -1,5 +1,4 @@
 import { Image as ImageIcon, Video, FileImage } from "lucide-react";
-import Image from "next/image";
 import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
 
 interface AdMediaThumbnailProps {
@@ -12,8 +11,12 @@ export function AdMediaThumbnail({ campaign, className = "h-10 w-10" }: AdMediaT
 
   if (campaign.mediaType === "video") {
     return (
-      <div className={`flex items-center justify-center rounded-lg bg-slate-100 ${className}`}>
-        <Video className="h-4 w-4 text-slate-500" />
+      <div className={`relative flex items-center justify-center rounded-lg bg-slate-100 overflow-hidden ${className}`}>
+        {hasUrl ? (
+          <video src={campaign.mediaUrl.trim()} className="h-full w-full object-cover" muted preload="metadata" />
+        ) : (
+          <Video className="h-4 w-4 text-slate-500" />
+        )}
       </div>
     );
   }
@@ -22,7 +25,7 @@ export function AdMediaThumbnail({ campaign, className = "h-10 w-10" }: AdMediaT
     return (
       <div className={`relative flex items-center justify-center rounded-lg bg-slate-100 overflow-hidden ${className}`}>
         {hasUrl ? (
-          <Image src={campaign.mediaUrl} alt="" fill sizes="40px" className="object-cover" />
+          <img src={campaign.mediaUrl.trim()} alt="" className="h-full w-full object-cover" />
         ) : (
           <FileImage className="h-4 w-4 text-slate-500" />
         )}
@@ -33,7 +36,7 @@ export function AdMediaThumbnail({ campaign, className = "h-10 w-10" }: AdMediaT
   return (
     <div className={`relative flex items-center justify-center rounded-lg bg-slate-100 overflow-hidden ${className}`}>
       {hasUrl ? (
-        <Image src={campaign.mediaUrl} alt="" fill sizes="40px" className="object-cover" />
+        <img src={campaign.mediaUrl.trim()} alt="" className="h-full w-full object-cover" />
       ) : (
         <ImageIcon className="h-4 w-4 text-slate-500" />
       )}

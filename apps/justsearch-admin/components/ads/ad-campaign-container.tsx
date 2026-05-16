@@ -23,9 +23,13 @@ export function AdCampaignContainer() {
       campaigns={campaigns}
       restaurants={restaurantOptions}
       games={gameOptions}
-      onAdd={(data) => createAd.mutate(data)}
-      onUpdate={(id, data) => updateAd.mutate({ id, data })}
+      onAdd={(data) => createAd.mutateAsync(data)}
+      onUpdate={(id, data) => updateAd.mutateAsync({ id, data })}
       onDelete={(id) => deleteAd.mutate(id)}
+      isCreatePending={createAd.isPending}
+      isUpdatePending={updateAd.isPending}
+      createError={createAd.error}
+      updateError={updateAd.error}
       onToggle={(id) => {
         const campaign = campaigns.find((c) => c.id === id);
         if (campaign) {

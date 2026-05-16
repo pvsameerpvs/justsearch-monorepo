@@ -18,15 +18,15 @@ export function AdCampaignRow({ campaign, onEdit, onDelete, onToggle }: AdCampai
         <div className="flex items-center gap-3">
           <AdMediaThumbnail campaign={campaign} className="h-11 w-11 rounded-xl ring-1 ring-slate-200 shadow-sm" />
           <div>
-            <p className="text-sm font-bold text-slate-900">{campaign.companyName}</p>
-            <p className="text-xs text-slate-500">{campaign.title}</p>
+            <p className="text-sm font-bold text-slate-900">{campaign.title}</p>
+            <p className="text-xs text-slate-500">{campaign.mediaType} • {campaign.duration}s</p>
           </div>
         </div>
       </td>
+      <td className="px-5 py-3.5 text-sm font-semibold text-slate-700">{campaign.companyName}</td>
       <td className="px-5 py-3.5">
         <AdCampaignTypeBadge type={campaign.type} />
       </td>
-      <td className="px-5 py-3.5 text-sm text-slate-700">{campaign.restaurantName ?? "—"}</td>
       <td className="px-5 py-3.5">
         <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
           <Gamepad2 className="h-3 w-3 text-slate-400" />

@@ -1,8 +1,7 @@
-import { writeFile, mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
 import { v4 as uuid } from 'uuid';
+import { supabase } from '../../lib/supabase';
 
-const UPLOADS_DIR = join(process.cwd(), 'public', 'uploads');
+const BUCKET_NAME = 'uploads';
 
 const MIME_EXTENSIONS: Record<string, string> = {
   'image/png': 'png',
@@ -10,7 +9,9 @@ const MIME_EXTENSIONS: Record<string, string> = {
   'image/gif': 'gif',
   'image/svg+xml': 'svg',
   'image/jpeg': 'jpg',
-  'application/pdf': 'pdf',
+  'video/mp4': 'mp4',
+  'video/webm': 'webm',
+  'video/quicktime': 'mov',
 };
 
 function getExtension(dataUrl: string): string {
@@ -20,15 +21,29 @@ function getExtension(dataUrl: string): string {
   return 'jpg';
 }
 
+function getMimeType(dataUrl: string): string {
+  const match = dataUrl.match(/^data:([^;]+);base64,/);
+  return match?.[1] ?? 'application/octet-stream';
+}
+
 export async function saveImage(dataUrl: string, folder: string): Promise<string> {
-  const base64Data = dataUrl.replace(/^data:[a-z]+\/[\w+.-]+;base64,/, '');
+  const base64Data = dataUrl.replace(/^data:[a-z]+\/[^;]+;base64,/, '');
   const buffer = Buffer.from(base64Data, 'base64');
   const ext = getExtension(dataUrl);
-  const filename = `${uuid()}.${ext}`;
-  const folderPath = join(UPLOADS_DIR, folder);
+  const mimeType = getMimeType(dataUrl);
+  const filename = `${folder}/${uuid()}.${ext}`;
 
-  await mkdir(folderPath, { recursive: true });
-  await writeFile(join(folderPath, filename), buffer);
+  const { error } = await supabase.storage
+    .from(BUCKET_NAME)
+    .upload(filename, buffer, {
+      contentType: mimeType,
+      upsert: false,
+    });
 
-  return `/uploads/${folder}/${filename}`;
+  if (error) {
+    throw new Error(`Supabase upload failed: ${error.message}`);
+  }
+
+  const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filename);
+  return data.publicUrl;
 }

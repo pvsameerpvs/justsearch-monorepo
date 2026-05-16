@@ -18,6 +18,7 @@ export function AdMediaUpload({ mediaType, mediaUrl, onChange }: AdMediaUploadPr
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
+      if (!result) return;
       if (file.type.startsWith("image/gif")) onChange("gif", result);
       else if (file.type.startsWith("video/")) onChange("video", result);
       else if (file.type.startsWith("image/")) onChange("image", result);
@@ -40,7 +41,11 @@ export function AdMediaUpload({ mediaType, mediaUrl, onChange }: AdMediaUploadPr
   return (
     <div className="space-y-3">
       <AdMediaTypePills mediaType={mediaType} onChange={(t) => onChange(t, mediaUrl)} />
-      <div onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }} onDragLeave={() => setIsDragging(false)} onDrop={onDrop}>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={onDrop}
+      >
         <AdMediaDropzone mediaType={mediaType} mediaUrl={mediaUrl} isDragging={isDragging} onFileSelect={onFileSelect} />
       </div>
     </div>

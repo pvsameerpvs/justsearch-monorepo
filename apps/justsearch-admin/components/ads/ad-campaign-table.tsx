@@ -35,8 +35,8 @@ export function AdCampaignTable({ campaigns, onEdit, onDelete, onToggle, onAdd }
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/80">
               <th className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Campaign</th>
+              <th className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Company</th>
               <th className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Type</th>
-              <th className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Restaurant</th>
               <th className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">Games</th>
               <th className="px-5 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-slate-400">Duration</th>
               <th className="px-5 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-slate-400">Revenue</th>

@@ -15,7 +15,7 @@ const uploadSchema = z.object({
 router.post('/', requireRole('owner', 'manager', 'super_admin'), async (req, res, next) => {
   try {
     const { image, folder } = uploadSchema.parse(req.body);
-    const url = image.startsWith('data:image/') ? await saveImage(image, folder) : image;
+    const url = image.startsWith('data:') ? await saveImage(image, folder) : image;
     res.status(201).json({ url });
   } catch (error) {
     next(error);

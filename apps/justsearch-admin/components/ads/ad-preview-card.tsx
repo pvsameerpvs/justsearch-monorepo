@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Clock, Gamepad2, Eye, CheckCircle, XCircle } from "lucide-react";
 import { AdCampaignTypeBadge } from "./ad-campaign-type-badge";
 import type { AdCampaign } from "@/lib/stores/ad-campaign-types";
@@ -14,9 +13,9 @@ export function AdPreviewCard({ campaign }: AdPreviewCardProps) {
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
       <div className="relative aspect-video bg-slate-100 flex items-center justify-center overflow-hidden">
         {campaign.mediaType === "video" && hasUrl ? (
-          <video src={campaign.mediaUrl} className="h-full w-full object-cover" muted loop playsInline />
+          <video src={campaign.mediaUrl.trim()} className="h-full w-full object-cover" muted loop playsInline preload="metadata" controls />
         ) : hasUrl ? (
-          <Image src={campaign.mediaUrl} alt={campaign.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+          <img src={campaign.mediaUrl.trim()} alt={campaign.title} className="h-full w-full object-cover" />
         ) : (
           <div className="flex flex-col items-center gap-1">
             <span className="text-3xl opacity-20">🖼️</span>

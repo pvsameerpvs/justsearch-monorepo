@@ -19,5 +19,6 @@ export async function uploadImage(imageBase64: string, folder = 'general'): Prom
     body: JSON.stringify({ image: imageBase64, folder }),
   });
 
+  // Backend now returns full Supabase Storage public URLs
   return url;
 }

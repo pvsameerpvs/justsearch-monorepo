@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { uploadImage } from '@/lib/api/upload.api';
 import type { AdCampaign, AdCampaignFormData } from '@/lib/stores/ad-campaign-types';
-import { type DbAd, mapDbToCampaign, mapFormToDb } from './ad-query-mappers';
+import { type DbAd, mapDbToCampaign, mapFormToDb, mapPartialFormToDb } from './ad-query-mappers';
 
 const ADS_KEY = ['advertisements'] as const;
 
@@ -44,7 +44,12 @@ export function useUpdateAdMutation() {
       if (mediaUrl && mediaUrl.startsWith('data:')) {
         mediaUrl = await uploadImage(mediaUrl, 'ads');
       }
-      const payload = mediaUrl ? { ...data, mediaUrl } : data;
+
+      // Full edit (has title) → map to DB shape; partial (toggle) → pass through
+      const payload = 'title' in data && data.title !== undefined
+        ? mapPartialFormToDb({ ...data, mediaUrl })
+        : mediaUrl !== undefined ? { ...data, mediaUrl } : data;
+
       return apiClient<DbAd>(`/advertisements/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ADS_KEY }),

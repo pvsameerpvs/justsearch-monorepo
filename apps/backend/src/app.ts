@@ -1,5 +1,4 @@
 import express, { Express, Request, Response } from 'express';
-import { join } from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -33,9 +32,6 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
-
-// Serve uploaded files
-app.use('/uploads', express.static(join(__dirname, '..', 'public', 'uploads')));
 
 // Tenant resolution — must run before API routes
 app.use(tenantMiddleware);

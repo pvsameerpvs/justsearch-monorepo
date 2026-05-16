@@ -34,13 +34,3 @@ export interface AdCampaignFormData {
   assignedGames: string[];
   isActive?: boolean;
 }
-
-export interface AdCampaignStats {
-  total: number;
-  active: number;
-  restaurantBrought: number;
-  platform: number;
-  totalRevenue: number;
-  totalImpressions: number;
-  totalCompletions: number;
-}

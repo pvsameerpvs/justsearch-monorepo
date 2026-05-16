@@ -5,10 +5,10 @@ import { Megaphone, TrendingUp, Users, DollarSign } from 'lucide-react';
 import { useAdsQuery } from '@/lib/hooks/use-ads-query';
 
 const STAT_META = [
-  { label: 'Total Campaigns', key: 'total' as const, icon: Megaphone, gradient: 'from-indigo-500 to-violet-500', text: 'text-indigo-700', light: 'bg-indigo-50' },
-  { label: 'Active', key: 'active' as const, icon: TrendingUp, gradient: 'from-emerald-500 to-teal-500', text: 'text-emerald-700', light: 'bg-emerald-50' },
-  { label: 'Impressions', key: 'impressions' as const, icon: Users, gradient: 'from-blue-500 to-sky-500', text: 'text-blue-700', light: 'bg-blue-50' },
-  { label: 'Revenue', key: 'revenue' as const, icon: DollarSign, gradient: 'from-amber-500 to-orange-500', text: 'text-amber-700', light: 'bg-amber-50' },
+  { label: 'Total Campaigns', key: 'total' as const, icon: Megaphone, gradient: 'from-indigo-500 to-violet-500', text: 'text-indigo-700' },
+  { label: 'Active', key: 'active' as const, icon: TrendingUp, gradient: 'from-emerald-500 to-teal-500', text: 'text-emerald-700' },
+  { label: 'Impressions', key: 'impressions' as const, icon: Users, gradient: 'from-blue-500 to-sky-500', text: 'text-blue-700' },
+  { label: 'Revenue', key: 'revenue' as const, icon: DollarSign, gradient: 'from-amber-500 to-orange-500', text: 'text-amber-700' },
 ];
 
 export function AdCampaignStatsCards() {

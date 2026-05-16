@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { Upload, Image as ImageIcon, Video, FileImage } from "lucide-react";
-import Image from "next/image";
 import type { AdMediaType } from "@/lib/stores/ad-campaign-types";
 
 interface AdMediaDropzoneProps {
@@ -16,23 +15,55 @@ export function AdMediaDropzone({ mediaType, mediaUrl, isDragging, onFileSelect 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasUrl = mediaUrl && mediaUrl.trim() !== "";
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFileSelect(e);
+    // Clear input so the same file can be selected again
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   return (
     <div
       className={`relative rounded-2xl border-2 border-dashed p-8 text-center transition-all ${
         isDragging ? "border-indigo-500 bg-indigo-50 scale-[1.01] shadow-sm" : "border-slate-200 bg-slate-50"
       }`}
     >
-      <input ref={fileInputRef} type="file" accept={mediaType === "video" ? "video/*" : mediaType === "gif" ? "image/gif" : "image/*"} onChange={onFileSelect} className="hidden" />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={mediaType === "video" ? "video/*" : mediaType === "gif" ? "image/gif" : "image/*"}
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+
       {hasUrl ? (
         <div className="space-y-3">
           {mediaType === "video" ? (
-            <video src={mediaUrl} className="mx-auto h-32 rounded-xl object-cover shadow-sm" muted loop playsInline />
+            <video
+              key={mediaUrl}
+              src={mediaUrl.trim()}
+              className="mx-auto block max-h-48 max-w-full rounded-xl object-contain shadow-sm"
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              controls
+            />
           ) : (
-            <div className="relative mx-auto h-32 w-32">
-              <Image src={mediaUrl} alt="Preview" fill sizes="128px" className="rounded-xl object-cover shadow-sm" />
-            </div>
+            <img
+              key={mediaUrl}
+              src={mediaUrl.trim()}
+              alt="Preview"
+              className="mx-auto block max-h-48 max-w-full rounded-xl object-contain shadow-sm"
+            />
           )}
-          <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs font-bold text-indigo-600 hover:text-indigo-700">
+          <p className="text-[10px] text-slate-400 truncate max-w-full px-4" title={mediaUrl}>
+            {mediaUrl}
+          </p>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
+          >
             Replace file
           </button>
         </div>

@@ -55,6 +55,9 @@ Thumbs.db
 # Vercel and deployment metadata
 .vercel/
 
+# Local upload storage (now using Supabase Storage)
+apps/backend/public/uploads/
+
 # Package manager leftovers
 package-lock.json
 yarn.lock
