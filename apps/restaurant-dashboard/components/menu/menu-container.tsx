@@ -16,6 +16,7 @@ export function MenuContainer() {
   const cats = useMenuCategoriesQuery();
   const items = useMenuItemsQuery();
   const [view, setView] = useState<"list" | "grid">("list");
+  const menuId = items.data?.items?.[0]?.menuId;
   const [editingItem, setEditingItem] = useState<{ categoryId: string; item?: MenuItem } | null>(null);
 
   const categories = useMemo(() => {
@@ -54,7 +55,7 @@ export function MenuContainer() {
         ))}
       </div>
       <CategoryCreator />
-      {editingItem && <ItemEditorModal categoryId={editingItem.categoryId} item={editingItem.item} onClose={() => setEditingItem(null)} />}
+      {editingItem && <ItemEditorModal categoryId={editingItem.categoryId} item={editingItem.item} menuId={menuId} onClose={() => setEditingItem(null)} />}
     </div>
   );
 }

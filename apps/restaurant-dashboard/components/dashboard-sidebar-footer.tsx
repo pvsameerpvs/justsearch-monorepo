@@ -1,13 +1,22 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { getRestaurantInitials } from '@justsearch/utils';
 import { useDashboardAuth } from "@/lib/auth-context";
-import type { Restaurant } from '@justsearch/utils';
 
-export function SidebarFooter({ restaurant }: { restaurant: Restaurant }) {
-  const initials = getRestaurantInitials(restaurant.name);
-  const { logout } = useDashboardAuth();
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+export function SidebarFooter() {
+  const { user, logout } = useDashboardAuth();
+  const name = user?.name ?? 'User';
+  const role = user?.role ?? 'staff';
+  const initials = getInitials(name);
 
   return (
     <div className="border-t border-white/5 p-3">
@@ -16,11 +25,8 @@ export function SidebarFooter({ restaurant }: { restaurant: Restaurant }) {
           {initials}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-white">Admin</p>
-          <div className="flex items-center gap-1">
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <p className="text-[10px] text-emerald-500">Online</p>
-          </div>
+          <p className="text-xs font-semibold text-white truncate">{name}</p>
+          <p className="text-[10px] text-slate-500 capitalize">{role.replace('_', ' ')}</p>
         </div>
         <button
           onClick={logout}

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { useDashboardAuth } from "@/lib/auth-context";
-import { getSlugFromHostname, getRestaurantCreds } from "./login.utils";
 import { LoginFormPresenter } from "./login-form-presenter";
 import { LoginForgotPresenter } from "./login-forgot-presenter";
 
@@ -17,9 +16,6 @@ export function LoginContainer() {
   const [showPass, setShowPass] = useState(false);
   const { login } = useDashboardAuth();
   const router = useRouter();
-
-  const slug = getSlugFromHostname();
-  const creds = getRestaurantCreds(slug);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +47,7 @@ export function LoginContainer() {
             onSubmit={handleSubmit} onForgot={() => { setShowForgot(true); setError(""); }}
           />
         ) : (
-          <LoginForgotPresenter creds={creds} onBack={() => setShowForgot(false)} />
+          <LoginForgotPresenter onBack={() => setShowForgot(false)} />
         )}
       </div>
     </div>

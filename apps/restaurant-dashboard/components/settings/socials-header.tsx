@@ -1,7 +1,7 @@
-import type { Restaurant } from "@justsearch/utils";
+import type { AdminRestaurant } from "@/lib/types/admin-restaurant";
 
 interface SocialsHeaderProps {
-  restaurant: Restaurant;
+  restaurant: AdminRestaurant;
 }
 
 export function SocialsHeader({ restaurant }: SocialsHeaderProps) {

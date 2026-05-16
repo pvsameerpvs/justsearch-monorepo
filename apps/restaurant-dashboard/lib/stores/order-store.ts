@@ -1,9 +1,18 @@
 "use client";
 
 import { create } from 'zustand';
-import { STATUS_TIMELINE_LABELS, INITIAL_ORDERS } from './order-store.data';
 
 export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'completed' | 'cancelled';
+
+export const STATUS_TIMELINE_LABELS: Record<OrderStatus, string> = {
+  pending: 'Order Received',
+  confirmed: 'Order Accepted',
+  preparing: 'Kitchen Started',
+  ready: 'Ready for Delivery',
+  out_for_delivery: 'Driver Picked Up',
+  completed: 'Order Completed',
+  cancelled: 'Order Cancelled',
+};
 
 export type OrderItem = {
   id: string;
@@ -51,7 +60,7 @@ interface OrderStore {
 }
 
 export const useOrderStore = create<OrderStore>((set) => ({
-  orders: INITIAL_ORDERS,
+  orders: [],
   assignAgent: (orderId, agentId) =>
     set((state) => ({
       orders: state.orders.map((o) =>

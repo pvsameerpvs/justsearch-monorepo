@@ -1,54 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
 import { X } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateMenuItemMutation, useUpdateMenuItemMutation } from "@/lib/hooks/use-menu-query";
-import { ItemFormFields, itemEditorSchema, type ItemEditorFormData } from "./item-form-fields";
+import { useItemEditorForm, useItemEditorSubmit, useEscKey } from "./item-editor-hooks";
+import { ItemFormFields } from "./item-form-fields";
 import type { MenuItem } from "@/lib/stores/menu-store";
 
 export function ItemEditorModal({
   categoryId,
   item,
+  menuId,
   onClose,
 }: {
   categoryId: string;
   item?: MenuItem;
+  menuId?: string;
   onClose: () => void;
 }) {
-  const createItem = useCreateMenuItemMutation();
-  const updateItem = useUpdateMenuItemMutation();
-  const form = useForm<ItemEditorFormData>({
-    resolver: zodResolver(itemEditorSchema),
-    defaultValues: {
-      name: item?.name ?? "",
-      description: item?.description ?? "",
-      price: item?.price ?? 0,
-      currency: item?.currency ?? "AED",
-      image: item?.image ?? "",
-      tags: item?.tags?.join(", ") ?? "",
-      subcategory: item?.subcategory ?? "",
-      isAvailable: item?.isAvailable ?? true,
-    },
-  });
+  const form = useItemEditorForm(item);
+  const onSubmit = useItemEditorSubmit({ item, categoryId, menuId, onClose });
+  useEscKey(onClose);
 
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
-
-  const onSubmit = form.handleSubmit((data) => {
-    const tagList = data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
-    const payload = { ...data, categoryId, tags: tagList };
-    if (item) {
-      updateItem.mutate({ id: item.id, data: payload });
-    } else {
-      createItem.mutate(payload);
-    }
-    onClose();
-  });
+  const handleSubmit = form.handleSubmit(onSubmit);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -60,7 +32,7 @@ export function ItemEditorModal({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={handleSubmit}>
           <ItemFormFields form={form} />
           <div className="mt-6 flex gap-3">
             <button type="button" onClick={onClose} className="elegant-btn-secondary flex-1">Cancel</button>

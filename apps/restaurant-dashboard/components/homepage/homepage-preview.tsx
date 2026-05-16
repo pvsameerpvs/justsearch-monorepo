@@ -1,13 +1,13 @@
 import { Gamepad2, MessagesSquare, Share2, UtensilsCrossed } from "lucide-react";
 import { FeatureCard } from "./feature-card";
 import { PreviewHero } from "./preview-hero";
-import type { Restaurant } from "@justsearch/utils";
+import type { RestaurantProfile } from "@/lib/hooks/use-restaurant-query";
 
 function rgb(v: string) {
   return `rgb(${v})`;
 }
 
-export function HomepagePreview({ restaurant }: { restaurant: Restaurant }) {
+export function HomepagePreview({ restaurant }: { restaurant: RestaurantProfile }) {
   const t = restaurant.theme;
 
   return (

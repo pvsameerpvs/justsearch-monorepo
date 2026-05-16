@@ -7,9 +7,19 @@ import { LayoutDashboard, Home, UtensilsCrossed, Settings, ShoppingBag, Truck, U
 import { SidebarFooter } from './dashboard-sidebar-footer';
 import { MobileToggle } from './mobile-toggle';
 import { SidebarBrand } from './sidebar-brand';
-import type { Restaurant } from '@justsearch/utils';
 
-const SECTIONS = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ElementType;
+}
+
+interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+const SECTIONS: NavSection[] = [
   { label: 'Overview', items: [{ href: '/', label: 'Dashboard', icon: LayoutDashboard }] },
   { label: 'Your Restaurant', items: [{ href: '/homepage', label: 'Homepage', icon: Home }, { href: '/menu', label: 'Menu', icon: UtensilsCrossed }] },
   { label: 'Operations', items: [{ href: '/orders', label: 'Orders', icon: ShoppingBag }, { href: '/delivery', label: 'Delivery', icon: Truck }, { href: '/vouchers', label: 'Vouchers', icon: Ticket }] },
@@ -17,7 +27,15 @@ const SECTIONS = [
   { label: 'Account', items: [{ href: '/profile', label: 'Profile', icon: UserCircle }, { href: '/settings', label: 'Contact & Socials', icon: Settings }] },
 ];
 
-export const DashboardSidebar = memo(function DashboardSidebar({ restaurant }: { restaurant: Restaurant }) {
+function getItemClasses(active: boolean): string {
+  const base = 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200';
+  if (active) {
+    return base + ' bg-white/10 text-white shadow-sm';
+  }
+  return base + ' text-slate-400 hover:bg-white/5 hover:text-slate-200';
+}
+
+export const DashboardSidebar = memo(function DashboardSidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const toggle = useCallback(() => setIsOpen((p) => !p), []);
@@ -27,8 +45,8 @@ export const DashboardSidebar = memo(function DashboardSidebar({ restaurant }: {
     <>
       <MobileToggle isOpen={isOpen} onToggle={toggle} />
       {isOpen && <div className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden" onClick={close} />}
-      <aside className={`fixed left-0 top-0 z-40 flex h-full w-[260px] flex-col bg-[#0B0F19] text-white transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <SidebarBrand restaurant={restaurant} />
+      <aside className="fixed left-0 top-0 z-40 flex h-full w-[260px] flex-col bg-[#0B0F19] transition-transform duration-300 md:translate-x-0" style={{ transform: isOpen ? 'translateX(0)' : undefined }}>
+        <SidebarBrand />
         <nav className="flex-1 space-y-5 px-3 py-2 overflow-y-auto">
           {SECTIONS.map((section) => (
             <div key={section.label}>
@@ -39,9 +57,13 @@ export const DashboardSidebar = memo(function DashboardSidebar({ restaurant }: {
                   const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
                   return (
                     <li key={item.href}>
-                      <Link href={item.href} onClick={close} className={active ? 'sidebar-item-active' : 'sidebar-item-inactive'}>
-                        <Icon className="h-4 w-4" strokeWidth={active ? 2.5 : 2} />
-                        {item.label}
+                      <Link
+                        href={item.href}
+                        onClick={close}
+                        className={getItemClasses(active)}
+                      >
+                        <Icon className="h-4 w-4 shrink-0" strokeWidth={active ? 2.5 : 2} />
+                        <span>{item.label}</span>
                       </Link>
                     </li>
                   );
@@ -50,7 +72,7 @@ export const DashboardSidebar = memo(function DashboardSidebar({ restaurant }: {
             </div>
           ))}
         </nav>
-        <SidebarFooter restaurant={restaurant} />
+        <SidebarFooter />
       </aside>
     </>
   );

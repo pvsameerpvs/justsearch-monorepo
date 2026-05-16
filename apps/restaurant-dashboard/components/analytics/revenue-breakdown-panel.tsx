@@ -1,14 +1,7 @@
 import { BarChart3 } from 'lucide-react';
 import { RevenueBar } from './analytics-cards';
 
-export function RevenueBreakdownPanel({ totalRevenue, orderRevenue, adRevenue }: {
-  totalRevenue: number;
-  orderRevenue: number;
-  adRevenue: number;
-}) {
-  const restaurantShare = Math.round(adRevenue * 0.6);
-  const platformShare = Math.round(adRevenue * 0.4);
-
+export function RevenueBreakdownPanel({ totalRevenue }: { totalRevenue: number }) {
   return (
     <div className="card-premium p-5">
       <div className="flex items-center gap-3 mb-5">
@@ -17,14 +10,12 @@ export function RevenueBreakdownPanel({ totalRevenue, orderRevenue, adRevenue }:
         </div>
         <div>
           <h3 className="font-bold text-slate-900">Revenue Breakdown</h3>
-          <p className="text-sm text-slate-500">Total: AED {totalRevenue.toLocaleString()}</p>
+          <p className="text-sm text-slate-500">Today's performance</p>
         </div>
       </div>
 
       <div className="space-y-4">
-        <RevenueBar label="Order Revenue" value={orderRevenue} total={totalRevenue} color="bg-blue-500" />
-        <RevenueBar label="Restaurant Ad Share (60%)" value={restaurantShare} total={totalRevenue} color="bg-amber-500" />
-        <RevenueBar label="Platform Fee (40%)" value={platformShare} total={totalRevenue} color="bg-slate-400" />
+        <RevenueBar label="Order Revenue" value={totalRevenue} total={totalRevenue || 1} color="bg-blue-500" />
       </div>
 
       <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-center">

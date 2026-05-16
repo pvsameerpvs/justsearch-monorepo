@@ -1,5 +1,11 @@
 export type RestaurantStatus = 'active' | 'draft' | 'suspended';
 
+export type SocialLink = {
+  platform: string;
+  url: string;
+  handle: string;
+};
+
 export type AdminRestaurant = {
   id: string;
   name: string;
@@ -21,4 +27,8 @@ export type AdminRestaurant = {
   photos: string[];
   dashboardUsername: string;
   dashboardPassword: string;
+  website: string;
+  socials: SocialLink[];
+  overallRating: number;
+  totalReviews: number;
 };

@@ -24,7 +24,6 @@ export function CompactImageUpload({ value, onChange, label = "Image", aspect = 
       setUrlValue(blobUrl);
     }
   };
-
   const handleRemove = () => { onChange(""); setUrlValue(""); };
   const handleUrlSave = () => { onChange(urlValue); setShowUrlInput(false); };
 

@@ -1,7 +1,14 @@
 import Image from 'next/image';
 import { Calendar, Bike } from "lucide-react";
-import { getRestaurantInitials } from "@justsearch/utils";
-import type { RestaurantTheme } from "@justsearch/utils";
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 interface MenuHeroPreviewProps {
   heroUrl: string;
@@ -11,11 +18,11 @@ interface MenuHeroPreviewProps {
   category: string;
   cuisine: string;
   hours: string;
-  theme: RestaurantTheme;
+  theme: Record<string, string>;
 }
 
 export function MenuHeroPreview({ heroUrl, logoUrl, name, tagline, category, cuisine, hours, theme }: MenuHeroPreviewProps) {
-  const initials = getRestaurantInitials(name);
+  const initials = getInitials(name);
 
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-200 shadow-lg">

@@ -1,14 +1,4 @@
-import { Activity } from 'lucide-react';
-import { PerformanceBar } from './analytics-cards';
-
-const GAME_DATA = {
-  topGame: 'Jump & Bite',
-  topGamePlays: 5430,
-  totalGamePlays: 15432,
-  avgSessionTime: '4m 32s',
-  conversionRate: '68%',
-  repeatRate: '42%',
-};
+import { Activity, Gamepad2 } from 'lucide-react';
 
 export function GamePerformancePanel() {
   return (
@@ -19,15 +9,14 @@ export function GamePerformancePanel() {
         </div>
         <div>
           <h3 className="font-bold text-slate-900">Game Performance</h3>
-          <p className="text-sm text-slate-500">Top performing metrics</p>
+          <p className="text-sm text-slate-500">No data available yet</p>
         </div>
       </div>
 
-      <div className="space-y-4">
-        <PerformanceBar label={GAME_DATA.topGame} value={GAME_DATA.topGamePlays} max={GAME_DATA.totalGamePlays} color="bg-purple-500" icon="🏃" />
-        <PerformanceBar label="Avg. Session Time" value={GAME_DATA.avgSessionTime} max={GAME_DATA.avgSessionTime} color="bg-blue-500" icon="⏱️" isText />
-        <PerformanceBar label="Conversion Rate" value={GAME_DATA.conversionRate} max="100%" color="bg-emerald-500" icon="📈" isText />
-        <PerformanceBar label="Repeat Customer Rate" value={GAME_DATA.repeatRate} max="100%" color="bg-amber-500" icon="🔄" isText />
+      <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+        <Gamepad2 className="h-10 w-10 mb-3 opacity-50" />
+        <p className="text-sm font-medium">Game analytics coming soon</p>
+        <p className="text-xs mt-1">Track plays, rewards, and conversions</p>
       </div>
     </div>
   );

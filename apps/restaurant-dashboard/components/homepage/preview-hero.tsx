@@ -1,19 +1,27 @@
 import Image from 'next/image';
-import { getRestaurantInitials, getRestaurantDomain } from "@justsearch/utils";
-import type { Restaurant } from "@justsearch/utils";
+import type { RestaurantProfile } from "@/lib/hooks/use-restaurant-query";
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 function rgb(v: string) {
   return `rgb(${v})`;
 }
 
 interface PreviewHeroProps {
-  restaurant: Restaurant;
+  restaurant: RestaurantProfile;
 }
 
 export function PreviewHero({ restaurant }: PreviewHeroProps) {
   const t = restaurant.theme;
-  const domain = getRestaurantDomain(restaurant.subdomain);
-  const initials = getRestaurantInitials(restaurant.name);
+  const domain = `${restaurant.subdomain}.js-restorant.com`;
+  const initials = getInitials(restaurant.name);
 
   return (
     <div

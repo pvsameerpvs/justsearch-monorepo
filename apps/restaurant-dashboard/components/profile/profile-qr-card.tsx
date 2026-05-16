@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { QrCode, Copy, Check, Download } from "lucide-react";
+import { getQrUrl } from "@/lib/utils/qr-utils";
 
 interface ProfileQrCardProps {
   subdomain: string;
@@ -10,13 +11,9 @@ interface ProfileQrCardProps {
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "js-restorant.com";
 
-function getQrUrl(data: string, size = 200): string {
-  return "https://api.qrserver.com/v1/create-qr-code/?size=" + size + "x" + size + "&data=" + encodeURIComponent(data);
-}
-
 export function ProfileQrCard({ subdomain }: ProfileQrCardProps) {
   const [copied, setCopied] = useState(false);
-  const customerUrl = "https://" + subdomain + "." + BASE_DOMAIN;
+  const customerUrl = `https://${subdomain}.${BASE_DOMAIN}`;
   const qrImageUrl = getQrUrl(customerUrl, 200);
 
   const handleCopy = async () => {
@@ -28,7 +25,7 @@ export function ProfileQrCard({ subdomain }: ProfileQrCardProps) {
   const handleDownload = () => {
     const link = document.createElement("a");
     link.href = qrImageUrl;
-    link.download = subdomain + "-qr-code.png";
+    link.download = `${subdomain}-qr-code.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -45,16 +42,9 @@ export function ProfileQrCard({ subdomain }: ProfileQrCardProps) {
           <p className="text-xs text-slate-500">Share this QR with your customers</p>
         </div>
       </div>
-
       <div className="flex items-start gap-5">
         <div className="shrink-0">
-          <Image
-            src={qrImageUrl}
-            alt="Restaurant QR Code"
-            width={128}
-            height={128}
-            className="h-32 w-32 rounded-xl border border-slate-200 bg-white object-contain"
-          />
+          <Image src={qrImageUrl} alt="Restaurant QR Code" width={128} height={128} className="h-32 w-32 rounded-xl border border-slate-200 bg-white object-contain" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
@@ -63,17 +53,11 @@ export function ProfileQrCard({ subdomain }: ProfileQrCardProps) {
             <p className="text-[10px] text-slate-500 mt-1">Scan to open restaurant menu</p>
           </div>
           <div className="flex gap-2 mt-3">
-            <button
-              onClick={handleCopy}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors"
-            >
+            <button onClick={handleCopy} className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors">
               {copied ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
               {copied ? "Copied" : "Copy URL"}
             </button>
-            <button
-              onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-purple-50 px-3 py-1.5 text-xs font-bold text-purple-600 hover:bg-purple-100 transition-colors"
-            >
+            <button onClick={handleDownload} className="inline-flex items-center gap-1.5 rounded-lg bg-purple-50 px-3 py-1.5 text-xs font-bold text-purple-600 hover:bg-purple-100 transition-colors">
               <Download className="h-3 w-3" /> Download QR
             </button>
           </div>

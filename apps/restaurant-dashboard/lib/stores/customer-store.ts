@@ -2,7 +2,6 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { INITIAL_CUSTOMERS } from "./customer-store-data";
 import type { Customer, CustomerStats } from "@/components/customers/types/customer.types";
 
 interface CustomerStore {
@@ -11,7 +10,7 @@ interface CustomerStore {
 
 export const useCustomerStore = create<CustomerStore>()(
   persist(
-    () => ({ customers: INITIAL_CUSTOMERS }),
+    () => ({ customers: [] as Customer[] }),
     { name: "customer-store" }
   )
 );

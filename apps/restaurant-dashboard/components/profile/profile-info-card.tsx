@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Building2, User, Phone, Mail, MapPin, Tag, FileText, Pencil, Check, X,
-  Lock, Link2, Calendar, Hash, Globe, Briefcase
-} from "lucide-react";
+import { Building2, Pencil, Check, X } from "lucide-react";
+import { ProfileInfoEdit } from "./profile-info-edit";
+import { ProfileInfoDisplay } from "./profile-info-display";
 import type { AdminRestaurant } from "@/lib/types/admin-restaurant";
-import type { LucideIcon } from "lucide-react";
 
 interface ProfileInfoCardProps {
   restaurant: AdminRestaurant;
@@ -15,7 +13,7 @@ interface ProfileInfoCardProps {
 
 export function ProfileInfoCard({ restaurant, onUpdate }: ProfileInfoCardProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     name: restaurant.name,
     ownerName: restaurant.ownerName,
     contactPhone: restaurant.contactPhone,
@@ -27,13 +25,12 @@ export function ProfileInfoCard({ restaurant, onUpdate }: ProfileInfoCardProps) 
     taxNumber: restaurant.taxNumber,
     businessLicense: restaurant.businessLicense,
     tables: String(restaurant.tables),
-  });
+  }));
+
+  const handleChange = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSave = () => {
-    onUpdate?.({
-      ...form,
-      tables: Number(form.tables),
-    });
+    onUpdate?.({ ...form, tables: Number(form.tables) });
     setIsEditing(false);
   };
 
@@ -57,67 +54,7 @@ export function ProfileInfoCard({ restaurant, onUpdate }: ProfileInfoCardProps) 
           </button>
         )}
       </div>
-
-      {isEditing ? (
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <EditField label="Restaurant Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} icon={Building2} />
-            <EditField label="Owner Name" value={form.ownerName} onChange={(v) => setForm({ ...form, ownerName: v })} icon={User} />
-            <EditField label="Contact Phone" value={form.contactPhone} onChange={(v) => setForm({ ...form, contactPhone: v })} icon={Phone} />
-            <EditField label="Contact Email" value={form.contactEmail} onChange={(v) => setForm({ ...form, contactEmail: v })} icon={Mail} />
-            <EditField label="Address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} icon={MapPin} full />
-            <EditField label="City" value={form.city} onChange={(v) => setForm({ ...form, city: v })} icon={MapPin} />
-            <EditField label="Area" value={form.area} onChange={(v) => setForm({ ...form, area: v })} icon={MapPin} />
-            <EditField label="Cuisine" value={form.cuisine} onChange={(v) => setForm({ ...form, cuisine: v })} icon={Tag} />
-            <EditField label="Tax Number" value={form.taxNumber} onChange={(v) => setForm({ ...form, taxNumber: v })} icon={FileText} />
-            <EditField label="Business License" value={form.businessLicense} onChange={(v) => setForm({ ...form, businessLicense: v })} icon={FileText} />
-            <EditField label="Tables" value={form.tables} onChange={(v) => setForm({ ...form, tables: v })} icon={Building2} />
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <ProfileRow icon={Building2} label="Restaurant Name" value={restaurant.name} />
-          <ProfileRow icon={User} label="Owner" value={restaurant.ownerName} />
-          <ProfileRow icon={Phone} label="Phone" value={restaurant.contactPhone} />
-          <ProfileRow icon={Mail} label="Email" value={restaurant.contactEmail} />
-          <ProfileRow icon={MapPin} label="Address" value={restaurant.address} />
-          <ProfileRow icon={MapPin} label="City" value={restaurant.city} />
-          <ProfileRow icon={MapPin} label="Area" value={restaurant.area} />
-          <ProfileRow icon={Tag} label="Cuisine" value={restaurant.cuisine} />
-          <ProfileRow icon={Hash} label="Tax Number" value={restaurant.taxNumber} />
-          <ProfileRow icon={FileText} label="Business License" value={restaurant.businessLicense} />
-          <ProfileRow icon={Building2} label="Tables" value={`${restaurant.tables} tables`} />
-          <ProfileRow icon={Lock} label="Dashboard Username" value={restaurant.dashboardUsername} />
-          <ProfileRow icon={Link2} label="Slug" value={restaurant.slug} />
-          <ProfileRow icon={Globe} label="Subdomain" value={`${restaurant.subdomain}.js-restorant.com`} />
-          <ProfileRow icon={Briefcase} label="Status" value={restaurant.status} />
-          <ProfileRow icon={Calendar} label="Created" value={restaurant.createdAt} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ProfileRow({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
-  return (
-    <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white p-3">
-      <Icon className="mt-0.5 h-4 w-4 text-slate-400 shrink-0" />
-      <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</p>
-        <p className="text-sm font-medium text-slate-700">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function EditField({ label, value, onChange, icon: Icon, full }: { label: string; value: string; onChange: (v: string) => void; icon: LucideIcon; full?: boolean }) {
-  return (
-    <div className={`flex items-center gap-2 ${full ? "sm:col-span-2" : ""}`}>
-      <Icon className="h-4 w-4 text-slate-400 shrink-0" />
-      <div className="flex-1">
-        <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</label>
-        <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm focus:border-amber-500 focus:outline-none" />
-      </div>
+      {isEditing ? <ProfileInfoEdit form={form} onChange={handleChange} /> : <ProfileInfoDisplay restaurant={restaurant} />}
     </div>
   );
 }

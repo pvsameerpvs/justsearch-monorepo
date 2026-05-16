@@ -2,7 +2,6 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { INITIAL_VOUCHERS, generateVoucherCode } from "./voucher-store-data";
 import type { Voucher, VoucherFormData } from "@/components/vouchers/types/voucher.types";
 
 interface VoucherStore {
@@ -14,10 +13,19 @@ interface VoucherStore {
   incrementUsage: (id: string) => void;
 }
 
+function generateVoucherCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 8; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
+
 export const useVoucherStore = create<VoucherStore>()(
   persist(
     (set) => ({
-      vouchers: INITIAL_VOUCHERS,
+      vouchers: [],
       addVoucher: (data) =>
         set((state) => ({
           vouchers: [

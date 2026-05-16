@@ -1,7 +1,6 @@
 "use client";
 
 import { create } from 'zustand';
-import { INITIAL } from './menu-store.data';
 
 export type MenuItem = {
   id: string;
@@ -35,7 +34,7 @@ interface MenuStore {
 }
 
 export const useMenuStore = create<MenuStore>((set) => ({
-  categories: INITIAL,
+  categories: [],
   addCategory: (title, description = '', emoji = '') =>
     set((state) => ({
       categories: [...state.categories, { id: crypto.randomUUID(), title, description, emoji, items: [] }],

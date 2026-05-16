@@ -1,18 +1,22 @@
 "use client";
 
 import { useState } from 'react';
-import { updateRestaurant } from '@justsearch/utils';
 import { Camera, Plus, Check, X } from 'lucide-react';
 import { SocialCard } from './social-card';
 import { SocialsHeader } from './socials-header';
-import type { Restaurant } from '@justsearch/utils';
+import type { AdminRestaurant, SocialLink } from '@/lib/types/admin-restaurant';
 
-export function SettingsSocialsCard({ restaurant }: { restaurant: Restaurant }) {
-  const [socials, setSocials] = useState(restaurant.socials);
+interface SettingsSocialsCardProps {
+  restaurant: AdminRestaurant;
+  onUpdate?: (updates: Partial<AdminRestaurant>) => void;
+}
+
+export function SettingsSocialsCard({ restaurant, onUpdate }: SettingsSocialsCardProps) {
+  const [socials, setSocials] = useState<SocialLink[]>(restaurant.socials);
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSave = () => {
-    updateRestaurant(restaurant.slug, { socials });
+    onUpdate?.({ socials });
     setIsEditing(false);
   };
 
@@ -28,8 +32,6 @@ export function SettingsSocialsCard({ restaurant }: { restaurant: Restaurant }) 
   return (
     <div className="space-y-6">
       <SocialsHeader restaurant={restaurant} />
-
-      {/* Edit Toggle */}
       <div className="flex justify-end">
         {isEditing ? (
           <div className="flex gap-2">

@@ -4,11 +4,11 @@ import { SectionCard, FormField } from "@/components/ui/form-field";
 import { MenuHeroPreview } from "./menu-hero-preview";
 import { EditorActions } from "./editor-actions";
 import { useHomepageEditor } from "./use-homepage-editor";
-import type { Restaurant } from "@justsearch/utils";
+import type { RestaurantProfile } from "@/lib/hooks/use-restaurant-query";
 
 interface HomepageEditorFormProps {
-  restaurant: Restaurant;
-  onUpdate: (updates: Partial<Restaurant>) => void;
+  restaurant: RestaurantProfile;
+  onUpdate: (updates: Partial<RestaurantProfile>) => void;
   isSaving?: boolean;
 }
 

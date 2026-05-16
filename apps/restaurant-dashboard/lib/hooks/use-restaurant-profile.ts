@@ -1,42 +1,50 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  getSlugFromHostname,
-  loadRestaurants,
-  saveRestaurants,
-} from "./use-restaurant-profile.data";
+import { apiClient } from "@/lib/api-client";
+import { mapApiToAdminRestaurant } from "@/lib/utils/restaurant-profile.utils";
 import type { AdminRestaurant } from "@/lib/types/admin-restaurant";
 
 export function useRestaurantProfile() {
   const [restaurant, setRestaurant] = useState<AdminRestaurant | null>(null);
-  const slug = getSlugFromHostname();
-
-  const load = useCallback(() => {
-    const restaurants = loadRestaurants();
-    const found = restaurants.find((r) => r.slug === slug || r.subdomain === slug);
-    if (found) setRestaurant(found);
-    else setRestaurant(null);
-  }, [slug]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const data = await apiClient<Record<string, unknown>>("/restaurants/current");
+        if (!cancelled) {
+          setRestaurant(mapApiToAdminRestaurant(data));
+        }
+      } catch {
+        if (!cancelled) setRestaurant(null);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
     load();
-    window.addEventListener("storage", load);
-    return () => window.removeEventListener("storage", load);
-  }, [load]);
+    return () => { cancelled = true; };
+  }, []);
 
   const updateRestaurant = useCallback(
-    (updates: Partial<AdminRestaurant>) => {
-      const restaurants = loadRestaurants();
-      const idx = restaurants.findIndex((r) => r.slug === slug || r.subdomain === slug);
-      if (idx === -1) return;
-      const updated = { ...restaurants[idx], ...updates };
-      restaurants[idx] = updated;
-      saveRestaurants(restaurants);
-      setRestaurant(updated);
+    async (updates: Partial<AdminRestaurant>) => {
+      setRestaurant((prev) => {
+        if (!prev) return prev;
+        return { ...prev, ...updates };
+      });
+      try {
+        const response = await apiClient<Record<string, unknown>>("/restaurants/current", {
+          method: "PATCH",
+          body: JSON.stringify(updates),
+        });
+        setRestaurant(mapApiToAdminRestaurant(response));
+      } catch {
+        // Revert on error is optional; for now keep optimistic update
+      }
     },
-    [slug]
+    []
   );
 
-  return { restaurant, updateRestaurant };
+  return { restaurant, isLoading, updateRestaurant };
 }

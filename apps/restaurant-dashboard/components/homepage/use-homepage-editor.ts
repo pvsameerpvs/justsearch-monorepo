@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { Restaurant } from "@justsearch/utils";
+import type { RestaurantProfile } from "@/lib/hooks/use-restaurant-query";
 
 export const homepageSchema = z.object({
   heroImageUrl: z.string().optional(),
@@ -15,7 +15,7 @@ export const homepageSchema = z.object({
 
 export type HomepageFormData = z.infer<typeof homepageSchema>;
 
-export function useHomepageEditor(restaurant: Restaurant) {
+export function useHomepageEditor(restaurant: RestaurantProfile) {
   const form = useForm<HomepageFormData>({
     resolver: zodResolver(homepageSchema),
     defaultValues: {
@@ -29,7 +29,7 @@ export function useHomepageEditor(restaurant: Restaurant) {
     },
   });
 
-  const buildUpdate = (): Partial<Restaurant> => {
+  const buildUpdate = (): Partial<RestaurantProfile> => {
     const values = form.getValues();
     return {
       heroImageUrl: values.heroImageUrl || undefined,

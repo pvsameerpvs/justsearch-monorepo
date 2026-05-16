@@ -1,13 +1,18 @@
 "use client";
 
 import { create } from 'zustand';
-import { generateUniqueId, INITIAL_AGENTS } from './delivery-boy-store.data';
 import type { DeliveryBoy, UpdateAgentData, AddAgentData, DeliveryBoyStore } from './delivery-boy-store.types';
 
 export * from './delivery-boy-store.types';
 
+function generateUniqueId(name: string): string {
+  const prefix = name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 3);
+  const num = Math.floor(100 + Math.random() * 900);
+  return `${prefix}-${num}`;
+}
+
 export const useDeliveryBoyStore = create<DeliveryBoyStore>((set) => ({
-  agents: INITIAL_AGENTS,
+  agents: [],
   addAgent: (agent) =>
     set((state) => {
       const uniqueId = generateUniqueId(agent.name);

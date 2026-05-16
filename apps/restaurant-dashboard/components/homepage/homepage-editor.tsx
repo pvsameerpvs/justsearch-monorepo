@@ -5,10 +5,10 @@ import { useUpdateRestaurantMutation } from "@/lib/hooks/use-restaurant-query";
 import { HomepageEditorForm } from "./homepage-editor-form";
 import { HomepagePreview } from "./homepage-preview";
 import { HomepageError } from "./homepage-error";
-import type { Restaurant } from "@justsearch/utils";
+import type { RestaurantProfile } from "@/lib/hooks/use-restaurant-query";
 
 interface HomepageEditorProps {
-  restaurant: Restaurant;
+  restaurant: RestaurantProfile;
 }
 
 export function HomepageEditor({ restaurant }: HomepageEditorProps) {
@@ -17,7 +17,7 @@ export function HomepageEditor({ restaurant }: HomepageEditorProps) {
 
   useEffect(() => { setPreview(restaurant); }, [restaurant]);
 
-  const handleUpdate = (updates: Partial<Restaurant>) => {
+  const handleUpdate = (updates: Partial<RestaurantProfile>) => {
     setPreview((p) => ({ ...p, ...updates }));
     if (restaurant.id) mutate({ id: restaurant.id, data: updates });
   };

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
-import { menuItems, menuCategories } from '../../db/schema';
+import { menuItems, menuCategories, menus } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -32,7 +32,7 @@ router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
     const schema = z.object({
-      menuId: z.string().uuid(),
+      menuId: z.string().uuid().optional(),
       categoryId: z.string().uuid().optional(),
       name: z.string().min(2),
       description: z.string().max(500).optional(),
@@ -46,11 +46,24 @@ router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
 
     const body = schema.parse(req.body);
 
+    let menuId = body.menuId;
+    if (!menuId) {
+      const [firstMenu] = await db
+        .select({ id: menus.id })
+        .from(menus)
+        .where(eq(menus.restaurantId, req.tenant.id))
+        .limit(1);
+      if (!firstMenu) {
+        return res.status(400).json({ error: 'No menu found for this restaurant. Create a menu first.' });
+      }
+      menuId = firstMenu.id;
+    }
+
     const [item] = await db
       .insert(menuItems)
       .values({
         restaurantId: req.tenant.id,
-        menuId: body.menuId,
+        menuId,
         categoryId: body.categoryId,
         name: body.name,
         description: body.description,

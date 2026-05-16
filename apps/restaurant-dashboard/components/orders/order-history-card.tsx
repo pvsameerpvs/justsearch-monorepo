@@ -1,5 +1,7 @@
 import { Phone, Package, MapPin, Calendar } from "lucide-react";
-import { HistoryCardHeader, HistoryCardAgent, HistoryCardFooter } from "./history-card-parts";
+import { HistoryCardHeader } from "./history-card-header";
+import { HistoryCardAgent } from "./history-card-agent";
+import { HistoryCardFooter } from "./history-card-footer";
 import { formatDateTime } from "./time-utils";
 import type { DashboardOrder } from "@/lib/stores/order-store";
 

@@ -2,20 +2,24 @@
 
 import { useState } from 'react';
 import { MapPin, Phone, Mail, Globe, Star, Check, X } from 'lucide-react';
-import { updateRestaurant } from '@justsearch/utils';
 import { ContactRow } from './contact-row';
-import type { Restaurant } from '@justsearch/utils';
+import type { AdminRestaurant } from '@/lib/types/admin-restaurant';
 
-export function SettingsContactCard({ restaurant }: { restaurant: Restaurant }) {
+interface SettingsContactCardProps {
+  restaurant: AdminRestaurant;
+  onUpdate?: (updates: Partial<AdminRestaurant>) => void;
+}
+
+export function SettingsContactCard({ restaurant, onUpdate }: SettingsContactCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [address, setAddress] = useState(restaurant.address);
   const [city, setCity] = useState(restaurant.city);
-  const [phone, setPhone] = useState(restaurant.phone);
-  const [email, setEmail] = useState(restaurant.email);
+  const [phone, setPhone] = useState(restaurant.contactPhone);
+  const [email, setEmail] = useState(restaurant.contactEmail);
   const [website, setWebsite] = useState(restaurant.website ?? '');
 
   const handleSave = () => {
-    updateRestaurant(restaurant.slug, { address, city, phone, email, website: website || undefined });
+    onUpdate?.({ address, city, contactPhone: phone, contactEmail: email, website: website || undefined });
     setIsEditing(false);
   };
 
@@ -47,8 +51,8 @@ export function SettingsContactCard({ restaurant }: { restaurant: Restaurant }) 
       <div className="space-y-3">
         <ContactRow icon={MapPin} label="Address" value={restaurant.address} isEditing={isEditing} onChange={setAddress} />
         <ContactRow icon={MapPin} label="City" value={restaurant.city} isEditing={isEditing} onChange={setCity} />
-        <ContactRow icon={Phone} label="Phone" value={restaurant.phone} isEditing={isEditing} onChange={setPhone} />
-        <ContactRow icon={Mail} label="Email" value={restaurant.email} isEditing={isEditing} onChange={setEmail} />
+        <ContactRow icon={Phone} label="Phone" value={restaurant.contactPhone} isEditing={isEditing} onChange={setPhone} />
+        <ContactRow icon={Mail} label="Email" value={restaurant.contactEmail} isEditing={isEditing} onChange={setEmail} />
         <ContactRow icon={Globe} label="Website" value={restaurant.website ?? ''} isEditing={isEditing} onChange={setWebsite} />
         <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white p-3">
           <Star className="mt-0.5 h-4 w-4 text-slate-400" />
