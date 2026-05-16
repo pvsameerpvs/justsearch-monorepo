@@ -8,7 +8,7 @@ const router = Router();
 router.use(authMiddleware);
 
 // GET /api/v1/orders — list orders (with optional driverId filter)
-router.get('/', requireRole('owner', 'manager', 'cashier', 'kitchen_staff'), async (req, res, next) => {
+router.get('/', requireRole('owner', 'manager', 'cashier', 'kitchen_staff', 'driver'), async (req, res, next) => {
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 

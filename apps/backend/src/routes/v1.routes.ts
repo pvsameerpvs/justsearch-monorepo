@@ -9,6 +9,8 @@ import menuPublicRoutes from '../modules/menu/menu-public.routes';
 import menuItemRoutes from '../modules/menu/menu-item.routes';
 import menuCategoryRoutes from '../modules/menu/menu-category.routes';
 import deliveryAgentRoutes from '../modules/delivery/delivery.routes';
+import deliveryMeRoutes from '../modules/delivery/delivery-me.routes';
+import deliveryAssignmentRoutes from '../modules/delivery/delivery-assignment.routes';
 import voucherRoutes from '../modules/vouchers/voucher.routes';
 import userRoutes from '../modules/users/user.routes';
 import userAdminRoutes from '../modules/users/user-admin.routes';
@@ -47,6 +49,12 @@ router.use('/orders', orderRoutes);
 
 // Delivery agents (authenticated)
 router.use('/delivery-agents', deliveryAgentRoutes);
+
+// Driver self-service (authenticated, driver role)
+router.use('/delivery-agents/me', deliveryMeRoutes);
+
+// Delivery assignment lifecycle
+router.use('/delivery-assignments', deliveryAssignmentRoutes);
 
 // Vouchers / promo codes (authenticated)
 router.use('/vouchers', voucherRoutes);

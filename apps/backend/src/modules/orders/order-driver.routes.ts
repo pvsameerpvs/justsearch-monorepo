@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders } from '../../db/schema';
+import { orders, deliveryAssignments } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -25,6 +25,15 @@ router.patch('/:id/driver', requireRole('owner', 'manager', 'cashier'), async (r
       .returning();
 
     if (!updated) return res.status(404).json({ error: 'Order not found' });
+
+    await db.insert(deliveryAssignments).values({
+      restaurantId: req.tenant.id,
+      orderId: updated.id,
+      agentId: driverId,
+      status: 'assigned',
+      assignedAt: new Date(),
+    });
+
     res.json({ order: updated });
   } catch (error) {
     next(error);
