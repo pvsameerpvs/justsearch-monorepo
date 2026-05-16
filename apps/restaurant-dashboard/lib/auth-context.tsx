@@ -6,7 +6,7 @@ import { useAuthMeQuery, useLoginMutation } from "./hooks/use-auth-query";
 
 interface DashboardAuthContextType {
   isAuthenticated: boolean;
-  user: { id: string; name: string; role: string } | null;
+  user: { id: string; name: string; role: string; type: string } | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
@@ -19,7 +19,7 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
   const { mutateAsync: doLogin } = useLoginMutation();
   const queryClient = useQueryClient();
 
-  const user = me ?? null;
+  const user = me && me.type === 'staff' ? me : null;
   const isAuthenticated = !!user;
   const isLoading = meLoading;
 

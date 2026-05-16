@@ -27,7 +27,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // POST /api/v1/menu-items — create item
-router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
+router.post('/', requireRole('owner', 'manager', 'super_admin'), async (req, res, next) => {
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
@@ -83,7 +83,7 @@ router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
 });
 
 // PATCH /api/v1/menu-items/:id — update item
-router.patch('/:id', requireRole('owner', 'manager'), async (req, res, next) => {
+router.patch('/:id', requireRole('owner', 'manager', 'super_admin'), async (req, res, next) => {
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
@@ -128,7 +128,7 @@ router.patch('/:id', requireRole('owner', 'manager'), async (req, res, next) => 
 });
 
 // DELETE /api/v1/menu-items/:id
-router.delete('/:id', requireRole('owner', 'manager'), async (req, res, next) => {
+router.delete('/:id', requireRole('owner', 'manager', 'super_admin'), async (req, res, next) => {
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
