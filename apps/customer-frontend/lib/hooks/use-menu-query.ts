@@ -1,40 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
-
-interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string | null;
-  tags: string[];
-  isAvailable: boolean;
-  sortOrder: number;
-}
-
-interface MenuCategory {
-  id: string;
-  name: string;
-  description: string | null;
-  emoji: string | null;
-  sortOrder: number;
-  items: MenuItem[];
-}
-
-interface MenuResponse {
-  categories: MenuCategory[];
-}
+import { fetchMenu } from '@/lib/api/menu.api';
 
 const STALE_TIME = 5 * 60 * 1000;
 
-async function fetchMenu(): Promise<MenuResponse> {
-  return apiClient<MenuResponse>('/menus');
-}
-
-export function useMenuQuery() {
+export function useMenuQuery(host?: string) {
   return useQuery({
-    queryKey: ['menu'],
-    queryFn: fetchMenu,
+    queryKey: ['menu', host],
+    queryFn: () => fetchMenu(host ?? ''),
     staleTime: STALE_TIME,
+    enabled: Boolean(host),
   });
 }

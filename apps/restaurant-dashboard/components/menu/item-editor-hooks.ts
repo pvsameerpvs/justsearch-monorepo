@@ -1,11 +1,36 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateMenuItemMutation, useUpdateMenuItemMutation } from "@/lib/hooks/use-menu-query";
+import {
+  useCreateMenuItemMutation,
+  useUpdateMenuItemMutation,
+} from "@/lib/hooks/use-menu-query";
+import { uploadImage } from "@/lib/api/upload.api";
 import { itemEditorSchema, type ItemEditorFormData } from "./item-form-fields";
 import type { MenuItem } from "@/lib/stores/menu-store";
+
+function parseTags(tags?: string): string[] {
+  if (!tags) return [];
+  return tags.split(",").map((t) => t.trim()).filter(Boolean);
+}
+
+function buildMenuItemPayload(
+  data: ItemEditorFormData,
+  categoryId: string,
+  imageUrl?: string,
+) {
+  return {
+    name: data.name,
+    description: data.description,
+    price: data.price,
+    imageUrl,
+    tags: parseTags(data.tags),
+    isAvailable: data.isAvailable,
+    categoryId,
+  };
+}
 
 export function useItemEditorForm(item?: MenuItem) {
   return useForm<ItemEditorFormData>({
@@ -36,34 +61,40 @@ export function useItemEditorSubmit({
 }) {
   const createItem = useCreateMenuItemMutation();
   const updateItem = useUpdateMenuItemMutation();
+  const [isSaving, setIsSaving] = useState(false);
 
-  return (data: ItemEditorFormData) => {
-    const tagList = data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
-    const payload: Record<string, unknown> = {
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      imageUrl: data.image,
-      tags: tagList,
-      isAvailable: data.isAvailable,
-      categoryId,
-    };
-    if (!item && menuId) {
-      payload.menuId = menuId;
-    }
-    if (item) {
-      updateItem.mutate({ id: item.id, data: payload });
-    } else {
-      createItem.mutate(payload);
-    }
-    onClose();
-  };
+  const onSubmit = useCallback(
+    async (data: ItemEditorFormData) => {
+      setIsSaving(true);
+      try {
+        const imageUrl = data.image
+          ? (await uploadImage(data.image, "menu")).url
+          : undefined;
+        const payload = buildMenuItemPayload(data, categoryId, imageUrl);
+        if (item) {
+          await updateItem.mutateAsync({ id: item.id, data: payload });
+        } else {
+          await createItem.mutateAsync(
+            menuId ? { ...payload, menuId } : payload,
+          );
+        }
+        onClose();
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [item, categoryId, menuId, createItem, updateItem, onClose],
+  );
+
+  return { onSubmit, isSaving };
 }
 
 export function useEscKey(onClose: () => void) {
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
 }

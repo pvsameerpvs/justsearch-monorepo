@@ -1,26 +1,14 @@
 import { NextResponse } from 'next/server';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+import { verifyOtp } from '@/lib/api/auth.api';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const response = await fetch(`${API_BASE}/auth/otp/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      credentials: 'include',
-    });
-
-    const data = await response.json().catch(() => ({ error: 'Unknown error' }));
-
-    if (!response.ok) {
-      return NextResponse.json(data, { status: response.status });
-    }
-
+    const data = await verifyOtp(body);
     return NextResponse.json(data, { status: 200 });
-  } catch {
-    return NextResponse.json({ error: 'Verification failed' }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Verification failed';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

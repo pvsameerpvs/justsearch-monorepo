@@ -18,6 +18,7 @@ import adRoutes, { publicAdRoutes } from '../modules/ads/ad.routes';
 import revenueRoutes from '../modules/revenue/revenue.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
 import analyticsAdminRoutes from '../modules/analytics/analytics-admin.routes';
+import uploadRoutes from '../modules/upload/upload.routes';
 
 const router = Router();
 
@@ -73,5 +74,8 @@ router.use('/analytics', analyticsAdminRoutes);
 
 // Close-of-day routes (authenticated inside closeout router)
 router.use('/close-day', orderCloseoutRoutes);
+
+// Upload routes (authenticated)
+router.use('/upload', uploadRoutes);
 
 export default router;

@@ -1,38 +1,38 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
+import {
+  fetchCategories,
+  fetchMenuItems,
+  createMenuItem,
+  updateMenuItem,
+  deleteMenuItem,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from '@/lib/api/menu.api';
+import type {
+  MenuCategoryData,
+  MenuItemData,
+  CreateMenuItemPayload,
+  UpdateMenuItemPayload,
+  CreateCategoryPayload,
+  UpdateCategoryPayload,
+} from '@/lib/api/menu.types';
+
+export type { MenuCategoryData, MenuItemData, CreateMenuItemPayload, UpdateMenuItemPayload, CreateCategoryPayload, UpdateCategoryPayload };
 
 const STALE_TIME = 30_000;
 
-interface MenuCategory {
-  id: string;
-  name: string;
-  description: string | null;
-  sortOrder: number;
-  status: string;
-  createdAt: string;
-}
-
-interface MenuItem {
-  id: string;
-  menuId: string;
-  categoryId: string | null;
-  name: string;
-  description: string | null;
-  price: string;
-  imageUrl: string | null;
-  tags: string[];
-  isVeg: boolean;
-  isAvailable: boolean;
-  sortOrder: number;
-  createdAt: string;
-}
-
-async function fetchCategories(): Promise<{ categories: MenuCategory[] }> {
-  return apiClient('/menu-categories');
-}
-
-async function fetchItems(): Promise<{ items: MenuItem[] }> {
-  return apiClient('/menu-items');
+function useInvalidateMutation<TVariables, TData>(
+  mutationFn: (variables: TVariables) => Promise<TData>,
+  queryKey: string[],
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
 }
 
 export function useMenuCategoriesQuery() {
@@ -46,71 +46,43 @@ export function useMenuCategoriesQuery() {
 export function useMenuItemsQuery() {
   return useQuery({
     queryKey: ['menu-items'],
-    queryFn: fetchItems,
+    queryFn: fetchMenuItems,
     staleTime: STALE_TIME,
   });
 }
 
-export function useCreateMenuItemMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: Record<string, unknown>) =>
-      apiClient('/menu-items', { method: 'POST', body: JSON.stringify(data) }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-items'] });
-    },
-  });
-}
+export const useCreateMenuItemMutation = () =>
+  useInvalidateMutation(
+    (data: CreateMenuItemPayload) => createMenuItem(data),
+    ['menu-items'],
+  );
 
-export function useUpdateMenuItemMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-      apiClient(`/menu-items/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-items'] });
-    },
-  });
-}
+export const useUpdateMenuItemMutation = () =>
+  useInvalidateMutation(
+    ({ id, data }: { id: string; data: UpdateMenuItemPayload }) => updateMenuItem(id, data),
+    ['menu-items'],
+  );
 
-export function useDeleteMenuItemMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => apiClient(`/menu-items/${id}`, { method: 'DELETE' }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-items'] });
-    },
-  });
-}
+export const useDeleteMenuItemMutation = () =>
+  useInvalidateMutation(
+    (id: string) => deleteMenuItem(id),
+    ['menu-items'],
+  );
 
-export function useCreateMenuCategoryMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: Record<string, unknown>) =>
-      apiClient('/menu-categories', { method: 'POST', body: JSON.stringify(data) }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
-    },
-  });
-}
+export const useCreateMenuCategoryMutation = () =>
+  useInvalidateMutation(
+    (data: CreateCategoryPayload) => createCategory(data),
+    ['menu-categories'],
+  );
 
-export function useUpdateMenuCategoryMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-      apiClient(`/menu-categories/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
-    },
-  });
-}
+export const useUpdateMenuCategoryMutation = () =>
+  useInvalidateMutation(
+    ({ id, data }: { id: string; data: UpdateCategoryPayload }) => updateCategory(id, data),
+    ['menu-categories'],
+  );
 
-export function useDeleteMenuCategoryMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => apiClient(`/menu-categories/${id}`, { method: 'DELETE' }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
-    },
-  });
-}
+export const useDeleteMenuCategoryMutation = () =>
+  useInvalidateMutation(
+    (id: string) => deleteCategory(id),
+    ['menu-categories'],
+  );
