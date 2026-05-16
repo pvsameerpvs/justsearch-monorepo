@@ -12,10 +12,11 @@ const NEXT_STATUS_LABEL: Record<string, string> = {
   out_for_delivery: "Complete",
 };
 
-export function OrderCard({ order, onAccept, onReject, onAssign, onView }: {
+export function OrderCard({ order, onAccept, onReject, onAdvance, onAssign, onView }: {
   order: DashboardOrder;
   onAccept: () => void;
   onReject: () => void;
+  onAdvance: () => void;
   onAssign: () => void;
   onView: () => void;
 }) {
@@ -60,7 +61,14 @@ export function OrderCard({ order, onAccept, onReject, onAssign, onView }: {
         )}
       </button>
 
-      <OrderCardFooter isPending={isPending} hasAgent={!!order.assignedAgentId} onAccept={onAccept} onReject={onReject} onAssign={onAssign} />
+      <OrderCardFooter
+        status={order.status}
+        hasAgent={!!order.assignedAgentId}
+        onAccept={onAccept}
+        onReject={onReject}
+        onAdvance={onAdvance}
+        onAssign={onAssign}
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, inArray } from 'drizzle-orm';
 import { db } from '../../db';
 import { orders, orderItems } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
@@ -34,7 +34,7 @@ router.get('/', requireRole('owner', 'manager', 'cashier', 'kitchen_staff', 'dri
           count: sql<number>`count(*)::int`,
         })
         .from(orderItems)
-        .where(sql`${orderItems.orderId} = ANY(${orderIds})`)
+        .where(inArray(orderItems.orderId, orderIds))
         .groupBy(orderItems.orderId);
 
       for (const c of counts) {

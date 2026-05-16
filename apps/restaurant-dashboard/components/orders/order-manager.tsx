@@ -22,13 +22,17 @@ export function OrderManager() {
     isLoading, error, refetch,
   } = useOrderManager();
 
+  const hasTabs = setTab !== (() => {});
+
   return (
     <div className="space-y-5">
       <OrdersStats orders={statsOrders} />
 
-      <OrderManagerTabs tab={tab} onTabChange={(t) => { setTab(t); setFilter("all"); }} />
+      {hasTabs && (
+        <OrderManagerTabs tab={tab} onTabChange={(t) => { setTab(t); setFilter("all"); }} />
+      )}
 
-      {!isActiveTab && (
+      {isActiveTab === false && hasTabs && (
         <OrderDateFilter
           date={historyDate}
           view={historyView}
@@ -48,6 +52,10 @@ export function OrderManager() {
           isActiveTab={isActiveTab}
           onAccept={(id) => updateStatus(id, "confirmed")}
           onReject={(id) => updateStatus(id, "cancelled")}
+          onAdvance={(id, status) => {
+            const next = status === 'confirmed' ? 'preparing' : 'ready';
+            updateStatus(id, next);
+          }}
           onAssign={setAssigningOrderId}
           onView={setViewingOrderId}
         />

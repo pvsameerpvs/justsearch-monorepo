@@ -7,6 +7,8 @@ import { LayoutDashboard, Home, UtensilsCrossed, Settings, ShoppingBag, Truck, U
 import { SidebarFooter } from './dashboard-sidebar-footer';
 import { MobileToggle } from './mobile-toggle';
 import { SidebarBrand } from './sidebar-brand';
+import { useDashboardAuth } from '@/lib/auth-context';
+import { filterSidebarSections } from '@/lib/utils/role-guards';
 
 interface NavItem {
   href: string;
@@ -40,6 +42,8 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = useCallback(() => setIsOpen((p) => !p), []);
   const close = useCallback(() => setIsOpen(false), []);
+  const { user } = useDashboardAuth();
+  const visibleSections = filterSidebarSections(user?.role, SECTIONS);
 
   return (
     <>
@@ -48,7 +52,7 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
       <aside className="fixed left-0 top-0 z-40 flex h-full w-[260px] flex-col bg-[#0B0F19] transition-transform duration-300 md:translate-x-0" style={{ transform: isOpen ? 'translateX(0)' : undefined }}>
         <SidebarBrand />
         <nav className="flex-1 space-y-5 px-3 py-2 overflow-y-auto">
-          {SECTIONS.map((section) => (
+          {visibleSections.map((section) => (
             <div key={section.label}>
               <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-600">{section.label}</p>
               <ul className="space-y-0.5">

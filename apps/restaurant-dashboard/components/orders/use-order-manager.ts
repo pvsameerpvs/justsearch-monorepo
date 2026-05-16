@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useOrderStore, type DashboardOrder, type OrderStatus } from "@/lib/stores/order-store";
 import { useOrdersQuery, useUpdateOrderStatusMutation } from "@/lib/hooks/use-orders-query";
+import { useDashboardAuth } from "@/lib/auth-context";
 import { useOrderSound } from "./use-order-sound";
 import { useOrderHistory } from "./use-order-history";
 import { mapApiOrderToDashboard } from "./orders.utils";
@@ -11,15 +12,20 @@ type Tab = "active" | "history";
 
 const ACTIVE_FILTERS = ["all", "pending", "confirmed", "preparing", "ready", "out_for_delivery"] as const;
 const HISTORY_FILTERS = ["all", "completed", "cancelled"] as const;
+const KITCHEN_FILTERS = ["all", "confirmed", "preparing", "ready"] as const;
 
 const DEFAULT_HISTORY_DATE = new Date(Date.UTC(2026, 4, 13));
 
 export function useOrderManager() {
+  const { user } = useDashboardAuth();
+  const isKitchen = user?.role === 'kitchen_staff';
+
   const updateStoreStatus = useOrderStore((s) => s.updateStatus);
-  const { orders: apiOrders, isLoading: apiLoading, error: apiError, refetch } = useOrdersQuery();
+  const { orders: apiOrders, isLoading, error, refetch } = useOrdersQuery();
   const { mutate: updateStatusApi } = useUpdateOrderStatusMutation();
+
   const [tab, setTab] = useState<Tab>("active");
-  const [filter, setFilter] = useState<string>("all");
+  const [filter, setFilter] = useState("all");
   const [historyView, setHistoryView] = useState<"day" | "month" | "all">("day");
   const [historyDate, setHistoryDate] = useState<Date>(DEFAULT_HISTORY_DATE);
   const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
@@ -29,8 +35,8 @@ export function useOrderManager() {
 
   useOrderSound(orders);
 
-  const isActiveTab = tab === "active";
-  const filters = isActiveTab ? ACTIVE_FILTERS : HISTORY_FILTERS;
+  const isActiveTab = isKitchen ? true : tab === "active";
+  const filters = isKitchen ? KITCHEN_FILTERS : (isActiveTab ? ACTIVE_FILTERS : HISTORY_FILTERS);
 
   const activeOrders = orders.filter((o) => !["completed", "cancelled"].includes(o.status));
   const filteredActive = activeOrders.filter((o) => (filter === "all" ? true : o.status === filter));
@@ -38,21 +44,19 @@ export function useOrderManager() {
   const historyOrders = useOrderHistory(historyView, historyDate);
   const filteredHistory = historyOrders.filter((o) => (filter === "all" ? true : o.status === filter));
 
-  const visibleOrders: DashboardOrder[] = isActiveTab ? filteredActive : filteredHistory;
-  const statsOrders = isActiveTab ? activeOrders : historyOrders;
+  const kitchenOrders = activeOrders.filter((o) => ["confirmed", "preparing", "ready"].includes(o.status));
+  const filteredKitchen = kitchenOrders.filter((o) => (filter === "all" ? true : o.status === filter));
+
+  const visibleOrders = isKitchen ? filteredKitchen : (isActiveTab ? filteredActive : filteredHistory);
+  const statsOrders = isKitchen ? kitchenOrders : (isActiveTab ? activeOrders : historyOrders);
 
   const updateStatus = (id: string, status: OrderStatus) => {
-    updateStatusApi(
-      { orderId: id, status },
-      {
-        onError: () => updateStoreStatus(id, status),
-      }
-    );
+    updateStatusApi({ orderId: id, status }, { onError: () => updateStoreStatus(id, status) });
   };
 
   return {
     tab,
-    setTab,
+    setTab: isKitchen ? () => {} : setTab,
     filter,
     setFilter,
     historyView,
@@ -68,8 +72,8 @@ export function useOrderManager() {
     filters,
     visibleOrders,
     statsOrders,
-    isLoading: apiLoading,
-    error: apiError,
+    isLoading,
+    error,
     refetch,
   };
 }

@@ -3,8 +3,9 @@
 import { EmptyState } from '@/components/shared/empty-state';
 import { Container } from '@/components/shared/container';
 import type { Restaurant } from '@/lib/restaurant-types';
+import { useMyOrdersQuery } from '@/lib/hooks/use-my-orders-query';
 import { ProfileOrderListItem } from './profile-order-list-item';
-import { useProfileOrders } from './use-profile-orders';
+import { mapOrderToDeliveryOrder } from './profile-order-mapper';
 
 type ProfileOrdersScreenProps = {
   restaurant: Restaurant;
@@ -24,7 +25,9 @@ function LoadingRows() {
 }
 
 export function ProfileOrdersScreen({ restaurant }: ProfileOrdersScreenProps) {
-  const { hydrated, orders } = useProfileOrders();
+  const { data, isLoading } = useMyOrdersQuery();
+  const orders = data?.orders ?? [];
+  const currency = restaurant.menu[0]?.items[0]?.currency ?? 'AED';
 
   return (
     <section className="py-4 sm:py-6">
@@ -38,7 +41,7 @@ export function ProfileOrdersScreen({ restaurant }: ProfileOrdersScreenProps) {
           </p>
         </div>
 
-        {!hydrated ? (
+        {isLoading ? (
           <LoadingRows />
         ) : orders.length === 0 ? (
           <EmptyState
@@ -48,11 +51,11 @@ export function ProfileOrdersScreen({ restaurant }: ProfileOrdersScreenProps) {
           />
         ) : (
           <div className="space-y-2.5 sm:space-y-3">
-            {orders.map((order) => (
+            {orders.map(({ order, items }) => (
               <ProfileOrderListItem
                 key={order.id}
                 restaurant={restaurant}
-                order={order}
+                order={mapOrderToDeliveryOrder(order, items, currency)}
               />
             ))}
           </div>

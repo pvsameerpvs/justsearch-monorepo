@@ -15,9 +15,10 @@ interface OrderDetailDrawerProps {
   orderId: string;
   onClose: () => void;
   onAssign: () => void;
+  isKitchenStaff?: boolean;
 }
 
-export function OrderDetailDrawer({ orderId, onClose, onAssign }: OrderDetailDrawerProps) {
+export function OrderDetailDrawer({ orderId, onClose, onAssign, isKitchenStaff }: OrderDetailDrawerProps) {
   const { data, isLoading } = useOrderDetailQuery(orderId);
   const { agents } = useDeliveryBoyStore();
 
@@ -51,7 +52,7 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign }: OrderDetailDra
           <OrderTotals order={order} />
           <OrderTimeline timeline={order.timeline} />
 
-          {assignedAgent && (
+          {assignedAgent && !isKitchenStaff && (
             <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-3">
               <p className="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1">Assigned Driver</p>
               <div className="flex items-center justify-between">
@@ -70,6 +71,7 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign }: OrderDetailDra
           status={order.status}
           type={order.type}
           hasAgent={!!assignedAgent}
+          isKitchenStaff={isKitchenStaff}
           onAssign={onAssign}
         />
       </div>

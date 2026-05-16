@@ -8,11 +8,12 @@ interface OrderManagerGridProps {
   isActiveTab: boolean;
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
+  onAdvance: (id: string, status: string) => void;
   onAssign: (id: string) => void;
   onView: (id: string) => void;
 }
 
-export function OrderManagerGrid({ orders, isActiveTab, onAccept, onReject, onAssign, onView }: OrderManagerGridProps) {
+export function OrderManagerGrid({ orders, isActiveTab, onAccept, onReject, onAdvance, onAssign, onView }: OrderManagerGridProps) {
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-12">
@@ -20,7 +21,7 @@ export function OrderManagerGrid({ orders, isActiveTab, onAccept, onReject, onAs
           <Package className="h-6 w-6 text-emerald-500" />
         </div>
         <p className="mt-3 text-sm font-medium text-slate-600">
-          {isActiveTab ? "No active orders" : "No orders for this period"}
+          No orders
         </p>
       </div>
     );
@@ -35,6 +36,7 @@ export function OrderManagerGrid({ orders, isActiveTab, onAccept, onReject, onAs
               order={order}
               onAccept={() => onAccept(order.id)}
               onReject={() => onReject(order.id)}
+              onAdvance={() => onAdvance(order.id, order.status)}
               onAssign={() => onAssign(order.id)}
               onView={() => onView(order.id)}
             />

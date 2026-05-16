@@ -6,6 +6,7 @@ interface OrderDetailActionsProps {
   status: string;
   type: string;
   hasAgent: boolean;
+  isKitchenStaff?: boolean;
   onAssign: () => void;
 }
 
@@ -17,6 +18,11 @@ const NEXT_STATUS: Record<string, string> = {
   out_for_delivery: "completed",
 };
 
+const KITCHEN_NEXT_STATUS: Record<string, string> = {
+  confirmed: "preparing",
+  preparing: "ready",
+};
+
 const ACTION_META: Record<string, { label: string; color: string; hover: string }> = {
   pending:     { label: "Accept Order",            color: "bg-emerald-500",      hover: "hover:bg-emerald-600" },
   confirmed:   { label: "Start Preparing",         color: "bg-amber-500",       hover: "hover:bg-amber-600" },
@@ -25,17 +31,39 @@ const ACTION_META: Record<string, { label: string; color: string; hover: string 
   out_for_delivery: { label: "Mark Completed",     color: "bg-emerald-500",      hover: "hover:bg-emerald-600" },
 };
 
-export function OrderDetailActions({ orderId, status, type, hasAgent, onAssign }: OrderDetailActionsProps) {
+export function OrderDetailActions({ orderId, status, type, hasAgent, isKitchenStaff, onAssign }: OrderDetailActionsProps) {
   const { mutate: updateStatus } = useUpdateOrderStatusMutation();
-  const next = NEXT_STATUS[status];
-  const meta = ACTION_META[status];
 
+  const next = isKitchenStaff ? KITCHEN_NEXT_STATUS[status] : NEXT_STATUS[status];
+  const meta = ACTION_META[status];
   const nextLabel = ORDER_FLOW.find((s) => s.value === next)?.label ?? "Next";
 
   const handleStatusChange = (newStatus: string) => {
     updateStatus({ orderId, status: newStatus });
   };
 
+  // Kitchen staff view
+  if (isKitchenStaff) {
+    if (!next) return null;
+
+    return (
+      <div className="border-t border-slate-100 p-4 space-y-2">
+        <div className="space-y-1.5">
+          <p className="text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Next: {nextLabel}
+          </p>
+          <button
+            onClick={() => handleStatusChange(next)}
+            className={`w-full rounded-xl py-2.5 text-sm font-bold text-white transition-colors ${meta.color} ${meta.hover}`}
+          >
+            {meta.label}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Default staff view
   return (
     <div className="border-t border-slate-100 p-4 space-y-2">
       {status === "pending" && (

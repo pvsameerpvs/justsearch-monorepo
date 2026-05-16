@@ -34,3 +34,11 @@ export async function createOrder(payload: CreateOrderPayload): Promise<CreateOr
 export async function fetchOrder(orderId: string): Promise<{ order: Order; items: OrderItem[] }> {
   return apiClient<{ order: Order; items: OrderItem[] }>(`/orders/${orderId}`);
 }
+
+export type MyOrdersResponse = {
+  orders: Array<{ order: Order; items: OrderItem[] }>;
+};
+
+export async function fetchMyOrders(): Promise<MyOrdersResponse> {
+  return apiClient<MyOrdersResponse>('/orders/my');
+}
