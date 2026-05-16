@@ -2,11 +2,22 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v
 
 function getRestaurantSlug(): string | null {
   if (typeof window === 'undefined') return null;
+  const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
+  const isLocalhost = host === 'localhost' || host.endsWith('.localhost');
+
+  // On localhost dev, always use the default env slug and ignore localStorage
+  // to avoid stale cached slugs from previous logins causing 403/404 errors
+  if (isLocalhost) {
+    return process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || null;
+  }
+
   const saved = localStorage.getItem('restaurant-slug');
   if (saved) return saved;
-  const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
+
   let first = host.split('.')[0];
-  if (!first || first === 'admin' || first === 'localhost') return null;
+  if (!first || first === 'admin' || first === 'localhost') {
+    return process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || null;
+  }
   if (first.endsWith('-admin')) first = first.slice(0, -6);
   if (first.endsWith('-delivery')) first = first.slice(0, -9);
   if (first.startsWith('admin-')) first = first.slice(6);
@@ -58,7 +69,8 @@ export async function apiClient<T>(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-    throw new Error(error.message || `API error: ${response.status}`);
+    const msg = error.message || error.error || `API error: ${response.status}`;
+    throw new Error(msg);
   }
 
   const raw = await response.json();

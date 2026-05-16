@@ -4,32 +4,19 @@ import { useDashboardAuth } from "@/lib/auth-context";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-export function DashboardAuthGuard({ children }: { children: React.ReactNode }) {
-  return <AuthGuard>{children}</AuthGuard>;
-}
-
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useDashboardAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const isLoginPage = pathname === "/login";
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && pathname !== "/login") {
+    if (!isLoading && !isAuthenticated && !isLoginPage) {
       router.push("/login");
     }
-  }, [isLoading, isAuthenticated, pathname, router]);
+  }, [isLoading, isAuthenticated, isLoginPage, router]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated && pathname !== "/login") {
-    return null;
-  }
-
+  // Always render children — pages handle their own loading skeletons.
+  // Redirect only happens after auth check completes and user is not authenticated.
   return <>{children}</>;
 }

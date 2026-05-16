@@ -7,9 +7,8 @@ import { createRestaurantSchema, buildSettings } from './restaurant-create.utils
 import { createTenantSchema, seedTenantSchema } from '../../db/tenant-template';
 
 const router = Router();
-router.use(authMiddleware);
 
-router.post('/', requireRole('super_admin'), async (req, res, next) => {
+router.post('/', authMiddleware, requireRole('super_admin'), async (req, res, next) => {
   try {
     const body = createRestaurantSchema.parse(req.body);
     const schemaName = `rest_${body.slug.replace(/-/g, '_')}`;
@@ -39,7 +38,7 @@ router.post('/', requireRole('super_admin'), async (req, res, next) => {
   }
 });
 
-router.get('/', requireRole('super_admin'), async (_req, res, next) => {
+router.get('/', authMiddleware, requireRole('super_admin'), async (_req, res, next) => {
   try {
     const allRestaurants = await db.select().from(restaurants).orderBy(desc(restaurants.createdAt));
     const flattened = allRestaurants.map((r) => ({

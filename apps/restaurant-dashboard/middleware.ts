@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
   // Allow localhost for development
   if (normalizedHost === 'localhost' || normalizedHost.endsWith('.localhost')) {
     const response = NextResponse.next();
-    response.headers.set('x-restaurant-slug', 'demo-bistro');
+    response.headers.set('x-restaurant-slug', 'mosaic-table');
     return response;
   }
 

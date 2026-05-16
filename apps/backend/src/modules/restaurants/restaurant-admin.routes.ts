@@ -7,9 +7,8 @@ import { updateRestaurantSchema } from './restaurant-create.utils';
 import { dropTenantSchema } from '../../db/tenant-template';
 
 const router = Router();
-router.use(authMiddleware);
 
-router.patch('/:id', requireRole('super_admin'), async (req, res, next) => {
+router.patch('/:id', authMiddleware, requireRole('super_admin'), async (req, res, next) => {
   try {
     const body = updateRestaurantSchema.parse(req.body);
     const updateData: Record<string, unknown> = {};
@@ -49,7 +48,7 @@ router.patch('/:id', requireRole('super_admin'), async (req, res, next) => {
   }
 });
 
-router.delete('/:id', requireRole('super_admin'), async (req, res, next) => {
+router.delete('/:id', authMiddleware, requireRole('super_admin'), async (req, res, next) => {
   try {
     const [existing] = await db
       .select()

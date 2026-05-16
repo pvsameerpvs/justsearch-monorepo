@@ -21,6 +21,24 @@ declare global {
 
 const PUBLIC_SCHEMAS = 'public';
 
+// Simple in-memory LRU cache for tenant lookups (dev/prod)
+const tenantCache = new Map<string, { tenant: TenantContext | null; expiry: number }>();
+const TENANT_CACHE_TTL_MS = 30_000;
+
+function getCachedTenant(subdomain: string): TenantContext | null | undefined {
+  const cached = tenantCache.get(subdomain);
+  if (!cached) return undefined;
+  if (Date.now() > cached.expiry) {
+    tenantCache.delete(subdomain);
+    return undefined;
+  }
+  return cached.tenant;
+}
+
+function setCachedTenant(subdomain: string, tenant: TenantContext | null) {
+  tenantCache.set(subdomain, { tenant, expiry: Date.now() + TENANT_CACHE_TTL_MS });
+}
+
 export async function tenantMiddleware(
   req: Request,
   _res: Response,
@@ -34,7 +52,11 @@ export async function tenantMiddleware(
   }
 
   try {
-    const tenant = await lookupTenant(subdomain);
+    let tenant = getCachedTenant(subdomain);
+    if (tenant === undefined) {
+      tenant = await lookupTenant(subdomain);
+      setCachedTenant(subdomain, tenant);
+    }
 
     if (!tenant) {
       await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);

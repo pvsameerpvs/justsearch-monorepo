@@ -12,6 +12,11 @@ export function LoginContainer() {
   const [password, setPassword] = useState("");
   const [subdomain, setSubdomain] = useState(() => {
     if (typeof window === 'undefined') return "";
+    const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
+    const isLocalhost = host === 'localhost' || host.endsWith('.localhost');
+    if (isLocalhost) {
+      return process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || "";
+    }
     return localStorage.getItem('restaurant-slug') || "";
   });
   const [error, setError] = useState("");

@@ -16,6 +16,10 @@ export const homepageSchema = z.object({
 export type HomepageFormData = z.infer<typeof homepageSchema>;
 
 export function useHomepageEditor(restaurant: RestaurantProfile) {
+  const cuisineString = Array.isArray(restaurant.cuisine)
+    ? restaurant.cuisine.join(", ")
+    : String(restaurant.cuisine ?? "");
+
   const form = useForm<HomepageFormData>({
     resolver: zodResolver(homepageSchema),
     defaultValues: {
@@ -24,7 +28,7 @@ export function useHomepageEditor(restaurant: RestaurantProfile) {
       name: restaurant.name,
       tagline: restaurant.tagline,
       category: restaurant.category,
-      cuisine: restaurant.cuisine.join(", "),
+      cuisine: cuisineString,
       hours: restaurant.openingHours.find((h) => h.isToday)?.hours ?? restaurant.openingHours[0]?.hours ?? "",
     },
   });
