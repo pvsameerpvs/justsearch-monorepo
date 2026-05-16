@@ -8,10 +8,11 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
   const normalizedHost = host.replace(/:\d+$/, '').toLowerCase();
 
-  // Allow localhost for development
+  // Allow localhost for development — use env-configured default slug
   if (normalizedHost === 'localhost' || normalizedHost.endsWith('.localhost')) {
     const response = NextResponse.next();
-    response.headers.set('x-restaurant-slug', 'demo-bistro');
+    const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
+    response.headers.set('x-restaurant-slug', defaultSlug);
     return response;
   }
 

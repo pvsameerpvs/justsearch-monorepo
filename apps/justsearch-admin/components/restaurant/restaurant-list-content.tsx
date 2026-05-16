@@ -15,6 +15,7 @@ export function RestaurantListContent({
   onSearchChange,
   onShowForm,
   onRequestDelete,
+  onUpdate,
 }: {
   restaurants: ApiRestaurant[];
   showForm: boolean;
@@ -22,6 +23,7 @@ export function RestaurantListContent({
   onSearchChange: (q: string) => void;
   onShowForm: () => void;
   onRequestDelete: (restaurant: AdminRestaurant) => void;
+  onUpdate?: (id: string, updates: Partial<AdminRestaurant>) => void;
 }) {
   const filtered = useMemo(() => {
     if (!searchQuery.trim()) return restaurants;
@@ -47,6 +49,7 @@ export function RestaurantListContent({
               key={r.id}
               restaurant={adminR}
               onRequestDelete={() => onRequestDelete(adminR)}
+              onUpdate={(updates) => onUpdate?.(r.id, updates)}
             />
           );
         })}

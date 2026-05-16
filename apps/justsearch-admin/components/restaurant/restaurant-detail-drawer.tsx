@@ -64,6 +64,8 @@ export function RestaurantDetailDrawer({ restaurant, isOpen, onClose, onUpdate, 
           onPhotosChange={handlePhotosChange}
           onUpdate={onUpdate ?? (() => {})}
           onRequestDelete={onRequestDelete}
+          onSave={handleSave}
+          onCancel={handleCancel}
         />
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Phone, Mail, MapPin, Tag, Building2, Briefcase, Lock, UserCircle } from "lucide-react";
+import { User, Phone, Mail, MapPin, Tag, Building2, Briefcase, Lock, UserCircle, Activity } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
@@ -10,6 +10,13 @@ interface RestaurantDetailFormProps {
   form: Partial<AdminRestaurant>;
   onChange: (field: keyof AdminRestaurant, value: string | number) => void;
 }
+
+const STATUS_OPTIONS = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
+  { value: 'suspended', label: 'Suspended' },
+];
 
 export function RestaurantDetailForm({ restaurant, isEditing, form, onChange }: RestaurantDetailFormProps) {
   const data = { ...restaurant, ...form };
@@ -33,6 +40,7 @@ export function RestaurantDetailForm({ restaurant, isEditing, form, onChange }: 
         <Field label="Tax Number" value={data.taxNumber} isEditing={isEditing} onChange={(v) => onChange("taxNumber", v)} icon={Building2} />
         <Field label="Business License" value={data.businessLicense} isEditing={isEditing} onChange={(v) => onChange("businessLicense", v)} icon={Building2} />
         <Field label="Slug" value={data.slug} isEditing={isEditing} onChange={(v) => onChange("slug", v)} icon={Building2} />
+        <StatusField label="Status" value={data.status} isEditing={isEditing} onChange={(v) => onChange("status", v)} icon={Activity} />
         <Field label="Dashboard Username" value={data.dashboardUsername || ""} isEditing={isEditing} onChange={(v) => onChange("dashboardUsername", v)} icon={UserCircle} />
         <Field label="Dashboard Password" value={data.dashboardPassword || ""} isEditing={isEditing} onChange={(v) => onChange("dashboardPassword", v)} icon={Lock} type="password" />
       </div>
@@ -64,6 +72,36 @@ function Field({ label, value, isEditing, onChange, icon: Icon, full, type = "te
         />
       ) : (
         <p className="text-sm font-medium text-slate-700">{value}</p>
+      )}
+    </div>
+  );
+}
+
+function StatusField({ label, value, isEditing, onChange, icon: Icon }: {
+  label: string;
+  value: string;
+  isEditing: boolean;
+  onChange: (v: string) => void;
+  icon: LucideIcon;
+}) {
+  return (
+    <div className="rounded-xl border border-slate-100 bg-white p-3">
+      <div className="flex items-center gap-1.5 mb-1">
+        <Icon className="h-3 w-3 text-slate-400" />
+        <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</label>
+      </div>
+      {isEditing ? (
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-amber-500 focus:outline-none bg-white"
+        >
+          {STATUS_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      ) : (
+        <p className="text-sm font-medium text-slate-700 capitalize">{value}</p>
       )}
     </div>
   );

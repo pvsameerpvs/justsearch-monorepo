@@ -30,12 +30,12 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
   if (typeof window !== 'undefined') {
     const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
     let slug = host.split('.')[0];
-    if (slug === 'localhost') slug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'mosaic-table';
+    if (slug === 'localhost') slug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
     if (slug && slug !== 'admin') {
       headers.set('x-restaurant-slug', slug);
     }
   } else {
-    const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'mosaic-table';
+    const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
     headers.set('x-restaurant-slug', defaultSlug);
   }
 

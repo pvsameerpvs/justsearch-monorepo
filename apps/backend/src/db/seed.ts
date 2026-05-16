@@ -11,11 +11,13 @@ import { seedGames } from './seed/seed.games';
 async function seed() {
   try {
     const restaurantId = await seedRestaurant();
-    await seedStaff(restaurantId);
-    await seedDeliveryAgent(restaurantId);
-    await seedTable(restaurantId);
-    await seedMenu(restaurantId);
-    await seedCustomer(restaurantId);
+    if (restaurantId) {
+      await seedStaff(restaurantId);
+      await seedDeliveryAgent(restaurantId);
+      await seedTable(restaurantId);
+      await seedMenu(restaurantId);
+      await seedCustomer(restaurantId);
+    }
     await seedSuperAdmin();
     await seedGames();
   } finally {

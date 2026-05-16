@@ -4,7 +4,7 @@ export { RestaurantCreateForm } from "./restaurant-create-form";
 export { restaurantSchema } from "./restaurant-create-schema";
 export type { RestaurantFormData } from "./restaurant-create-schema";
 export { RestaurantDeleteDialog } from "./restaurant-delete-dialog";
-export { deleteRestaurantSchema } from "./restaurant-delete-schema";
+export { buildDeleteRestaurantSchema } from "./restaurant-delete-schema";
 export type { DeleteRestaurantFormData } from "./restaurant-delete-schema";
 export { RestaurantDetailForm } from "./restaurant-detail-form";
 export { RestaurantDetailDrawer } from "./restaurant-detail-drawer";

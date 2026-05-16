@@ -15,6 +15,8 @@ interface RestaurantDetailContentProps {
   onPhotosChange: (photos: string[]) => void;
   onUpdate: (updates: Partial<AdminRestaurant>) => void;
   onRequestDelete: () => void;
+  onSave?: () => void;
+  onCancel?: () => void;
 }
 
 export function RestaurantDetailContent({
@@ -25,6 +27,8 @@ export function RestaurantDetailContent({
   onPhotosChange,
   onUpdate,
   onRequestDelete,
+  onSave,
+  onCancel,
 }: RestaurantDetailContentProps) {
   const photos = (form.photos !== undefined ? form.photos : restaurant.photos) || [];
 
@@ -41,6 +45,23 @@ export function RestaurantDetailContent({
       </div>
 
       <RestaurantDetailForm restaurant={restaurant} isEditing={isEditing} form={form} onChange={onChange} />
+
+      {isEditing && (
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onSave}
+            className="flex-1 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-600 transition-colors"
+          >
+            Save Changes
+          </button>
+          <button
+            onClick={onCancel}
+            className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
 
       <DashboardCredentialsCard restaurant={restaurant} />
 

@@ -7,6 +7,7 @@ import { useRestaurantsQuery } from "@/lib/hooks/use-restaurants-query";
 import { RestaurantCreateForm } from "@/components/restaurant/restaurant-create-form";
 import { useCreateRestaurant } from "@/lib/hooks/use-create-restaurant";
 import { useDeleteRestaurant } from "@/lib/hooks/use-delete-restaurant";
+import { useUpdateRestaurant } from "@/lib/hooks/use-update-restaurant";
 import { RestaurantStatsBar } from "@/components/restaurant/restaurant-stats-bar";
 import { RestaurantListContent } from "./restaurant-list-content";
 import { RestaurantLoading } from "./restaurant-loading";
@@ -22,6 +23,7 @@ export function RestaurantListPage() {
 
   const handleCreate = useCreateRestaurant(refetch, () => setShowForm(false));
   const handleDelete = useDeleteRestaurant(refetch);
+  const handleUpdate = useUpdateRestaurant(refetch);
 
   if (isLoading) return <RestaurantLoading />;
 
@@ -56,6 +58,7 @@ export function RestaurantListPage() {
         onSearchChange={setSearchQuery}
         onShowForm={() => setShowForm(true)}
         onRequestDelete={setDeleteTarget}
+        onUpdate={handleUpdate}
       />
 
       {deleteTarget && (
@@ -63,8 +66,11 @@ export function RestaurantListPage() {
           restaurant={deleteTarget}
           onCancel={() => setDeleteTarget(null)}
           onConfirm={async (username, password) => {
-            await handleDelete(deleteTarget.id, username, password);
-            setDeleteTarget(null);
+            const result = await handleDelete(deleteTarget.id, username, password);
+            if (!result.backup) {
+              setDeleteTarget(null);
+            }
+            return result;
           }}
         />
       )}

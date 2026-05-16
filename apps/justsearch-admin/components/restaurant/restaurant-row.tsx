@@ -10,9 +10,10 @@ import { RestaurantRowActions } from "./restaurant-row-actions";
 interface RestaurantRowProps {
   restaurant: AdminRestaurant;
   onRequestDelete: () => void;
+  onUpdate?: (updates: Partial<AdminRestaurant>) => void;
 }
 
-export function RestaurantRow({ restaurant, onRequestDelete }: RestaurantRowProps) {
+export function RestaurantRow({ restaurant, onRequestDelete, onUpdate }: RestaurantRowProps) {
   const [detailOpen, setDetailOpen] = useState(false);
 
   const domains = [
@@ -53,6 +54,7 @@ export function RestaurantRow({ restaurant, onRequestDelete }: RestaurantRowProp
         restaurant={restaurant}
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
+        onUpdate={onUpdate}
         onRequestDelete={onRequestDelete}
       />
     </>

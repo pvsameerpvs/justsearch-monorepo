@@ -5,10 +5,9 @@ function getRestaurantSlug(): string | null {
   const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
   const isLocalhost = host === 'localhost' || host.endsWith('.localhost');
 
-  // On localhost dev, always use the default env slug and ignore localStorage
-  // to avoid stale cached slugs from previous logins causing 403/404 errors
+  // On localhost dev, only use localStorage — user must explicitly type a subdomain
   if (isLocalhost) {
-    return process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || null;
+    return localStorage.getItem('restaurant-slug');
   }
 
   const saved = localStorage.getItem('restaurant-slug');
@@ -16,7 +15,7 @@ function getRestaurantSlug(): string | null {
 
   let first = host.split('.')[0];
   if (!first || first === 'admin' || first === 'localhost') {
-    return process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || null;
+    return null;
   }
   if (first.endsWith('-admin')) first = first.slice(0, -6);
   if (first.endsWith('-delivery')) first = first.slice(0, -9);

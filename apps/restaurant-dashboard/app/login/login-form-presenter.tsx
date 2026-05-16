@@ -32,10 +32,10 @@ export function LoginFormPresenter({
         <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Restaurant Subdomain</label>
         <div className="relative">
           <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input value={subdomain} onChange={(e) => onSubdomainChange(e.target.value)} placeholder="e.g., mosaic-table"
+          <input value={subdomain} onChange={(e) => onSubdomainChange(e.target.value)} placeholder="e.g., naples"
             className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20" required />
         </div>
-        <p className="text-[10px] text-slate-400">The slug from justsearch-admin (e.g., test, mosaic-table)</p>
+        <p className="text-[10px] text-slate-400">The slug from justsearch-admin (e.g., naples)</p>
       </div>
 
       <div className="space-y-1.5">

@@ -1,23 +1,11 @@
 import { db } from '../index';
 import { restaurants } from '../schema';
 
-export async function seedRestaurant() {
-  const [mosaic] = await db
-    .insert(restaurants)
-    .values({
-      slug: 'mosaic-table',
-      subdomain: 'mosaic-table',
-      schemaName: 'rest_mosaic',
-      name: 'Mosaic Table',
-      status: 'active',
-      settings: JSON.stringify({}),
-      theme: JSON.stringify({
-        brandColor: '15 118 110',
-        brandSoft: '223 247 243',
-        accentColor: '245 170 66',
-      }),
-    })
-    .returning();
-
-  return mosaic.id;
+export async function seedRestaurant(): Promise<string | null> {
+  // No default restaurant seeded — restaurants are created via admin portal
+  const existing = await db.select().from(restaurants).limit(1);
+  if (existing.length > 0) {
+    return existing[0].id;
+  }
+  return null;
 }

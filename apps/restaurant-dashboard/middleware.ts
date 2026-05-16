@@ -7,11 +7,9 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
   const normalizedHost = host.replace(/:\d+$/, '').toLowerCase();
 
-  // Allow localhost for development
+  // Allow localhost for development — no hardcoded slug; frontend api-client sends it via localStorage
   if (normalizedHost === 'localhost' || normalizedHost.endsWith('.localhost')) {
-    const response = NextResponse.next();
-    response.headers.set('x-restaurant-slug', 'mosaic-table');
-    return response;
+    return NextResponse.next();
   }
 
   // Block admin subdomain

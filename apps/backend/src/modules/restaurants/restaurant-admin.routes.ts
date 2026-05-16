@@ -4,7 +4,7 @@ import { db } from '../../db';
 import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 import { updateRestaurantSchema } from './restaurant-create.utils';
-import { dropTenantSchema } from '../../db/tenant-template';
+import { dropTenantSchema, backupTenantSchema } from '../../db/tenant-template';
 
 const router = Router();
 
@@ -58,9 +58,19 @@ router.delete('/:id', authMiddleware, requireRole('super_admin'), async (req, re
 
     if (!existing) return res.status(404).json({ error: 'Restaurant not found' });
 
+    // 1. Backup all tenant data before destruction
+    const backupPath = await backupTenantSchema(existing.schemaName, existing.slug);
+
+    // 2. Drop the entire schema + all tables + all data
     await dropTenantSchema(existing.schemaName);
+
+    // 3. Remove registry row
     await db.delete(restaurants).where(eq(restaurants.id, req.params.id));
-    res.status(204).send();
+
+    res.status(200).json({
+      message: 'Restaurant deleted successfully',
+      backup: backupPath,
+    });
   } catch (error) {
     next(error);
   }
