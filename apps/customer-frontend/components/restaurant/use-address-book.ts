@@ -14,21 +14,6 @@ export type SavedAddress = {
 
 const STORAGE_KEY = 'justsearch:user:addresses';
 
-const DEFAULT_ADDRESSES: SavedAddress[] = [
-  {
-    id: '1',
-    label: 'Work',
-    address: 'Dubai Damas tower, 28 Al Maktoum Road, Riggat Al Buteen, Dubai',
-    details: '305 office number',
-  },
-  {
-    id: '2',
-    label: 'Home',
-    address: 'Marina Bay Tower A, Floor 12, Unit 1204, Dubai Marina',
-    details: 'Near the elevator',
-  },
-];
-
 export function useAddressBook() {
   const [addresses, setAddresses] = useState<SavedAddress[]>([]);
   const [hydrated, setHydrated] = useState(false);
@@ -36,13 +21,7 @@ export function useAddressBook() {
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      try {
-        setAddresses(JSON.parse(raw));
-      } catch {
-        setAddresses(DEFAULT_ADDRESSES);
-      }
-    } else {
-      setAddresses(DEFAULT_ADDRESSES);
+      try { setAddresses(JSON.parse(raw)); } catch { /* ignore */ }
     }
     setHydrated(true);
   }, []);

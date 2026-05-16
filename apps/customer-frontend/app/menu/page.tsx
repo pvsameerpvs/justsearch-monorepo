@@ -41,34 +41,24 @@ export default async function MenuPage() {
   const host = headerStore.get('host') ?? '';
 
   const menuData = await fetchMenu(host);
+  const adaptedMenu = menuData
+    ? menuData.categories.map((cat) => ({
+        id: cat.id,
+        title: cat.name,
+        description: cat.description ?? '',
+        emoji: '',
+        items: cat.items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          description: item.description ?? '',
+          price: Number(item.price),
+          currency: 'AED',
+          image: item.imageUrl ?? undefined,
+          tags: item.tags,
+          isAvailable: item.isAvailable,
+        })),
+      }))
+    : [];
 
-  if (menuData && menuData.categories.length > 0) {
-    // Merge API menu data into restaurant object
-    const adaptedMenu = menuData.categories.map((cat) => ({
-      id: cat.id,
-      title: cat.name,
-      description: cat.description ?? '',
-      emoji: '',
-      items: cat.items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description ?? '',
-        price: Number(item.price),
-        currency: 'AED',
-        image: item.imageUrl ?? undefined,
-        tags: item.tags,
-        isAvailable: item.isAvailable,
-      })),
-    }));
-
-    const mergedRestaurant = {
-      ...restaurant,
-      menu: adaptedMenu,
-    };
-
-    return <RestaurantMenuShowcase restaurant={mergedRestaurant} />;
-  }
-
-  // Fallback to mock menu data
-  return <RestaurantMenuShowcase restaurant={restaurant} />;
+  return <RestaurantMenuShowcase restaurant={{ ...restaurant, menu: adaptedMenu }} />;
 }

@@ -38,7 +38,7 @@ function writeNavigationStack(stack: string[]) {
       JSON.stringify(stack.slice(-MAX_STACK_SIZE)),
     );
   } catch {
-    // Ignore storage errors in demo mode.
+    // Ignore storage errors.
   }
 }
 

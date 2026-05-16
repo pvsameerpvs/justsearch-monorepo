@@ -48,7 +48,19 @@ export function AdFormContainer({ campaign, onSave, onCancel }: AdFormContainerP
     setForm((prev) => ({ ...prev, restaurantId: id, restaurantName: r?.name ?? "" }));
   };
 
-  const handleSave = () => onSave(form);
+  const handleSave = () => {
+    const mapped = {
+      name: `${form.title} — ${form.companyName}`,
+      type: form.type,
+      content: form.clientName,
+      imageUrl: form.mediaUrl,
+      duration: form.duration,
+      assignedGames: form.assignedGames,
+      targetRestaurants: form.restaurantId ? [form.restaurantId] : [],
+      isActive: form.isActive ?? true,
+    };
+    onSave(mapped as unknown as AdCampaignFormData);
+  };
 
   return (
     <AdFormPresenter

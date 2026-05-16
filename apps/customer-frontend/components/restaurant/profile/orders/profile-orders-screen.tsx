@@ -24,7 +24,7 @@ function LoadingRows() {
 }
 
 export function ProfileOrdersScreen({ restaurant }: ProfileOrdersScreenProps) {
-  const { hydrated, orders } = useProfileOrders(restaurant);
+  const { hydrated, orders } = useProfileOrders();
 
   return (
     <section className="py-4 sm:py-6">

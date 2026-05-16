@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { clearFreshRegistration, useRegistration } from '@/components/auth/registration-context';
+import { clearFreshRegistration } from '@/components/auth/registration-storage';
+import { useRegistration } from '@/components/auth/registration-context';
 import { useLoyaltyPoints } from '../use-loyalty-points';
 import { useRestaurantFulfillment } from '../use-restaurant-fulfillment';
 import { ScratchCard } from './scratch-card';

@@ -8,7 +8,7 @@ export default function NotFound() {
       <Container>
         <EmptyState
           title="This page could not be found"
-          description="The restaurant frontend stays public, but this route does not exist in the current demo."
+          description="The page you are looking for does not exist or has been moved."
           action={<ButtonLink href="/">Back to home</ButtonLink>}
         />
       </Container>

@@ -106,7 +106,7 @@ export default function ProfilePage() {
                 href="/profile/rewards"
                 icon={Gift}
                 label="Rewards"
-                description="Unlocked offers (demo)"
+                description="Redeem your earned rewards"
               />
               <ProfileMenuItem
                 href="/profile/how-to-play"
@@ -136,7 +136,7 @@ export default function ProfilePage() {
                 href="/profile/settings"
                 icon={Settings}
                 label="Settings"
-                description="Preferences and privacy (demo)"
+                description="Manage your account preferences"
               />
             </div>
           </div>

@@ -6,20 +6,14 @@ const STORAGE_KEY = 'justsearch:loyaltyPoints';
 const UPDATED_EVENT = 'justsearch:loyaltyPointsUpdated';
 const DEFAULT_POINTS = 0;
 
-function parsePoints(value: string | null) {
-  if (!value) return null;
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return null;
-  return Math.max(0, Math.floor(parsed));
-}
-
 function readStoredPoints() {
   if (typeof window === 'undefined') return DEFAULT_POINTS;
-
   try {
-    const stored = parsePoints(window.localStorage.getItem(STORAGE_KEY));
-    if (stored === null) return DEFAULT_POINTS;
-    return stored;
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULT_POINTS;
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) return DEFAULT_POINTS;
+    return Math.max(0, Math.floor(parsed));
   } catch {
     return DEFAULT_POINTS;
   }
@@ -48,9 +42,7 @@ export function useLoyaltyPoints() {
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.key !== STORAGE_KEY) return;
-      const next = parsePoints(event.newValue);
-      if (next === null) return;
-      setPointsState(next);
+      setPointsState(readStoredPoints());
     };
 
     window.addEventListener('storage', onStorage);

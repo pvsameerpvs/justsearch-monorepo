@@ -1,7 +1,6 @@
 "use client";
 
 import { useOrderStatusQuery } from '@/lib/hooks/use-order-status-query';
-import { useRestaurantFulfillment } from '@/components/restaurant/fulfillment';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { CheckoutLiveOrderStatusPresenter } from './checkout-live-order-status-presenter';
 
@@ -12,8 +11,7 @@ export function CheckoutLiveOrderStatusScreen({
   restaurant: Restaurant;
   orderId: string;
 }) {
-  const { orders } = useRestaurantFulfillment();
-  const { data, isLoading } = useOrderStatusQuery(orderId, orders);
+  const { data, isLoading } = useOrderStatusQuery(orderId);
 
   if (isLoading) {
     return (

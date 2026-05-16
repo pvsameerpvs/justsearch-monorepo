@@ -13,7 +13,7 @@ import userRoutes from '../modules/users/user.routes';
 import userAdminRoutes from '../modules/users/user-admin.routes';
 import gameRoutes from '../modules/games/game.routes';
 import gameSessionRoutes from '../modules/games/game-session.routes';
-import adRoutes from '../modules/ads/ad.routes';
+import adRoutes, { publicAdRoutes } from '../modules/ads/ad.routes';
 import revenueRoutes from '../modules/revenue/revenue.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
 import analyticsAdminRoutes from '../modules/analytics/analytics-admin.routes';
@@ -60,6 +60,7 @@ router.use('/games', gameSessionRoutes);
 
 // Advertisements (super-admin)
 router.use('/advertisements', adRoutes);
+router.use('/advertisements/public', publicAdRoutes);
 
 // Revenue (super-admin)
 router.use('/revenue', revenueRoutes);

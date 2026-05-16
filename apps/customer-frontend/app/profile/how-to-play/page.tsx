@@ -1,25 +1,7 @@
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
 import { ButtonLink } from '@/components/shared/button-link';
-
-const games = [
-  {
-    title: 'Spin the Wheel',
-    steps: ['Tap Spin', 'Wait for the wheel to stop', 'Your points are added automatically'],
-  },
-  {
-    title: 'Scratch Card',
-    steps: ['Scratch with finger or mouse', 'Scratch about half to unlock', 'Points are added automatically'],
-  },
-  {
-    title: 'Tap Challenge',
-    steps: ['Tap as fast as you can', 'You have 10 seconds', 'Points = taps × 2 (max 120)'],
-  },
-  {
-    title: 'Quick Quiz',
-    steps: ['Tap an answer', 'It moves to the next question automatically', 'Points per correct answer'],
-  },
-] as const;
+import { HOW_TO_PLAY_GAMES } from '@/lib/constants/how-to-play.constants';
 
 export default function ProfileHowToPlayPage() {
   return (
@@ -39,7 +21,7 @@ export default function ProfileHowToPlayPage() {
           </Surface>
 
           <div className="grid gap-4">
-            {games.map((game) => (
+            {HOW_TO_PLAY_GAMES.map((game) => (
               <Surface
                 key={game.title}
                 className="rounded-[28px] border-white/70 bg-white/90 p-6"

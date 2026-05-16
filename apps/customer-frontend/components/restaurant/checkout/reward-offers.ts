@@ -1,5 +1,5 @@
 import type { RegisteredUser } from '@/components/auth/registered-user';
-import { readFreshRegistration } from '@/components/auth/registration-context';
+import { readFreshRegistration } from '@/components/auth/registration-storage';
 import type { DeliveryOrder } from '../use-restaurant-fulfillment';
 import {
   ORDER_REWARD_DELAY_MS,

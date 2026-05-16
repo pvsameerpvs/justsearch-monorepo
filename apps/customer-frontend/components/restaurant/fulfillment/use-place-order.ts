@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { apiClient } from '@/lib/api-client';
+import { useRegistration } from '@/components/auth/registration-context';
 import type { StoredState } from './fulfillment.types';
 import { computeTotal } from './fulfillment.constants';
 
@@ -12,52 +13,34 @@ export function usePlaceOrder(
   subtotal: number,
   deliveryFee: number
 ) {
+  const { user } = useRegistration();
+
   return useCallback(
-    async ({ address, note, promoCode, promoDiscount = 0 }: { address: string; note: string; promoCode?: string; promoDiscount?: number }) => {
+    async ({ address, note }: { address: string; note: string; promoCode?: string; promoDiscount?: number }) => {
       if (cartCount === 0) return null;
-      const fee = deliveryFee;
-      const totalVal = computeTotal(subtotal, fee, promoDiscount);
-      try {
-        const res = await apiClient<{ order: { id: string; code: string } }>('/orders', {
-          method: 'POST',
-          body: JSON.stringify({
-            customerName: 'Guest',
-            customerPhone: '+971500000000',
-            fulfillmentType: 'delivery',
-            items: cart.map((item) => ({
-              menuItemId: item.itemId,
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price,
-            })),
-            subtotal,
-            deliveryFee: fee,
-            tax: 0,
-            total: totalVal,
-            deliveryAddress: address,
-            notes: note,
-          }),
-        });
-        setState((s) => ({ ...s, cart: [] }));
-        return res.order.id;
-      } catch {
-        const id = `ORD-${Date.now().toString(36).toUpperCase()}`;
-        const newOrder = {
-          id,
-          createdAt: Date.now(),
-          items: cart,
-          address,
-          note,
-          riderName: 'Rider',
+      const totalVal = computeTotal(subtotal, deliveryFee, 0);
+      const res = await apiClient<{ order: { id: string; code: string } }>('/orders', {
+        method: 'POST',
+        body: JSON.stringify({
+          customerName: user?.name ?? 'Guest',
+          customerPhone: user?.mobile ?? '',
+          fulfillmentType: 'delivery',
+          items: cart.map((item) => ({
+            menuItemId: item.itemId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+          })),
           subtotal,
-          deliveryFee: fee,
-          promoCode,
-          promoDiscount,
+          deliveryFee,
+          tax: 0,
           total: totalVal,
-        };
-        setState((s) => ({ ...s, cart: [], orders: [newOrder, ...s.orders].slice(0, 10) }));
-        return id;
-      }
+          deliveryAddress: address,
+          notes: note,
+        }),
+      });
+      setState((s) => ({ ...s, cart: [] }));
+      return res.order.id;
     },
     [cart, cartCount, subtotal, deliveryFee, setState]
   );

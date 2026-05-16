@@ -43,20 +43,24 @@ export function useCheckoutState() {
 
     const combinedAddress = `${address.addressTitle} - ${address.address}\n${address.addressDetails}${address.alternateNumber ? `\nAlt number: ${address.alternateNumber}` : ''}\n${handoff}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
 
-    const orderId = await placeOrder({
-      address: combinedAddress,
-      note: restaurantNote,
-      promoCode: promo.appliedVoucher?.code,
-      promoDiscount: promo.discount || undefined,
-    });
+    try {
+      const orderId = await placeOrder({
+        address: combinedAddress,
+        note: restaurantNote,
+        promoCode: promo.appliedVoucher?.code,
+        promoDiscount: promo.discount || undefined,
+      });
 
-    if (!orderId) {
-      place.setPlaceError('Add at least one item and a delivery address before placing the order.');
-      return;
+      if (!orderId) {
+        place.setPlaceError('Add at least one item and a delivery address before placing the order.');
+        return;
+      }
+
+      promo.consumePromo();
+      place.startPlacing(orderId);
+    } catch (e) {
+      place.setPlaceError(e instanceof Error ? e.message : 'Failed to place order');
     }
-
-    promo.consumePromo();
-    place.startPlacing(orderId);
   };
 
   return {

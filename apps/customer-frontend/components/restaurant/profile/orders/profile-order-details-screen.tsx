@@ -44,7 +44,7 @@ export function ProfileOrderDetailsScreen({
   restaurant,
   orderId,
 }: ProfileOrderDetailsScreenProps) {
-  const { hydrated, findOrderById } = useProfileOrders(restaurant);
+  const { hydrated, findOrderById } = useProfileOrders();
 
   if (!hydrated) {
     return (

@@ -1,28 +1,24 @@
 "use client";
-
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft } from 'lucide-react';
 import type { Game } from '@/lib/restaurant-types';
-import type { GameAwardResult } from './games/game-award';
-import { GameCoinPill } from './games/game-coin-pill';
-import { GameExitConfirmDialog } from './games/game-exit-confirm-dialog';
-import { GameIntroStage } from './games/game-intro-stage';
-import { GamePlayerStage } from './games/game-player-stage';
-import { AdOverlay } from './games/ad-overlay';
-import { submitScore } from './games/use-submit-score';
+import type { GameAwardResult } from '@/components/restaurant/games/game-award';
+import { GameExitConfirmDialog } from '@/components/restaurant/games/game-exit-confirm-dialog';
+import { GameIntroStage } from '@/components/restaurant/games/game-intro-stage';
+import { GamePlayerStage } from '@/components/restaurant/games/game-player-stage';
+import { submitScore } from '@/components/restaurant/games/use-submit-score';
 import { useRegistration } from '@/components/auth/registration-context';
 import { useSmartBackNavigation } from '@/components/layout/use-smart-back-navigation';
-import { useLoyaltyPoints } from './use-loyalty-points';
-import { useUserGameStats } from './use-user-game-stats';
+import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
+import { useUserGameStats } from '@/components/restaurant/use-user-game-stats';
+import { useScrollLock } from '@/components/restaurant/use-scroll-lock';
+import { GameBackground } from '@/components/restaurant/game-background';
+import { GameHeader } from '@/components/restaurant/game-header';
+import { GameAdOverlays } from '@/components/restaurant/game-ad-overlays';
+interface Props { game: Game; mode?: 'intro' | 'play'; }
 
-type RestaurantGameScreenProps = {
-  game: Game;
-  mode?: 'intro' | 'play';
-};
-
-export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScreenProps) {
+export function RestaurantGameScreen({ game, mode = 'intro' }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const { isRegistered, openModal } = useRegistration();
@@ -33,187 +29,52 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: RestaurantGameScr
   const [showAdOnBack, setShowAdOnBack] = useState(false);
   const [pendingAward, setPendingAward] = useState<GameAwardResult | null>(null);
   const isIntro = mode === 'intro';
-  const restaurantId = 'mosaic-table';
-  const gameId = game.id;
-  const backFallbackPath = useMemo(
-    () => (isIntro ? '/eat-play' : `/eat-play/${game.id}`),
-    [game.id, isIntro],
-  );
+  const backFallbackPath = useMemo(() => (isIntro ? '/eat-play' : `/eat-play/${game.id}`), [game.id, isIntro]);
   const goBack = useSmartBackNavigation(pathname, backFallbackPath);
   const gameStat = getGameStat(game.id);
+  useScrollLock(true);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const body = document.body;
-    const previous = {
-      rootOverflow: root.style.overflow,
-      bodyOverflow: body.style.overflow,
-      rootOverscroll: root.style.overscrollBehavior,
-      bodyOverscroll: body.style.overscrollBehavior,
-    };
+  const processAward = useCallback(async (result: GameAwardResult) => {
+    const { pointsAwarded } = await submitScore(game.id, result.score, result.level);
+    addPoints(pointsAwarded);
+    updateGameStat(game.id, result.score, pointsAwarded, result.level);
+  }, [addPoints, game.id, updateGameStat]);
 
-    root.style.overflow = 'hidden';
-    body.style.overflow = 'hidden';
-    root.style.overscrollBehavior = 'none';
-    body.style.overscrollBehavior = 'none';
+  const onAward = useCallback((result: GameAwardResult) => { setPendingAward(result); setShowAdOnGameEnd(true); }, []);
 
-    return () => {
-      root.style.overflow = previous.rootOverflow;
-      body.style.overflow = previous.bodyOverflow;
-      root.style.overscrollBehavior = previous.rootOverscroll;
-      body.style.overscrollBehavior = previous.bodyOverscroll;
-    };
-  }, []);
-
-  const processAward = useCallback(
-    async (result: GameAwardResult) => {
-      const { pointsAwarded } = await submitScore(game.id, result.score, result.level);
-      addPoints(pointsAwarded);
-      updateGameStat(game.id, result.score, pointsAwarded, result.level);
-    },
-    [addPoints, game.id, updateGameStat],
-  );
-
-  // Ad on game fail/end: wrap onAward to show ad first
-  const onAward = useCallback(
-    (result: GameAwardResult) => {
-      setPendingAward(result);
-      setShowAdOnGameEnd(true);
-    },
-    [],
-  );
-
-  const handleGameEndAdComplete = useCallback(async () => {
+  const handleGameEndAdDone = useCallback(async () => {
     setShowAdOnGameEnd(false);
-    if (pendingAward) {
-      await processAward(pendingAward);
-      setPendingAward(null);
-    }
-  }, [pendingAward, processAward]);
-
-  const handleGameEndAdSkip = useCallback(async () => {
-    setShowAdOnGameEnd(false);
-    if (pendingAward) {
-      await processAward(pendingAward);
-      setPendingAward(null);
-    }
+    if (pendingAward) { await processAward(pendingAward); setPendingAward(null); }
   }, [pendingAward, processAward]);
 
   const handleStart = useCallback(() => {
-    if (!isRegistered) {
-      openModal();
-      return;
-    }
+    if (!isRegistered) { openModal(); return; }
     router.push(`/eat-play/${game.id}/play`);
   }, [isRegistered, openModal, game.id, router]);
 
-  // Ad on back click from play page
   const handleBackPress = useCallback(() => {
-    if (!isIntro) {
-      setShowAdOnBack(true);
-      return;
-    }
+    if (!isIntro) { setShowAdOnBack(true); return; }
     setIsExitDialogOpen(true);
   }, [isIntro]);
 
-  const handleBackAdComplete = useCallback(() => {
-    setShowAdOnBack(false);
-    setIsExitDialogOpen(true);
-  }, []);
-
-  const handleBackAdSkip = useCallback(() => {
-    setShowAdOnBack(false);
-    setIsExitDialogOpen(true);
-  }, []);
-
-  const handleExitConfirm = useCallback(() => {
-    setIsExitDialogOpen(false);
-    goBack();
-  }, [goBack]);
-
+  const handleBackAdDone = useCallback(() => { setShowAdOnBack(false); setIsExitDialogOpen(true); }, []);
+  const handleExitConfirm = useCallback(() => { setIsExitDialogOpen(false); goBack(); }, [goBack]);
   return (
     <section className="fixed inset-0 overflow-hidden bg-[radial-gradient(circle_at_22%_18%,#8ee6f0_0%,#62d1dc_32%,#34b8c5_70%,#2797a8_100%)]">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_15%,rgba(255,255,255,0.32),transparent_42%),radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.2),transparent_44%),radial-gradient(circle_at_50%_84%,rgba(4,65,78,0.22),transparent_55%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-24 top-28 h-56 w-56 rounded-full bg-white/14 blur-2xl"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-20 bottom-24 h-60 w-60 rounded-full bg-[#0e6f83]/26 blur-3xl"
-      />
-
-      <div className="absolute left-0 right-0 top-0 z-20 flex items-start justify-between px-4 pt-[calc(env(safe-area-inset-top,0px)+12px)] sm:px-6">
-        <button
-          type="button"
-          onClick={handleBackPress}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/45 bg-white/22 text-white shadow-[0_14px_36px_rgba(15,23,42,0.14)] backdrop-blur-md transition-all hover:bg-white/30 active:scale-95"
-          aria-label="Back to games"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-
-        <GameCoinPill coins={points} />
-      </div>
-
+      <GameBackground />
+      <GameHeader onBack={handleBackPress} coins={points} />
       {isIntro ? (
         <>
           <div className="relative z-10 flex h-full items-center justify-center px-4">
-            <GameIntroStage
-              game={game}
-              onStart={handleStart}
-              hasPlayed={gameStat.roundsPlayed > 0}
-              lastScore={gameStat.lastScore}
-              highScore={gameStat.highScore}
-              communityTopScore={game.communityTopScore}
-            />
+            <GameIntroStage game={game} onStart={handleStart} hasPlayed={gameStat.roundsPlayed > 0} lastScore={gameStat.lastScore} highScore={gameStat.highScore} communityTopScore={game.communityTopScore} />
           </div>
-
           <div className="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+16px)] left-1/2 z-10 -translate-x-1/2">
-            <Image
-              src="/games/logo-justsearch.png"
-              alt="Just Search"
-              width={160}
-              height={42}
-              priority
-              className="h-auto w-[110px] object-contain drop-shadow-[0_8px_20px_rgba(3,43,53,0.3)] sm:w-[130px]"
-            />
+            <Image src="/games/logo-justsearch.png" alt="Just Search" width={160} height={42} priority className="h-auto w-[110px] object-contain drop-shadow-[0_8px_20px_rgba(3,43,53,0.3)] sm:w-[130px]" />
           </div>
         </>
-      ) : (
-        <GamePlayerStage game={game} onAward={onAward} coins={points} />
-      )}
-
-      {/* Ad on game fail/end */}
-      {showAdOnGameEnd && (
-        <AdOverlay
-          onComplete={handleGameEndAdComplete}
-          onSkip={handleGameEndAdSkip}
-          restaurantId={restaurantId}
-          gameId={gameId}
-          completeLabel="Continue"
-        />
-      )}
-
-      {/* Ad on back click from play page */}
-      {showAdOnBack && (
-        <AdOverlay
-          onComplete={handleBackAdComplete}
-          onSkip={handleBackAdSkip}
-          restaurantId={restaurantId}
-          gameId={gameId}
-          completeLabel="Continue"
-        />
-      )}
-
-      <GameExitConfirmDialog
-        open={isExitDialogOpen}
-        onCancel={() => setIsExitDialogOpen(false)}
-        onConfirm={handleExitConfirm}
-      />
+      ) : <GamePlayerStage game={game} onAward={onAward} coins={points} />}
+      <GameAdOverlays showAdOnGameEnd={showAdOnGameEnd} showAdOnBack={showAdOnBack} restaurantId="mosaic-table" gameId={game.id} onGameEndComplete={handleGameEndAdDone} onGameEndSkip={handleGameEndAdDone} onBackComplete={handleBackAdDone} onBackSkip={handleBackAdDone} />
+      <GameExitConfirmDialog open={isExitDialogOpen} onCancel={() => setIsExitDialogOpen(false)} onConfirm={handleExitConfirm} />
     </section>
   );
 }

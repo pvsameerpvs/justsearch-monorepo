@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-type GameStat = {
+export type GameStat = {
   highScore: number;
   lastScore: number;
   lastPoints: number;
@@ -24,18 +24,6 @@ const EMPTY_GAME_STAT: GameStat = {
   roundsPlayed: 0,
   lastPlayed: '',
 };
-
-function normalizeGameStat(input?: Partial<GameStat>): GameStat {
-  return {
-    highScore: input?.highScore ?? EMPTY_GAME_STAT.highScore,
-    lastScore: input?.lastScore ?? EMPTY_GAME_STAT.lastScore,
-    lastPoints: input?.lastPoints ?? EMPTY_GAME_STAT.lastPoints,
-    totalPoints: input?.totalPoints ?? EMPTY_GAME_STAT.totalPoints,
-    maxLevel: input?.maxLevel ?? EMPTY_GAME_STAT.maxLevel,
-    roundsPlayed: input?.roundsPlayed ?? EMPTY_GAME_STAT.roundsPlayed,
-    lastPlayed: input?.lastPlayed ?? EMPTY_GAME_STAT.lastPlayed,
-  };
-}
 
 function readStoredStats(): GameStatsMap {
   if (typeof window === 'undefined') return {};
@@ -65,7 +53,7 @@ export function useUserGameStats() {
 
   const updateGameStat = useCallback((gameId: string, score: number, points: number, level: number = 1) => {
     setGameStats((current) => {
-      const existing = normalizeGameStat(current[gameId]);
+      const existing = { ...EMPTY_GAME_STAT, ...current[gameId] };
 
       const updated: GameStat = {
         highScore: Math.max(existing.highScore, score),
@@ -84,7 +72,7 @@ export function useUserGameStats() {
   }, []);
 
   const getGameStat = useCallback((gameId: string) => {
-    return normalizeGameStat(gameStats[gameId]);
+    return { ...EMPTY_GAME_STAT, ...gameStats[gameId] };
   }, [gameStats]);
 
   return { gameStats, updateGameStat, getGameStat };
