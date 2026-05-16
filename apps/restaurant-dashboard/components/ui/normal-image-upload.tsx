@@ -11,6 +11,7 @@ type NormalImageUploadProps = {
   label?: string;
   aspect?: "square" | "landscape";
   placeholder?: string;
+  folder?: string;
 };
 
 export function NormalImageUpload({
@@ -19,11 +20,12 @@ export function NormalImageUpload({
   label = "Image",
   aspect = "landscape",
   placeholder,
+  folder = "menu",
 }: NormalImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlValue, setUrlValue] = useState(value);
-  const { upload, isUploading } = useImageUpload("menu");
+  const { upload, isUploading } = useImageUpload(folder);
   const isLandscape = aspect === "landscape";
 
   const handleFile = async (file: File | null) => {

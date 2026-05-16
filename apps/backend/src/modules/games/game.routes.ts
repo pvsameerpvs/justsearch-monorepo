@@ -6,6 +6,7 @@ import { games } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
+router.use(authMiddleware);
 
 const createSchema = z.object({
   name: z.string().min(1),

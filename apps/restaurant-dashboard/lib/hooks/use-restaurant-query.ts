@@ -88,8 +88,8 @@ export function useRestaurantQuery() {
 export function useUpdateRestaurantMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<RestaurantProfile> }) =>
-      apiClient(`/restaurants/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    mutationFn: (data: Partial<RestaurantProfile>) =>
+      apiClient('/restaurants/current', { method: 'PATCH', body: JSON.stringify(data) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurant'] });
     },

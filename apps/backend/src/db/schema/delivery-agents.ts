@@ -11,8 +11,6 @@ export const deliveryAgents = pgTable('delivery_agents', {
   userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   name: varchar('name', { length: 255 }).notNull(),
   phone: varchar('phone', { length: 20 }).notNull(),
-  email: varchar('email', { length: 255 }),
-  location: varchar('location', { length: 255 }),
   username: varchar('username', { length: 100 }).notNull(),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   vehicleType: vehicleTypeEnum('vehicle_type').default('scooter').notNull(),

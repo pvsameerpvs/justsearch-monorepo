@@ -11,6 +11,7 @@ type CompactImageUploadProps = {
   label?: string;
   aspect?: "square" | "landscape";
   placeholder?: string;
+  folder?: string;
 };
 
 export function CompactImageUpload({
@@ -19,11 +20,12 @@ export function CompactImageUpload({
   label = "Image",
   aspect = "square",
   placeholder,
+  folder = "menu",
 }: CompactImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlValue, setUrlValue] = useState(value);
-  const { upload, isUploading } = useImageUpload("menu");
+  const { upload, isUploading } = useImageUpload(folder);
   const isSquare = aspect === "square";
 
   const handleFile = async (file: File | null) => {

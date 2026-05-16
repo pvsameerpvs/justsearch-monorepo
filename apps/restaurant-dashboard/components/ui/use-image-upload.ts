@@ -8,10 +8,12 @@ export function useImageUpload(folder = "general") {
 
   const upload = async (file: File): Promise<string> => {
     setIsUploading(true);
+    const blobUrl = URL.createObjectURL(file);
     try {
-      const { url } = await uploadImage(URL.createObjectURL(file), folder);
+      const { url } = await uploadImage(blobUrl, folder);
       return url;
     } finally {
+      URL.revokeObjectURL(blobUrl);
       setIsUploading(false);
     }
   };

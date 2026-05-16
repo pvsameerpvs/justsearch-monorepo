@@ -9,7 +9,9 @@ export function middleware(request: NextRequest) {
 
   // Allow localhost for development
   if (normalizedHost === 'localhost' || normalizedHost.endsWith('.localhost')) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set('x-restaurant-slug', 'demo-bistro');
+    return response;
   }
 
   // Only allow delivery subdomain patterns

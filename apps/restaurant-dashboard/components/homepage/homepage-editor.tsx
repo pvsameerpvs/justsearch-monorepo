@@ -19,7 +19,7 @@ export function HomepageEditor({ restaurant }: HomepageEditorProps) {
 
   const handleUpdate = (updates: Partial<RestaurantProfile>) => {
     setPreview((p) => ({ ...p, ...updates }));
-    if (restaurant.id) mutate({ id: restaurant.id, data: updates });
+    mutate(updates);
   };
 
   return (

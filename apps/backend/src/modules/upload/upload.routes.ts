@@ -12,7 +12,7 @@ const uploadSchema = z.object({
   folder: z.string().optional().default('general'),
 });
 
-router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
+router.post('/', requireRole('owner', 'manager', 'super_admin'), async (req, res, next) => {
   try {
     const { image, folder } = uploadSchema.parse(req.body);
     const url = image.startsWith('data:image/') ? await saveImage(image, folder) : image;

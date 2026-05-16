@@ -10,6 +10,7 @@ const MIME_EXTENSIONS: Record<string, string> = {
   'image/gif': 'gif',
   'image/svg+xml': 'svg',
   'image/jpeg': 'jpg',
+  'application/pdf': 'pdf',
 };
 
 function getExtension(dataUrl: string): string {
@@ -20,7 +21,7 @@ function getExtension(dataUrl: string): string {
 }
 
 export async function saveImage(dataUrl: string, folder: string): Promise<string> {
-  const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, '');
+  const base64Data = dataUrl.replace(/^data:[a-z]+\/[\w+.-]+;base64,/, '');
   const buffer = Buffer.from(base64Data, 'base64');
   const ext = getExtension(dataUrl);
   const filename = `${uuid()}.${ext}`;

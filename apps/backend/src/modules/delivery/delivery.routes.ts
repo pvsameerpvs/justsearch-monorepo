@@ -40,8 +40,6 @@ router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
     const schema = z.object({
       name: z.string().min(2),
       phone: z.string().min(10),
-      email: z.string().email().optional().or(z.literal('')),
-      location: z.string().optional(),
       username: z.string().min(3),
       password: z.string().min(6),
       vehicleType: z.enum(['bike', 'scooter', 'car']).default('scooter'),
@@ -56,8 +54,6 @@ router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
         restaurantId: req.tenant.id,
         name: body.name,
         phone: body.phone,
-        email: body.email || null,
-        location: body.location || null,
         username: body.username,
         passwordHash,
         vehicleType: body.vehicleType,
@@ -80,8 +76,6 @@ router.patch('/:id', requireRole('owner', 'manager'), async (req, res, next) => 
     const schema = z.object({
       name: z.string().min(2).optional(),
       phone: z.string().min(10).optional(),
-      email: z.string().email().optional().nullable(),
-      location: z.string().optional().nullable(),
       vehicleType: z.enum(['bike', 'scooter', 'car']).optional(),
       password: z.string().min(6).optional(),
       isActive: z.boolean().optional(),
@@ -94,8 +88,6 @@ router.patch('/:id', requireRole('owner', 'manager'), async (req, res, next) => 
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
     if (body.name !== undefined) updateData.name = body.name;
     if (body.phone !== undefined) updateData.phone = body.phone;
-    if (body.email !== undefined) updateData.email = body.email;
-    if (body.location !== undefined) updateData.location = body.location;
     if (body.vehicleType !== undefined) updateData.vehicleType = body.vehicleType;
     if (body.password) updateData.passwordHash = await hashPassword(body.password);
     if (body.isActive !== undefined) updateData.isActive = body.isActive;

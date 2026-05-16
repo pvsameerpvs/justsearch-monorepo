@@ -20,7 +20,6 @@ const TENANT_TABLES = [
   'game_sessions',
   'audit_logs',
   'otp_requests',
-  'daily_closeouts',
 ];
 
 const DEFAULT_OWNER_PASSWORD = process.env.SEED_STAFF_PASSWORD || 'owner123';
