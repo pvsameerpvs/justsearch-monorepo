@@ -9,6 +9,7 @@ type CheckoutStickyFooterProps = {
   latestOrderId: string | null;
   cartCount: number;
   isPlacing?: boolean;
+  isValid?: boolean;
   onPlaceOrder: () => void;
 };
 
@@ -19,6 +20,7 @@ export function CheckoutStickyFooter({
   latestOrderId,
   cartCount,
   isPlacing = false,
+  isValid = true,
   onPlaceOrder,
 }: CheckoutStickyFooterProps) {
   return (
@@ -40,10 +42,10 @@ export function CheckoutStickyFooter({
         <button
           type="button"
           onClick={onPlaceOrder}
-          disabled={cartCount === 0 || isPlacing}
+          disabled={cartCount === 0 || isPlacing || !isValid}
           className="inline-flex h-14 shrink-0 items-center justify-center rounded-[20px] bg-[rgb(var(--brand))] px-8 text-lg font-bold text-white shadow-[0_12px_36px_rgb(var(--brand)/0.25)] transition-all hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPlacing ? 'Placing...' : cartCount > 0 ? 'Place Order' : 'Order Placed'}
+          {isPlacing ? 'Placing...' : cartCount === 0 ? 'Cart Empty' : !isValid ? 'Add Address' : 'Place Order'}
         </button>
       </div>
     </div>

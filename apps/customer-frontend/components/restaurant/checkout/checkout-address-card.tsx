@@ -13,6 +13,8 @@ export type CheckoutAddressCardProps = {
   setAlternateNumber?: (val: string) => void;
   setNote: (val: string) => void;
   onOpenAddressBook?: () => void;
+  paymentMethod: 'cash' | 'card';
+  setPaymentMethod: (value: 'cash' | 'card') => void;
 };
 
 export function CheckoutAddressCard(props: CheckoutAddressCardProps) {

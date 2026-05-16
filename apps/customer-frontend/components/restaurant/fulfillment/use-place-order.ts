@@ -16,7 +16,7 @@ export function usePlaceOrder(
   const { user } = useRegistration();
 
   return useCallback(
-    async ({ address, note }: { address: string; note: string; promoCode?: string; promoDiscount?: number }) => {
+    async ({ address, note, paymentMethod }: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card' }) => {
       if (!user) throw new Error('Please sign in to place an order');
       if (cartCount === 0) return null;
       const totalVal = computeTotal(subtotal, deliveryFee, 0);
@@ -36,6 +36,7 @@ export function usePlaceOrder(
         total: totalVal,
         deliveryAddress: address,
         notes: note,
+        paymentMethod,
       });
       setState((s) => ({ ...s, cart: [] }));
       return res.order.id;

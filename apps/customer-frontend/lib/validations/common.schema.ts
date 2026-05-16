@@ -39,6 +39,15 @@ export const checkoutAddressSchema = z.object({
 
 export type CheckoutAddressFormData = z.infer<typeof checkoutAddressSchema>;
 
+export const checkoutValidationSchema = z.object({
+  address: z.string().min(5, 'Delivery address is required'),
+  customerName: z.string().min(2, 'Name is required'),
+  customerPhone: z.string().min(10, 'Valid phone is required'),
+  paymentMethod: z.enum(['cash', 'card']),
+});
+
+export type CheckoutValidationFormData = z.infer<typeof checkoutValidationSchema>;
+
 export const checkoutSchema = z.object({
   customerName: z.string().min(2, 'Name is required'),
   customerPhone: z.string().min(10, 'Valid phone is required'),

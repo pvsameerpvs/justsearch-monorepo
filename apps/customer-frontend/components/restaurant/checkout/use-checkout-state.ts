@@ -7,6 +7,7 @@ import { useCheckoutPromo } from './use-checkout-promo';
 import { useCheckoutPlace } from './use-checkout-place';
 import { getCheckoutLineTotal } from './checkout.constants';
 import { useRegistration } from '@/components/auth/registration-context';
+import { useCheckoutValidation } from './use-checkout-validation';
 
 export function useCheckoutState() {
   const { cart, cartCount, total, deliverySavings, placeOrder } = useRestaurantFulfillment();
@@ -17,7 +18,15 @@ export function useCheckoutState() {
 
   const [restaurantNote, setRestaurantNote] = useState('');
   const [riderNote, setRiderNote] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
   const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
+
+  const validation = useCheckoutValidation(
+    address.address,
+    isRegistered,
+    cartCount,
+    Boolean(place.placingOrder)
+  );
 
   const displayItems = useMemo(
     () => cart.map((item) => ({ ...item, lineTotal: getCheckoutLineTotal(item) })),
@@ -42,12 +51,39 @@ export function useCheckoutState() {
   const onPlaceOrder = async () => {
     if (place.placingOrder) return;
 
-    if (!isRegistered) {
-      place.setPlaceError('Please sign in to place an order');
+    if (!validation.isValid) {
+      place.setPlaceError(validation.errors[0] ?? 'Cannot place order');
       return;
     }
 
-    const combinedAddress = `${address.addressTitle} - ${address.address}\n${address.addressDetails}${address.alternateNumber ? `\nAlt number: ${address.alternateNumber}` : ''}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
+    // Auto-save address to DB if it's a new address (not from saved list)
+    const isAlreadySaved = address.addresses.some(
+      (saved) =>
+        saved.address.trim() === address.address.trim() &&
+        saved.label === address.addressTitle
+    );
+
+    if (!isAlreadySaved && address.address.trim().length >= 5) {
+      try {
+        await address.addAddress({
+          label: (address.addressTitle as 'Home' | 'Work' | 'Other') || 'Home',
+          address: address.address.trim(),
+          details: address.addressDetails.trim(),
+          alternateNumber: address.alternateNumber || undefined,
+        });
+      } catch {
+        // Non-blocking: if save fails, still proceed with order
+      }
+    }
+
+    const combinedAddress = [
+      `${address.addressTitle} - ${address.address}`,
+      address.addressDetails,
+      address.alternateNumber ? `Alt number: ${address.alternateNumber}` : '',
+      riderNote ? `Note for rider: ${riderNote}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
 
     try {
       const orderId = await placeOrder({
@@ -55,10 +91,11 @@ export function useCheckoutState() {
         note: restaurantNote,
         promoCode: promo.appliedVoucher?.code,
         promoDiscount: promo.discount || undefined,
+        paymentMethod,
       });
 
       if (!orderId) {
-        place.setPlaceError('Add at least one item and a delivery address before placing the order.');
+        place.setPlaceError('Failed to create order. Please try again.');
         return;
       }
 
@@ -79,6 +116,8 @@ export function useCheckoutState() {
     setRiderNote,
     restaurantNote,
     setRestaurantNote,
+    paymentMethod,
+    setPaymentMethod,
     displayItems,
     displaySavings,
     displayTotal,
@@ -90,5 +129,7 @@ export function useCheckoutState() {
     placingOrder: place.placingOrder,
     placingProgress: place.placingProgress,
     onPlaceOrder,
+    isCheckoutValid: validation.isValid,
+    checkoutErrors: validation.errors,
   };
 }

@@ -5,10 +5,12 @@ import type { CheckoutAddressCardProps } from './checkout-address-card';
 import { CheckoutAddressCardBadge } from './checkout-address-card-badge';
 import { CheckoutAddressCardInfo } from './checkout-address-card-info';
 import { CheckoutAddressCardActions } from './checkout-address-card-actions';
+import { CheckoutPaymentMethod } from './checkout-payment-method';
 
 export function CheckoutAddressCardContent({
   addressTitle, address, addressDetails, userPhone, alternateNumber, savedAddressesCount = 0,
   note, setAlternateNumber, setNote, onOpenAddressBook,
+  paymentMethod, setPaymentMethod,
 }: CheckoutAddressCardProps) {
   return (
     <>
@@ -20,6 +22,9 @@ export function CheckoutAddressCardContent({
         <CheckoutAddressCardActions onOpenAddressBook={onOpenAddressBook}>
           <CheckoutAddressCardInfo addressTitle={addressTitle} address={address} addressDetails={addressDetails} alternateNumber={alternateNumber} />
         </CheckoutAddressCardActions>
+        {!address && (
+          <p className="mt-3 text-xs font-bold text-red-500">Please select or add a delivery address</p>
+        )}
       </div>
       <div className="border-b border-[rgb(var(--border)/0.4)] px-6 py-5">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Contact Number</p>
@@ -34,6 +39,9 @@ export function CheckoutAddressCardContent({
           <Phone className="h-4 w-4 text-slate-400" />
           <input value={alternateNumber ?? ''} onChange={(e) => setAlternateNumber?.(e.target.value)} placeholder="Alternate number (optional)" className="w-full bg-transparent text-sm font-medium text-[rgb(var(--ink))] outline-none placeholder:text-slate-400" />
         </div>
+      </div>
+      <div className="border-b border-[rgb(var(--border)/0.4)] px-6 py-6">
+        <CheckoutPaymentMethod value={paymentMethod} onChange={setPaymentMethod} />
       </div>
       <div className="border-b border-[rgb(var(--border)/0.4)] px-6 py-6">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Note for the rider</p>

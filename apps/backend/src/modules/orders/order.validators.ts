@@ -22,6 +22,7 @@ export const createOrderSchema = z.object({
   lng: z.number().optional(),
   notes: z.string().max(1000).optional(),
   tableId: z.string().uuid().optional(),
+  paymentMethod: z.enum(['cash', 'card']).optional(),
 });
 
 export const updateStatusSchema = z.object({

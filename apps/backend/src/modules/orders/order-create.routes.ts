@@ -35,6 +35,7 @@ router.post('/', async (req, res, next) => {
       lng: body.lng ? String(body.lng) : null,
       notes: body.notes || null,
       tableId: body.tableId || null,
+      paymentMethod: body.paymentMethod || null,
     }).returning();
 
     const itemValues = body.items.map((item) => ({

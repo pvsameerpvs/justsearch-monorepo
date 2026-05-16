@@ -35,6 +35,8 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             note={state.riderNote}
             setNote={state.setRiderNote}
             onOpenAddressBook={() => state.setIsAddressBookOpen(true)}
+            paymentMethod={state.paymentMethod}
+            setPaymentMethod={state.setPaymentMethod}
           />
 
           <CheckoutSummaryCard
@@ -56,6 +58,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         latestOrderId={state.placedOrderId}
         cartCount={state.cartCount}
         isPlacing={Boolean(state.placingOrder)}
+        isValid={state.isCheckoutValid}
         onPlaceOrder={state.onPlaceOrder}
       />
 
