@@ -34,7 +34,7 @@ export function DeliveryBoyRow({ agent, assignedOrderCode, onAssign }: DeliveryB
           <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {agent.location}</span>
           <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {agent.phone}</span>
           <span className="flex items-center gap-1"><Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {agent.rating}</span>
-          <span className="flex items-center gap-1"><Package className="h-3 w-3" /> {agent.totalDeliveries} deliveries</span>
+          <span className="flex items-center gap-1"><Package className="h-3 w-3" /> {agent.completedToday} deliveries</span>
         </div>
         {assignedOrderCode && (
           <p className="mt-1 text-[11px] font-semibold text-amber-600">Currently on {assignedOrderCode}</p>

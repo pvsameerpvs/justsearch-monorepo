@@ -1,6 +1,5 @@
 import { randomUUID } from 'crypto';
 import { Router } from 'express';
-import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
 import { otpRequests } from '../../db/schema';
 import { normalizeMobile, isValidMobile, isValidName, randomOtp, OTP_TTL_MS } from './auth.utils';

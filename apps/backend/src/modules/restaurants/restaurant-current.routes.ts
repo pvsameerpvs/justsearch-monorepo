@@ -1,8 +1,38 @@
 import { Router } from 'express';
-import { eq, and } from 'drizzle-orm';
+import { z } from 'zod';
+import { eq } from 'drizzle-orm';
 import { db } from '../../db';
 import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
+
+const updateCurrentSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  heroImageUrl: z.string().optional().nullable(),
+  logoUrl: z.string().optional().nullable(),
+  tagline: z.string().max(500).optional(),
+  description: z.string().max(2000).optional(),
+  category: z.string().optional(),
+  cuisine: z.union([z.array(z.string()), z.string()]).optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().email().optional().nullable(),
+  website: z.string().optional().nullable(),
+  googleMapsUrl: z.string().optional().nullable(),
+  googlePlaceId: z.string().optional().nullable(),
+  openingHours: z.array(z.object({
+    day: z.string(),
+    hours: z.string(),
+    isToday: z.boolean().optional(),
+  })).optional(),
+  socials: z.array(z.object({
+    platform: z.string(),
+    url: z.string(),
+    handle: z.string(),
+  })).optional(),
+  overallRating: z.number().min(0).max(5).optional(),
+  totalReviews: z.number().int().nonnegative().optional(),
+});
 
 const router = Router();
 
@@ -44,7 +74,7 @@ router.patch('/current', authMiddleware, requireRole('owner', 'manager'), async 
       return res.status(400).json({ error: 'Tenant context required' });
     }
 
-    const body = req.body as Record<string, unknown>;
+    const body = updateCurrentSchema.parse(req.body);
 
     const [existing] = await db
       .select()
@@ -68,7 +98,7 @@ router.patch('/current', authMiddleware, requireRole('owner', 'manager'), async 
         settings: mergedSettings,
         updatedAt: new Date(),
       })
-      .where(and(eq(restaurants.id, req.tenant.id)))
+      .where(eq(restaurants.id, req.tenant.id))
       .returning();
 
     res.json({

@@ -33,10 +33,13 @@ router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
 
     const schema = z.object({
       code: z.string().min(3).max(50),
+      title: z.string().max(255).optional(),
+      description: z.string().optional(),
       type: z.enum(['fixed', 'percentage']),
       value: z.number().positive(),
       minOrder: z.number().nonnegative().optional(),
       maxDiscount: z.number().positive().optional(),
+      usageLimit: z.number().int().nonnegative().optional(),
       validFrom: z.string().datetime().optional(),
       validUntil: z.string().datetime().optional(),
     });
@@ -48,10 +51,13 @@ router.post('/', requireRole('owner', 'manager'), async (req, res, next) => {
       .values({
         restaurantId: req.tenant.id,
         code: body.code.toUpperCase(),
+        title: body.title,
+        description: body.description,
         type: body.type,
         value: String(body.value),
         minOrder: String(body.minOrder ?? 0),
         maxDiscount: body.maxDiscount ? String(body.maxDiscount) : null,
+        usageLimit: body.usageLimit ?? 0,
         validFrom: body.validFrom ? new Date(body.validFrom) : null,
         validUntil: body.validUntil ? new Date(body.validUntil) : null,
         isActive: true,
@@ -71,10 +77,13 @@ router.patch('/:id', requireRole('owner', 'manager'), async (req, res, next) => 
 
     const schema = z.object({
       code: z.string().min(3).max(50).optional(),
+      title: z.string().max(255).optional().nullable(),
+      description: z.string().optional().nullable(),
       type: z.enum(['fixed', 'percentage']).optional(),
       value: z.number().positive().optional(),
       minOrder: z.number().nonnegative().optional(),
       maxDiscount: z.number().positive().optional().nullable(),
+      usageLimit: z.number().int().nonnegative().optional(),
       isActive: z.boolean().optional(),
       validFrom: z.string().datetime().optional().nullable(),
       validUntil: z.string().datetime().optional().nullable(),
@@ -85,10 +94,13 @@ router.patch('/:id', requireRole('owner', 'manager'), async (req, res, next) => 
 
     const updateData: Record<string, unknown> = {};
     if (body.code !== undefined) updateData.code = body.code.toUpperCase();
+    if (body.title !== undefined) updateData.title = body.title;
+    if (body.description !== undefined) updateData.description = body.description;
     if (body.type !== undefined) updateData.type = body.type;
     if (body.value !== undefined) updateData.value = String(body.value);
     if (body.minOrder !== undefined) updateData.minOrder = String(body.minOrder);
     if (body.maxDiscount !== undefined) updateData.maxDiscount = body.maxDiscount ? String(body.maxDiscount) : null;
+    if (body.usageLimit !== undefined) updateData.usageLimit = body.usageLimit;
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
     if (body.validFrom !== undefined) updateData.validFrom = body.validFrom ? new Date(body.validFrom) : null;
     if (body.validUntil !== undefined) updateData.validUntil = body.validUntil ? new Date(body.validUntil) : null;

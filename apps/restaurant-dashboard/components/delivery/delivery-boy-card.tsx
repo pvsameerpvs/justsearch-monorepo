@@ -56,7 +56,7 @@ export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onVie
         </div>
 
         <CardInfoGrid agent={agent} />
-        <DriverLoginInfo uniqueId={agent.username} password={agent.password} />
+        <DriverLoginInfo uniqueId={agent.username} password="••••••" />
       </div>
 
       {/* View Orders Button */}

@@ -49,37 +49,3 @@ export async function querySchemaById<T>(
   );
   return row ?? null;
 }
-
-export async function querySchemaByRestaurantId<T>(
-  schemaName: string,
-  tableName: string,
-  restaurantId: string,
-  limit: number = 100
-): Promise<T[]> {
-  return client.unsafe<T[]>(
-    `SELECT * FROM ${sql.identifier(schemaName).toString()}.${sql.identifier(tableName).toString()} WHERE restaurant_id = $1 ORDER BY created_at DESC LIMIT ${limit}`,
-    [restaurantId]
-  );
-}
-
-export async function aggregateAllSchemas<T>(
-  tableName: string,
-  aggregateFn: string
-): Promise<T> {
-  const schemas = await getActiveSchemas();
-  const parts: string[] = [];
-
-  for (const schema of schemas) {
-    parts.push(
-      `SELECT ${aggregateFn} FROM ${sql.identifier(schema.schemaName).toString()}.${sql.identifier(tableName).toString()}`
-    );
-  }
-
-  if (parts.length === 0) {
-    return 0 as T;
-  }
-
-  const query = parts.join(' UNION ALL ');
-  const [result] = await client.unsafe<T[]>(`SELECT COALESCE(SUM(sum), 0) as value FROM (${query}) sub`);
-  return result as T;
-}

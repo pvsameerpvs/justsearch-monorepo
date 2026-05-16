@@ -8,13 +8,14 @@ const schema = z.object({
   phone: z.string().min(5, "Phone must be at least 5 characters"),
   email: z.string().email("Invalid email"),
   location: z.string().min(1, "Location is required"),
-  password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
+  vehicleType: z.enum(["bike", "scooter", "car"]),
+  password: z.string().optional().or(z.literal("")),
 });
 type FormData = z.infer<typeof schema>;
 
 interface DriverEditFormProps {
   agent: DeliveryAgent;
-  onSave: (data: FormData) => void;
+  onSave: (data: Partial<FormData>) => void;
   onCancel: () => void;
   isPending?: boolean;
 }
@@ -22,10 +23,21 @@ interface DriverEditFormProps {
 export function DriverEditForm({ agent, onSave, onCancel, isPending }: DriverEditFormProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { name: agent.name, phone: agent.phone, email: agent.email, location: agent.location, password: "" },
+    defaultValues: {
+      name: agent.name, phone: agent.phone, email: agent.email,
+      location: agent.location, vehicleType: agent.vehicleType as "bike" | "scooter" | "car" || "scooter",
+      password: "",
+    },
   });
+
+  const handleSubmit = (data: FormData) => {
+    const payload: Partial<FormData> = { name: data.name, phone: data.phone, email: data.email, location: data.location, vehicleType: data.vehicleType };
+    if (data.password) payload.password = data.password;
+    onSave(payload);
+  };
+
   return (
-    <form onSubmit={form.handleSubmit(onSave)} className="elegant-card space-y-3 p-5">
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="elegant-card space-y-3 p-5">
       <p className="text-sm font-bold text-slate-900">Edit Driver</p>
       <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Username (Login ID)</p>
@@ -46,6 +58,13 @@ export function DriverEditForm({ agent, onSave, onCancel, isPending }: DriverEdi
       <div>
         <input {...form.register("location")} placeholder="Base Location (e.g. Marina, JLT)" className="elegant-input w-full" />
         {form.formState.errors.location && <p className="mt-1 text-xs text-red-500">{form.formState.errors.location.message}</p>}
+      </div>
+      <div>
+        <select {...form.register("vehicleType")} className="elegant-input w-full">
+          <option value="scooter">Scooter</option>
+          <option value="bike">Bike</option>
+          <option value="car">Car</option>
+        </select>
       </div>
       <div>
         <input type="password" {...form.register("password")} placeholder="New Password (leave empty to keep current)" className="elegant-input w-full" />

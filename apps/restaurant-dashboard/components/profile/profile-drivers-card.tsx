@@ -45,8 +45,14 @@ export function ProfileDriversCard({ subdomain }: ProfileDriversCardProps) {
         {agents.map((agent) => (
           <ProfileDriverItem
             key={agent.id}
-            agent={agent}
-            portalUrl={`https://${subdomain}${SEPARATOR}${agent.uniqueId}.${BASE_DOMAIN}/login`}
+            agent={{
+              id: agent.id,
+              name: agent.name,
+              uniqueId: agent.username,
+              status: agent.status,
+              password: "driver123",
+            }}
+            portalUrl={`https://${subdomain}${SEPARATOR}${agent.username}.${BASE_DOMAIN}/login`}
             copied={copied}
             onCopy={handleCopy}
           />

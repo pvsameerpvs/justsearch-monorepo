@@ -18,10 +18,10 @@ function mapApiToVoucher(data: Record<string, unknown>): Voucher {
 
 function mapVoucherToApi(data: VoucherFormData & { isActive?: boolean }): Record<string, unknown> {
   const payload: Record<string, unknown> = {
-    code: data.code, title: data.title, description: data.description, type: data.type,
-    value: String(data.value), minOrder: String(data.minOrderValue),
-    maxDiscount: data.maxDiscount ? String(data.maxDiscount) : null,
-    validFrom: data.startDate, validUntil: data.endDate, usageLimit: data.usageLimit,
+    code: data.code, title: data.title || undefined, description: data.description || undefined,
+    type: data.type, value: data.value, minOrder: data.minOrderValue,
+    maxDiscount: data.maxDiscount || undefined, validFrom: data.startDate || undefined,
+    validUntil: data.endDate || undefined, usageLimit: data.usageLimit || undefined,
   };
   if (data.isActive !== undefined) payload.isActive = data.isActive;
   return payload;

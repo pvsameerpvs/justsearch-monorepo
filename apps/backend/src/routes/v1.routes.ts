@@ -5,7 +5,7 @@ import orderCloseoutRoutes from '../modules/orders/order-closeout.routes';
 import restaurantAdminRoutes from '../modules/restaurants/restaurant.routes';
 import restaurantAdminMutationRoutes from '../modules/restaurants/restaurant-admin.routes';
 import restaurantCurrentRoutes from '../modules/restaurants/restaurant-current.routes';
-import menuPublicRoutes from '../modules/menus/menu-public.routes';
+import menuPublicRoutes from '../modules/menu/menu-public.routes';
 import menuItemRoutes from '../modules/menu/menu-item.routes';
 import menuCategoryRoutes from '../modules/menu/menu-category.routes';
 import deliveryAgentRoutes from '../modules/delivery/delivery.routes';

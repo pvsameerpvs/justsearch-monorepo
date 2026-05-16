@@ -11,6 +11,24 @@ function getRestaurantSlug(): string | null {
   return first || null;
 }
 
+function toCamelCase(str: string): string {
+  return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+function transformKeys<T>(data: unknown): T {
+  if (Array.isArray(data)) {
+    return data.map(transformKeys) as T;
+  }
+  if (data !== null && typeof data === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+      result[toCamelCase(key)] = transformKeys(value);
+    }
+    return result as T;
+  }
+  return data as T;
+}
+
 export async function apiClient<T>(
   path: string,
   options: RequestInit = {}
@@ -41,5 +59,6 @@ export async function apiClient<T>(
     throw new Error(error.message || `API error: ${response.status}`);
   }
 
-  return response.json() as Promise<T>;
+  const raw = await response.json();
+  return transformKeys<T>(raw);
 }

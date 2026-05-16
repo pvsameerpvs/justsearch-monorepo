@@ -2,8 +2,10 @@
 
 import { X, Users, AlertCircle } from "lucide-react";
 import { useDeliveryBoyStore } from "@/lib/stores/delivery-boy-store";
+import { useDeliveryAgentsQuery } from "@/lib/hooks/use-delivery-agents-query";
 import { useOrderStore } from "@/lib/stores/order-store";
 import { useAssignDriver } from "@/lib/hooks/use-assign-driver";
+import { useEffect } from "react";
 import { DeliveryBoyRow } from "./delivery-boy-row";
 
 interface DeliveryBoyPickerProps {
@@ -12,12 +14,19 @@ interface DeliveryBoyPickerProps {
 }
 
 export function DeliveryBoyPicker({ orderId, onClose }: DeliveryBoyPickerProps) {
-  const { agents } = useDeliveryBoyStore();
+  const { agents, setAgents } = useDeliveryBoyStore();
+  const { data: apiData } = useDeliveryAgentsQuery();
   const { orders, assignAgent } = useOrderStore();
   const { mutate: assignDriver } = useAssignDriver();
 
+  useEffect(() => {
+    if (apiData?.agents) {
+      setAgents(apiData.agents);
+    }
+  }, [apiData, setAgents]);
+
   const order = orders.find((o) => o.id === orderId);
-  const availableCount = agents.filter((a) => a.status === "available").length;
+  const availableCount = agents.filter((a) => a.status === "online" || a.status === "available").length;
 
   const getAssignedOrderCode = (agentId: string) => {
     const assignedOrder = orders.find((o) => o.assignedAgentId === agentId && o.id !== orderId);
@@ -25,8 +34,8 @@ export function DeliveryBoyPicker({ orderId, onClose }: DeliveryBoyPickerProps) 
   };
 
   const handleAssign = (agentId: string) => {
-    assignAgent(orderId, agentId); // local store update
-    assignDriver({ orderId, driverId: agentId }); // API call
+    assignAgent(orderId, agentId);
+    assignDriver({ orderId, driverId: agentId });
     onClose();
   };
 

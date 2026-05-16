@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import { sql } from 'drizzle-orm';
+import { sql, eq } from 'drizzle-orm';
 import { db } from '../../db';
 import { restaurants } from '../../db/schema';
-import { eq } from 'drizzle-orm';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();

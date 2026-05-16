@@ -1,40 +1,17 @@
 "use client";
 
 import { create } from 'zustand';
-import type { DeliveryBoy, UpdateAgentData, AddAgentData, DeliveryBoyStore } from './delivery-boy-store.types';
+import type { DeliveryBoy, UpdateAgentData, DeliveryBoyStore } from './delivery-boy-store.types';
 
 export * from './delivery-boy-store.types';
 
-function generateUniqueId(name: string): string {
-  const prefix = name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 3);
-  const num = Math.floor(100 + Math.random() * 900);
-  return `${prefix}-${num}`;
-}
-
 export const useDeliveryBoyStore = create<DeliveryBoyStore>((set) => ({
   agents: [],
+  setAgents: (agents) => set({ agents }),
   addAgent: (agent) =>
-    set((state) => {
-      const uniqueId = generateUniqueId(agent.name);
-      const newAgent: DeliveryBoy = {
-        id: crypto.randomUUID(),
-        name: agent.name,
-        phone: agent.phone,
-        email: agent.email,
-        uniqueId,
-        username: uniqueId,
-        password: agent.password,
-        isActive: agent.isActive,
-        status: 'available',
-        currentOrderId: null,
-        totalDeliveries: 0,
-        rating: 5.0,
-        location: agent.location,
-      };
-      return {
-        agents: [...state.agents, newAgent],
-      };
-    }),
+    set((state) => ({
+      agents: [...state.agents, agent],
+    })),
   removeAgent: (id) =>
     set((state) => ({
       agents: state.agents.filter((a) => a.id !== id),
@@ -51,10 +28,10 @@ export const useDeliveryBoyStore = create<DeliveryBoyStore>((set) => ({
         a.id === id ? { ...a, ...data } : a
       ),
     })),
-  setStatus: (id, status, currentOrderId = null) =>
+  setStatus: (id, status) =>
     set((state) => ({
       agents: state.agents.map((a) =>
-        a.id === id ? { ...a, status, currentOrderId } : a
+        a.id === id ? { ...a, status } : a
       ),
     })),
 }));

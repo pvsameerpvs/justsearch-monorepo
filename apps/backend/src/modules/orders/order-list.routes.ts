@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders } from '../../db/schema';
+import { orders, orderItems } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -24,7 +24,30 @@ router.get('/', requireRole('owner', 'manager', 'cashier', 'kitchen_staff'), asy
     }
 
     const orderList = await query;
-    res.json({ orders: orderList });
+
+    const orderIds = orderList.map((o) => o.id);
+    let itemsCountMap: Record<string, number> = {};
+    if (orderIds.length > 0) {
+      const counts = await db
+        .select({
+          orderId: orderItems.orderId,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(orderItems)
+        .where(sql`${orderItems.orderId} = ANY(${orderIds})`)
+        .groupBy(orderItems.orderId);
+
+      for (const c of counts) {
+        itemsCountMap[c.orderId] = c.count;
+      }
+    }
+
+    const enriched = orderList.map((o) => ({
+      ...o,
+      items: itemsCountMap[o.id] || 0,
+    }));
+
+    res.json({ orders: enriched });
   } catch (error) {
     next(error);
   }

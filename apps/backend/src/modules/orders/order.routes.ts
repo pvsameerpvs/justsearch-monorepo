@@ -5,7 +5,6 @@ import detailOrderRoutes from './order-detail.routes';
 import statusOrderRoutes from './order-status.routes';
 import driverOrderRoutes from './order-driver.routes';
 import paymentOrderRoutes from './order-payment.routes';
-import closeoutOrderRoutes from './order-closeout.routes';
 
 const router = Router();
 
@@ -15,6 +14,5 @@ router.use('/', detailOrderRoutes);
 router.use('/', statusOrderRoutes);
 router.use('/', driverOrderRoutes);
 router.use('/', paymentOrderRoutes);
-router.use('/close-day', closeoutOrderRoutes);
 
 export default router;

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
 import { menuCategories } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';

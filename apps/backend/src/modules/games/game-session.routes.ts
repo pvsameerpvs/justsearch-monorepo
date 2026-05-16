@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, and, gte, sql } from 'drizzle-orm';
+import { eq, and, sql, gte } from 'drizzle-orm';
 import { db } from '../../db';
 import { games, gameSessions } from '../../db/schema';
+import { authMiddleware } from '../../middleware/auth.middleware';
 import { calculatePoints, extractScoringConfig, DAILY_HARD_CAP } from '../../lib/scoring';
 
 const router = Router();
+router.use(authMiddleware);
 
 const createSessionSchema = z.object({
   gameId: z.string().min(1),
