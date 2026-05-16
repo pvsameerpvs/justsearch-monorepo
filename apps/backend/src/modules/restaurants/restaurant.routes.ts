@@ -4,11 +4,11 @@ import { db } from '../../db';
 import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 import { createRestaurantSchema, buildSettings } from './restaurant-create.utils';
+import { createTenantSchema, seedTenantSchema } from '../../db/tenant-template';
 
 const router = Router();
 router.use(authMiddleware);
 
-// POST /api/v1/restaurants — create new restaurant (super-admin only)
 router.post('/', requireRole('super_admin'), async (req, res, next) => {
   try {
     const body = createRestaurantSchema.parse(req.body);
@@ -27,13 +27,15 @@ router.post('/', requireRole('super_admin'), async (req, res, next) => {
       })
       .returning();
 
+    await createTenantSchema(schemaName);
+    await seedTenantSchema(schemaName, restaurant.id);
+
     res.status(201).json({ restaurant });
   } catch (error) {
     next(error);
   }
 });
 
-// GET /api/v1/restaurants — list all (super-admin only)
 router.get('/', requireRole('super_admin'), async (_req, res, next) => {
   try {
     const allRestaurants = await db.select().from(restaurants).orderBy(desc(restaurants.createdAt));

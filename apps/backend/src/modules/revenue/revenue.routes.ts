@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { desc } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders, restaurants } from '../../db/schema';
+import { restaurants } from '../../db/schema';
+import { eq, desc } from 'drizzle-orm';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -9,23 +10,29 @@ router.use(authMiddleware);
 
 router.get('/', requireRole('super_admin'), async (_req, res, next) => {
   try {
-    const allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
-    const totalRevenue = allOrders.reduce((sum, o) => sum + Number(o.total), 0);
-    const totalOrders = allOrders.length;
+    const allRestaurants = await db.select().from(restaurants).orderBy(desc(restaurants.createdAt));
+    const activeSchemas = allRestaurants.filter((r) => r.status === 'active');
 
-    const map = new Map<string, { revenue: number; orders: number }>();
-    for (const o of allOrders) {
-      const cur = map.get(o.restaurantId) || { revenue: 0, orders: 0 };
-      cur.revenue += Number(o.total);
-      cur.orders += 1;
-      map.set(o.restaurantId, cur);
+    let totalRevenue = 0;
+    let totalOrders = 0;
+    const revenueMap = new Map<string, { revenue: number; orders: number }>();
+
+    for (const schema of activeSchemas) {
+      const orderRows = await db.execute(
+        sql`SELECT COUNT(*) as count, COALESCE(SUM(CAST(total AS DECIMAL)), 0) as revenue FROM ${sql.identifier(schema.schemaName)}.orders`
+      );
+      const data = orderRows[0] as { count: number; revenue: number } | undefined;
+      if (data) {
+        const orderCount = Number(data.count);
+        const revenue = Number(data.revenue);
+        totalOrders += orderCount;
+        totalRevenue += revenue;
+        revenueMap.set(schema.id, { revenue, orders: orderCount });
+      }
     }
 
-    const allRestaurants = await db.select().from(restaurants);
-    const activeRestaurants = allRestaurants.filter((r) => r.status === 'active').length;
-
     const restaurantList = allRestaurants.map((r) => {
-      const stats = map.get(r.id) || { revenue: 0, orders: 0 };
+      const stats = revenueMap.get(r.id) || { revenue: 0, orders: 0 };
       const settings =
         typeof r.settings === 'object' && r.settings !== null
           ? (r.settings as Record<string, unknown>)
@@ -43,6 +50,9 @@ router.get('/', requireRole('super_admin'), async (_req, res, next) => {
       };
     });
 
+    const activeRestaurants = activeSchemas.length;
+    const avgRevenue = allRestaurants.length > 0 ? Math.round(totalRevenue / allRestaurants.length) : 0;
+
     res.json({
       totalRevenue,
       adRevenue: 0,
@@ -50,7 +60,7 @@ router.get('/', requireRole('super_admin'), async (_req, res, next) => {
       activeRestaurants,
       totalOrders,
       totalViews: 0,
-      avgRevenuePerRestaurant: allRestaurants.length > 0 ? Math.round(totalRevenue / allRestaurants.length) : 0,
+      avgRevenuePerRestaurant: avgRevenue,
       growthPercent: 0,
       restaurants: restaurantList,
     });

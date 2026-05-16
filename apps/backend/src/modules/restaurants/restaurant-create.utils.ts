@@ -20,6 +20,15 @@ export const createRestaurantSchema = z.object({
   dashboardPassword: z.string().optional(),
 });
 
+export const updateRestaurantSchema = z.object({
+  name: z.string().min(1).optional(),
+  status: z.enum(['draft', 'active', 'inactive', 'suspended']).optional(),
+  ownerName: z.string().optional(),
+  contactPhone: z.string().optional(),
+  contactEmail: z.string().email().optional(),
+  settings: z.record(z.unknown()).optional(),
+});
+
 export function buildSettings(body: z.infer<typeof createRestaurantSchema>) {
   return {
     ownerName: body.ownerName,

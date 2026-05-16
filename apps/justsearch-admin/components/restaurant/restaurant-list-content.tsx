@@ -5,6 +5,7 @@ import { RestaurantRow } from "@/components/restaurant/restaurant-row";
 import { RestaurantEmptyState } from "@/components/restaurant/restaurant-empty-state";
 import { RestaurantSearchBar } from "@/components/restaurant/restaurant-search-bar";
 import { mapApiToAdmin } from "./restaurant-list.utils";
+import type { ApiRestaurant } from "@/lib/hooks/use-restaurants-query";
 
 export function RestaurantListContent({
   restaurants,
@@ -13,7 +14,7 @@ export function RestaurantListContent({
   onSearchChange,
   onShowForm,
 }: {
-  restaurants: { id: string; slug: string; subdomain: string; name: string; status: string; createdAt: string }[];
+  restaurants: ApiRestaurant[];
   showForm: boolean;
   searchQuery: string;
   onSearchChange: (q: string) => void;

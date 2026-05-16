@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { MOCK_AUTH_ENABLED, MOCK_RESTAURANT } from '../lib/mock-auth';
 import { resolveSubdomain } from './tenant-resolver';
 import { lookupTenant } from './tenant-lookup';
+import { client } from '../db';
 
 export interface TenantContext {
   id: string;
@@ -19,14 +20,17 @@ declare global {
   }
 }
 
+const PUBLIC_SCHEMAS = 'public';
+
 export async function tenantMiddleware(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) {
   const subdomain = resolveSubdomain(req);
 
   if (!subdomain) {
+    await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
     return next();
   }
 
@@ -38,6 +42,7 @@ export async function tenantMiddleware(
       schemaName: MOCK_RESTAURANT.schemaName,
       status: MOCK_RESTAURANT.status,
     };
+    await client.unsafe(`SET search_path TO "${MOCK_RESTAURANT.schemaName}", ${PUBLIC_SCHEMAS}`);
     return next();
   }
 
@@ -45,20 +50,28 @@ export async function tenantMiddleware(
     const tenant = await lookupTenant(subdomain);
 
     if (!tenant) {
-      return res.status(404).json({ error: 'Restaurant not found' });
+      await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
+      _res.status(404).json({ error: 'Restaurant not found' });
+      return;
     }
 
     if (tenant.status === 'suspended') {
-      return res.status(403).json({ error: 'Restaurant is suspended' });
+      await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
+      _res.status(403).json({ error: 'Restaurant is suspended' });
+      return;
     }
 
     if (tenant.status === 'inactive' || tenant.status === 'draft') {
-      return res.status(403).json({ error: 'Restaurant is not active' });
+      await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
+      _res.status(403).json({ error: 'Restaurant is not active' });
+      return;
     }
 
     req.tenant = tenant;
+    await client.unsafe(`SET search_path TO "${tenant.schemaName}", ${PUBLIC_SCHEMAS}`);
     next();
   } catch (error) {
+    await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
     next(error);
   }
 }

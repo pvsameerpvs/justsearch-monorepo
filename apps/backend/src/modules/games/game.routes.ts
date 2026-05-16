@@ -7,6 +7,13 @@ import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
 
+const createSchema = z.object({
+  name: z.string().min(1),
+  type: z.string().min(1),
+  config: z.record(z.unknown()).optional(),
+  isActive: z.boolean().optional(),
+});
+
 const updateSchema = z.object({
   name: z.string().min(1).optional(),
   type: z.string().min(1).optional(),
@@ -14,7 +21,6 @@ const updateSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-// GET /api/v1/games — list all games (super-admin only)
 router.get('/', requireRole('super_admin'), async (_req, res, next) => {
   try {
     const list = await db.select().from(games).orderBy(desc(games.createdAt));
@@ -24,7 +30,6 @@ router.get('/', requireRole('super_admin'), async (_req, res, next) => {
   }
 });
 
-// GET /api/v1/games/active — list active games (public, no auth)
 router.get('/active', async (_req, res, next) => {
   try {
     const list = await db.select().from(games).where(eq(games.isActive, true));
@@ -34,12 +39,32 @@ router.get('/active', async (_req, res, next) => {
   }
 });
 
-// PATCH /api/v1/games/:id — toggle active/inactive, update config (super-admin only)
+router.post('/', requireRole('super_admin'), async (req, res, next) => {
+  try {
+    const body = createSchema.parse(req.body);
+    const values = {
+      name: body.name,
+      type: body.type,
+      config: body.config ?? {},
+      isActive: body.isActive ?? true,
+      createdBy: req.auth?.userId,
+    };
+    const [game] = await db.insert(games).values(values).returning();
+    res.status(201).json({ game });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.patch('/:id', authMiddleware, requireRole('super_admin'), async (req, res, next) => {
   try {
     const body = updateSchema.parse(req.body);
     if (body.config) {
-      const [existing] = await db.select({ config: games.config }).from(games).where(eq(games.id, req.params.id)).limit(1);
+      const [existing] = await db
+        .select({ config: games.config })
+        .from(games)
+        .where(eq(games.id, req.params.id))
+        .limit(1);
       if (existing) {
         const merged = { ...(existing.config as Record<string, unknown>), ...body.config };
         body.config = merged;

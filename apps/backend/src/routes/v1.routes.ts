@@ -3,6 +3,7 @@ import authRoutes from '../modules/auth/auth.routes';
 import orderRoutes from '../modules/orders/order.routes';
 import orderCloseoutRoutes from '../modules/orders/order-closeout.routes';
 import restaurantAdminRoutes from '../modules/restaurants/restaurant.routes';
+import restaurantAdminMutationRoutes from '../modules/restaurants/restaurant-admin.routes';
 import restaurantCurrentRoutes from '../modules/restaurants/restaurant-current.routes';
 import menuPublicRoutes from '../modules/menus/menu-public.routes';
 import menuItemRoutes from '../modules/menu/menu-item.routes';
@@ -30,6 +31,7 @@ router.use('/auth', authRoutes);
 
 // Restaurant admin routes (super-admin)
 router.use('/restaurants', restaurantAdminRoutes);
+router.use('/restaurants', restaurantAdminMutationRoutes);
 router.use('/restaurants', restaurantCurrentRoutes);
 
 // Public menu routes (tenant-scoped)

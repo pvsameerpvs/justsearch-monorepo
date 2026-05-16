@@ -18,11 +18,11 @@ export function LoginContainer() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const success = await login(username, password);
-    if (success) {
+    const result = await login(username, password);
+    if (result.success) {
       router.push("/");
     } else {
-      setError("Invalid username or password");
+      setError(result.error ?? "Invalid username or password");
     }
     setLoading(false);
   };
