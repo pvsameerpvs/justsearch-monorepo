@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { Order } from '@justsearch/types';
+import type { Order, OrderItem } from '@justsearch/types';
 
 export type CreateOrderPayload = {
   customerName: string;
@@ -31,6 +31,6 @@ export async function createOrder(payload: CreateOrderPayload): Promise<CreateOr
   });
 }
 
-export async function fetchOrder(orderId: string): Promise<Order> {
-  return apiClient<Order>(`/orders/${orderId}`);
+export async function fetchOrder(orderId: string): Promise<{ order: Order; items: OrderItem[] }> {
+  return apiClient<{ order: Order; items: OrderItem[] }>(`/orders/${orderId}`);
 }

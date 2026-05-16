@@ -20,6 +20,7 @@ export function useCheckoutState() {
   const [riderNote, setRiderNote] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
   const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validation = useCheckoutValidation(
     address.address,
@@ -55,6 +56,8 @@ export function useCheckoutState() {
       place.setPlaceError(validation.errors[0] ?? 'Cannot place order');
       return;
     }
+
+    setIsSubmitting(true);
 
     // Auto-save address to DB if it's a new address (not from saved list)
     const isAlreadySaved = address.addresses.some(
@@ -103,6 +106,8 @@ export function useCheckoutState() {
       place.startPlacing(orderId);
     } catch (e) {
       place.setPlaceError(e instanceof Error ? e.message : 'Failed to place order');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -128,6 +133,7 @@ export function useCheckoutState() {
     placedOrderId: place.placedOrderId,
     placingOrder: place.placingOrder,
     placingProgress: place.placingProgress,
+    isSubmitting,
     onPlaceOrder,
     isCheckoutValid: validation.isValid,
     checkoutErrors: validation.errors,

@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { createOrder } from '@/lib/api/orders.api';
 import { useRegistration } from '@/components/auth/registration-context';
-import type { StoredState } from './fulfillment.types';
+import type { StoredState, StoredOrder } from './fulfillment.types';
 import { computeTotal } from './fulfillment.constants';
 
 export function usePlaceOrder(
@@ -16,7 +16,7 @@ export function usePlaceOrder(
   const { user } = useRegistration();
 
   return useCallback(
-    async ({ address, note, paymentMethod }: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card' }) => {
+    async ({ address, note, promoCode, promoDiscount, paymentMethod }: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card' }) => {
       if (!user) throw new Error('Please sign in to place an order');
       if (cartCount === 0) return null;
       const totalVal = computeTotal(subtotal, deliveryFee, 0);
@@ -38,7 +38,29 @@ export function usePlaceOrder(
         notes: note,
         paymentMethod,
       });
-      setState((s) => ({ ...s, cart: [] }));
+
+      const newOrder: StoredOrder = {
+        id: res.order.id,
+        createdAt: Date.now(),
+        items: cart.map((item) => ({
+          itemId: item.itemId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          currency: item.currency,
+          image: item.image,
+        })),
+        address,
+        note,
+        riderName: '',
+        subtotal,
+        deliveryFee,
+        total: totalVal,
+        promoCode,
+        promoDiscount,
+      };
+
+      setState((s) => ({ ...s, cart: [], orders: [newOrder, ...s.orders] }));
       return res.order.id;
     },
     [cart, cartCount, subtotal, deliveryFee, setState, user],

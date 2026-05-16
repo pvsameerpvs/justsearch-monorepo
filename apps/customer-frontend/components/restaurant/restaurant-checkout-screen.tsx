@@ -57,7 +57,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         error={state.error}
         latestOrderId={state.placedOrderId}
         cartCount={state.cartCount}
-        isPlacing={Boolean(state.placingOrder)}
+        isPlacing={Boolean(state.placingOrder) || state.isSubmitting}
         isValid={state.isCheckoutValid}
         onPlaceOrder={state.onPlaceOrder}
       />
