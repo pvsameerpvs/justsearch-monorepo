@@ -22,7 +22,6 @@ const TENANT_TABLES = [
   'otp_requests',
 ];
 
-const DEFAULT_OWNER_PASSWORD = process.env.SEED_STAFF_PASSWORD || 'owner123';
 const DEFAULT_RIDER_PASSWORD = process.env.SEED_RIDER_PASSWORD || 'rider123';
 
 export async function createTenantSchema(schemaName: string): Promise<void> {
@@ -37,14 +36,17 @@ export async function createTenantSchema(schemaName: string): Promise<void> {
 
 export async function seedTenantSchema(
   schemaName: string,
-  restaurantId: string
+  restaurantId: string,
+  ownerCredentials?: { username?: string; password?: string }
 ): Promise<void> {
-  const ownerHash = await bcrypt.hash(DEFAULT_OWNER_PASSWORD, 12);
+  const ownerUsername = ownerCredentials?.username || 'owner';
+  const ownerPassword = ownerCredentials?.password || (process.env.SEED_STAFF_PASSWORD || 'owner123');
+  const ownerHash = await bcrypt.hash(ownerPassword, 12);
   const riderHash = await bcrypt.hash(DEFAULT_RIDER_PASSWORD, 12);
 
   await client.unsafe(
     `INSERT INTO "${schemaName}"."staff" (restaurant_id, name, username, password_hash, role, permissions, is_active) VALUES ($1, $2, $3, $4, $5, $6, true)`,
-    [restaurantId, 'Restaurant Owner', 'owner', ownerHash, 'owner', JSON.stringify({ all: true })]
+    [restaurantId, 'Restaurant Owner', ownerUsername, ownerHash, 'owner', JSON.stringify({ all: true })]
   );
 
   await client.unsafe(

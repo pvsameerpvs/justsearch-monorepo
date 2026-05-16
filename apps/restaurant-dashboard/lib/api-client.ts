@@ -2,10 +2,11 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v
 
 function getRestaurantSlug(): string | null {
   if (typeof window === 'undefined') return null;
+  const saved = localStorage.getItem('restaurant-slug');
+  if (saved) return saved;
   const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
   let first = host.split('.')[0];
-  if (!first || first === 'admin') return null;
-  if (first === 'localhost') return 'demo-bistro';
+  if (!first || first === 'admin' || first === 'localhost') return null;
   if (first.endsWith('-admin')) first = first.slice(0, -6);
   if (first.endsWith('-delivery')) first = first.slice(0, -9);
   if (first.startsWith('admin-')) first = first.slice(6);

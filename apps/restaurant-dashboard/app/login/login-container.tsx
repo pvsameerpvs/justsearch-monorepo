@@ -10,6 +10,10 @@ import { LoginForgotPresenter } from "./login-forgot-presenter";
 export function LoginContainer() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [subdomain, setSubdomain] = useState(() => {
+    if (typeof window === 'undefined') return "";
+    return localStorage.getItem('restaurant-slug') || "";
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
@@ -20,6 +24,9 @@ export function LoginContainer() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (subdomain) {
+      localStorage.setItem('restaurant-slug', subdomain.trim().toLowerCase());
+    }
     setLoading(true);
     const success = await login(username, password);
     if (success) router.push("/");
@@ -42,8 +49,8 @@ export function LoginContainer() {
 
         {!showForgot ? (
           <LoginFormPresenter
-            username={username} password={password} error={error} loading={loading} showPass={showPass}
-            onUsernameChange={setUsername} onPasswordChange={setPassword} onTogglePass={() => setShowPass(!showPass)}
+            username={username} password={password} subdomain={subdomain} error={error} loading={loading} showPass={showPass}
+            onUsernameChange={setUsername} onPasswordChange={setPassword} onSubdomainChange={setSubdomain} onTogglePass={() => setShowPass(!showPass)}
             onSubmit={handleSubmit} onForgot={() => { setShowForgot(true); setError(""); }}
           />
         ) : (

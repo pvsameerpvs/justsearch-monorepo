@@ -28,7 +28,10 @@ router.post('/', requireRole('super_admin'), async (req, res, next) => {
       .returning();
 
     await createTenantSchema(schemaName);
-    await seedTenantSchema(schemaName, restaurant.id);
+    await seedTenantSchema(schemaName, restaurant.id, {
+      username: body.dashboardUsername,
+      password: body.dashboardPassword,
+    });
 
     res.status(201).json({ restaurant });
   } catch (error) {

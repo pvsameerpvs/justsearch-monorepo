@@ -48,7 +48,8 @@ export async function tenantMiddleware(
       return;
     }
 
-    if (tenant.status === 'inactive' || tenant.status === 'draft') {
+    const isAuthRoute = req.path?.includes('/auth/');
+    if (!isAuthRoute && (tenant.status === 'inactive' || tenant.status === 'draft')) {
       await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
       _res.status(403).json({ error: 'Restaurant is not active' });
       return;
