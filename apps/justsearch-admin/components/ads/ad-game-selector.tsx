@@ -1,25 +1,19 @@
 import { Check } from "lucide-react";
-
-const DEMO_GAMES = [
-  { id: "1", name: "Jump & Bite", icon: "🏃" },
-  { id: "2", name: "Hungry Bird Rush", icon: "🐤" },
-  { id: "3", name: "Gem Match", icon: "🃏" },
-  { id: "4", name: "Cheddar Chase", icon: "🧀" },
-  { id: "5", name: "Slice Master", icon: "🍕" },
-];
+import type { GameOption } from "./ad-campaign.types";
 
 interface AdGameSelectorProps {
+  games: GameOption[];
   assignedGames: string[];
   onToggle: (gameId: string) => void;
 }
 
-export function AdGameSelector({ assignedGames, onToggle }: AdGameSelectorProps) {
+export function AdGameSelector({ games, assignedGames, onToggle }: AdGameSelectorProps) {
   return (
     <div>
       <label className="mb-2 block text-xs font-bold text-slate-700">Assign to Games</label>
       <p className="mb-3 text-xs text-slate-500">Select which games this ad will run on</p>
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-        {DEMO_GAMES.map((g) => {
+        {games.map((g) => {
           const active = assignedGames.includes(g.id);
           return (
             <button

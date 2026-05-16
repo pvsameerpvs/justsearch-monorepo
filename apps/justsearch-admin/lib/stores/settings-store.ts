@@ -1,7 +1,11 @@
-export * from './settings-store-types';
+export type { SettingsStore, PlatformSettings, NotificationSettings, SecuritySettings, RestaurantDefaults, RevenueSettings, GameSettings, BillingSettings, SettingsTab } from "./settings-types";
+
+export { DEFAULTS } from "./settings-defaults";
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { type SettingsStore, DEFAULTS } from "./settings-store-types";
+import type { SettingsStore } from "./settings-types";
+import { DEFAULTS } from "./settings-defaults";
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(

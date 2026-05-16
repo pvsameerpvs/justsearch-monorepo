@@ -9,16 +9,19 @@ import { AdModal } from "./ad-modal";
 import { AdFormContainer } from "./ad-form-container";
 import { AdViewTabs } from "./ad-view-tabs";
 import type { AdCampaign, AdCampaignFormData } from "@/lib/stores/ad-campaign-types";
+import type { GameOption, RestaurantOption } from "./ad-campaign.types";
 
 interface AdCampaignPresenterProps {
   campaigns: AdCampaign[];
+  restaurants: RestaurantOption[];
+  games: GameOption[];
   onAdd: (data: AdCampaignFormData) => void;
   onUpdate: (id: string, data: Partial<AdCampaignFormData>) => void;
   onDelete: (id: string) => void;
   onToggle: (id: string) => void;
 }
 
-export function AdCampaignPresenter({ campaigns, onAdd, onUpdate, onDelete, onToggle }: AdCampaignPresenterProps) {
+export function AdCampaignPresenter({ campaigns, restaurants, games, onAdd, onUpdate, onDelete, onToggle }: AdCampaignPresenterProps) {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "grid" | "performance">("table");
@@ -61,7 +64,7 @@ export function AdCampaignPresenter({ campaigns, onAdd, onUpdate, onDelete, onTo
 
       {(showForm || editingId) && (
         <AdModal title={editingCampaign ? "Edit Campaign" : "Create Ad Campaign"} onClose={handleCancel}>
-          <AdFormContainer campaign={editingCampaign} onSave={handleSave} onCancel={handleCancel} />
+          <AdFormContainer campaign={editingCampaign} restaurants={restaurants} games={games} onSave={handleSave} onCancel={handleCancel} />
         </AdModal>
       )}
     </div>

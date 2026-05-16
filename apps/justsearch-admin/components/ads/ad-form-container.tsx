@@ -2,21 +2,19 @@
 
 import { useState } from "react";
 import type { AdCampaign, AdCampaignFormData } from "@/lib/stores/ad-campaign-types";
+import type { GameOption, RestaurantOption } from "./ad-campaign.types";
 import { AdFormPresenter } from "./ad-form-presenter";
 
 interface AdFormContainerProps {
   campaign: AdCampaign | null;
+  restaurants: RestaurantOption[];
+  games: GameOption[];
   onSave: (data: AdCampaignFormData) => void;
   onCancel: () => void;
 }
 
-const DEMO_RESTAURANTS = [
-  { id: "mosaic-table", name: "Mosaic Table" },
-  { id: "spice-route", name: "Spice Route" },
-  { id: "golden-spoon", name: "Golden Spoon" },
-];
-
-export function AdFormContainer({ campaign, onSave, onCancel }: AdFormContainerProps) {
+export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel }: AdFormContainerProps) {
+  const firstRestaurant = restaurants[0];
   const [form, setForm] = useState<AdCampaignFormData>({
     title: campaign?.title ?? "",
     clientName: campaign?.clientName ?? "",
@@ -25,8 +23,8 @@ export function AdFormContainer({ campaign, onSave, onCancel }: AdFormContainerP
     mediaUrl: campaign?.mediaUrl ?? "",
     duration: campaign?.duration ?? 15,
     type: campaign?.type ?? "restaurant_brought",
-    restaurantId: campaign?.restaurantId ?? "mosaic-table",
-    restaurantName: campaign?.restaurantName ?? "Mosaic Table",
+    restaurantId: campaign?.restaurantId ?? firstRestaurant?.id ?? "",
+    restaurantName: campaign?.restaurantName ?? firstRestaurant?.name ?? "",
     assignedGames: campaign?.assignedGames ?? [],
   });
 
@@ -44,7 +42,7 @@ export function AdFormContainer({ campaign, onSave, onCancel }: AdFormContainerP
   };
 
   const setRestaurant = (id: string) => {
-    const r = DEMO_RESTAURANTS.find((x) => x.id === id);
+    const r = restaurants.find((x) => x.id === id);
     setForm((prev) => ({ ...prev, restaurantId: id, restaurantName: r?.name ?? "" }));
   };
 
@@ -66,7 +64,8 @@ export function AdFormContainer({ campaign, onSave, onCancel }: AdFormContainerP
     <AdFormPresenter
       form={form}
       isEdit={!!campaign}
-      restaurants={DEMO_RESTAURANTS}
+      restaurants={restaurants}
+      games={games}
       onSetField={setField}
       onToggleGame={toggleGame}
       onSetRestaurant={setRestaurant}

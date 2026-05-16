@@ -1,9 +1,5 @@
 import { Store } from "lucide-react";
-
-interface RestaurantOption {
-  id: string;
-  name: string;
-}
+import type { RestaurantOption } from "./ad-campaign.types";
 
 interface AdRestaurantSelectProps {
   value: string | null;

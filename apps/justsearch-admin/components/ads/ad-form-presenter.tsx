@@ -4,16 +4,13 @@ import { AdRestaurantSelect } from "./ad-restaurant-select";
 import { AdGameSelector } from "./ad-game-selector";
 import { AdFormDetails } from "./ad-form-details";
 import type { AdCampaignFormData } from "@/lib/stores/ad-campaign-types";
-
-interface RestaurantOption {
-  id: string;
-  name: string;
-}
+import type { GameOption, RestaurantOption } from "./ad-campaign.types";
 
 interface AdFormPresenterProps {
   form: AdCampaignFormData;
   isEdit: boolean;
   restaurants: RestaurantOption[];
+  games: GameOption[];
   onSetField: <K extends keyof AdCampaignFormData>(key: K, value: AdCampaignFormData[K]) => void;
   onToggleGame: (gameId: string) => void;
   onSetRestaurant: (id: string) => void;
@@ -25,6 +22,7 @@ export function AdFormPresenter({
   form,
   isEdit,
   restaurants,
+  games,
   onSetField,
   onToggleGame,
   onSetRestaurant,
@@ -61,7 +59,7 @@ export function AdFormPresenter({
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
         <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">🎮 Target Games</h4>
-        <AdGameSelector assignedGames={form.assignedGames} onToggle={onToggleGame} />
+        <AdGameSelector games={games} assignedGames={form.assignedGames} onToggle={onToggleGame} />
       </section>
 
       <div className="flex gap-3 pt-2">

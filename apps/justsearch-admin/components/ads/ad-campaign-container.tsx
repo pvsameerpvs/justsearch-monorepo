@@ -1,19 +1,28 @@
 'use client';
 
 import { useAdsQuery, useCreateAdMutation, useUpdateAdMutation, useDeleteAdMutation } from '@/lib/hooks/use-ads-query';
+import { useRestaurantsQuery } from '@/lib/hooks/use-restaurants-query';
+import { useGamesQuery } from '@/lib/hooks/use-games-query';
 import { AdCampaignPresenter } from './ad-campaign-presenter';
 
 export function AdCampaignContainer() {
-  const { ads: campaigns, isLoading } = useAdsQuery();
+  const { ads: campaigns, isLoading: adsLoading } = useAdsQuery();
+  const { restaurants, isLoading: restaurantsLoading } = useRestaurantsQuery();
+  const { games, isLoading: gamesLoading } = useGamesQuery();
   const createAd = useCreateAdMutation();
   const updateAd = useUpdateAdMutation();
   const deleteAd = useDeleteAdMutation();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (adsLoading || restaurantsLoading || gamesLoading) return <div>Loading...</div>;
+
+  const restaurantOptions = restaurants.map((r) => ({ id: r.id, name: r.name }));
+  const gameOptions = games.map((g) => ({ id: g.id, name: g.name, icon: g.icon }));
 
   return (
     <AdCampaignPresenter
       campaigns={campaigns}
+      restaurants={restaurantOptions}
+      games={gameOptions}
       onAdd={(data) => createAd.mutate(data)}
       onUpdate={(id, data) => updateAd.mutate({ id, data })}
       onDelete={(id) => deleteAd.mutate(id)}
