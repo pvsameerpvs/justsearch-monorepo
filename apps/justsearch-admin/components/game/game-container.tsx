@@ -15,7 +15,7 @@ export function GameContainer() {
       activeCount={games.filter((g) => g.isActive).length}
       totalCount={games.length}
       onToggleAvailability={(id, isActive) => updateGame.mutate({ id, data: { isActive } })}
-      onSaveScoring={(id, config) => updateGame.mutate({ id, data: { config } })}
+      onSaveScoring={(id, config) => updateGame.mutate({ id, data: config })}
     />
   );
 }

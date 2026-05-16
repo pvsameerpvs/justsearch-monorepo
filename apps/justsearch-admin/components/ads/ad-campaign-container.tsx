@@ -16,7 +16,7 @@ export function AdCampaignContainer() {
   if (adsLoading || restaurantsLoading || gamesLoading) return <div>Loading...</div>;
 
   const restaurantOptions = restaurants.map((r) => ({ id: r.id, name: r.name }));
-  const gameOptions = games.map((g) => ({ id: g.id, name: g.name, icon: g.icon }));
+  const gameOptions = games.map((g) => ({ id: g.id, name: g.name, icon: g.icon, isActive: g.isActive }));
 
   return (
     <AdCampaignPresenter
