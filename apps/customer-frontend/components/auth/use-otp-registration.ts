@@ -18,7 +18,6 @@ export function useOtpRegistration() {
   const { isModalOpen, closeModal, setUser, user } = useRegistration();
   const [step, setStep] = useState<Step>('details');
   const [requestId, setRequestId] = useState<string | null>(null);
-  const [demoOtp, setDemoOtp] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +31,7 @@ export function useOtpRegistration() {
 
   useEffect(() => {
     if (!isModalOpen) return;
-    setError(null); setBusy(false); setStep('details'); setRequestId(null); setDemoOtp(null);
+    setError(null); setBusy(false); setStep('details'); setRequestId(null);
     form.reset({ name: user?.name ?? '', mobile: user?.mobile ? normalizeUaeLocalDigits(user.mobile) : '', otp: '' });
   }, [isModalOpen, form, user?.mobile, user?.name]);
 
@@ -40,7 +39,7 @@ export function useOtpRegistration() {
     setError(null); setBusy(true);
     try {
       const data = await postOtp('/api/auth/otp/request', { name: name.trim(), mobile: `+971${mobileLocalDigits}` }) as OtpRequestResponse;
-      setRequestId(data.requestId); setDemoOtp(typeof data.demoOtp === 'string' ? data.demoOtp : null);
+      setRequestId(data.requestId);
       setStep('otp');
       form.setValue('otp', '', { shouldValidate: true });
     } catch (e) { setError(e instanceof Error ? e.message : 'Failed to request OTP'); }
@@ -58,5 +57,5 @@ export function useOtpRegistration() {
     setBusy(false);
   }, [requestId, mobileLocalDigits, otp, setUser, closeModal]);
 
-  return { isModalOpen, closeModal, form, step, busy, error, setError, setBusy, mobileFull, demoOtp, canRequestOtp, canVerifyOtp, setStep, requestOtp, verifyOtp };
+  return { isModalOpen, closeModal, form, step, busy, error, setError, setBusy, mobileFull, canRequestOtp, canVerifyOtp, setStep, requestOtp, verifyOtp };
 }

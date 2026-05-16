@@ -1,6 +1,5 @@
 export type OtpRequestResponse = {
   requestId: string;
-  demoOtp?: string;
 };
 
 export type OtpVerifyResponse = {

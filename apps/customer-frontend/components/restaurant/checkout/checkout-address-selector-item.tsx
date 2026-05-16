@@ -1,5 +1,4 @@
 "use client";
-
 import { Briefcase, Check, Home, MapPin, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/cn';

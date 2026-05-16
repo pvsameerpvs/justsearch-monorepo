@@ -1,2 +1,3 @@
 export * from './subscription-plans';
-export * from './plan-card';
+export * from './subscription-plan-card';
+export * from './subscription-plan-features';

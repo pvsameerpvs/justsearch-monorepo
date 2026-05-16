@@ -10,7 +10,6 @@ interface OtpStepProps {
   busy: boolean;
   error: string | null;
   mobileFull: string;
-  demoOtp: string | null;
   canRequestOtp: boolean;
   canVerifyOtp: boolean;
   onBack: () => void;
@@ -18,7 +17,7 @@ interface OtpStepProps {
   onVerifyOtp: () => void;
 }
 
-export function OtpStep({ form, busy, error, mobileFull, demoOtp, canRequestOtp, canVerifyOtp, onBack, onRequestOtp, onVerifyOtp }: OtpStepProps) {
+export function OtpStep({ form, busy, error, mobileFull, canRequestOtp, canVerifyOtp, onBack, onRequestOtp, onVerifyOtp }: OtpStepProps) {
   const { control, formState: { errors } } = form;
 
   return (
@@ -26,7 +25,7 @@ export function OtpStep({ form, busy, error, mobileFull, demoOtp, canRequestOtp,
       <div className="rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/70 p-4">
         <p className="text-xs font-semibold text-[rgb(var(--ink))]">OTP sent to <span className="font-mono">{mobileFull}</span></p>
         <p className="mt-1 text-xs text-[rgb(var(--muted))]">Enter the 4-digit code to continue.</p>
-        {demoOtp ? <p className="mt-2 text-xs font-semibold text-[rgb(var(--brand))]">Demo OTP: <span className="font-mono">{demoOtp}</span></p> : null}
+
       </div>
 
       <label className="grid gap-1.5">

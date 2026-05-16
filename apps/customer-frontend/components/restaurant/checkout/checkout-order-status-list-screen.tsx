@@ -7,6 +7,7 @@ import { Surface } from '@/components/shared/surface';
 import { useRestaurantFulfillment } from '../use-restaurant-fulfillment';
 import { getActiveCheckoutOrders } from './checkout-live-status-utils';
 import { CheckoutTrackingCard } from './checkout-tracking-card';
+import { CheckoutOrderStatusSkeleton } from './checkout-order-status-skeleton';
 
 export function CheckoutOrderStatusListScreen() {
   const router = useRouter();
@@ -33,20 +34,7 @@ export function CheckoutOrderStatusListScreen() {
   }, [activeOrders.length, hydrated, router]);
 
   if (!hydrated) {
-    return (
-      <section className="py-4 sm:py-6">
-        <Container className="max-w-2xl">
-          <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-[110px] animate-pulse rounded-[24px] border border-[rgb(var(--border)/0.56)] bg-white/70"
-              />
-            ))}
-          </div>
-        </Container>
-      </section>
-    );
+    return <CheckoutOrderStatusSkeleton />;
   }
 
   if (activeOrders.length === 0) {

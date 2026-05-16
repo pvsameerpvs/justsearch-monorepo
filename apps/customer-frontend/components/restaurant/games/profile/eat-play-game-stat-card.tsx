@@ -1,10 +1,11 @@
 "use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Trophy, BarChart3, Clock3, Gamepad2, Play, Coins } from 'lucide-react';
+import { Trophy, Coins } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
 import type { Game } from '@/lib/restaurant-types';
+import { EatPlayGameStatIcon } from './eat-play-game-stat-icon';
+import { EatPlayGameStatScore } from './eat-play-game-stat-score';
+import { EatPlayGameStatBar } from './eat-play-game-stat-bar';
 
 type GameStatSnapshot = {
   highScore: number;
@@ -19,13 +20,6 @@ type EatPlayGameStatCardProps = {
   game: Game;
   stat: GameStatSnapshot;
 };
-
-function formatPlayedAt(value: string) {
-  if (!value) return 'Not played yet';
-  const timestamp = Date.parse(value);
-  if (!Number.isFinite(timestamp)) return 'Not played yet';
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(timestamp));
-}
 
 function getRankDetails(points: number, hasPlayed: boolean) {
   if (points >= 10000) return { label: 'IMMORTAL', color: 'text-orange-600', bg: 'bg-orange-50' };
@@ -45,23 +39,7 @@ export function EatPlayGameStatCard({ game, stat }: EatPlayGameStatCardProps) {
 
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <div className="flex min-w-0 items-center gap-5">
-          <div className="relative shrink-0">
-            <div className="h-20 w-20 overflow-hidden rounded-[24px] border-4 border-white bg-slate-100 shadow-xl ring-1 ring-black/[0.05]">
-              {game.coverImageUrl ? (
-                <Image src={game.coverImageUrl} alt={game.name} width={80} height={80} className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,rgb(var(--brand-soft)),rgb(var(--accent-soft)))] text-4xl">
-                  <span aria-hidden="true">{game.icon}</span>
-                </div>
-              )}
-            </div>
-            {hasPlayed && (
-              <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-xl bg-orange-500 text-white shadow-lg ring-2 ring-white">
-                <span className="text-[10px] font-black italic">TOP</span>
-              </div>
-            )}
-          </div>
-
+          <EatPlayGameStatIcon game={game} hasPlayed={hasPlayed} />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <p className="truncate text-[10px] font-black uppercase tracking-[0.25em] text-[rgb(var(--brand))]">
@@ -93,43 +71,8 @@ export function EatPlayGameStatCard({ game, stat }: EatPlayGameStatCardProps) {
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-4">
-        <div className="flex-1 min-w-[120px] rounded-2xl bg-slate-50/80 p-3 ring-1 ring-black/[0.02]">
-          <p className="text-[9px] font-black uppercase tracking-widest text-[rgb(var(--muted))]">LAST EARNED</p>
-          <p className="mt-0.5 flex items-center gap-2 font-display text-lg font-bold text-[rgb(var(--ink))]">
-            <Coins className="h-4 w-4 text-amber-500" />
-            +{stat.lastPoints.toLocaleString()} pts
-          </p>
-        </div>
-        <div className="flex-1 min-w-[120px] rounded-2xl bg-slate-50/80 p-3 ring-1 ring-black/[0.02]">
-          <p className="text-[9px] font-black uppercase tracking-widest text-[rgb(var(--muted))]">HIGH SCORE</p>
-          <p className="mt-0.5 flex items-center gap-2 font-display text-lg font-bold text-[rgb(var(--ink))]">
-            <BarChart3 className="h-4 w-4 text-[rgb(var(--brand))]" />
-            {stat.highScore.toLocaleString()}
-          </p>
-        </div>
-        <div className="flex-1 min-w-[120px] rounded-2xl bg-slate-50/80 p-3 ring-1 ring-black/[0.02]">
-          <p className="text-[9px] font-black uppercase tracking-widest text-[rgb(var(--muted))]">TOTAL ROUNDS</p>
-          <p className="mt-0.5 flex items-center gap-2 font-display text-lg font-bold text-[rgb(var(--ink))]">
-            <Gamepad2 className="h-4 w-4 text-emerald-500" />
-            {stat.roundsPlayed.toLocaleString()}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-8 flex items-center justify-between border-t border-black/[0.03] pt-5">
-        <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-[rgb(var(--muted))]">
-          <Clock3 className="h-3 w-3" />
-          RECORDED {formatPlayedAt(stat.lastPlayed).toUpperCase()}
-        </p>
-        <Link
-          href={`/eat-play/${game.id}`}
-          className="group/play flex items-center gap-2 rounded-2xl bg-[rgb(var(--brand))] px-5 py-2.5 text-white shadow-lg shadow-[rgb(var(--brand-rgb)/0.3)] transition-all hover:scale-105 hover:shadow-[rgb(var(--brand-rgb)/0.5)] active:scale-95"
-        >
-          <span className="text-[10px] font-black uppercase tracking-widest">Play</span>
-          <Play className="h-3.5 w-3.5 fill-current" />
-        </Link>
-      </div>
+      <EatPlayGameStatScore lastPoints={stat.lastPoints} highScore={stat.highScore} roundsPlayed={stat.roundsPlayed} />
+      <EatPlayGameStatBar gameId={game.id} lastPlayed={stat.lastPlayed} />
     </Surface>
   );
 }

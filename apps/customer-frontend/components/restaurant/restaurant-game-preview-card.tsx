@@ -21,19 +21,11 @@ export function RestaurantGamePreviewCard({
   const [showAd, setShowAd] = useState(false);
 
   const handleClick = useCallback(() => {
-    if (!isRegistered) {
-      openModal();
-      return;
-    }
+    if (!isRegistered) { openModal(); return; }
     setShowAd(true);
   }, [isRegistered, openModal]);
 
-  const handleAdComplete = useCallback(() => {
-    setShowAd(false);
-    router.push(`/eat-play/${game.id}`);
-  }, [game.id, router]);
-
-  const handleAdSkip = useCallback(() => {
+  const navigateToGame = useCallback(() => {
     setShowAd(false);
     router.push(`/eat-play/${game.id}`);
   }, [game.id, router]);
@@ -75,8 +67,8 @@ export function RestaurantGamePreviewCard({
 
       {showAd && (
         <AdOverlay
-          onComplete={handleAdComplete}
-          onSkip={handleAdSkip}
+          onComplete={navigateToGame}
+          onSkip={navigateToGame}
           restaurantId={RESTAURANT_ID}
           gameId={game.id}
           completeLabel="Continue"

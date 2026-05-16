@@ -1,6 +1,5 @@
 "use client";
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
@@ -11,8 +10,7 @@ import {
   getCheckoutOrderSummaries,
   getCheckoutStatusHref,
 } from './checkout/checkout-live-status-utils';
-import { AnimatedStatusEmoji } from './checkout/animated-status-emoji';
-import { MultiOrderCircularProgress } from './checkout/multi-order-circular-progress';
+import { RestaurantHomeHeroProgress } from './restaurant-home-hero-progress';
 import { useRestaurantFulfillment } from './use-restaurant-fulfillment';
 
 type RestaurantHomeHeroProps = {
@@ -59,21 +57,7 @@ export function RestaurantHomeHero({ restaurant }: RestaurantHomeHeroProps) {
                 <p className="text-xs text-slate-500 sm:text-sm">{domain}</p>
                 
                 {showProgress && statusHref && (
-                  <Link 
-                    href={statusHref}
-                    className="flex flex-col items-center animate-in fade-in zoom-in duration-700 hover:scale-105 transition-transform active:scale-95"
-                  >
-                    <div className="relative h-24 w-24">
-                      <MultiOrderCircularProgress 
-                        orders={activeOrders} 
-                        className="h-full w-full"
-                      />
-                      
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <AnimatedStatusEmoji isOnTheWay={isOnTheWay} />
-                      </div>
-                    </div>
-                  </Link>
+                  <RestaurantHomeHeroProgress statusHref={statusHref} activeOrders={activeOrders} isOnTheWay={isOnTheWay} />
                 )}
               </div>
             </div>

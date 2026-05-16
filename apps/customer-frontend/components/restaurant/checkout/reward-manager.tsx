@@ -1,15 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import { clearFreshRegistration } from '@/components/auth/registration-storage';
 import { useRegistration } from '@/components/auth/registration-context';
 import { useLoyaltyPoints } from '../use-loyalty-points';
 import { useRestaurantFulfillment } from '../use-restaurant-fulfillment';
-import { ScratchCard } from './scratch-card';
 import { getNextScratchRewardCandidate } from './reward-offers';
 import { getRewardSeenKey, writeBooleanStorage } from './reward-storage';
 import { useVoucherWallet } from './use-voucher-wallet';
+import { RewardManagerOption } from './reward-manager-option';
 import type { ScratchReward } from './reward-types';
 
 export function RewardManager() {
@@ -32,59 +31,27 @@ export function RewardManager() {
 
   useEffect(() => {
     if (activeReward || !nextRewardCandidate) return;
-
-    const timer = window.setTimeout(() => {
-      setActiveReward(nextRewardCandidate.reward);
-    }, nextRewardCandidate.delayMs);
-
+    const timer = window.setTimeout(() => setActiveReward(nextRewardCandidate.reward), nextRewardCandidate.delayMs);
     return () => window.clearTimeout(timer);
   }, [nextRewardCandidate?.reward.id, activeReward?.id]);
 
-  const claimReward = useCallback(
-    (reward: ScratchReward) => {
-      if (reward.kind === 'voucher') {
-        addVoucher({
-          code: reward.code,
-          title: reward.title,
-          discountLabel: reward.discountLabel,
-          discount: reward.discount,
-          expiryLabel: reward.expiryLabel,
-          source: reward.trigger,
-          mobile: reward.mobile,
-          orderId: reward.orderId,
-        });
-      } else {
-        addPoints(reward.points);
-      }
-
-      writeBooleanStorage(getRewardSeenKey(reward.id), true);
-      if (reward.trigger === 'welcome') {
-        clearFreshRegistration();
-      }
-    },
-    [addPoints, addVoucher],
-  );
+  const claimReward = useCallback((reward: ScratchReward) => {
+    if (reward.kind === 'voucher') {
+      addVoucher({ code: reward.code, title: reward.title, discountLabel: reward.discountLabel, discount: reward.discount, expiryLabel: reward.expiryLabel, source: reward.trigger, mobile: reward.mobile, orderId: reward.orderId });
+    } else {
+      addPoints(reward.points);
+    }
+    writeBooleanStorage(getRewardSeenKey(reward.id), true);
+    if (reward.trigger === 'welcome') clearFreshRegistration();
+  }, [addPoints, addVoucher]);
 
   const closeReward = useCallback(() => {
     if (activeReward) {
       writeBooleanStorage(getRewardSeenKey(activeReward.id), true);
-      if (activeReward.trigger === 'welcome') {
-        clearFreshRegistration();
-      }
+      if (activeReward.trigger === 'welcome') clearFreshRegistration();
     }
-
     setActiveReward(null);
   }, [activeReward]);
 
-  return (
-    <AnimatePresence>
-      {activeReward ? (
-        <ScratchCard
-          reward={activeReward}
-          onClaim={claimReward}
-          onClose={closeReward}
-        />
-      ) : null}
-    </AnimatePresence>
-  );
+  return <RewardManagerOption reward={activeReward} onClaim={claimReward} onClose={closeReward} />;
 }
