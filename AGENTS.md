@@ -818,13 +818,35 @@ pnpm add -D drizzle-kit
 
 ### 14.8 Environment Variables
 
+**Backend (`apps/backend/.env`):**
+
 ```
-DATABASE_URL=postgresql://postgres:[password]@db.[project].supabase.co:5432/postgres
-SUPABASE_URL=https://[project].supabase.co
+# Use Pooler for local dev (IPv4, works behind firewalls)
+DATABASE_URL=postgresql://postgres.[project-ref]:[password]@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres
+
+# Direct connection (may fail on IPv6 networks)
+# DATABASE_URL=postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
+
+SUPABASE_URL=https://[project-ref].supabase.co
 SUPABASE_SERVICE_ROLE_KEY=[service-role-key]
 SUPABASE_ANON_KEY=[anon-key]
 JWT_SECRET=[jwt-secret]
+PORT=3001
+NODE_ENV=development
+CLIENT_URL=http://localhost:3000
+MOCK_AUTH=false
+SEED_ADMIN_PASSWORD=admin123
 ```
+
+**Frontend (`apps/justsearch-admin/.env`):**
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+NEXT_PUBLIC_SUPABASE_URL=https://[project-ref].supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=[anon-key]
+```
+
+**SSL Requirement:** Supabase requires SSL on all connections. The `postgres` driver is configured with `ssl: 'require'` in `apps/backend/src/db/index.ts`.
 
 ### 14.9 Automated Backups
 

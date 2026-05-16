@@ -25,7 +25,8 @@ export function RestaurantBusinessFields({ form }: RestaurantBusinessFieldsProps
           <FileText className="h-3.5 w-3.5 text-slate-400" />
           Business License Document
         </label>
-        <RestaurantLicenseUpload licenseUrl={watch("licenseUrl")} onChange={(url) => setValue("licenseUrl", url)} />
+        <RestaurantLicenseUpload licenseUrl={watch("licenseUrl")} onChange={(url) => setValue("licenseUrl", url, { shouldValidate: true })} />
+        {errors.licenseUrl && <p className="text-xs font-medium text-red-500">{errors.licenseUrl.message}</p>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -41,7 +42,7 @@ export function RestaurantBusinessFields({ form }: RestaurantBusinessFieldsProps
         <div className="grid grid-cols-1 gap-3">
           <FormInput label="Confirm Password" icon={KeyRound} type="password" {...register("confirmPassword")} error={errors.confirmPassword?.message} placeholder="Re-enter password" />
         </div>
-        <p className="text-[10px] text-slate-400">The restaurant owner will use these credentials to log in to their dashboard at admin-{watch("slug") || "slug"}.js-restorant.com</p>
+        <p className="text-[10px] text-slate-400">The restaurant owner will use these credentials to log in to their dashboard at admin-{watch("slug") || "slug"}.mydomain.com</p>
       </div>
     </div>
   );

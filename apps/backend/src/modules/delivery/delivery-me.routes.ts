@@ -14,8 +14,6 @@ const AGENT_FIELDS = {
   id: deliveryAgents.id,
   name: deliveryAgents.name,
   phone: deliveryAgents.phone,
-  email: deliveryAgents.email,
-  location: deliveryAgents.location,
   vehicleType: deliveryAgents.vehicleType,
   status: deliveryAgents.status,
   rating: deliveryAgents.rating,
@@ -84,36 +82,7 @@ router.patch('/status', async (req, res, next) => {
   }
 });
 
-// PATCH /api/v1/delivery-agents/me/location — update GPS location
-router.patch('/location', async (req, res, next) => {
-  try {
-    if (!req.tenant || !req.auth) {
-      return res.status(400).json({ error: 'Authentication context required' });
-    }
-
-    const schema = z.object({
-      location: z.string().min(1).max(255),
-    });
-
-    const { location } = schema.parse(req.body);
-
-    const [updated] = await db
-      .update(deliveryAgents)
-      .set({ location, updatedAt: new Date() })
-      .where(
-        and(
-          eq(deliveryAgents.id, req.auth.userId),
-          eq(deliveryAgents.restaurantId, req.tenant.id)
-        )
-      )
-      .returning(AGENT_FIELDS);
-
-    if (!updated) return res.status(404).json({ error: 'Delivery agent not found' });
-
-    res.json({ agent: updated });
-  } catch (error) {
-    next(error);
-  }
-});
+// GPS location tracking not implemented in current schema
+// PATCH /api/v1/delivery-agents/me/location placeholder removed
 
 export default router;

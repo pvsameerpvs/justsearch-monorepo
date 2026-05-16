@@ -6,6 +6,58 @@
 
 ---
 
+## 0. Infrastructure (Supabase + Drizzle)
+
+| Layer | Technology | Config File |
+|-------|-----------|-------------|
+| **Database** | Supabase PostgreSQL | `apps/backend/.env` → `DATABASE_URL` |
+| **ORM** | Drizzle ORM + Drizzle Kit | `apps/backend/drizzle.config.ts` |
+| **Driver** | `postgres` (npm) with SSL | `apps/backend/src/db/index.ts` |
+| **Auth** | Custom JWT (bcrypt + jsonwebtoken) | `apps/backend/.env` → `JWT_SECRET` |
+| **Storage** | Supabase Storage (service role) | `apps/backend/.env` → `SUPABASE_SERVICE_ROLE_KEY` |
+
+### 0.1 Supabase Connection
+
+**Project**: `yxmfqvkdtvmdrfimxxvo`  
+**Region**: auto-assigned by Supabase  
+**SSL**: Required (`ssl: 'require'` in `postgres` client)
+
+**`apps/backend/.env`:**
+```
+# Pooler (IPv4, recommended for local dev)
+DATABASE_URL=postgresql://postgres.yxmfqvkdtvmdrfimxxvo:[password]@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres
+
+# Direct (IPv6 — may fail on some networks)
+# DATABASE_URL=postgresql://postgres:[password]@db.yxmfqvkdtvmdrfimxxvo.supabase.co:5432/postgres
+
+SUPABASE_URL=https://yxmfqvkdtvmdrfimxxvo.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=[key]
+SUPABASE_ANON_KEY=[key]
+JWT_SECRET=justsearch-local-dev-secret-key-32-chars-long
+PORT=3001
+NODE_ENV=development
+CLIENT_URL=http://localhost:3000
+MOCK_AUTH=false
+SEED_ADMIN_PASSWORD=admin123
+```
+
+### 0.2 Local Dev Commands (Supabase)
+
+```bash
+# 1. Run migrations (creates tables in Supabase)
+pnpm --filter backend db:migrate
+
+# 2. Seed data (super admin + demo restaurant)
+pnpm --filter backend db:seed
+
+# 3. Start backend server
+pnpm --filter backend dev
+```
+
+No Docker required — database is managed by Supabase.
+
+---
+
 ## 1. Architecture Overview
 
 ```

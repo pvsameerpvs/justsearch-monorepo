@@ -16,6 +16,10 @@ export const client = postgres(connectionString, {
   max: 10,
   idle_timeout: 20,
   connect_timeout: 10,
+  ssl: 'require',
+  // Force IPv4 to avoid Supabase IPv6 connection issues
+  // @ts-expect-error — postgres-js accepts this but types don't declare it
+  family: 4,
 });
 
 export const db = drizzle(client, { schema });

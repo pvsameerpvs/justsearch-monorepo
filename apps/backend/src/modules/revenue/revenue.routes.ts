@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sql, eq, desc } from 'drizzle-orm';
+import { sql, desc } from 'drizzle-orm';
 import { db } from '../../db';
 import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';

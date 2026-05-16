@@ -6,17 +6,22 @@ import { PageHeader } from "@justsearch/ui";
 import { useRestaurantsQuery } from "@/lib/hooks/use-restaurants-query";
 import { RestaurantCreateForm } from "@/components/restaurant/restaurant-create-form";
 import { useCreateRestaurant } from "@/lib/hooks/use-create-restaurant";
+import { useDeleteRestaurant } from "@/lib/hooks/use-delete-restaurant";
 import { RestaurantStatsBar } from "@/components/restaurant/restaurant-stats-bar";
 import { RestaurantListContent } from "./restaurant-list-content";
 import { RestaurantLoading } from "./restaurant-loading";
+import { RestaurantDeleteDialog } from "./restaurant-delete-dialog";
 import { mapApiToAdmin } from "./restaurant-list.utils";
+import type { AdminRestaurant } from "@/lib/types/restaurant.types";
 
 export function RestaurantListPage() {
   const { restaurants, isLoading, error, refetch } = useRestaurantsQuery();
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<AdminRestaurant | null>(null);
 
   const handleCreate = useCreateRestaurant(refetch, () => setShowForm(false));
+  const handleDelete = useDeleteRestaurant(refetch);
 
   if (isLoading) return <RestaurantLoading />;
 
@@ -50,7 +55,19 @@ export function RestaurantListPage() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onShowForm={() => setShowForm(true)}
+        onRequestDelete={setDeleteTarget}
       />
+
+      {deleteTarget && (
+        <RestaurantDeleteDialog
+          restaurant={deleteTarget}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={async (username, password) => {
+            await handleDelete(deleteTarget.id, username, password);
+            setDeleteTarget(null);
+          }}
+        />
+      )}
     </div>
   );
 }

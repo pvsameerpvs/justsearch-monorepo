@@ -6,11 +6,12 @@ import type { LucideIcon } from "lucide-react";
 interface RestaurantSlugFieldProps {
   slug: string;
   onChange: (slug: string) => void;
+  error?: string;
 }
 
-const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "js-restorant.com";
+const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "mydomain.com";
 
-export function RestaurantSlugField({ slug, onChange }: RestaurantSlugFieldProps) {
+export function RestaurantSlugField({ slug, onChange, error }: RestaurantSlugFieldProps) {
   return (
     <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
       <div className="flex items-center gap-2">
@@ -22,11 +23,12 @@ export function RestaurantSlugField({ slug, onChange }: RestaurantSlugFieldProps
         <input
           value={slug}
           onChange={(e) => onChange(e.target.value)}
-          className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-mono text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+          className={`flex-1 rounded-lg border bg-white px-3 py-2.5 text-sm font-mono text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/20 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500/20" : "border-slate-200 focus:border-amber-500"}`}
           placeholder="restaurant-slug"
         />
         <span className="shrink-0 text-sm font-medium text-slate-400">.{BASE_DOMAIN}</span>
       </div>
+      {error && <p className="text-xs font-medium text-red-500">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <UrlPreviewCard label="Customer Site" icon={Globe} url={`https://${slug}.${BASE_DOMAIN}`} color="indigo" />

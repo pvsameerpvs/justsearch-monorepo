@@ -1,5 +1,4 @@
 import { findSuperAdmin, findDeliveryAgent, findStaffMember } from './auth-login.services';
-import { MOCK_AUTH_ENABLED, findMockUser } from '../../lib/mock-auth';
 import type { TenantContext } from '../../middleware/tenant.middleware';
 
 interface ResolvedUser {
@@ -22,20 +21,6 @@ export async function resolveUser(
 ): Promise<LoginResult> {
   let user: ResolvedUser | null = null;
   let userType: 'staff' | 'delivery' | 'super_admin' = 'staff';
-
-  if (MOCK_AUTH_ENABLED) {
-    const mockUser = findMockUser(username, password, type);
-    if (mockUser) {
-      user = {
-        id: mockUser.id,
-        name: mockUser.name,
-        role: mockUser.role,
-        restaurantId: mockUser.restaurantId,
-      };
-      userType = mockUser.type;
-    }
-    return { user, userType };
-  }
 
   if (type === 'super_admin') {
     user = await findSuperAdmin(username, password);

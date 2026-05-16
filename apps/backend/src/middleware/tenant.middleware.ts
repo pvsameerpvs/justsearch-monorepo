@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { MOCK_AUTH_ENABLED, MOCK_RESTAURANT } from '../lib/mock-auth';
 import { resolveSubdomain } from './tenant-resolver';
 import { lookupTenant } from './tenant-lookup';
 import { client } from '../db';
@@ -31,18 +30,6 @@ export async function tenantMiddleware(
 
   if (!subdomain) {
     await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
-    return next();
-  }
-
-  if (MOCK_AUTH_ENABLED) {
-    req.tenant = {
-      id: MOCK_RESTAURANT.id,
-      slug: MOCK_RESTAURANT.slug,
-      subdomain: MOCK_RESTAURANT.subdomain,
-      schemaName: MOCK_RESTAURANT.schemaName,
-      status: MOCK_RESTAURANT.status,
-    };
-    await client.unsafe(`SET search_path TO "${MOCK_RESTAURANT.schemaName}", ${PUBLIC_SCHEMAS}`);
     return next();
   }
 

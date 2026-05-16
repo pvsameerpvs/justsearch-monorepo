@@ -10,10 +10,10 @@ interface RestaurantDetailDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   onUpdate?: (updates: Partial<AdminRestaurant>) => void;
-  onRemove: () => void;
+  onRequestDelete: () => void;
 }
 
-export function RestaurantDetailDrawer({ restaurant, isOpen, onClose, onUpdate, onRemove }: RestaurantDetailDrawerProps) {
+export function RestaurantDetailDrawer({ restaurant, isOpen, onClose, onUpdate, onRequestDelete }: RestaurantDetailDrawerProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState<Partial<AdminRestaurant>>({});
 
@@ -44,11 +44,6 @@ export function RestaurantDetailDrawer({ restaurant, isOpen, onClose, onUpdate, 
     if (!isEditing) onUpdate?.({ photos });
   };
 
-  const handleRemove = () => {
-    onRemove();
-    onClose();
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-end">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
@@ -68,7 +63,7 @@ export function RestaurantDetailDrawer({ restaurant, isOpen, onClose, onUpdate, 
           onChange={handleChange}
           onPhotosChange={handlePhotosChange}
           onUpdate={onUpdate ?? (() => {})}
-          onRemove={handleRemove}
+          onRequestDelete={onRequestDelete}
         />
       </div>
     </div>

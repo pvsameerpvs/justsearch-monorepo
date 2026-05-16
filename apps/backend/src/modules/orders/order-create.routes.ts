@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../../db';
 import { orders, orderItems } from '../../db/schema';
-import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
+import { authMiddleware } from '../../middleware/auth.middleware';
 import { createOrderSchema } from './order.validators';
 
 const router = Router();

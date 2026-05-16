@@ -11,7 +11,7 @@ function getQrUrl(data: string, size = 200): string {
 }
 
 export function RestaurantDetailQr({ subdomain }: RestaurantDetailQrProps) {
-  const customerUrl = `https://${subdomain}.js-restorant.com`;
+  const customerUrl = `https://${subdomain}.mydomain.com`;
   const qrImageUrl = getQrUrl(customerUrl, 200);
 
   return (

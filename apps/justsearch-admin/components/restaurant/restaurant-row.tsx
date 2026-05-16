@@ -9,15 +9,15 @@ import { RestaurantRowActions } from "./restaurant-row-actions";
 
 interface RestaurantRowProps {
   restaurant: AdminRestaurant;
-  onRemove: () => void;
+  onRequestDelete: () => void;
 }
 
-export function RestaurantRow({ restaurant, onRemove }: RestaurantRowProps) {
+export function RestaurantRow({ restaurant, onRequestDelete }: RestaurantRowProps) {
   const [detailOpen, setDetailOpen] = useState(false);
 
   const domains = [
-    { label: "Customer Site", url: `https://${restaurant.subdomain}.js-restorant.com`, icon: Globe },
-    { label: "Dashboard", url: `https://admin-${restaurant.subdomain}.js-restorant.com`, icon: Briefcase },
+    { label: "Customer Site", url: `https://${restaurant.subdomain}.mydomain.com`, icon: Globe },
+    { label: "Dashboard", url: `https://admin-${restaurant.subdomain}.mydomain.com`, icon: Briefcase },
   ];
 
   return (
@@ -29,7 +29,7 @@ export function RestaurantRow({ restaurant, onRemove }: RestaurantRowProps) {
         <div className="p-5">
           <div className="flex items-start justify-between gap-4">
             <RestaurantRowInfo restaurant={restaurant} />
-            <RestaurantRowActions onRemove={onRemove} />
+            <RestaurantRowActions onRequestDelete={onRequestDelete} />
           </div>
           <div className="mt-3 flex gap-2 flex-wrap" onClick={(e) => e.stopPropagation()}>
             {domains.map((d) => (
@@ -53,7 +53,7 @@ export function RestaurantRow({ restaurant, onRemove }: RestaurantRowProps) {
         restaurant={restaurant}
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
-        onRemove={onRemove}
+        onRequestDelete={onRequestDelete}
       />
     </>
   );

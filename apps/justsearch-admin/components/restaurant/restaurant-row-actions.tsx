@@ -1,16 +1,16 @@
 import { Trash2 } from "lucide-react";
 
 interface RestaurantRowActionsProps {
-  onRemove: () => void;
+  onRequestDelete: () => void;
 }
 
-export function RestaurantRowActions({ onRemove }: RestaurantRowActionsProps) {
+export function RestaurantRowActions({ onRequestDelete }: RestaurantRowActionsProps) {
   return (
     <div className="flex items-center gap-1 shrink-0">
       <button
         onClick={(e) => {
           e.stopPropagation();
-          onRemove();
+          onRequestDelete();
         }}
         className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500"
         title="Delete"

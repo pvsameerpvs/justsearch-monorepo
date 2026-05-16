@@ -15,6 +15,8 @@ export function RestaurantBasicFields({ form, onNameChange }: RestaurantBasicFie
   const { register, formState: { errors }, watch, setValue } = form;
   const photos = watch("photos") || [];
 
+  const nameField = register("name");
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -22,8 +24,11 @@ export function RestaurantBasicFields({ form, onNameChange }: RestaurantBasicFie
           <FormInput
             label="Restaurant Name"
             icon={Building2}
-            {...register("name")}
-            onChange={(e) => onNameChange(e.target.value)}
+            {...nameField}
+            onChange={(e) => {
+              nameField.onChange(e);
+              onNameChange(e.target.value);
+            }}
             error={errors.name?.message}
             placeholder="e.g., Mosaic Table"
           />
@@ -40,7 +45,8 @@ export function RestaurantBasicFields({ form, onNameChange }: RestaurantBasicFie
           <ImagePlus className="h-3.5 w-3.5 text-slate-400" />
           Restaurant Photos (max 4)
         </label>
-        <RestaurantPhotoUpload photos={photos} onChange={(p) => setValue("photos", p)} />
+        <RestaurantPhotoUpload photos={photos} onChange={(p) => setValue("photos", p, { shouldValidate: true })} />
+        {errors.photos && <p className="text-xs font-medium text-red-500">{errors.photos.message}</p>}
       </div>
     </div>
   );

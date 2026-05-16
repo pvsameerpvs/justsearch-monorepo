@@ -28,8 +28,8 @@ export function useCreateRestaurant(refetch: () => void, onSuccess: () => void) 
       });
       refetch();
       onSuccess();
-    } catch {
-      alert("Failed to create restaurant");
+    } catch (err) {
+      throw err instanceof Error ? err : new Error("Failed to create restaurant");
     }
   };
 }

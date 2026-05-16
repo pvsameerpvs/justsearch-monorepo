@@ -14,7 +14,7 @@ interface RestaurantDetailContentProps {
   onChange: (field: keyof AdminRestaurant, value: string | number) => void;
   onPhotosChange: (photos: string[]) => void;
   onUpdate: (updates: Partial<AdminRestaurant>) => void;
-  onRemove: () => void;
+  onRequestDelete: () => void;
 }
 
 export function RestaurantDetailContent({
@@ -24,7 +24,7 @@ export function RestaurantDetailContent({
   onChange,
   onPhotosChange,
   onUpdate,
-  onRemove,
+  onRequestDelete,
 }: RestaurantDetailContentProps) {
   const photos = (form.photos !== undefined ? form.photos : restaurant.photos) || [];
 
@@ -36,8 +36,8 @@ export function RestaurantDetailContent({
       </div>
 
       <div className="flex gap-2">
-        <DomainLink label="Customer Site" url={`https://${restaurant.subdomain}.js-restorant.com`} icon={Globe} />
-        <DomainLink label="Dashboard" url={`https://admin-${restaurant.subdomain}.js-restorant.com`} icon={ExternalLink} />
+        <DomainLink label="Customer Site" url={`https://${restaurant.subdomain}.mydomain.com`} icon={Globe} />
+        <DomainLink label="Dashboard" url={`https://admin-${restaurant.subdomain}.mydomain.com`} icon={ExternalLink} />
       </div>
 
       <RestaurantDetailForm restaurant={restaurant} isEditing={isEditing} form={form} onChange={onChange} />
@@ -64,7 +64,7 @@ export function RestaurantDetailContent({
 
       <div className="pt-4 border-t border-slate-100">
         <button
-          onClick={onRemove}
+          onClick={onRequestDelete}
           className="w-full rounded-xl bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-100 transition-colors"
         >
           Delete Restaurant
