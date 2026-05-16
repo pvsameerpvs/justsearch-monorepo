@@ -383,11 +383,13 @@ pnpm --filter justsearch-admin dev  # Port 3003
 | 4.3 | `components/ads/ad-form-container.tsx` | Call `POST /api/v1/advertisements` | ❌ Needs route |
 
 ### Phase 5: Connect Analytics & Users
-| # | File | Action | Backend Needed |
-|---|---|---|---|
-| 5.1 | `app/analytics/page.tsx` | Fetch aggregated stats | ❌ Needs aggregation routes |
-| 5.2 | `app/revenue/page.tsx` | Fetch revenue by restaurant | ❌ Needs aggregation routes |
-| 5.3 | `app/users/page.tsx` | Fetch `GET /api/v1/users` | ❌ Needs route |
+| # | File | Action | Backend Needed | Schema Impact |
+|---|---|---|---|---|
+| 5.1 | `app/analytics/page.tsx` | Fetch aggregated stats | ❌ Needs aggregation routes | Cross-schema loop (Option A) |
+| 5.2 | `app/revenue/page.tsx` | Fetch revenue by restaurant | ❌ Needs aggregation routes | Cross-schema loop (Option A) |
+| 5.3 | `app/users/page.tsx` | Fetch `GET /api/v1/users` | ❌ Needs route | Cross-schema loop (Option A) |
+
+**Note on schema-per-tenant**: All three endpoints query data across ALL restaurant schemas. Backend uses Option A (dynamic loop) — queries each `rest_<slug>.users`, aggregates via UNION ALL. Frontend components remain unchanged; they still receive the same JSON shape.
 
 ---
 

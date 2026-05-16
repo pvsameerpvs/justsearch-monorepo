@@ -866,6 +866,89 @@ async function backupRestaurant(schemaName: string) {
 | 7. Frontend Connect | 3 | Replace mock data with real API |
 | 8. Backup | 1 | Custom backup script + storage |
 
+### 14.11 Schema-Per-Tenant: Super Admin Data Access Complications
+
+Since each restaurant's data lives in its own schema (`rest_mosaic`, `rest_burger`, etc.),
+the super admin (justsearch-admin) **cannot** query tenant tables directly from `public`.
+
+#### 14.11.1 What Changes for Super Admin Queries
+
+| Query | Before (single public schema) | After (schema-per-tenant) |
+|-------|------------------------------|--------------------------|
+| List all users | `SELECT * FROM public.users` | Loop: `SELECT * FROM "rest_X"."users"` UNION ALL |
+| List all orders | `SELECT * FROM public.orders` | Loop: `SELECT * FROM "rest_X"."orders"` UNION ALL |
+| Revenue aggregation | `SELECT SUM(total) FROM public.orders` | Loop + aggregate per schema |
+| Per-restaurant user detail | `WHERE restaurant_id = X` | Already per-schema, just query that schema directly |
+
+#### 14.11.2 Cross-Schema Query Approaches
+
+**Option A — Dynamic Loop (recommended for low-volume queries)**
+
+Super admin endpoints iterate over active restaurant schemas:
+
+```
+GET /api/v1/admin/users
+  → 1. SELECT schema_name FROM public.restaurants WHERE status = 'active'
+  → 2. For each: db.execute(sql`SELECT * FROM "${schema}"."users"`)
+  → 3. UNION ALL results → flat array → return
+```
+
+**Characteristics:**
+- Simple to implement (10-15 lines per endpoint)
+- Works for up to ~100 restaurants
+- No data duplication
+- Frontend never changes — same API response shape
+- Suitable for: user lists, order lists, per-restaurant detail views
+
+**Option B — Sync Tables in Public (recommended for analytics)**
+
+On every INSERT/UPDATE in a tenant schema, a trigger or application-level hook
+syncs data into aggregate tables in `public`:
+
+```
+public.platform_users        ← synced from each tenant's users table
+public.platform_orders       ← synced from each tenant's orders table
+public.platform_game_sessions ← synced from each tenant's game_sessions
+```
+
+**Characteristics:**
+- Faster queries (no loop, no UNION)
+- Adds sync complexity (triggers or dual-writes)
+- Small replication lag
+- Suitable for: dashboards, revenue charts, platform-wide analytics
+
+#### 14.11.3 Complexity by Endpoint
+
+| Endpoint | Approach | Complexity | Why |
+|----------|----------|------------|-----|
+| GET /api/v1/admin/users | Option A (loop) | Low | Simple SELECT per schema, UNION ALL |
+| GET /api/v1/admin/users/:restaurantId | Direct query | None | Single schema, no loop needed |
+| GET /api/v1/revenue | Option A or B | Medium | Needs aggregation across schemas |
+| GET /api/v1/analytics/admin/summary | Option A | Medium | Counts across schemas |
+| GET /api/v1/games | None | None | Stays in public schema |
+| GET /api/v1/advertisements | None | None | Stays in public schema |
+| GET /api/v1/restaurants | None | None | Stays in public schema |
+
+#### 14.11.4 What Stays Simple
+
+| Feature | Why no change |
+|---------|---------------|
+| Public tables (restaurants, games, ads, super_admins) | Still in `public`, query directly |
+| Restaurant-scoped queries | Tenant middleware `SET search_path` handles routing |
+| Super admin login | Checks `public.super_admins` — no loop needed |
+| Games catalog | Shared via `public.games` + `restaurant_games` junction |
+| Frontend pages | All API endpoints return same shape, frontend unchanged |
+
+#### 14.11.5 Implementation Order
+
+| Step | What | Files |
+|------|------|-------|
+| 1 | Update POST /restaurants to CREATE SCHEMA + clone tables | `restaurant.routes.ts`, new `tenant-template.ts` |
+| 2 | Update tenant middleware to SET search_path | `tenant.middleware.ts` |
+| 3 | Update super admin list endpoints to loop schemas | `user-admin.routes.ts`, `revenue.routes.ts`, `analytics-admin.routes.ts` |
+| 4 | Move migration seed data into template function | `seed.games.ts`, `seed.ts` |
+| 5 | Test: create restaurant → verify schema created → query across schemas | Manual test |
+
 ---
 
 *This document is the living standard for JustSearch development. All code must conform to these rules.*

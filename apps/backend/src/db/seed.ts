@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { client } from './index';
 import { seedRestaurant } from './seed/seed.restaurant';
 import { seedStaff, seedDeliveryAgent, seedTable } from './seed/seed.staff';
