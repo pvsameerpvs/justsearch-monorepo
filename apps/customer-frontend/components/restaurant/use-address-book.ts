@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  fetchAddresses,
+  createAddress,
+  deleteAddress,
+  type Address,
+} from '@/lib/api/addresses.api';
 
 export type AddressLabel = 'Home' | 'Work' | 'Other';
 
@@ -12,40 +18,64 @@ export type SavedAddress = {
   alternateNumber?: string;
 };
 
-const STORAGE_KEY = 'justsearch:user:addresses';
+function normalizeAddress(raw: Address): SavedAddress {
+  return {
+    id: raw.id,
+    label: raw.label as AddressLabel,
+    address: raw.address,
+    details: raw.details ?? '',
+    alternateNumber: raw.alternateNumber ?? undefined,
+  };
+}
 
 export function useAddressBook() {
-  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try { setAddresses(JSON.parse(raw)); } catch { /* ignore */ }
-    }
-    setHydrated(true);
-  }, []);
+  const {
+    data: rawAddresses = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['addresses'],
+    queryFn: fetchAddresses,
+    staleTime: 30 * 1000,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(addresses));
-  }, [addresses, hydrated]);
+  const addresses = isError ? [] : rawAddresses.map(normalizeAddress);
 
-  const addAddress = (newAddr: Omit<SavedAddress, 'id'>) => {
-    const id = Math.random().toString(36).substr(2, 9);
-    const createdAddress = { ...newAddr, id };
-    setAddresses(curr => [...curr, createdAddress]);
-    return createdAddress;
+  const addMutation = useMutation({
+    mutationFn: createAddress,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['addresses'] });
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: deleteAddress,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['addresses'] });
+    },
+  });
+
+  const addAddress = async (newAddr: Omit<SavedAddress, 'id'>) => {
+    const created = await addMutation.mutateAsync({
+      label: newAddr.label,
+      address: newAddr.address,
+      details: newAddr.details || undefined,
+      alternateNumber: newAddr.alternateNumber || undefined,
+    });
+    return normalizeAddress(created);
   };
 
-  const removeAddress = (id: string) => {
-    setAddresses(curr => curr.filter(a => a.id !== id));
+  const removeAddress = async (id: string) => {
+    await removeMutation.mutateAsync(id);
   };
 
   return {
     addresses,
     addAddress,
     removeAddress,
-    hydrated
+    hydrated: !isLoading,
   };
 }

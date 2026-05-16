@@ -17,7 +17,7 @@ export type OtpVerifyPayload = {
 
 export type OtpVerifyResponse = {
   token: string;
-  user: { id: string; name: string; mobile: string };
+  user: { id: string; name: string; phone: string };
 };
 
 export async function requestOtp(payload: OtpRequestPayload, host?: string): Promise<OtpRequestResponse> {

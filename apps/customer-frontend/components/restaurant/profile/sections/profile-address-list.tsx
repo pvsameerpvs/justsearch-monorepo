@@ -12,8 +12,8 @@ export function ProfileAddressList() {
 
   if (!hydrated) return null;
 
-  const handleSave = (newAddr: Omit<SavedAddress, 'id'>) => {
-    addAddress(newAddr);
+  const handleSave = async (newAddr: Omit<SavedAddress, 'id'>) => {
+    await addAddress(newAddr);
     setIsAdding(false);
   };
 

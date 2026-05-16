@@ -11,7 +11,7 @@ interface CheckoutAddressSelectorSheetProps {
   selectedAddressId?: string;
   onClose: () => void;
   onSelectAddress: (address: SavedAddress) => void;
-  onAddAddress: (address: Omit<SavedAddress, 'id'>) => void;
+  onAddAddress: (address: Omit<SavedAddress, 'id'>) => Promise<void>;
   onUseCurrentLocation: (address: string) => void;
 }
 

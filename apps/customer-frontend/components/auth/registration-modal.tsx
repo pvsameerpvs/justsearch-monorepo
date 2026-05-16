@@ -28,7 +28,7 @@ export function RegistrationModal() {
           {otr.step === 'details' ? (
             <DetailsStep form={otr.form} busy={otr.busy} error={otr.error} onRequestOtp={otr.form.handleSubmit(otr.requestOtp)} canRequestOtp={otr.canRequestOtp} />
           ) : (
-            <OtpStep form={otr.form} busy={otr.busy} error={otr.error} mobileFull={otr.mobileFull} canRequestOtp={otr.canRequestOtp} canVerifyOtp={otr.canVerifyOtp} onBack={() => { otr.setStep('details'); otr.setError(null); otr.setBusy(false); otr.form.setValue('otp', '', { shouldValidate: true }); }} onRequestOtp={otr.form.handleSubmit(otr.requestOtp)} onVerifyOtp={otr.form.handleSubmit(otr.verifyOtp)} />
+            <OtpStep form={otr.form} busy={otr.busy} error={otr.error} mobileFull={otr.mobileFull} canRequestOtp={otr.canRequestOtp} canVerifyOtp={otr.canVerifyOtp} demoOtp={otr.demoOtp} onBack={() => { otr.setStep('details'); otr.setError(null); otr.setBusy(false); otr.setDemoOtp(null); otr.form.setValue('otp', '', { shouldValidate: true }); }} onRequestOtp={otr.form.handleSubmit(otr.requestOtp)} onVerifyOtp={otr.form.handleSubmit(otr.verifyOtp)} />
           )}
         </div>
       </Surface>

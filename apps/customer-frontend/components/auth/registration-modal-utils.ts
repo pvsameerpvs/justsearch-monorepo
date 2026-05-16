@@ -1,10 +1,11 @@
 export type OtpRequestResponse = {
   requestId: string;
+  demoOtp?: string;
 };
 
 export type OtpVerifyResponse = {
   verified: true;
-  user: { name: string; mobile: string };
+  user: { name: string; phone: string };
 };
 
 export function normalizeUaeLocalDigits(raw: string) {

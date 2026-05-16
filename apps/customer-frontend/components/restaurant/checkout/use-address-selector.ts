@@ -10,7 +10,7 @@ export function useAddressSelector(
   selectedAddressId: string | undefined,
   onClose: () => void,
   onSelectAddress: (address: SavedAddress) => void,
-  onAddAddress: (address: Omit<SavedAddress, 'id'>) => void,
+  onAddAddress: (address: Omit<SavedAddress, 'id'>) => Promise<void>,
   _onUseCurrentLocation: (address: string) => void,
 ) {
   const [mode, setMode] = useState<'list' | 'map' | 'add'>('list');
@@ -56,8 +56,8 @@ export function useAddressSelector(
     });
   };
 
-  const handleSaveAddress = (address: Omit<SavedAddress, 'id'>) => {
-    onAddAddress(address);
+  const handleSaveAddress = async (address: Omit<SavedAddress, 'id'>) => {
+    await onAddAddress(address);
     setMode('list');
     setCurrentLocationAddress(null);
     setCurrentLocationCoords(null);

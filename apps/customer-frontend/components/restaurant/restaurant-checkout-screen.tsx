@@ -28,6 +28,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             addressTitle={state.addressTitle}
             address={state.address}
             addressDetails={state.addressDetails}
+            userPhone={state.user?.mobile}
             alternateNumber={state.alternateNumber}
             savedAddressesCount={state.addresses.length}
             setAlternateNumber={state.setAlternateNumber}
@@ -64,8 +65,8 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         selectedAddressId={state.selectedAddressId ?? undefined}
         onClose={() => state.setIsAddressBookOpen(false)}
         onSelectAddress={state.applySavedAddress}
-        onAddAddress={(newAddress) => {
-          const createdAddress = state.addAddress(newAddress);
+        onAddAddress={async (newAddress) => {
+          const createdAddress = await state.addAddress(newAddress);
           state.applySavedAddress(createdAddress);
         }}
         onUseCurrentLocation={state.applyCurrentLocationAddress}

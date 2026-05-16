@@ -12,12 +12,13 @@ interface OtpStepProps {
   mobileFull: string;
   canRequestOtp: boolean;
   canVerifyOtp: boolean;
+  demoOtp: string | null;
   onBack: () => void;
   onRequestOtp: () => void;
   onVerifyOtp: () => void;
 }
 
-export function OtpStep({ form, busy, error, mobileFull, canRequestOtp, canVerifyOtp, onBack, onRequestOtp, onVerifyOtp }: OtpStepProps) {
+export function OtpStep({ form, busy, error, mobileFull, canRequestOtp, canVerifyOtp, demoOtp, onBack, onRequestOtp, onVerifyOtp }: OtpStepProps) {
   const { control, formState: { errors } } = form;
 
   return (
@@ -25,7 +26,11 @@ export function OtpStep({ form, busy, error, mobileFull, canRequestOtp, canVerif
       <div className="rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/70 p-4">
         <p className="text-xs font-semibold text-[rgb(var(--ink))]">OTP sent to <span className="font-mono">{mobileFull}</span></p>
         <p className="mt-1 text-xs text-[rgb(var(--muted))]">Enter the 4-digit code to continue.</p>
-
+        {demoOtp && (
+          <div className="mt-3 rounded-xl border border-dashed border-[rgb(var(--brand)/0.4)] bg-[rgb(var(--brand-soft)/0.15)] px-3 py-2">
+            <p className="text-[11px] font-bold text-[rgb(var(--brand))]">Demo mode — use code: <span className="font-mono text-sm tracking-widest">{demoOtp}</span></p>
+          </div>
+        )}
       </div>
 
       <label className="grid gap-1.5">

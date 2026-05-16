@@ -20,6 +20,7 @@ import adRoutes, { publicAdRoutes } from '../modules/ads/ad.routes';
 import revenueRoutes from '../modules/revenue/revenue.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
 import analyticsAdminRoutes from '../modules/analytics/analytics-admin.routes';
+import addressRoutes from '../modules/addresses/address.routes';
 import uploadRoutes from '../modules/upload/upload.routes';
 
 const router = Router();
@@ -61,6 +62,9 @@ router.use('/vouchers', voucherRoutes);
 
 // Customers / users (authenticated)
 router.use('/users', userRoutes);
+
+// Addresses (authenticated customers)
+router.use('/addresses', addressRoutes);
 
 // Admin users (super-admin, platform-wide)
 router.use('/admin/users', userAdminRoutes);

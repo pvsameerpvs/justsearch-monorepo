@@ -6,12 +6,14 @@ import { useCheckoutAddress } from './use-checkout-address';
 import { useCheckoutPromo } from './use-checkout-promo';
 import { useCheckoutPlace } from './use-checkout-place';
 import { getCheckoutLineTotal } from './checkout.constants';
+import { useRegistration } from '@/components/auth/registration-context';
 
 export function useCheckoutState() {
   const { cart, cartCount, total, deliverySavings, placeOrder } = useRestaurantFulfillment();
   const address = useCheckoutAddress();
   const promo = useCheckoutPromo(total);
   const place = useCheckoutPlace();
+  const { isRegistered, user } = useRegistration();
 
   const [restaurantNote, setRestaurantNote] = useState('');
   const [riderNote, setRiderNote] = useState('');
@@ -40,6 +42,11 @@ export function useCheckoutState() {
   const onPlaceOrder = async () => {
     if (place.placingOrder) return;
 
+    if (!isRegistered) {
+      place.setPlaceError('Please sign in to place an order');
+      return;
+    }
+
     const combinedAddress = `${address.addressTitle} - ${address.address}\n${address.addressDetails}${address.alternateNumber ? `\nAlt number: ${address.alternateNumber}` : ''}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
 
     try {
@@ -67,11 +74,11 @@ export function useCheckoutState() {
     total,
     currency: cart[0]?.currency ?? 'AED',
     ...address,
+    user,
     riderNote,
     setRiderNote,
     restaurantNote,
     setRestaurantNote,
-
     displayItems,
     displaySavings,
     displayTotal,

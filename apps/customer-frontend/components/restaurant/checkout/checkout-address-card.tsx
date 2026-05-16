@@ -6,6 +6,7 @@ export type CheckoutAddressCardProps = {
   addressTitle: string;
   address: string;
   addressDetails: string;
+  userPhone?: string;
   alternateNumber?: string;
   savedAddressesCount?: number;
   note: string;

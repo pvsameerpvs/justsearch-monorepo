@@ -17,11 +17,12 @@ export function usePlaceOrder(
 
   return useCallback(
     async ({ address, note }: { address: string; note: string; promoCode?: string; promoDiscount?: number }) => {
+      if (!user) throw new Error('Please sign in to place an order');
       if (cartCount === 0) return null;
       const totalVal = computeTotal(subtotal, deliveryFee, 0);
       const res = await createOrder({
-        customerName: user?.name ?? 'Guest',
-        customerPhone: user?.mobile ?? '',
+        customerName: user.name,
+        customerPhone: user.mobile,
         fulfillmentType: 'delivery',
         items: cart.map((item) => ({
           menuItemId: item.itemId,
@@ -39,6 +40,6 @@ export function usePlaceOrder(
       setState((s) => ({ ...s, cart: [] }));
       return res.order.id;
     },
-    [cart, cartCount, subtotal, deliveryFee, setState],
+    [cart, cartCount, subtotal, deliveryFee, setState, user],
   );
 }
