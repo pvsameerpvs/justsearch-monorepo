@@ -26,6 +26,7 @@ export function MenuContainer() {
       id: cat.id,
       title: cat.name,
       description: cat.description ?? "",
+      emoji: cat.emoji ?? "",
       items: allItems.filter((i) => i.categoryId === cat.id).map((i) => ({
         id: i.id,
         name: i.name,

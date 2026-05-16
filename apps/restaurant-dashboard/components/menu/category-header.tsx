@@ -21,7 +21,7 @@ export function CategoryHeader({ category }: CategoryHeaderProps) {
   const [showDelete, setShowDelete] = useState(false);
 
   const save = () => {
-    updateCategory.mutate({ id: category.id, data: { name: title, description: desc } });
+    updateCategory.mutate({ id: category.id, data: { name: title, description: desc, emoji } });
     setIsEditing(false);
   };
 

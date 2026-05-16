@@ -34,6 +34,7 @@ router.post('/', requireRole('owner', 'manager', 'super_admin'), async (req, res
     const schema = z.object({
       name: z.string().min(2),
       description: z.string().max(500).optional(),
+      emoji: z.string().max(10).optional(),
       sortOrder: z.number().int().nonnegative().optional(),
     });
 
@@ -45,6 +46,7 @@ router.post('/', requireRole('owner', 'manager', 'super_admin'), async (req, res
         restaurantId: req.tenant.id,
         name: body.name,
         description: body.description,
+        emoji: body.emoji,
         sortOrder: body.sortOrder ?? 0,
         status: 'active',
       })
@@ -64,6 +66,7 @@ router.patch('/:id', requireRole('owner', 'manager', 'super_admin'), async (req,
     const schema = z.object({
       name: z.string().min(2).optional(),
       description: z.string().max(500).optional(),
+      emoji: z.string().max(10).optional().or(z.literal('')),
       sortOrder: z.number().int().nonnegative().optional(),
       status: z.enum(['active', 'inactive']).optional(),
     });
@@ -71,9 +74,16 @@ router.patch('/:id', requireRole('owner', 'manager', 'super_admin'), async (req,
     const body = schema.parse(req.body);
     const categoryId = req.params.id;
 
+    const updateData: Record<string, unknown> = {};
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.emoji !== undefined) updateData.emoji = body.emoji || null;
+    if (body.sortOrder !== undefined) updateData.sortOrder = body.sortOrder;
+    if (body.status !== undefined) updateData.status = body.status;
+
     const [updated] = await db
       .update(menuCategories)
-      .set({ ...body })
+      .set(updateData)
       .where(and(eq(menuCategories.id, categoryId), eq(menuCategories.restaurantId, req.tenant.id)))
       .returning();
 

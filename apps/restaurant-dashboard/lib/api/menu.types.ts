@@ -2,6 +2,7 @@ export type MenuCategoryData = {
   id: string;
   name: string;
   description: string | null;
+  emoji: string | null;
   sortOrder: number;
   status: string;
   createdAt: string;
@@ -39,6 +40,7 @@ export type UpdateMenuItemPayload = Partial<CreateMenuItemPayload>;
 export type CreateCategoryPayload = {
   name: string;
   description?: string;
+  emoji?: string;
   sortOrder?: number;
 };
 

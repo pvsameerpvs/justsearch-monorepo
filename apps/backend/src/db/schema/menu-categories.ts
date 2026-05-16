@@ -9,6 +9,7 @@ export const menuCategories = pgTable('menu_categories', {
     .references(() => restaurants.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   description: varchar('description', { length: 500 }),
+  emoji: varchar('emoji', { length: 10 }),
   sortOrder: integer('sort_order').default(0).notNull(),
   status: menuStatusEnum('status').default('active').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

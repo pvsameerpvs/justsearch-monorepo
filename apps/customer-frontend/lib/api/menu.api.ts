@@ -17,6 +17,7 @@ export type ApiMenuCategory = {
   id: string;
   name: string;
   description: string | null;
+  emoji: string | null;
   sortOrder: number;
   items: ApiMenuItem[];
 };
@@ -48,7 +49,7 @@ export function adaptApiCategoriesToLocal(
     id: cat.id,
     title: cat.name,
     description: cat.description ?? '',
-    emoji: '',
+    emoji: cat.emoji ?? '',
     items: cat.items.map((item) => ({
       id: item.id,
       name: item.name,
