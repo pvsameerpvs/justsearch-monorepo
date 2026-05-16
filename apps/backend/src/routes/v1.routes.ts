@@ -32,10 +32,10 @@ router.get('/', (_req, res) => {
 // Auth routes (tenant-scoped)
 router.use('/auth', authRoutes);
 
-// Restaurant admin routes (super-admin)
+// Restaurant routes — ORDER MATTERS: specific routes (/current) must come BEFORE parameterized routes (/:id)
+router.use('/restaurants', restaurantCurrentRoutes);
 router.use('/restaurants', restaurantAdminRoutes);
 router.use('/restaurants', restaurantAdminMutationRoutes);
-router.use('/restaurants', restaurantCurrentRoutes);
 
 // Public menu routes (tenant-scoped)
 router.use('/menus', menuPublicRoutes);

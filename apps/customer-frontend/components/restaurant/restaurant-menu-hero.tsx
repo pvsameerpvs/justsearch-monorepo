@@ -38,14 +38,16 @@ export function RestaurantMenuHero({ restaurant }: RestaurantMenuHeroProps) {
               </div>
             </div>
 
-            <h2 className="mx-auto font-display text-xl font-medium leading-relaxed text-white/90 sm:text-2xl lg:max-w-2xl">
-              Signature dishes, thoughtful plating, and a menu that feels great on every screen.
-            </h2>
+            {restaurant.description && (
+              <h2 className="mx-auto font-display text-xl font-medium leading-relaxed text-white/90 sm:text-2xl lg:max-w-2xl">
+                {restaurant.description}
+              </h2>
+            )}
 
             <div className="flex flex-wrap justify-center gap-2">
-              {restaurant.cuisine.map((cuisine) => (
-                <span key={cuisine} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/60">
-                  {cuisine}
+              {restaurant.cuisine.map((c, i) => (
+                <span key={`${c}-${i}`} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/60">
+                  {c}
                 </span>
               ))}
             </div>

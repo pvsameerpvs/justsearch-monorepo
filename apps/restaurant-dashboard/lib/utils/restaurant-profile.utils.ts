@@ -35,6 +35,8 @@ export function mapApiToAdminRestaurant(apiData: Record<string, unknown>): Admin
     dashboardUsername: String(s.dashboardUsername ?? ""),
     dashboardPassword: String(s.dashboardPassword ?? ""),
     website: String(s.website ?? ""),
+    logoUrl: String(s.logoUrl ?? ""),
+    heroImageUrl: String(s.heroImageUrl ?? ""),
     socials: parseSocials(s.socials),
     overallRating: Number(s.overallRating ?? 0),
     totalReviews: Number(s.totalReviews ?? 0),

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Briefcase } from "lucide-react";
-import { ProfileRow, EditField } from "../profile/profile-info-parts";
+import { ProfileRow } from "../profile/profile-info-parts";
 import { User, Phone, Mail, MapPin, Tag, FileText, Building2, Lock } from "lucide-react";
+import { SettingsProfileEditForm } from "./settings-profile-edit-form";
 import type { AdminRestaurant } from "@/lib/types/admin-restaurant";
 
 interface SettingsProfileCardProps {
@@ -19,12 +20,15 @@ export function SettingsProfileCard({ restaurant, onUpdate }: SettingsProfileCar
     contactEmail: restaurant.contactEmail,
     address: restaurant.address,
     cuisine: restaurant.cuisine,
+    logoUrl: restaurant.logoUrl,
   });
 
   const handleSave = () => {
     onUpdate?.(form);
     setIsEditing(false);
   };
+
+  const set = (k: keyof typeof form, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
   return (
     <div className="elegant-card p-5">
@@ -45,15 +49,15 @@ export function SettingsProfileCard({ restaurant, onUpdate }: SettingsProfileCar
         )}
       </div>
       {isEditing ? (
-        <div className="space-y-3">
-          <EditField label="Owner Name" value={form.ownerName} onChange={(v) => setForm({ ...form, ownerName: v })} icon={User} />
-          <EditField label="Contact Phone" value={form.contactPhone} onChange={(v) => setForm({ ...form, contactPhone: v })} icon={Phone} />
-          <EditField label="Contact Email" value={form.contactEmail} onChange={(v) => setForm({ ...form, contactEmail: v })} icon={Mail} />
-          <EditField label="Address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} icon={MapPin} />
-          <EditField label="Cuisine" value={form.cuisine} onChange={(v) => setForm({ ...form, cuisine: v })} icon={Tag} />
-        </div>
+        <SettingsProfileEditForm form={form} onChange={set} />
       ) : (
         <div className="space-y-3">
+          {restaurant.logoUrl && (
+            <div className="flex items-center gap-3">
+              <img src={restaurant.logoUrl} alt="Logo" className="h-14 w-14 rounded-xl object-cover border border-slate-200" />
+              <span className="text-xs font-semibold text-slate-500">Current Logo</span>
+            </div>
+          )}
           <ProfileRow icon={User} label="Restaurant Name" value={restaurant.name} />
           <ProfileRow icon={User} label="Owner" value={restaurant.ownerName} />
           <ProfileRow icon={Phone} label="Phone" value={restaurant.contactPhone} />

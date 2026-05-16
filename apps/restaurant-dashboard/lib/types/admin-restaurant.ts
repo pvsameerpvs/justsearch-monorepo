@@ -28,6 +28,8 @@ export type AdminRestaurant = {
   dashboardUsername: string;
   dashboardPassword: string;
   website: string;
+  logoUrl: string;
+  heroImageUrl: string;
   socials: SocialLink[];
   overallRating: number;
   totalReviews: number;

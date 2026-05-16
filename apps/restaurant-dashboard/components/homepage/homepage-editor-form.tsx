@@ -1,7 +1,9 @@
+import { Controller } from "react-hook-form";
 import { ImagePlus, Type, Tag, Clock, Calendar } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { SectionCard, FormField } from "@/components/ui/form-field";
-import { MenuHeroPreview } from "./menu-hero-preview";
+import { SectionCard } from "@/components/ui/form-field";
+import { HomepageTextField } from "./homepage-text-field";
+import { HomepageLivePreview } from "./homepage-live-preview";
 import { EditorActions } from "./editor-actions";
 import { useHomepageEditor } from "./use-homepage-editor";
 import type { RestaurantProfile } from "@/lib/hooks/use-restaurant-query";
@@ -13,41 +15,49 @@ interface HomepageEditorFormProps {
 }
 
 export function HomepageEditorForm({ restaurant, onUpdate, isSaving }: HomepageEditorFormProps) {
-  const { watch, setValue, handleSubmit, formState, reset, buildUpdate } = useHomepageEditor(restaurant);
-  const t = restaurant.theme;
+  const { control, handleSubmit, formState, reset, buildUpdate } = useHomepageEditor(restaurant);
   const onSubmit = () => onUpdate(buildUpdate());
-  const hero = watch("heroImageUrl") || "", logo = watch("logoUrl") || "", name = watch("name"), tagline = watch("tagline"), category = watch("category"), cuisine = watch("cuisine"), hours = watch("hours");
+  const t = restaurant.theme;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <MenuHeroPreview heroUrl={hero} logoUrl={logo} name={name} tagline={tagline} category={category} cuisine={cuisine} hours={hours} theme={t} />
+      <HomepageLivePreview control={control} theme={t} />
       <SectionCard icon={ImagePlus} title="Menu Background Image" accent={`rgb(${t.brandColor})`}>
-        <ImageUpload value={hero} onChange={(v) => setValue("heroImageUrl", v, { shouldDirty: true })} label="Menu Hero" aspect="landscape" />
+        <Controller name="heroImageUrl" control={control} render={({ field }) => (
+          <ImageUpload value={field.value || ""} onChange={field.onChange} label="Menu Hero" aspect="landscape" folder="restaurants" />
+        )} />
       </SectionCard>
       <SectionCard icon={ImagePlus} title="Logo" accent={`rgb(${t.brandColor})`}>
-        <ImageUpload value={logo} onChange={(v) => setValue("logoUrl", v, { shouldDirty: true })} label="Restaurant Logo" aspect="square" size="compact" />
+        <Controller name="logoUrl" control={control} render={({ field }) => (
+          <ImageUpload value={field.value || ""} onChange={field.onChange} label="Restaurant Logo" aspect="square" size="compact" folder="restaurants" />
+        )} />
       </SectionCard>
       <SectionCard icon={Type} title="Restaurant Name & Tagline" accent={`rgb(${t.brandColor})`}>
         <div className="space-y-3">
-          <FormField label="Name" value={name} onChange={(v) => setValue("name", v, { shouldDirty: true })} placeholder="e.g. Mosaic Table" />
-          {formState.errors.name && <p className="text-xs text-red-500">{formState.errors.name.message}</p>}
-          <FormField label="Tagline" value={tagline} onChange={(v) => setValue("tagline", v, { shouldDirty: true })} placeholder="e.g. Where every meal becomes a memory" />
-          {formState.errors.tagline && <p className="text-xs text-red-500">{formState.errors.tagline.message}</p>}
+          <HomepageTextField control={control} name="name" label="Name" placeholder="e.g. Mosaic Table" />
+          <HomepageTextField control={control} name="tagline" label="Tagline" placeholder="e.g. Where every meal becomes a memory" />
+          <HomepageTextField control={control} name="description" label="Description" placeholder="Short description shown on homepage and menu hero" />
         </div>
       </SectionCard>
       <SectionCard icon={Tag} title="Menu Header Labels" accent={`rgb(${t.accentColor})`}>
         <div className="space-y-3">
-          <FormField label="Category Eyebrow" value={category} onChange={(v) => setValue("category", v, { shouldDirty: true })} placeholder="e.g. Fine Dining" />
+          <HomepageTextField control={control} name="category" label="Category Eyebrow" placeholder="e.g. Fine Dining" />
           <div>
             <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cuisine Tags (comma separated)</label>
-            <input value={cuisine} onChange={(e) => setValue("cuisine", e.target.value, { shouldDirty: true })} placeholder="Mediterranean, Middle Eastern, Modern European" className="elegant-input w-full mt-1" />
+            <Controller name="cuisine" control={control} render={({ field }) => (
+              <input {...field} placeholder="Mediterranean, Middle Eastern, Modern European" className="elegant-input w-full mt-1" />
+            )} />
           </div>
         </div>
       </SectionCard>
       <SectionCard icon={Clock} title="Opening Today" accent={`rgb(${t.brandColor})`}>
         <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-50 text-teal-600 shrink-0"><Calendar className="h-4 w-4" /></div>
-          <input value={hours} onChange={(e) => setValue("hours", e.target.value, { shouldDirty: true })} placeholder="09:00 – 00:00" className="elegant-input flex-1" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-50 text-teal-600 shrink-0">
+            <Calendar className="h-4 w-4" />
+          </div>
+          <Controller name="hours" control={control} render={({ field }) => (
+            <input {...field} placeholder="09:00 – 00:00" className="elegant-input flex-1" />
+          )} />
         </div>
       </SectionCard>
       <EditorActions hasChanges={formState.isDirty} onReset={reset} onSave={handleSubmit(onSubmit)} isSaving={isSaving} />

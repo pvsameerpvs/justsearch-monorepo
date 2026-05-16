@@ -10,11 +10,12 @@ interface ImageUploadProps {
   aspect?: "square" | "landscape";
   size?: "compact" | "normal";
   placeholder?: string;
+  folder?: string;
 }
 
-export function ImageUpload({ size = "normal", ...props }: ImageUploadProps) {
+export function ImageUpload({ size = "normal", folder, ...props }: ImageUploadProps) {
   if (size === "compact") {
-    return <CompactImageUpload {...props} />;
+    return <CompactImageUpload {...props} folder={folder} />;
   }
-  return <NormalImageUpload {...props} />;
+  return <NormalImageUpload {...props} folder={folder} />;
 }

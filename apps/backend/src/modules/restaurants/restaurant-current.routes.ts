@@ -68,7 +68,7 @@ router.get('/current', async (req, res, next) => {
 });
 
 // PATCH /api/v1/restaurants/current — update current tenant restaurant
-router.patch('/current', authMiddleware, requireRole('owner', 'manager'), async (req, res, next) => {
+router.patch('/current', authMiddleware, requireRole('owner', 'manager', 'super_admin'), async (req, res, next) => {
   try {
     if (!req.tenant) {
       return res.status(400).json({ error: 'Tenant context required' });
@@ -86,18 +86,37 @@ router.patch('/current', authMiddleware, requireRole('owner', 'manager'), async 
       return res.status(404).json({ error: 'Restaurant not found' });
     }
 
+    // Separate direct columns from settings fields
+    const directColumns: Record<string, unknown> = {};
+    const settingsUpdate: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(body)) {
+      if (value === undefined) continue;
+      if (key === 'name') {
+        directColumns.name = value;
+      } else {
+        settingsUpdate[key] = value;
+      }
+    }
+
     const currentSettings = (typeof existing.settings === 'object' && existing.settings !== null)
       ? (existing.settings as Record<string, unknown>)
       : {};
 
-    const mergedSettings = { ...currentSettings, ...body };
+    const mergedSettings = { ...currentSettings, ...settingsUpdate };
+
+    const updateData: Record<string, unknown> = {
+      settings: mergedSettings,
+      updatedAt: new Date(),
+    };
+
+    if ('name' in directColumns) {
+      updateData.name = directColumns.name;
+    }
 
     const [updated] = await db
       .update(restaurants)
-      .set({
-        settings: mergedSettings,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(restaurants.id, req.tenant.id))
       .returning();
 

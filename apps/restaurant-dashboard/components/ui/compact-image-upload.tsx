@@ -33,6 +33,7 @@ export function CompactImageUpload({
     const url = await upload(file);
     onChange(url);
     setUrlValue(url);
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   const handleRemove = () => {
@@ -45,56 +46,60 @@ export function CompactImageUpload({
     setShowUrlInput(false);
   };
 
-  if (isUploading) {
-    return (
-      <div className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
-        <span className="text-xs text-slate-500">Uploading...</span>
-      </div>
-    );
-  }
+  const triggerFilePicker = () => inputRef.current?.click();
 
-  if (value) {
-    return (
-      <div className="flex items-center gap-3">
-        <Thumbnail src={value} alt={label} isSquare={isSquare} />
-        <ImageActions
-          onChangeClick={() => inputRef.current?.click()}
-          onUrlToggle={() => {
-            setShowUrlInput((s) => !s);
-            setUrlValue(value);
-          }}
-          onRemove={handleRemove}
+  return (
+    <div className="flex items-center gap-3">
+      {isUploading ? (
+        <UploadingState />
+      ) : value ? (
+        <>
+          <Thumbnail src={value} alt={label} isSquare={isSquare} />
+          <ImageActions
+            onChangeClick={triggerFilePicker}
+            onUrlToggle={() => {
+              setShowUrlInput((s) => !s);
+              setUrlValue(value);
+            }}
+            onRemove={handleRemove}
+            showUrlInput={showUrlInput}
+            urlValue={urlValue}
+            onUrlChange={setUrlValue}
+            onUrlSave={handleUrlSave}
+            placeholder={placeholder}
+          />
+        </>
+      ) : (
+        <EmptyState
+          onUploadClick={triggerFilePicker}
           showUrlInput={showUrlInput}
           urlValue={urlValue}
           onUrlChange={setUrlValue}
+          onUrlToggle={() => {
+            setShowUrlInput((s) => !s);
+            setUrlValue("");
+          }}
           onUrlSave={handleUrlSave}
           placeholder={placeholder}
         />
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
-          className="hidden"
-        />
-      </div>
-    );
-  }
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+        style={{ display: "none" }}
+      />
+    </div>
+  );
+}
 
+function UploadingState() {
   return (
-    <EmptyState
-      onUploadClick={() => inputRef.current?.click()}
-      showUrlInput={showUrlInput}
-      urlValue={urlValue}
-      onUrlChange={setUrlValue}
-      onUrlToggle={() => {
-        setShowUrlInput((s) => !s);
-        setUrlValue("");
-      }}
-      onUrlSave={handleUrlSave}
-      placeholder={placeholder}
-    />
+    <div className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+      <span className="text-xs text-slate-500">Uploading...</span>
+    </div>
   );
 }
 
@@ -111,13 +116,7 @@ function Thumbnail({
     <div
       className={`relative shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 ${isSquare ? "h-20 w-20" : "h-16 w-28"}`}
     >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        className="object-cover"
-        sizes={isSquare ? "80px" : "112px"}
-      />
+      <Image src={src} alt={alt} fill className="object-cover" sizes={isSquare ? "80px" : "112px"} />
     </div>
   );
 }
@@ -171,10 +170,7 @@ function ImageActions({
             placeholder={placeholder ?? "https://..."}
             className="elegant-input h-7 flex-1 px-2 text-[11px]"
           />
-          <button
-            onClick={onUrlSave}
-            className="elegant-btn-primary h-7 px-2 text-[11px]"
-          >
+          <button onClick={onUrlSave} className="elegant-btn-primary h-7 px-2 text-[11px]">
             Save
           </button>
         </div>
@@ -224,10 +220,7 @@ function EmptyState({
               placeholder={placeholder ?? "https://..."}
               className="elegant-input h-7 flex-1 px-2 text-[11px]"
             />
-            <button
-              onClick={onUrlSave}
-              className="elegant-btn-primary h-7 px-2 text-[11px]"
-            >
+            <button onClick={onUrlSave} className="elegant-btn-primary h-7 px-2 text-[11px]">
               Save
             </button>
           </div>

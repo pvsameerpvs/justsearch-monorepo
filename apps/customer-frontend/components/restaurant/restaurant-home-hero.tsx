@@ -44,7 +44,7 @@ export function RestaurantHomeHero({ restaurant }: RestaurantHomeHeroProps) {
             <RestaurantLogoBadge restaurant={restaurant} size="lg" />
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[rgb(var(--brand))]">
-                Restaurant Logo
+                {restaurant.category}
               </p>
               <h2 className="font-display text-4xl font-semibold tracking-[-0.08em] text-[rgb(var(--ink))] sm:text-5xl lg:text-4xl xl:text-5xl">
                 {restaurant.name}
@@ -52,7 +52,23 @@ export function RestaurantHomeHero({ restaurant }: RestaurantHomeHeroProps) {
               <p className="mx-auto max-w-2xl text-sm leading-6 text-slate-600 sm:text-base lg:text-sm lg:leading-5">
                 {restaurant.tagline}
               </p>
-              
+              {restaurant.description && (
+                <p className="mx-auto max-w-2xl text-xs leading-5 text-slate-500 sm:text-sm lg:text-xs lg:leading-4">
+                  {restaurant.description}
+                </p>
+              )}
+              {restaurant.cuisine.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {restaurant.cuisine.map((c, i) => (
+                    <span
+                      key={`${c}-${i}`}
+                      className="rounded-full border border-[rgb(var(--card-border))] bg-[rgb(var(--card-surface))] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[rgb(var(--muted))]"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="flex flex-col items-center gap-2">
                 <p className="text-xs text-slate-500 sm:text-sm">{domain}</p>
                 

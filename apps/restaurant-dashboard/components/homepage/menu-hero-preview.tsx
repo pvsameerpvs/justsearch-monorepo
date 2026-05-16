@@ -15,13 +15,14 @@ interface MenuHeroPreviewProps {
   logoUrl: string;
   name: string;
   tagline: string;
+  description: string;
   category: string;
   cuisine: string;
   hours: string;
   theme: Record<string, string>;
 }
 
-export function MenuHeroPreview({ heroUrl, logoUrl, name, tagline, category, cuisine, hours, theme }: MenuHeroPreviewProps) {
+export function MenuHeroPreview({ heroUrl, logoUrl, name, tagline, description, category, cuisine, hours, theme }: MenuHeroPreviewProps) {
   const initials = getInitials(name);
 
   return (
@@ -46,6 +47,7 @@ export function MenuHeroPreview({ heroUrl, logoUrl, name, tagline, category, cui
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/80">{category || "Category"}</p>
           <h3 className="text-2xl font-bold">{name || "Restaurant Name"}</h3>
           <p className="mt-1 text-sm text-white/80">{tagline || "Tagline"}</p>
+          {description && <p className="mt-1 text-xs text-white/70 max-w-xs line-clamp-2">{description}</p>}
         </div>
       </div>
 

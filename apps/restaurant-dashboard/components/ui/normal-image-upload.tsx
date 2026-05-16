@@ -33,6 +33,7 @@ export function NormalImageUpload({
     const url = await upload(file);
     onChange(url);
     setUrlValue(url);
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   const handleDrop = async (e: React.DragEvent) => {
@@ -60,6 +61,7 @@ export function NormalImageUpload({
           alt={label}
           isLandscape={isLandscape}
           onRemove={handleRemove}
+          onChangeClick={() => inputRef.current?.click()}
         />
       ) : (
         <DropZone onDrop={handleDrop} onClick={() => inputRef.current?.click()} />
@@ -69,7 +71,7 @@ export function NormalImageUpload({
         type="file"
         accept="image/*"
         onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
-        className="hidden"
+        style={{ display: "none" }}
       />
       <UrlToggle
         show={showUrlInput}
@@ -100,11 +102,13 @@ function ImagePreview({
   alt,
   isLandscape,
   onRemove,
+  onChangeClick,
 }: {
   src: string;
   alt: string;
   isLandscape: boolean;
   onRemove: () => void;
+  onChangeClick: () => void;
 }) {
   return (
     <div
@@ -117,12 +121,20 @@ function ImagePreview({
         className="object-cover"
         sizes={isLandscape ? "400px" : "200px"}
       />
-      <button
-        onClick={onRemove}
-        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm transition-colors hover:bg-white hover:text-red-500"
-      >
-        <X className="h-4 w-4" />
-      </button>
+      <div className="absolute right-2 top-2 flex gap-1.5">
+        <button
+          onClick={onChangeClick}
+          className="flex h-8 items-center gap-1 rounded-full bg-white/90 px-2.5 text-xs font-semibold text-slate-600 shadow-sm transition-colors hover:bg-white hover:text-slate-900"
+        >
+          <Upload className="h-3 w-3" /> Change
+        </button>
+        <button
+          onClick={onRemove}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm transition-colors hover:bg-white hover:text-red-500"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }
