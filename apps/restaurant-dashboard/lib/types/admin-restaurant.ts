@@ -33,4 +33,5 @@ export type AdminRestaurant = {
   socials: SocialLink[];
   overallRating: number;
   totalReviews: number;
+  isPureVeg: boolean;
 };

@@ -43,6 +43,7 @@ export type MenuItem = {
   image?: string;
   tags?: string[];
   isAvailable: boolean;
+  isVeg?: boolean;
 };
 
 export type MenuCategory = {
@@ -133,4 +134,5 @@ export type Restaurant = {
   games: Game[];
   reviews: GoogleReview[];
   partyPackages: PartyPackage[];
+  isPureVeg?: boolean;
 };

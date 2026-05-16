@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { EmojiPicker } from "@/components/ui/emoji-picker";
 import { useUpdateMenuCategoryMutation, useDeleteMenuCategoryMutation } from "@/lib/hooks/use-menu-query";
+import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import type { MenuCategory } from "@/lib/stores/menu-store";
 
 interface CategoryHeaderProps {
@@ -17,6 +18,7 @@ export function CategoryHeader({ category }: CategoryHeaderProps) {
   const [title, setTitle] = useState(category.title);
   const desc = category.description;
   const [emoji, setEmoji] = useState(category.emoji ?? "");
+  const [showDelete, setShowDelete] = useState(false);
 
   const save = () => {
     updateCategory.mutate({ id: category.id, data: { name: title, description: desc } });
@@ -24,33 +26,50 @@ export function CategoryHeader({ category }: CategoryHeaderProps) {
   };
 
   return (
-    <div className="flex items-center justify-between gap-3 mb-4">
-      <div className="flex items-center gap-3 flex-1">
-        <span className="text-2xl">{category.emoji}</span>
-        {isEditing ? (
-          <div className="flex items-center gap-2 flex-1">
-            <EmojiPicker value={emoji} onChange={setEmoji} size="sm" />
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Name" className="elegant-input flex-1" />
-          </div>
-        ) : (
-          <div>
-            <h3 className="text-base font-bold text-slate-900">{category.title}</h3>
-            <p className="text-xs text-slate-500">{category.description}</p>
-          </div>
-        )}
-      </div>
-      <div className="flex gap-1">
-        {isEditing ? (
-          <button onClick={save} className="elegant-btn-primary text-xs px-3">Save</button>
-        ) : (
-          <button onClick={() => setIsEditing(true)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100">
-            <Pencil className="h-3.5 w-3.5" />
+    <>
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3 flex-1">
+          <span className="text-2xl">{category.emoji}</span>
+          {isEditing ? (
+            <div className="flex items-center gap-2 flex-1">
+              <EmojiPicker value={emoji} onChange={setEmoji} size="sm" />
+              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Name" className="elegant-input flex-1" />
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-base font-bold text-slate-900">{category.title}</h3>
+              <p className="text-xs text-slate-500">{category.description}</p>
+            </div>
+          )}
+        </div>
+        <div className="flex gap-1">
+          {isEditing ? (
+            <button onClick={save} className="elegant-btn-primary text-xs px-3">Save</button>
+          ) : (
+            <button onClick={() => setIsEditing(true)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100">
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+          )}
+          <button
+            onClick={() => setShowDelete(true)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
-        )}
-        <button onClick={() => deleteCategory.mutate(category.id)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500">
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
+        </div>
       </div>
-    </div>
+
+      {showDelete && (
+        <DeleteConfirmDialog
+          title="Delete Category"
+          description={`Are you sure you want to delete "${category.title}"? All ${category.items.length} item(s) inside will also be permanently removed.`}
+          onConfirm={() => {
+            deleteCategory.mutate(category.id);
+            setShowDelete(false);
+          }}
+          onCancel={() => setShowDelete(false)}
+        />
+      )}
+    </>
   );
 }

@@ -58,6 +58,7 @@ export function adaptApiCategoriesToLocal(
       image: item.imageUrl ?? undefined,
       tags: normalizeTags(item.tags),
       isAvailable: item.isAvailable,
+      isVeg: item.isVeg,
     })),
   }));
 }

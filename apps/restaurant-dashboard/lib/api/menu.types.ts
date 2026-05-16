@@ -29,6 +29,7 @@ export type CreateMenuItemPayload = {
   imageUrl?: string;
   tags?: string[];
   isAvailable?: boolean;
+  isVeg?: boolean;
   categoryId?: string;
   menuId?: string;
 };

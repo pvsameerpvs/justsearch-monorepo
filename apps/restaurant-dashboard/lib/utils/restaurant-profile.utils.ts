@@ -40,5 +40,6 @@ export function mapApiToAdminRestaurant(apiData: Record<string, unknown>): Admin
     socials: parseSocials(s.socials),
     overallRating: Number(s.overallRating ?? 0),
     totalReviews: Number(s.totalReviews ?? 0),
+    isPureVeg: typeof s.isPureVeg === 'boolean' ? s.isPureVeg : false,
   };
 }

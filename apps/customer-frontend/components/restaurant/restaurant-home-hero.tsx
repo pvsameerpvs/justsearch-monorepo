@@ -6,6 +6,7 @@ import { Surface } from '@/components/shared/surface';
 import { getRestaurantDomain } from '@/lib/restaurant-utils';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { RestaurantLogoBadge } from './restaurant-logo-badge';
+import { Leaf } from 'lucide-react';
 import {
   getCheckoutOrderSummaries,
   getCheckoutStatusHref,
@@ -46,9 +47,17 @@ export function RestaurantHomeHero({ restaurant }: RestaurantHomeHeroProps) {
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[rgb(var(--brand))]">
                 {restaurant.category}
               </p>
-              <h2 className="font-display text-4xl font-semibold tracking-[-0.08em] text-[rgb(var(--ink))] sm:text-5xl lg:text-4xl xl:text-5xl">
-                {restaurant.name}
-              </h2>
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                <h2 className="font-display text-4xl font-semibold tracking-[-0.08em] text-[rgb(var(--ink))] sm:text-5xl lg:text-4xl xl:text-5xl">
+                  {restaurant.name}
+                </h2>
+                {restaurant.isPureVeg && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700 border border-emerald-200">
+                    <Leaf className="h-3.5 w-3.5" />
+                    Pure Veg
+                  </span>
+                )}
+              </div>
               <p className="mx-auto max-w-2xl text-sm leading-6 text-slate-600 sm:text-base lg:text-sm lg:leading-5">
                 {restaurant.tagline}
               </p>

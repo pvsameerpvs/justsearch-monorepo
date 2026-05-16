@@ -30,10 +30,12 @@ export function RestaurantMenuShowcase({ restaurant }: RestaurantMenuShowcasePro
             availableItemsCount={state.availableItemsCount}
             viewMode={state.viewMode}
             setViewMode={state.setViewMode}
+            dietaryFilter={state.dietaryFilter}
+            setDietaryFilter={state.setDietaryFilter}
           />
 
           <MenuSectionsList
-            menu={restaurant.menu}
+            menu={state.filteredMenu}
             viewMode={state.viewMode}
             fulfillmentMode={state.mode}
             getCartQuantity={state.getQuantity}

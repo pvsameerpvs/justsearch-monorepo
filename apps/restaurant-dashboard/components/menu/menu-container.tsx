@@ -35,6 +35,7 @@ export function MenuContainer() {
         image: i.imageUrl ?? undefined,
         tags: i.tags,
         isAvailable: i.isAvailable,
+        isVeg: i.isVeg,
       })),
     }));
   }, [cats.data, items.data]);

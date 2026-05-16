@@ -2,7 +2,7 @@ import { formatCurrency } from '@/lib/format';
 import type { MenuItem } from '@/lib/restaurant-types';
 import type { ViewMode } from './restaurant-menu-showcase';
 import type { FulfillmentMode } from './use-restaurant-fulfillment';
-import { MenuItemImage, AvailabilityBadge, ListViewFooter, GridViewFooter } from './menu-item-card-parts';
+import { MenuItemImage, AvailabilityBadge, DietaryBadge, ListViewFooter, GridViewFooter } from './menu-item-card-parts';
 
 interface RestaurantMenuItemCardProps {
   item: MenuItem;
@@ -33,7 +33,10 @@ export function RestaurantMenuItemCard({
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
             <div className="flex-1 space-y-1 sm:space-y-2">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="font-display text-base font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl leading-tight">{item.name}</h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-display text-base font-bold tracking-tight text-[rgb(var(--ink))] sm:text-2xl leading-tight">{item.name}</h3>
+                  <DietaryBadge isVeg={item.isVeg} size="sm" />
+                </div>
                 {isList && (
                   <span className="font-display text-sm font-bold tracking-tight text-[rgb(var(--brand))] sm:text-xl">
                     {formatCurrency(item.price, item.currency)}

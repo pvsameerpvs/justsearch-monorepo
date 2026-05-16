@@ -7,6 +7,7 @@ import { SettingsLicenseCard } from "@/components/settings/settings-license-card
 import { SettingsQrCard } from "@/components/settings/settings-qr-card";
 import { SettingsContactCard } from "@/components/settings/settings-contact-card";
 import { SettingsSocialsCard } from "@/components/settings/settings-socials-card";
+import { SettingsDietaryCard } from "@/components/settings/settings-dietary-card";
 
 export function SettingsContainer() {
   const { restaurant: profile, updateRestaurant } = useRestaurantProfile();
@@ -20,11 +21,14 @@ export function SettingsContainer() {
         <SettingsDomainCard subdomain={profile.subdomain} />
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
-        <SettingsLicenseCard restaurant={profile} onUpdate={updateRestaurant} />
+        <SettingsDietaryCard restaurant={profile} onUpdate={updateRestaurant} />
         <SettingsQrCard subdomain={profile.subdomain} />
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
+        <SettingsLicenseCard restaurant={profile} onUpdate={updateRestaurant} />
         <SettingsContactCard restaurant={profile} onUpdate={updateRestaurant} />
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2">
         <SettingsSocialsCard restaurant={profile} onUpdate={updateRestaurant} />
       </div>
     </div>

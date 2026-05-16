@@ -28,6 +28,7 @@ function buildMenuItemPayload(
     imageUrl,
     tags: parseTags(data.tags),
     isAvailable: data.isAvailable,
+    isVeg: data.isVeg,
     categoryId,
   };
 }
@@ -44,6 +45,7 @@ export function useItemEditorForm(item?: MenuItem) {
       tags: item?.tags?.join(", ") ?? "",
       subcategory: item?.subcategory ?? "",
       isAvailable: item?.isAvailable ?? true,
+      isVeg: item?.isVeg ?? false,
     },
   });
 }

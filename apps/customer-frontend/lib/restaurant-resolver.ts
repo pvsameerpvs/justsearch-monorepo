@@ -73,6 +73,7 @@ function createEmptyRestaurant(slug: string): Restaurant {
     games: [],
     reviews: [],
     partyPackages: [],
+    isPureVeg: false,
   };
 }
 
@@ -159,6 +160,7 @@ function mapApiToRestaurant(data: ApiRestaurantData): Restaurant {
     games: [],
     reviews: arr(s.reviews),
     partyPackages: arr(s.partyPackages),
+    isPureVeg: typeof s.isPureVeg === 'boolean' ? s.isPureVeg : false,
   };
 }
 

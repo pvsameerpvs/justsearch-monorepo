@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { useRestaurantFulfillment } from './use-restaurant-fulfillment';
 
 export type ViewMode = 'grid' | 'list';
+export type DietaryFilter = 'all' | 'veg' | 'nonVeg';
 
 export function useMenuShowcaseState(restaurant: Restaurant) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [dietaryFilter, setDietaryFilter] = useState<DietaryFilter>('all');
   const {
     mode,
     cart,
@@ -20,7 +22,22 @@ export function useMenuShowcaseState(restaurant: Restaurant) {
     clearCart,
   } = useRestaurantFulfillment();
 
-  const availableItemsCount = restaurant.menu
+  const filteredMenu = useMemo(() => {
+    if (restaurant.isPureVeg) {
+      return restaurant.menu;
+    }
+    if (dietaryFilter === 'all') {
+      return restaurant.menu;
+    }
+    return restaurant.menu.map((category) => ({
+      ...category,
+      items: category.items.filter((item) =>
+        dietaryFilter === 'veg' ? item.isVeg : !item.isVeg
+      ),
+    })).filter((category) => category.items.length > 0);
+  }, [restaurant.menu, restaurant.isPureVeg, dietaryFilter]);
+
+  const availableItemsCount = filteredMenu
     .flatMap((category) => category.items)
     .filter((item) => item.isAvailable).length;
 
@@ -30,6 +47,9 @@ export function useMenuShowcaseState(restaurant: Restaurant) {
   return {
     viewMode,
     setViewMode,
+    dietaryFilter,
+    setDietaryFilter,
+    filteredMenu,
     mode,
     cart,
     cartCount,

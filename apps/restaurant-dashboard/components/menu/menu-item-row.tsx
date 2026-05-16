@@ -14,6 +14,7 @@ interface MenuItemRowProps {
     tags?: string[];
     subcategory?: string;
     isAvailable: boolean;
+    isVeg?: boolean;
   };
   onEdit: () => void;
 }
@@ -31,6 +32,9 @@ export function MenuItemRow({ item, onEdit }: MenuItemRowProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="text-sm font-bold text-slate-900 truncate">{item.name}</p>
+          {item.isVeg && (
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold text-emerald-700">Veg</span>
+          )}
           {item.tags?.map((tag) => (
             <span key={tag} className="hidden sm:inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-[9px] font-bold text-amber-700">{tag}</span>
           ))}
@@ -41,7 +45,7 @@ export function MenuItemRow({ item, onEdit }: MenuItemRowProps) {
           {item.subcategory && <span className="text-[10px] text-slate-400">• {item.subcategory}</span>}
         </div>
       </div>
-      <MenuItemActions itemId={item.id} isAvailable={item.isAvailable} onEdit={onEdit} />
+      <MenuItemActions itemId={item.id} itemName={item.name} isAvailable={item.isAvailable} onEdit={onEdit} />
     </div>
   );
 }

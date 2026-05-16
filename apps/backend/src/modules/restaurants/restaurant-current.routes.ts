@@ -35,6 +35,7 @@ const updateCurrentSchema = z.object({
   })).optional(),
   overallRating: z.number().min(0).max(5).optional(),
   totalReviews: z.number().int().nonnegative().optional(),
+  isPureVeg: z.boolean().optional(),
 });
 
 const router = Router();

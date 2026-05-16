@@ -19,6 +19,11 @@ export function MenuItemCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="font-semibold text-slate-900 truncate">{item.name}</p>
+            {item.isVeg && (
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                Veg
+              </span>
+            )}
             {!item.isAvailable && (
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
                 Hidden
@@ -52,7 +57,7 @@ export function MenuItemCard({
       )}
 
       <div className="mt-3">
-        <MenuItemActions itemId={item.id} isAvailable={item.isAvailable} onEdit={onEdit} />
+        <MenuItemActions itemId={item.id} itemName={item.name} isAvailable={item.isAvailable} onEdit={onEdit} />
       </div>
     </div>
   );

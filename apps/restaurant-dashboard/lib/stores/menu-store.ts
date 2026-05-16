@@ -12,6 +12,7 @@ export type MenuItem = {
   image?: string;
   tags?: string[];
   isAvailable: boolean;
+  isVeg?: boolean;
 };
 
 export type MenuCategory = {

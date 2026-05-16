@@ -14,6 +14,7 @@ export const itemEditorSchema = z.object({
   tags: z.string().optional(),
   subcategory: z.string().optional(),
   isAvailable: z.boolean().default(true),
+  isVeg: z.boolean().default(false),
 });
 
 export type ItemEditorFormData = z.infer<typeof itemEditorSchema>;
@@ -42,10 +43,16 @@ export function ItemFormFields({ form }: ItemFormFieldsProps) {
       </div>
       <ImageUpload value={watch("image") ?? ""} onChange={(v) => setValue("image", v)} label="Item Image" aspect="landscape" />
       <Field label="Tags (comma separated)" {...register("tags")} placeholder="Popular, Vegetarian, Spicy" />
-      <label className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
-        <input {...register("isAvailable")} type="checkbox" className="h-4 w-4 rounded" />
-        <span className="text-sm font-medium text-slate-700">Item is available</span>
-      </label>
+      <div className="flex flex-col gap-3">
+        <label className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
+          <input {...register("isAvailable")} type="checkbox" className="h-4 w-4 rounded" />
+          <span className="text-sm font-medium text-slate-700">Item is available</span>
+        </label>
+        <label className="flex items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50/50 p-3">
+          <input {...register("isVeg")} type="checkbox" className="h-4 w-4 rounded accent-emerald-600" />
+          <span className="text-sm font-medium text-emerald-800">Pure Veg</span>
+        </label>
+      </div>
     </div>
   );
 }

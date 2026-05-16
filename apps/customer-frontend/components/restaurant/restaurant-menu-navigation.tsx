@@ -1,8 +1,8 @@
 "use client";
 
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid, Leaf, Beef } from 'lucide-react';
 import type { Restaurant } from '@/lib/restaurant-types';
-import type { ViewMode } from './restaurant-menu-showcase';
+import type { ViewMode, DietaryFilter } from './use-menu-showcase-state';
 import { ViewModeToggle } from './view-mode-toggle';
 import { CategoryScrollList } from './category-scroll-list';
 
@@ -11,6 +11,8 @@ interface RestaurantMenuNavigationProps {
   availableItemsCount: number;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
+  dietaryFilter: DietaryFilter;
+  setDietaryFilter: (filter: DietaryFilter) => void;
 }
 
 export function RestaurantMenuNavigation({
@@ -18,6 +20,8 @@ export function RestaurantMenuNavigation({
   availableItemsCount,
   viewMode,
   setViewMode,
+  dietaryFilter,
+  setDietaryFilter,
 }: RestaurantMenuNavigationProps) {
   return (
     <div className="sticky top-[calc(var(--restaurant-mobile-header-height,0px)+12px)] z-40 mb-16 rounded-[14px] border border-white/40 bg-white/70 p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-all sm:p-3">
@@ -41,8 +45,53 @@ export function RestaurantMenuNavigation({
           </div>
         </div>
 
+        {!restaurant.isPureVeg && (
+          <div className="flex items-center gap-2">
+            <DietaryPill filter="all" active={dietaryFilter} onClick={setDietaryFilter} />
+            <DietaryPill filter="veg" active={dietaryFilter} onClick={setDietaryFilter} />
+            <DietaryPill filter="nonVeg" active={dietaryFilter} onClick={setDietaryFilter} />
+          </div>
+        )}
+
+        {restaurant.isPureVeg && (
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700">
+              <Leaf className="h-3.5 w-3.5" />
+              Pure Veg Restaurant
+            </span>
+          </div>
+        )}
+
         <CategoryScrollList categories={restaurant.menu} />
       </div>
     </div>
+  );
+}
+
+function DietaryPill({
+  filter,
+  active,
+  onClick,
+}: {
+  filter: DietaryFilter;
+  active: DietaryFilter;
+  onClick: (f: DietaryFilter) => void;
+}) {
+  const isActive = active === filter;
+  const label = filter === 'all' ? 'All' : filter === 'veg' ? 'Veg' : 'Non-Veg';
+  const icon = filter === 'veg' ? <Leaf className="h-3.5 w-3.5" /> : filter === 'nonVeg' ? <Beef className="h-3.5 w-3.5" /> : null;
+
+  return (
+    <button
+      onClick={() => onClick(filter)}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+        isActive
+          ? 'bg-slate-900 text-white'
+          : 'border border-slate-200 bg-white text-slate-500 hover:bg-slate-50'
+      }`}
+    >
+      {icon}
+      {label}
+    </button>
   );
 }
