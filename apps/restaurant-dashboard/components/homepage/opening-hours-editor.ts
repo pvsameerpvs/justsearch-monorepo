@@ -5,6 +5,7 @@ export type OpeningHourRow = {
   open: string;
   close: string;
   isOpen: boolean;
+  is24Hour?: boolean;
   isToday?: boolean;
 };
 
@@ -15,11 +16,13 @@ export const DEFAULT_OPENING_HOURS: OpeningHourRow[] = DAYS.map((day) => ({
   open: "09:00",
   close: "22:00",
   isOpen: true,
+  is24Hour: false,
 }));
 
 export function formatHoursDisplay(hours: OpeningHourRow[]): string {
   const today = hours.find((h) => h.isToday);
   if (!today || !today.isOpen) return "Closed today";
+  if (today.is24Hour) return "Open 24 hours";
   return `${today.open} – ${today.close}`;
 }
 
@@ -38,6 +41,17 @@ export function useOpeningHoursEditor(
     [openingHours, onChange]
   );
 
+  const toggle24Hour = useCallback(
+    (day: string) => {
+      onChange(
+        openingHours.map((h) =>
+          h.day === day ? { ...h, is24Hour: !h.is24Hour } : h
+        )
+      );
+    },
+    [openingHours, onChange]
+  );
+
   const updateTime = useCallback(
     (day: string, field: "open" | "close", value: string) => {
       onChange(
@@ -49,5 +63,5 @@ export function useOpeningHoursEditor(
     [openingHours, onChange]
   );
 
-  return { toggleDay, updateTime };
+  return { toggleDay, toggle24Hour, updateTime };
 }

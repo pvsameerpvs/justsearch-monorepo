@@ -33,7 +33,7 @@ function sanitizeCuisineTags(cuisine: unknown): string[] {
 }
 
 function migrateOpeningHours(
-  existing: Array<{ day: string; hours?: string; open?: string; close?: string; isOpen?: boolean; isToday?: boolean }>
+  existing: Array<{ day: string; hours?: string; open?: string; close?: string; isOpen?: boolean; is24Hour?: boolean; isToday?: boolean }>
 ): OpeningHourRow[] {
   if (!existing.length) return DEFAULT_OPENING_HOURS.map((h) => ({ ...h }));
 
@@ -46,6 +46,7 @@ function migrateOpeningHours(
         open: parts[0] || "09:00",
         close: parts[1] || "22:00",
         isOpen: true,
+        is24Hour: false,
       };
     }
     return {
@@ -53,6 +54,7 @@ function migrateOpeningHours(
       open: h.open || "09:00",
       close: h.close || "22:00",
       isOpen: h.isOpen ?? true,
+      is24Hour: h.is24Hour ?? false,
     };
   });
 }

@@ -29,6 +29,7 @@ export type OpeningHour = {
   open: string;
   close: string;
   isOpen: boolean;
+  is24Hour?: boolean;
   isToday?: boolean;
 };
 

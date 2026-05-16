@@ -3,18 +3,21 @@ export type OpeningHour = {
   open: string;
   close: string;
   isOpen: boolean;
+  is24Hour?: boolean;
   isToday?: boolean;
 };
 
 export function getTodaysHours(hours: OpeningHour[]): string {
   const today = hours.find((h) => h.isToday);
   if (!today || !today.isOpen) return "Closed today";
+  if (today.is24Hour) return "Open 24 hours";
   return `${today.open} – ${today.close}`;
 }
 
 export function isCurrentlyOpen(hours: OpeningHour[]): boolean {
   const today = hours.find((h) => h.isToday);
   if (!today || !today.isOpen) return false;
+  if (today.is24Hour) return true;
 
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();

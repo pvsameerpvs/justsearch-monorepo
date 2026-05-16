@@ -139,13 +139,14 @@ function mapApiToRestaurant(data: ApiRestaurantData): Restaurant {
       // Support both old format (hours: string) and new format (open/close/isOpen)
       if (h.hours && !h.open) {
         const parts = str(h.hours).split(/[–\-]/).map((s) => s.trim());
-        return { day, open: parts[0] || '09:00', close: parts[1] || '22:00', isOpen: true, isToday: Boolean(h.isToday) };
+        return { day, open: parts[0] || '09:00', close: parts[1] || '22:00', isOpen: true, is24Hour: false, isToday: Boolean(h.isToday) };
       }
       return {
         day,
         open: str(h.open, '09:00'),
         close: str(h.close, '22:00'),
         isOpen: typeof h.isOpen === 'boolean' ? h.isOpen : true,
+        is24Hour: typeof h.is24Hour === 'boolean' ? h.is24Hour : false,
         isToday: Boolean(h.isToday),
       };
     }),

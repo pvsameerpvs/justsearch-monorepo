@@ -25,6 +25,7 @@ const updateCurrentSchema = z.object({
     open: z.string(),
     close: z.string(),
     isOpen: z.boolean(),
+    is24Hour: z.boolean().optional(),
     isToday: z.boolean().optional(),
   })).optional(),
   socials: z.array(z.object({
