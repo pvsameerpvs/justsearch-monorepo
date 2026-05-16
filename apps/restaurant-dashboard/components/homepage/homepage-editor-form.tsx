@@ -1,9 +1,10 @@
 import { Controller } from "react-hook-form";
-import { ImagePlus, Type, Tag, Clock, Calendar } from "lucide-react";
+import { ImagePlus, Type, Tag, Clock } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { SectionCard } from "@/components/ui/form-field";
 import { HomepageTextField } from "./homepage-text-field";
 import { HomepageLivePreview } from "./homepage-live-preview";
+import { OpeningHoursEditorForm } from "./opening-hours-editor-form";
 import { EditorActions } from "./editor-actions";
 import { useHomepageEditor } from "./use-homepage-editor";
 import type { RestaurantProfile } from "@/lib/hooks/use-restaurant-query";
@@ -15,9 +16,11 @@ interface HomepageEditorFormProps {
 }
 
 export function HomepageEditorForm({ restaurant, onUpdate, isSaving }: HomepageEditorFormProps) {
-  const { control, handleSubmit, formState, reset, buildUpdate } = useHomepageEditor(restaurant);
+  const { control, handleSubmit, formState, reset, buildUpdate, setValue, watch } = useHomepageEditor(restaurant);
   const onSubmit = () => onUpdate(buildUpdate());
   const t = restaurant.theme;
+
+  const openingHours = watch("openingHours");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -50,15 +53,18 @@ export function HomepageEditorForm({ restaurant, onUpdate, isSaving }: HomepageE
           </div>
         </div>
       </SectionCard>
-      <SectionCard icon={Clock} title="Opening Today" accent={`rgb(${t.brandColor})`}>
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-50 text-teal-600 shrink-0">
-            <Calendar className="h-4 w-4" />
-          </div>
-          <Controller name="hours" control={control} render={({ field }) => (
-            <input {...field} placeholder="09:00 – 00:00" className="elegant-input flex-1" />
-          )} />
-        </div>
+      <SectionCard icon={Clock} title="Opening Hours" accent={`rgb(${t.brandColor})`}>
+        <Controller
+          name="openingHours"
+          control={control}
+          render={({ field }) => (
+            <OpeningHoursEditorForm
+              hours={field.value}
+              onChange={(v: import("./opening-hours-editor").OpeningHourRow[]) => setValue("openingHours", v, { shouldDirty: true })}
+              accent={`rgb(${t.brandColor})`}
+            />
+          )}
+        />
       </SectionCard>
       <EditorActions hasChanges={formState.isDirty} onReset={reset} onSave={handleSubmit(onSubmit)} isSaving={isSaving} />
     </form>

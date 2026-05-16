@@ -12,11 +12,6 @@ interface RestaurantMenuHeroProps {
 }
 
 export function RestaurantMenuHero({ restaurant }: RestaurantMenuHeroProps) {
-  const todayHours =
-    restaurant.openingHours.find((entry) => entry.isToday)?.hours ??
-    restaurant.openingHours[0]?.hours ??
-    'Open today';
-
   const backgroundImage = restaurant.heroImageUrl ?? 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=2070';
 
   return (
@@ -53,7 +48,7 @@ export function RestaurantMenuHero({ restaurant }: RestaurantMenuHeroProps) {
             </div>
 
             <DeliveryBadge />
-            <OpeningTodayCard hours={todayHours} />
+            <OpeningTodayCard hours={restaurant.openingHours} />
           </div>
         </div>
       </Container>

@@ -25,7 +25,7 @@ export interface RestaurantProfile {
   googlePlaceId?: string;
   overallRating: number;
   totalReviews: number;
-  openingHours: Array<{ day: string; hours: string; isToday?: boolean }>;
+  openingHours: Array<{ day: string; open: string; close: string; isOpen: boolean; isToday?: boolean }>;
   socials: Array<{ platform: string; url: string; handle: string }>;
   menu: unknown[];
   games: unknown[];
@@ -68,7 +68,16 @@ async function fetchCurrentRestaurant(): Promise<RestaurantProfile> {
     googlePlaceId: (s.googlePlaceId as string) || undefined,
     overallRating: (s.overallRating as number) || 0,
     totalReviews: (s.totalReviews as number) || 0,
-    openingHours: Array.isArray(s.openingHours) ? (s.openingHours as Array<{ day: string; hours: string; isToday?: boolean }>) : [],
+    openingHours: Array.isArray(s.openingHours)
+      ? (s.openingHours as Array<Record<string, unknown>>).map((h, i) => {
+          const day = String(h.day || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i] || 'Mon');
+          if (h.hours && !h.open) {
+            const parts = String(h.hours).split(/[–\-]/).map((s) => s.trim());
+            return { day, open: parts[0] || '09:00', close: parts[1] || '22:00', isOpen: true, isToday: Boolean(h.isToday) };
+          }
+          return { day, open: String(h.open || '09:00'), close: String(h.close || '22:00'), isOpen: typeof h.isOpen === 'boolean' ? h.isOpen : true, isToday: Boolean(h.isToday) };
+        })
+      : [],
     socials: Array.isArray(s.socials) ? (s.socials as Array<{ platform: string; url: string; handle: string }>) : [],
     menu: Array.isArray(s.menu) ? s.menu : [],
     games: Array.isArray(s.games) ? s.games : [],

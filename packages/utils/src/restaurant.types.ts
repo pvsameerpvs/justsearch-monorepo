@@ -26,7 +26,9 @@ export type SocialLink = {
 
 export type OpeningHour = {
   day: string;
-  hours: string;
+  open: string;
+  close: string;
+  isOpen: boolean;
   isToday?: boolean;
 };
 

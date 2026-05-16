@@ -13,9 +13,13 @@ export type ApiRestaurantData = {
 export async function fetchCurrentRestaurant(host: string): Promise<ApiRestaurantData | null> {
   try {
     return await apiClient<ApiRestaurantData>('/restaurants/current', {
-      headers: { host },
+      tenantHost: host,
     });
-  } catch {
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('[fetchCurrentRestaurant] failed:', error);
+    }
     return null;
   }
 }

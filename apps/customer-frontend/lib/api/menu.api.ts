@@ -35,6 +35,12 @@ export async function fetchMenu(host: string): Promise<ApiMenuResponse | null> {
   }
 }
 
+function normalizeTags(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((t): t is string => typeof t === 'string');
+  if (typeof value === 'string') return value.split(',').map((t) => t.trim()).filter(Boolean);
+  return [];
+}
+
 export function adaptApiCategoriesToLocal(
   data: ApiMenuResponse,
 ): MenuCategory[] {
@@ -50,7 +56,7 @@ export function adaptApiCategoriesToLocal(
       price: Number(item.price),
       currency: 'AED',
       image: item.imageUrl ?? undefined,
-      tags: item.tags,
+      tags: normalizeTags(item.tags),
       isAvailable: item.isAvailable,
     })),
   }));

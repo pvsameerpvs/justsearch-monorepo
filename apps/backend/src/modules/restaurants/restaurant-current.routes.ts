@@ -22,7 +22,9 @@ const updateCurrentSchema = z.object({
   googlePlaceId: z.string().optional().nullable(),
   openingHours: z.array(z.object({
     day: z.string(),
-    hours: z.string(),
+    open: z.string(),
+    close: z.string(),
+    isOpen: z.boolean(),
     isToday: z.boolean().optional(),
   })).optional(),
   socials: z.array(z.object({

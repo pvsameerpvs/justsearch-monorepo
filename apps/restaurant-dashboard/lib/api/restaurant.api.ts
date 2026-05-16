@@ -30,7 +30,7 @@ export type RestaurantProfile = {
   partyPackages: unknown[];
 };
 
-type OpeningHour = { day: string; hours: string; isToday?: boolean };
+type OpeningHour = { day: string; open: string; close: string; isOpen: boolean; isToday?: boolean };
 type SocialLink = { platform: string; url: string; handle: string };
 
 type ApiResponse = {
@@ -85,7 +85,14 @@ function buildProfile(data: ApiResponse): RestaurantProfile {
     googlePlaceId: str(s.googlePlaceId) || undefined,
     overallRating: num(s.overallRating),
     totalReviews: num(s.totalReviews),
-    openingHours: arr(s.openingHours),
+    openingHours: arr<Record<string, unknown>>(s.openingHours).map((h, i) => {
+      const day = str(h.day, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i] || 'Mon');
+      if (h.hours && !h.open) {
+        const parts = str(h.hours).split(/[–\-]/).map((s) => s.trim());
+        return { day, open: parts[0] || '09:00', close: parts[1] || '22:00', isOpen: true, isToday: Boolean(h.isToday) };
+      }
+      return { day, open: str(h.open, '09:00'), close: str(h.close, '22:00'), isOpen: typeof h.isOpen === 'boolean' ? h.isOpen : true, isToday: Boolean(h.isToday) };
+    }),
     socials: arr(s.socials),
     menu: arr(s.menu),
     games: arr(s.games),

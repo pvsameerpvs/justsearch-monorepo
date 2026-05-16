@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { RestaurantProfile } from "@/lib/hooks/use-restaurant-query";
+import { DEFAULT_OPENING_HOURS, type OpeningHourRow } from "./opening-hours-editor";
 
 export const homepageSchema = z.object({
   heroImageUrl: z.string().optional(),
@@ -11,7 +12,14 @@ export const homepageSchema = z.object({
   description: z.string().min(1, "Description is required").max(300, "Description must be under 300 characters"),
   category: z.string().min(1, "Category is required"),
   cuisine: z.string().min(1, "At least one cuisine tag is required"),
-  hours: z.string().min(1, "Hours are required"),
+  openingHours: z.array(
+    z.object({
+      day: z.string(),
+      open: z.string(),
+      close: z.string(),
+      isOpen: z.boolean(),
+    })
+  ),
 });
 
 export type HomepageFormData = z.infer<typeof homepageSchema>;
@@ -24,9 +32,35 @@ function sanitizeCuisineTags(cuisine: unknown): string[] {
     .filter((c, i, a) => a.indexOf(c) === i);
 }
 
+function migrateOpeningHours(
+  existing: Array<{ day: string; hours?: string; open?: string; close?: string; isOpen?: boolean; isToday?: boolean }>
+): OpeningHourRow[] {
+  if (!existing.length) return DEFAULT_OPENING_HOURS.map((h) => ({ ...h }));
+
+  return existing.map((h) => {
+    // Migrate from old format (hours: "09:00 – 18:00") to new format
+    if (h.hours && !h.open && !h.close) {
+      const parts = h.hours.split(/[–\-]/).map((s) => s.trim());
+      return {
+        day: h.day,
+        open: parts[0] || "09:00",
+        close: parts[1] || "22:00",
+        isOpen: true,
+      };
+    }
+    return {
+      day: h.day,
+      open: h.open || "09:00",
+      close: h.close || "22:00",
+      isOpen: h.isOpen ?? true,
+    };
+  });
+}
+
 export function useHomepageEditor(restaurant: RestaurantProfile) {
   const cleanCuisine = sanitizeCuisineTags(restaurant.cuisine);
   const cuisineString = cleanCuisine.join(", ");
+  const migratedHours = migrateOpeningHours(restaurant.openingHours);
 
   const form = useForm<HomepageFormData>({
     resolver: zodResolver(homepageSchema),
@@ -38,7 +72,7 @@ export function useHomepageEditor(restaurant: RestaurantProfile) {
       description: restaurant.description ?? "",
       category: restaurant.category,
       cuisine: cuisineString,
-      hours: restaurant.openingHours.find((h) => h.isToday)?.hours ?? restaurant.openingHours[0]?.hours ?? "",
+      openingHours: migratedHours,
     },
   });
 
@@ -52,7 +86,10 @@ export function useHomepageEditor(restaurant: RestaurantProfile) {
       description: values.description,
       category: values.category,
       cuisine: sanitizeCuisineTags(values.cuisine),
-      openingHours: restaurant.openingHours.map((h) => h.isToday ? { ...h, hours: values.hours } : h),
+      openingHours: values.openingHours.map((h, i) => ({
+        ...h,
+        isToday: i === new Date().getDay() - 1 || i === 0,
+      })),
     };
   };
 

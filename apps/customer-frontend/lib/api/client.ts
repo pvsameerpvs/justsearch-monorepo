@@ -20,7 +20,7 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
   const headers = new Headers(options.headers);
 
   if (options.tenantHost) {
-    headers.set('host', options.tenantHost);
+    headers.set('x-forwarded-host', options.tenantHost);
   }
 
   if (!headers.has('content-type') && options.body) {
@@ -30,10 +30,13 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
   if (typeof window !== 'undefined') {
     const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
     let slug = host.split('.')[0];
-    if (slug === 'localhost') slug = 'demo-bistro';
+    if (slug === 'localhost') slug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'mosaic-table';
     if (slug && slug !== 'admin') {
       headers.set('x-restaurant-slug', slug);
     }
+  } else {
+    const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'mosaic-table';
+    headers.set('x-restaurant-slug', defaultSlug);
   }
 
   const response = await fetch(url, {
