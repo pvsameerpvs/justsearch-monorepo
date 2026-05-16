@@ -5,43 +5,8 @@ import { DeliveryPortalShell } from '@/components/layout/delivery-portal-shell';
 import { DriverHomeView } from '@/components/orders/driver-home-view';
 import { useDriverAuth } from '@/lib/driver-auth-store';
 import { useDriverOrdersQuery } from '@/lib/hooks/use-driver-orders-query';
-import { mapApiOrderToDelivery } from '@/lib/delivery-mappers';
-import type { DeliveryPortalSnapshot } from '@/lib/delivery-types';
-
+import { buildSnapshot } from '@/lib/delivery-snapshot';
 import type { ApiOrder } from '@/lib/hooks/use-driver-orders-query';
-
-function buildSnapshot(
-  restaurantSlug: string | null,
-  driverName: string | null,
-  activeOrders: ApiOrder[],
-  completedOrders: ApiOrder[]
-): DeliveryPortalSnapshot {
-  return {
-    restaurant: {
-      slug: restaurantSlug || 'restaurant',
-      name: restaurantSlug || 'Restaurant',
-      deliveryDomain: `${restaurantSlug || 'restaurant'}-delivery.localhost`,
-      zoneLabel: 'Zone A',
-      supportPhone: '+971 4 000 0000',
-    },
-    agent: {
-      id: 'driver-1',
-      name: driverName || 'Driver',
-      phone: '+971 50 000 0000',
-      vehicleType: 'Scooter',
-      shiftLabel: 'Active',
-      status: 'online',
-      rating: 4.9,
-      completedToday: completedOrders.length,
-    },
-    metrics: [],
-    activeOrders: activeOrders.map(mapApiOrderToDelivery),
-    completedOrders: completedOrders.map(mapApiOrderToDelivery),
-    routeChecklist: [],
-    routeHealthLabel: 'Good',
-    supportNotice: '',
-  };
-}
 
 export default function DeliveryPortalPage() {
   const { driverName, restaurantSlug, driverId } = useDriverAuth();
@@ -54,11 +19,6 @@ export default function DeliveryPortalPage() {
     setTimeout(() => setIsRefreshing(false), 500);
   }, [refetch]);
 
-  const activeOrders = orders.filter((o: ApiOrder) => !['completed', 'cancelled'].includes(o.status));
-  const completedOrders = orders.filter((o: ApiOrder) => ['completed', 'cancelled'].includes(o.status));
-
-  const snapshot = buildSnapshot(restaurantSlug, driverName, activeOrders, completedOrders);
-
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
@@ -67,6 +27,9 @@ export default function DeliveryPortalPage() {
     );
   }
 
+  const activeOrders = orders.filter((o: ApiOrder) => !['completed', 'cancelled'].includes(o.status));
+  const completedOrders = orders.filter((o: ApiOrder) => ['completed', 'cancelled'].includes(o.status));
+  const snapshot = buildSnapshot(restaurantSlug, driverName, activeOrders, completedOrders);
   const allOrders = [...snapshot.activeOrders, ...snapshot.completedOrders];
 
   return (

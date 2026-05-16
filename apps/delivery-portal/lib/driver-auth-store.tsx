@@ -2,19 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { apiClient } from "./api-client";
-
-interface AuthState {
-  isLoggedIn: boolean;
-  driverId: string | null;
-  restaurantSlug: string | null;
-  driverName: string | null;
-  hydrated: boolean;
-}
-
-interface AuthContextType extends AuthState {
-  login: (username: string, password: string) => Promise<boolean>;
-  logout: () => void;
-}
+import type { AuthState, AuthContextType } from "./driver-auth.types";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
