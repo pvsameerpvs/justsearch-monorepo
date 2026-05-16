@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.0",
     "@justsearch/types": "workspace:*",
     "@justsearch/ui": "workspace:*",
     "@justsearch/utils": "workspace:*",

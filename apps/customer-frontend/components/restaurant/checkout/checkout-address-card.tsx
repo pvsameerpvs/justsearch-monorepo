@@ -8,10 +8,8 @@ export type CheckoutAddressCardProps = {
   addressDetails: string;
   alternateNumber?: string;
   savedAddressesCount?: number;
-  handoff: string;
   note: string;
   setAlternateNumber?: (val: string) => void;
-  setHandoff: (updater: (curr: string) => string) => void;
   setNote: (val: string) => void;
   onOpenAddressBook?: () => void;
 };

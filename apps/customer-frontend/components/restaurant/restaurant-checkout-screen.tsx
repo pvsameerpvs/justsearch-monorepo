@@ -30,9 +30,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             addressDetails={state.addressDetails}
             alternateNumber={state.alternateNumber}
             savedAddressesCount={state.addresses.length}
-            handoff={state.handoff}
             setAlternateNumber={state.setAlternateNumber}
-            setHandoff={state.setHandoff}
             note={state.riderNote}
             setNote={state.setRiderNote}
             onOpenAddressBook={() => state.setIsAddressBookOpen(true)}

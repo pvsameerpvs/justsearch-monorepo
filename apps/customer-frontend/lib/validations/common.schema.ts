@@ -24,11 +24,26 @@ export const addressSchema = z.object({
   lng: z.number().optional(),
 });
 
+export const checkoutAddressSchema = z.object({
+  label: z.enum(['Home', 'Work', 'Other']),
+  address: z
+    .string()
+    .min(5, 'Address must be at least 5 characters'),
+  details: z.string().optional(),
+  alternateNumber: z
+    .string()
+    .regex(/^\+?\d{0,15}$/, 'Invalid phone number')
+    .optional()
+    .or(z.literal('')),
+});
+
+export type CheckoutAddressFormData = z.infer<typeof checkoutAddressSchema>;
+
 export const checkoutSchema = z.object({
   customerName: z.string().min(2, 'Name is required'),
   customerPhone: z.string().min(10, 'Valid phone is required'),
   fulfillmentType: z.enum(['dine_in', 'delivery', 'pickup']),
-  deliveryAddress: z.string().optional(),
+  deliveryAddress: checkoutAddressSchema,
   notes: z.string().max(200, 'Notes too long').optional(),
   paymentMethod: z.enum(['cash', 'card']).optional(),
 });

@@ -13,7 +13,6 @@ export function useCheckoutState() {
   const promo = useCheckoutPromo(total);
   const place = useCheckoutPlace();
 
-  const [handoff, setHandoff] = useState('Hand it to me');
   const [restaurantNote, setRestaurantNote] = useState('');
   const [riderNote, setRiderNote] = useState('');
   const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
@@ -41,7 +40,7 @@ export function useCheckoutState() {
   const onPlaceOrder = async () => {
     if (place.placingOrder) return;
 
-    const combinedAddress = `${address.addressTitle} - ${address.address}\n${address.addressDetails}${address.alternateNumber ? `\nAlt number: ${address.alternateNumber}` : ''}\n${handoff}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
+    const combinedAddress = `${address.addressTitle} - ${address.address}\n${address.addressDetails}${address.alternateNumber ? `\nAlt number: ${address.alternateNumber}` : ''}${riderNote ? `\nNote for rider: ${riderNote}` : ''}`;
 
     try {
       const orderId = await placeOrder({
@@ -68,12 +67,11 @@ export function useCheckoutState() {
     total,
     currency: cart[0]?.currency ?? 'AED',
     ...address,
-    handoff,
-    setHandoff,
     riderNote,
     setRiderNote,
     restaurantNote,
     setRestaurantNote,
+
     displayItems,
     displaySavings,
     displayTotal,
