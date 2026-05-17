@@ -39,7 +39,8 @@ router.post('/request', async (req, res, next) => {
       expiresAt,
     });
 
-    res.json({ requestId });
+    const isDev = process.env.NODE_ENV !== 'production';
+    res.json({ requestId, ...(isDev ? { demoOtp: otp } : {}) });
   } catch (error) {
     next(error);
   }

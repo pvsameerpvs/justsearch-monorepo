@@ -8,12 +8,13 @@ interface SubmitScoreResult {
   dailyCap: number;
 }
 
-export async function submitScore(gameId: string, rawScore: number, level?: number, customerId?: string): Promise<SubmitScoreResult> {
+export async function submitScore(gameId: string, rawScore: number, level?: number): Promise<SubmitScoreResult> {
   try {
     const res = await fetch(`${API_BASE}/games/sessions`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ gameId, rawScore, level, customerId }),
+      credentials: 'include',
+      body: JSON.stringify({ gameId, rawScore, level }),
     });
     if (!res.ok) throw new Error('Score submission failed');
     return res.json() as Promise<SubmitScoreResult>;

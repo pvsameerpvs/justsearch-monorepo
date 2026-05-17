@@ -18,22 +18,4 @@ export async function fetchActiveGames(): Promise<string[]> {
   }
 }
 
-export type SubmitScorePayload = {
-  gameId: string;
-  score: number;
-  level?: number;
-  playerId?: string;
-};
 
-export type SubmitScoreResponse = {
-  pointsAwarded: number;
-  dailyTotal: number;
-  dailyCap: number;
-};
-
-export async function submitGameScore(payload: SubmitScorePayload): Promise<SubmitScoreResponse> {
-  return apiClient<SubmitScoreResponse>('/games/sessions', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
-}

@@ -11,6 +11,9 @@ router.use(authMiddleware);
 router.post('/', async (req, res, next) => {
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
+    if (!req.auth?.userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
 
     const body = createOrderSchema.parse(req.body);
     const restaurantId = req.tenant.id;
@@ -19,7 +22,7 @@ router.post('/', async (req, res, next) => {
     const [order] = await db.insert(orders).values({
       restaurantId,
       code,
-      customerId: req.auth?.userId || null,
+      customerId: req.auth.userId,
       customerName: body.customerName,
       customerPhone: body.customerPhone,
       status: 'pending',

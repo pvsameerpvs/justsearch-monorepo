@@ -1,10 +1,12 @@
 export type OtpRequestResponse = {
   requestId: string;
+  expiresIn?: number;
+  demoOtp?: string;
 };
 
 export type OtpVerifyResponse = {
-  verified: true;
-  user: { name: string; phone: string };
+  token: string;
+  user: { id: string; name: string; phone: string };
 };
 
 export function normalizeUaeLocalDigits(raw: string) {

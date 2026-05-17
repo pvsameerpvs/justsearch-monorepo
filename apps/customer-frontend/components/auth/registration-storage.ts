@@ -6,8 +6,14 @@ const FRESH_REGISTRATION_KEY = 'justsearch:freshRegistration';
 function parseUser(raw: unknown): RegisteredUser | null {
   if (!raw || typeof raw !== 'object' || raw === null) return null;
   const obj = raw as Record<string, unknown>;
-  if (typeof obj.name !== 'string' || typeof obj.mobile !== 'string' || typeof obj.verifiedAt !== 'number') return null;
-  return { name: obj.name, mobile: obj.mobile, verifiedAt: obj.verifiedAt };
+  if (
+    typeof obj.id !== 'string' ||
+    typeof obj.name !== 'string' ||
+    typeof obj.mobile !== 'string' ||
+    typeof obj.verifiedAt !== 'number'
+  )
+    return null;
+  return { id: obj.id, name: obj.name, mobile: obj.mobile, verifiedAt: obj.verifiedAt };
 }
 
 export function readStoredUser(): RegisteredUser | null {

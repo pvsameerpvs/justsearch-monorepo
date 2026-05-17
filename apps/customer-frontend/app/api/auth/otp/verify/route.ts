@@ -7,10 +7,12 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const headers = new Headers({ 'content-type': 'application/json' });
-    const host = request.headers.get('host') ?? '';
+    const rawHost = request.headers.get('host') ?? '';
+    const host = rawHost.replace(/:\d+$/, '').toLowerCase();
     if (host) headers.set('x-forwarded-host', host);
 
-    const slug = host.split('.')[0] || process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
+    let slug = host.split('.')[0];
+    if (slug === 'localhost') slug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
     if (slug && slug !== 'admin') headers.set('x-restaurant-slug', slug);
 
     const backendRes = await fetch(`${API_BASE}/auth/otp/verify`, {
