@@ -1,55 +1,61 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
-export interface ApiOrder {
-  id: string;
+const POLL_INTERVAL_MS = 5000;
+const STALE_TIME = 30000;
+
+export interface ApiAssignment {
+  assignment_id: string;
+  order_id: string;
+  agent_id: string;
+  assignment_status: string;
+  assigned_at: string;
+  picked_up_at: string | null;
+  delivered_at: string | null;
   code: string;
-  status: string;
-  customerName: string;
-  customerPhone: string;
+  order_status: string;
+  customer_name: string;
+  customer_phone: string;
+  subtotal: string;
+  delivery_fee: string;
+  tax: string;
   total: string;
-  paymentMethod: string | null;
-  createdAt: string;
+  delivery_address: string | null;
+  lat: string | null;
+  lng: string | null;
+  notes: string | null;
+  payment_method: string | null;
+  payment_status: string;
+  eta_minutes: number | null;
+  created_at: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: string;
+    currency: string;
+  }>;
 }
 
-const POLLING_INTERVAL = 10_000;
-const STALE_TIME = 30_000;
-
-interface DriverOrdersResponse {
-  orders: ApiOrder[];
+interface AssignmentsResponse {
+  assignments: ApiAssignment[];
 }
 
-async function fetchDriverOrders(driverId: string): Promise<DriverOrdersResponse> {
-  return apiClient<DriverOrdersResponse>(`/orders?driverId=${driverId}`);
+async function fetchAssignments(): Promise<AssignmentsResponse> {
+  return apiClient('/delivery-assignments');
 }
 
-export function useDriverOrdersQuery(driverId?: string | null) {
+export function useDriverOrdersQuery(driverId: string | null) {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['driverOrders', driverId],
-    queryFn: () => fetchDriverOrders(driverId || ''),
-    staleTime: STALE_TIME,
-    refetchInterval: POLLING_INTERVAL,
+    queryKey: ['driverAssignments'],
+    queryFn: fetchAssignments,
     enabled: Boolean(driverId),
+    refetchInterval: POLL_INTERVAL_MS,
+    staleTime: STALE_TIME,
   });
 
   return {
-    orders: data?.orders ?? [],
+    assignments: data?.assignments ?? [],
     isLoading,
     refetch,
   };
-}
-
-export function useUpdateDeliveryStatusMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
-      apiClient(`/orders/${orderId}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['driverOrders'] });
-    },
-  });
 }

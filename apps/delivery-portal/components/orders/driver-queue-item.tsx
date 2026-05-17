@@ -19,7 +19,7 @@ export function DriverQueueItem({ order, index }: DriverQueueItemProps) {
             </span>
             <span className="text-sm font-bold text-slate-900">{order.code}</span>
             <span className={cn("rounded-full px-2 py-0.5 text-[9px] font-bold", statusColors[order.status])}>
-              {order.status.replace("_", " ")}
+              {order.status.replace(/_/g, " ")}
             </span>
             {order.priority === "rush" && (
               <span className="rounded-full bg-red-50 px-1.5 py-0.5 text-[9px] font-bold text-red-600">RUSH</span>

@@ -9,12 +9,11 @@ const STEPS: { key: DeliveryOrderStatus; label: string }[] = [
   { key: "assigned", label: "Assigned" },
   { key: "picked_up", label: "Picked up" },
   { key: "on_route", label: "On route" },
-  { key: "arrived", label: "Arrived" },
   { key: "delivered", label: "Done" },
 ];
 
 const STATUS_INDEX: Record<DeliveryOrderStatus, number> = {
-  assigned: 0, picked_up: 1, on_route: 2, arrived: 3, delivered: 4,
+  assigned: 0, picked_up: 1, on_route: 2, delivered: 3,
 };
 
 type DriverStatusStepperProps = {

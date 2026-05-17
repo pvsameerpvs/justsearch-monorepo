@@ -18,7 +18,7 @@ export function DriverCompletedSection({ orders }: DriverCompletedSectionProps) 
       </div>
       <div className="space-y-2">
         {completed.slice(0, 3).map((order) => (
-          <div key={order.id} className="flex items-center justify-between text-xs">
+          <div key={order.assignmentId} className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
               <span className="font-medium text-slate-700">{order.code}</span>

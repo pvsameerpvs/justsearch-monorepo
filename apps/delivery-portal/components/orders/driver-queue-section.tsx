@@ -22,7 +22,7 @@ export function DriverQueueSection({ orders, currentOrderId }: DriverQueueSectio
       <div className="space-y-2">
         {queue.map((order, index) => (
           <DriverQueueItem
-            key={order.id}
+            key={order.assignmentId}
             order={order}
             index={index}
           />

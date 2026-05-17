@@ -6,11 +6,11 @@ import { DriverHomeView } from '@/components/orders/driver-home-view';
 import { useDriverAuth } from '@/lib/driver-auth-store';
 import { useDriverOrdersQuery } from '@/lib/hooks/use-driver-orders-query';
 import { buildSnapshot } from '@/lib/delivery-snapshot';
-import type { ApiOrder } from '@/lib/hooks/use-driver-orders-query';
+import type { ApiAssignment } from '@/lib/hooks/use-driver-orders-query';
 
 export default function DeliveryPortalPage() {
   const { driverName, restaurantSlug, driverId } = useDriverAuth();
-  const { orders, isLoading, refetch } = useDriverOrdersQuery(driverId);
+  const { assignments, isLoading, refetch } = useDriverOrdersQuery(driverId);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -27,10 +27,12 @@ export default function DeliveryPortalPage() {
     );
   }
 
-  const activeOrders = orders.filter((o: ApiOrder) => !['completed', 'cancelled'].includes(o.status));
-  const completedOrders = orders.filter((o: ApiOrder) => ['completed', 'cancelled'].includes(o.status));
-  const snapshot = buildSnapshot(restaurantSlug, driverName, activeOrders, completedOrders);
-  const allOrders = [...snapshot.activeOrders, ...snapshot.completedOrders];
+  const snapshot = buildSnapshot(restaurantSlug, driverName, assignments);
+
+  // Dedupe by assignmentId to prevent duplicate keys if API returns stale data
+  const allOrders = Array.from(
+    new Map([...snapshot.activeOrders, ...snapshot.completedOrders].map((o) => [o.assignmentId, o])).values()
+  );
 
   return (
     <DeliveryPortalShell restaurant={snapshot.restaurant} agent={snapshot.agent}>

@@ -1,13 +1,15 @@
 import type { DeliveryPortalSnapshot } from './delivery-types';
-import type { ApiOrder } from './hooks/use-driver-orders-query';
-import { mapApiOrderToDelivery } from './delivery-mappers';
+import type { ApiAssignment } from './hooks/use-driver-orders-query';
+import { mapApiAssignmentToDelivery } from './delivery-mappers';
 
 export function buildSnapshot(
   restaurantSlug: string | null,
   driverName: string | null,
-  activeOrders: ApiOrder[],
-  completedOrders: ApiOrder[]
+  assignments: ApiAssignment[]
 ): DeliveryPortalSnapshot {
+  const active = assignments.filter((a) => a.assignment_status !== 'delivered' && a.assignment_status !== 'cancelled');
+  const completed = assignments.filter((a) => a.assignment_status === 'delivered' || a.assignment_status === 'cancelled');
+
   return {
     restaurant: {
       slug: restaurantSlug || 'restaurant',
@@ -24,11 +26,11 @@ export function buildSnapshot(
       shiftLabel: 'Active',
       status: 'online',
       rating: 4.9,
-      completedToday: completedOrders.length,
+      completedToday: completed.length,
     },
     metrics: [],
-    activeOrders: activeOrders.map(mapApiOrderToDelivery),
-    completedOrders: completedOrders.map(mapApiOrderToDelivery),
+    activeOrders: active.map(mapApiAssignmentToDelivery),
+    completedOrders: completed.map(mapApiAssignmentToDelivery),
     routeChecklist: [],
     routeHealthLabel: 'Good',
     supportNotice: '',

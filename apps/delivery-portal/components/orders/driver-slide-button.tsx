@@ -7,26 +7,32 @@ import { useSlideAction } from "./hooks/use-slide-action";
 import { DriverPaymentSheet } from "./driver-payment-sheet";
 import { DriverSlideDone } from "./driver-slide-done";
 import { DriverSlideCodBadge } from "./driver-slide-cod-badge";
-import type { DeliveryOrder, DeliveryOrderStatus } from "@/lib/delivery-types";
+import type { DeliveryOrder } from "@/lib/delivery-types";
 
-const NEXT_LABELS: Record<DeliveryOrderStatus, string> = {
-  assigned: "Slide to pick up", picked_up: "Slide to start route",
-  on_route: "Slide to mark arrived", arrived: "Slide to complete", delivered: "Completed",
+const NEXT_LABELS: Record<string, string> = {
+  assigned: "Slide to pick up",
+  picked_up: "Slide to start route",
+  on_route: "Slide to complete",
+  delivered: "Completed",
 };
 
-const STATUS_BG: Record<DeliveryOrderStatus, string> = {
-  assigned: "bg-slate-100", picked_up: "bg-emerald-50", on_route: "bg-emerald-50",
-  arrived: "bg-emerald-50", delivered: "bg-emerald-50",
+const STATUS_BG: Record<string, string> = {
+  assigned: "bg-slate-100",
+  picked_up: "bg-emerald-50",
+  on_route: "bg-emerald-50",
+  delivered: "bg-emerald-50",
 };
 
-const STATUS_TEXT: Record<DeliveryOrderStatus, string> = {
-  assigned: "text-slate-500", picked_up: "text-emerald-600", on_route: "text-emerald-600",
-  arrived: "text-emerald-600", delivered: "text-emerald-600",
+const STATUS_TEXT: Record<string, string> = {
+  assigned: "text-slate-500",
+  picked_up: "text-emerald-600",
+  on_route: "text-emerald-600",
+  delivered: "text-emerald-600",
 };
 
 type DriverSlideButtonProps = {
   order: DeliveryOrder;
-  onUpdateStatus: (orderId: string, status: DeliveryOrderStatus) => void;
+  onUpdateStatus: (assignmentId: string, status: string) => void;
 };
 
 export function DriverSlideButton({ order, onUpdateStatus }: DriverSlideButtonProps) {

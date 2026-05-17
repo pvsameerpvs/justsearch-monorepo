@@ -5,7 +5,6 @@ export type DeliveryOrderStatus =
   | 'assigned'
   | 'picked_up'
   | 'on_route'
-  | 'arrived'
   | 'delivered';
 
 export type DeliveryPortalRestaurant = {
@@ -43,6 +42,7 @@ export type DeliveryOrderItem = {
 
 export type DeliveryOrder = {
   id: string;
+  assignmentId: string;
   code: string;
   customerName: string;
   customerPhone: string;

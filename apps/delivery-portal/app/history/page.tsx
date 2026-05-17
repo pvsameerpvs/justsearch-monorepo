@@ -1,16 +1,19 @@
+"use client";
+
 import { DeliveryPortalShell } from '@/components/layout/delivery-portal-shell';
 import { DriverCompletedSection } from '@/components/orders/driver-completed-section';
-import { getCurrentDeliveryPortalSnapshot } from '@/lib/portal-context';
+import { useDriverAuth } from '@/lib/driver-auth-store';
+import { useDriverOrdersQuery } from '@/lib/hooks/use-driver-orders-query';
+import { buildSnapshot } from '@/lib/delivery-snapshot';
 
-export default async function HistoryPage() {
-  const snapshot = await getCurrentDeliveryPortalSnapshot();
+export default function HistoryPage() {
+  const { driverName, restaurantSlug, driverId } = useDriverAuth();
+  const { assignments } = useDriverOrdersQuery(driverId);
+  const snapshot = buildSnapshot(restaurantSlug, driverName, assignments);
   const allOrders = [...snapshot.activeOrders, ...snapshot.completedOrders];
 
   return (
-    <DeliveryPortalShell
-      restaurant={snapshot.restaurant}
-      agent={snapshot.agent}
-    >
+    <DeliveryPortalShell restaurant={snapshot.restaurant} agent={snapshot.agent}>
       <div className="space-y-4">
         <div>
           <h1 className="text-lg font-bold text-slate-900">Order history</h1>

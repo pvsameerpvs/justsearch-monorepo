@@ -1,15 +1,13 @@
-"use client";
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
-interface UpdateStatusVars {
-  orderId: string;
+interface UpdateAssignmentVars {
+  assignmentId: string;
   status: string;
 }
 
-async function updateDeliveryStatus({ orderId, status }: UpdateStatusVars) {
-  return apiClient(`/orders/${orderId}/status`, {
+async function updateAssignmentStatus({ assignmentId, status }: UpdateAssignmentVars) {
+  return apiClient(`/delivery-assignments/${assignmentId}/status`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
   });
@@ -19,10 +17,9 @@ export function useUpdateDeliveryStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateDeliveryStatus,
-    onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({ queryKey: ['driverOrders'] });
-      queryClient.invalidateQueries({ queryKey: ['order', vars.orderId] });
+    mutationFn: updateAssignmentStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['driverAssignments'] });
     },
   });
 }

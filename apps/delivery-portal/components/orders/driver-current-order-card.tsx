@@ -11,7 +11,7 @@ import type { DeliveryOrder, DeliveryOrderStatus } from "@/lib/delivery-types";
 
 type DriverCurrentOrderCardProps = {
   order: DeliveryOrder;
-  onUpdateStatus?: (orderId: string, status: DeliveryOrderStatus) => void;
+  onUpdateStatus?: (assignmentId: string, status: string) => void;
 };
 
 export function DriverCurrentOrderCard({ order, onUpdateStatus }: DriverCurrentOrderCardProps) {

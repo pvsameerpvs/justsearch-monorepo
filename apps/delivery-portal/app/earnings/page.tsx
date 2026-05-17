@@ -1,9 +1,15 @@
+"use client";
+
 import { DeliveryPortalShell } from '@/components/layout/delivery-portal-shell';
 import { DriverEarningsView } from '@/components/orders/driver-earnings-view';
-import { getCurrentDeliveryPortalSnapshot } from '@/lib/portal-context';
+import { useDriverAuth } from '@/lib/driver-auth-store';
+import { useDriverOrdersQuery } from '@/lib/hooks/use-driver-orders-query';
+import { buildSnapshot } from '@/lib/delivery-snapshot';
 
-export default async function EarningsPage() {
-  const snapshot = await getCurrentDeliveryPortalSnapshot();
+export default function EarningsPage() {
+  const { driverName, restaurantSlug, driverId } = useDriverAuth();
+  const { assignments } = useDriverOrdersQuery(driverId);
+  const snapshot = buildSnapshot(restaurantSlug, driverName, assignments);
   const delivered = [...snapshot.activeOrders, ...snapshot.completedOrders].filter((o) => o.status === "delivered");
 
   const totalEarned = delivered.reduce((s, o) => s + o.total, 0);

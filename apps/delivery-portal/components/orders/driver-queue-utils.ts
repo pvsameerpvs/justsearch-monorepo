@@ -4,15 +4,14 @@ export const statusColors: Record<string, string> = {
   assigned: "bg-slate-100 text-slate-700",
   picked_up: "bg-blue-50 text-blue-700",
   on_route: "bg-amber-50 text-amber-700",
-  arrived: "bg-violet-50 text-violet-700",
   delivered: "bg-emerald-50 text-emerald-700",
+  cancelled: "bg-red-50 text-red-700",
 };
 
 const STATUS_PRIORITY: Record<string, number> = {
-  arrived: 1,
-  on_route: 2,
-  picked_up: 3,
-  assigned: 4,
+  on_route: 1,
+  picked_up: 2,
+  assigned: 3,
 };
 
 export function sortOrdersByUrgency(orders: DeliveryOrder[]): DeliveryOrder[] {

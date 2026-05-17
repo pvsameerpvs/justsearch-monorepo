@@ -4,9 +4,15 @@ import { useState, useRef, useCallback } from "react";
 import { useMotionValue, animate } from "framer-motion";
 import type { DeliveryOrder, DeliveryOrderStatus } from "@/lib/delivery-types";
 
-const STATUS_FLOW: DeliveryOrderStatus[] = ["assigned", "picked_up", "on_route", "arrived", "delivered"];
+const STATUS_FLOW: DeliveryOrderStatus[] = ["assigned", "picked_up", "on_route", "delivered"];
 
-export function useSlideAction(order: DeliveryOrder, onUpdateStatus: (orderId: string, status: DeliveryOrderStatus) => void) {
+const PORTAL_TO_ASSIGNMENT_STATUS: Record<string, string> = {
+  picked_up: 'picked_up',
+  on_route: 'in_transit',
+  delivered: 'delivered',
+};
+
+export function useSlideAction(order: DeliveryOrder, onUpdateStatus: (assignmentId: string, status: string) => void) {
   const activeIndex = STATUS_FLOW.indexOf(order.status);
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
@@ -16,9 +22,10 @@ export function useSlideAction(order: DeliveryOrder, onUpdateStatus: (orderId: s
   const [showPaymentPicker, setShowPaymentPicker] = useState(false);
 
   const doStatusUpdate = useCallback((next: DeliveryOrderStatus) => {
-    onUpdateStatus(order.id, next);
+    const assignmentStatus = PORTAL_TO_ASSIGNMENT_STATUS[next] || next;
+    onUpdateStatus(order.assignmentId, assignmentStatus);
     setTimeout(() => { setIsComplete(false); setShowPaymentPicker(false); animate(x, 0, { type: "spring", stiffness: 500, damping: 30 }); }, 400);
-  }, [order.id, onUpdateStatus, x]);
+  }, [order.assignmentId, onUpdateStatus, x]);
 
   const handleDragEnd = useCallback(
     (_: MouseEvent | TouchEvent | PointerEvent, info: { offset: { x: number } }) => {
@@ -27,7 +34,7 @@ export function useSlideAction(order: DeliveryOrder, onUpdateStatus: (orderId: s
         setIsComplete(true);
         const next = STATUS_FLOW[activeIndex + 1];
         if (!next) { setIsDragging(false); return; }
-        if (order.status === "arrived" && next === "delivered") {
+        if (order.status === "on_route" && next === "delivered") {
           setTimeout(() => setShowPaymentPicker(true), 200);
         } else {
           setTimeout(() => doStatusUpdate(next), 200);
