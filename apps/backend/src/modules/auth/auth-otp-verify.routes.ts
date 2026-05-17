@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { signToken } from '../../utils/jwt';
+import { otpVerifyLimiter } from '../../middleware/rate-limit.middleware';
 import { normalizeMobile } from './auth.utils';
 import { validateOtpRequest } from './auth-otp.services';
 
 const router = Router();
 
-router.post('/verify', async (req, res, next) => {
+router.post('/verify', otpVerifyLimiter, async (req, res, next) => {
   try {
     if (!req.tenant) {
       return res.status(400).json({ error: 'Tenant context required' });

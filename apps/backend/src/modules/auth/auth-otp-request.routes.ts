@@ -2,11 +2,12 @@ import { randomUUID } from 'crypto';
 import { Router } from 'express';
 import { db } from '../../db';
 import { otpRequests } from '../../db/schema';
+import { otpRequestLimiter } from '../../middleware/rate-limit.middleware';
 import { normalizeMobile, isValidMobile, isValidName, randomOtp, OTP_TTL_MS } from './auth.utils';
 
 const router = Router();
 
-router.post('/request', async (req, res, next) => {
+router.post('/request', otpRequestLimiter, async (req, res, next) => {
   try {
     if (!req.tenant) {
       return res.status(400).json({ error: 'Tenant context required' });
