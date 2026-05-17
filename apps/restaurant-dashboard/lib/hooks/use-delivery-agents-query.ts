@@ -9,16 +9,12 @@ export interface DeliveryAgent {
   userId: string | null;
   name: string;
   phone: string;
-  email: string;
   username: string;
-  password: string;
   vehicleType: string;
   status: string;
   rating: string;
   completedToday: number;
-  shiftLabel: string | null;
   isActive: boolean;
-  location: string;
   createdAt: string;
 }
 

@@ -17,12 +17,12 @@ export function CardInfoGrid({ agent }: CardInfoGridProps) {
         <span className="font-medium">{agent.completedToday} deliveries today</span>
       </div>
       <div className="flex items-center gap-1.5 text-slate-500">
-        <MapPin className="h-3 w-3 text-slate-400" />
-        <span className="font-medium">{agent.location}</span>
+        <Bike className="h-3 w-3 text-slate-400" />
+        <span className="font-medium">{agent.vehicleType}</span>
       </div>
       <div className="flex items-center gap-1.5 text-slate-500">
-        <Bike className="h-3 w-3 text-slate-400" />
-        <span className="font-medium">{agent.status === "busy" ? "On delivery" : "No order"}</span>
+        <Package className="h-3 w-3 text-slate-400" />
+        <span className="font-medium">ID: {agent.id.slice(0, 8)}</span>
       </div>
     </div>
   );

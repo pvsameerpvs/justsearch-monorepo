@@ -26,7 +26,7 @@ export function DeliveryBoyPicker({ orderId, onClose }: DeliveryBoyPickerProps) 
   }, [apiData, setAgents]);
 
   const order = orders.find((o) => o.id === orderId);
-  const availableCount = agents.filter((a) => a.status === "online" || a.status === "available").length;
+  const availableCount = agents.filter((a) => a.status === "online").length;
 
   const getAssignedOrderCode = (agentId: string) => {
     const assignedOrder = orders.find((o) => o.assignedAgentId === agentId && o.id !== orderId);

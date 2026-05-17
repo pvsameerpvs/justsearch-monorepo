@@ -12,7 +12,7 @@ router.post('/', async (req, res, next) => {
     const type = typeof body.type === 'string' ? body.type : 'staff';
 
     if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password required' });
+      return res.status(400).json({ message: 'Username and password required' });
     }
 
     const loginResult = await resolveUser(username, password, type, req.tenant);
@@ -20,7 +20,7 @@ router.post('/', async (req, res, next) => {
     const userType = loginResult.userType;
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const token = signToken({
@@ -48,6 +48,9 @@ router.post('/', async (req, res, next) => {
       },
     });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Tenant context required') {
+      return res.status(400).json({ message: 'Restaurant subdomain required. Please provide a valid restaurant slug.' });
+    }
     next(error);
   }
 });

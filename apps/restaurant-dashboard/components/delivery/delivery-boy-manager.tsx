@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useDeliveryAgentsQuery, useCreateDeliveryAgentMutation, useUpdateDeliveryAgentMutation, useDeleteDeliveryAgentMutation } from "@/lib/hooks/use-delivery-agents-query";
+import type { DeliveryAgent } from "@/lib/hooks/use-delivery-agents-query";
 import { DeliveryBoyStats } from "./delivery-boy-stats";
 import { DeliveryBoyHeader } from "./delivery-boy-header";
 import { DeliveryBoyList } from "./delivery-boy-list";
@@ -11,6 +12,7 @@ import { DeliveryError } from "./delivery-error";
 import { DeliveryAgentForm } from "./delivery-agent-form";
 import { DriverEditForm } from "./driver-edit-form";
 import { DeliveryBoyOrdersDrawer } from "./delivery-boy-orders-drawer";
+import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 
 export function DeliveryBoyManager() {
   const { data, isLoading, error, refetch } = useDeliveryAgentsQuery();
@@ -20,35 +22,45 @@ export function DeliveryBoyManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingAgentId, setEditingAgentId] = useState<string | null>(null);
   const [viewingAgentId, setViewingAgentId] = useState<string | null>(null);
+  const [deletingAgent, setDeletingAgent] = useState<DeliveryAgent | null>(null);
 
   if (isLoading) return <DeliverySkeleton />;
   if (error) return <DeliveryError error={error} onRetry={refetch} />;
-  if (!data?.agents.length) return <DeliveryEmpty onAdd={() => setShowForm(true)} />;
 
-  const agents = data.agents;
+  const agents = data?.agents ?? [];
   const editingAgent = agents.find((a) => a.id === editingAgentId) ?? null;
 
   return (
     <div className="space-y-5">
-      <DeliveryBoyStats agents={agents} />
-      <DeliveryBoyHeader total={agents.length} onAdd={() => setShowForm(true)} />
-      <DeliveryBoyList
-        agents={agents}
-        onToggleActive={(id) => {
-          const agent = agents.find((a) => a.id === id);
-          if (agent) updateMutation.mutate({ id, data: { isActive: !agent.isActive } });
-        }}
-        onRemove={(id) => deleteMutation.mutate(id)}
-        onEdit={setEditingAgentId}
-        onViewOrders={setViewingAgentId}
-      />
+      {agents.length === 0 ? (
+        <DeliveryEmpty onAdd={() => { createMutation.reset(); setShowForm(true); }} />
+      ) : (
+        <>
+          <DeliveryBoyStats agents={agents} />
+          <DeliveryBoyHeader total={agents.length} onAdd={() => { createMutation.reset(); setShowForm(true); }} />
+          <DeliveryBoyList
+            agents={agents}
+            onToggleActive={(id) => {
+              const agent = agents.find((a) => a.id === id);
+              if (agent) updateMutation.mutate({ id, data: { isActive: !agent.isActive } });
+            }}
+            onRemove={(id) => {
+              const agent = agents.find((a) => a.id === id);
+              if (agent) setDeletingAgent(agent);
+            }}
+            onEdit={(id) => { updateMutation.reset(); setEditingAgentId(id); }}
+            onViewOrders={setViewingAgentId}
+          />
+        </>
+      )}
       {showForm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-md">
             <DeliveryAgentForm
               onSubmit={(data) => createMutation.mutate(data, { onSuccess: () => setShowForm(false) })}
-              onCancel={() => setShowForm(false)}
+              onCancel={() => { createMutation.reset(); setShowForm(false); }}
               isPending={createMutation.isPending}
+              error={createMutation.error instanceof Error ? createMutation.error.message : null}
             />
           </div>
         </div>
@@ -59,14 +71,28 @@ export function DeliveryBoyManager() {
             <DriverEditForm
               agent={editingAgent}
               onSave={(data) => updateMutation.mutate({ id: editingAgent.id, data }, { onSuccess: () => setEditingAgentId(null) })}
-              onCancel={() => setEditingAgentId(null)}
+              onCancel={() => { updateMutation.reset(); setEditingAgentId(null); }}
               isPending={updateMutation.isPending}
+              error={updateMutation.error instanceof Error ? updateMutation.error.message : null}
             />
           </div>
         </div>
       )}
       {viewingAgentId && (
         <DeliveryBoyOrdersDrawer agentId={viewingAgentId} onClose={() => setViewingAgentId(null)} />
+      )}
+      {deletingAgent && (
+        <DeleteConfirmDialog
+          driverName={deletingAgent.name}
+          onConfirm={() => {
+            deleteMutation.mutate(deletingAgent.id, {
+              onSuccess: () => setDeletingAgent(null),
+              onError: () => setDeletingAgent(null),
+            });
+          }}
+          onCancel={() => setDeletingAgent(null)}
+          isPending={deleteMutation.isPending}
+        />
       )}
     </div>
   );

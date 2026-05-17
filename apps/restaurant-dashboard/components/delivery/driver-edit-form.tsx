@@ -6,9 +6,8 @@ import type { DeliveryAgent } from "@/lib/hooks/use-delivery-agents-query";
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   phone: z.string().min(5, "Phone must be at least 5 characters"),
-  email: z.string().email("Invalid email"),
-  location: z.string().min(1, "Location is required"),
   vehicleType: z.enum(["bike", "scooter", "car"]),
+  status: z.enum(["online", "busy", "offline"]),
   password: z.string().optional().or(z.literal("")),
 });
 type FormData = z.infer<typeof schema>;
@@ -18,20 +17,28 @@ interface DriverEditFormProps {
   onSave: (data: Partial<FormData>) => void;
   onCancel: () => void;
   isPending?: boolean;
+  error?: string | null;
 }
 
-export function DriverEditForm({ agent, onSave, onCancel, isPending }: DriverEditFormProps) {
+export function DriverEditForm({ agent, onSave, onCancel, isPending, error }: DriverEditFormProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: agent.name, phone: agent.phone, email: agent.email,
-      location: agent.location, vehicleType: agent.vehicleType as "bike" | "scooter" | "car" || "scooter",
+      name: agent.name,
+      phone: agent.phone,
+      vehicleType: (agent.vehicleType as "bike" | "scooter" | "car") || "scooter",
+      status: (agent.status as "online" | "busy" | "offline") || "offline",
       password: "",
     },
   });
 
   const handleSubmit = (data: FormData) => {
-    const payload: Partial<FormData> = { name: data.name, phone: data.phone, email: data.email, location: data.location, vehicleType: data.vehicleType };
+    const payload: Partial<FormData> = {
+      name: data.name,
+      phone: data.phone,
+      vehicleType: data.vehicleType,
+      status: data.status,
+    };
     if (data.password) payload.password = data.password;
     onSave(payload);
   };
@@ -51,25 +58,33 @@ export function DriverEditForm({ agent, onSave, onCancel, isPending }: DriverEdi
         <input {...form.register("phone")} placeholder="Phone Number" className="elegant-input w-full" />
         {form.formState.errors.phone && <p className="mt-1 text-xs text-red-500">{form.formState.errors.phone.message}</p>}
       </div>
-      <div>
-        <input {...form.register("email")} placeholder="Email Address" className="elegant-input w-full" />
-        {form.formState.errors.email && <p className="mt-1 text-xs text-red-500">{form.formState.errors.email.message}</p>}
-      </div>
-      <div>
-        <input {...form.register("location")} placeholder="Base Location (e.g. Marina, JLT)" className="elegant-input w-full" />
-        {form.formState.errors.location && <p className="mt-1 text-xs text-red-500">{form.formState.errors.location.message}</p>}
-      </div>
-      <div>
-        <select {...form.register("vehicleType")} className="elegant-input w-full">
-          <option value="scooter">Scooter</option>
-          <option value="bike">Bike</option>
-          <option value="car">Car</option>
-        </select>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vehicle</label>
+          <select {...form.register("vehicleType")} className="elegant-input w-full mt-1">
+            <option value="scooter">Scooter</option>
+            <option value="bike">Bike</option>
+            <option value="car">Car</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</label>
+          <select {...form.register("status")} className="elegant-input w-full mt-1">
+            <option value="offline">Offline</option>
+            <option value="online">Available</option>
+            <option value="busy">On Delivery</option>
+          </select>
+        </div>
       </div>
       <div>
         <input type="password" {...form.register("password")} placeholder="New Password (leave empty to keep current)" className="elegant-input w-full" />
         {form.formState.errors.password && <p className="mt-1 text-xs text-red-500">{form.formState.errors.password.message}</p>}
       </div>
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-100 px-3 py-2 text-xs text-red-600">
+          {error}
+        </div>
+      )}
       <div className="flex gap-2 pt-1">
         <button type="button" className="elegant-btn-secondary flex-1" onClick={onCancel}>Cancel</button>
         <button type="submit" className="elegant-btn-primary flex-1" disabled={isPending}>{isPending ? "Saving..." : "Save Changes"}</button>

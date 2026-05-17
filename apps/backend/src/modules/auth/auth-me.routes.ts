@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { users, superAdmins, staff, deliveryAgents } from '../../db/schema';
+import { users, superAdmins, restaurants } from '../../db/schema';
 
 
 const router = Router();
@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', async (req, res, next) => {
   try {
     if (!req.auth) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ message: 'Not authenticated' });
     }
 
     const { type, userId, restaurantId } = req.auth;
@@ -34,27 +34,34 @@ router.get('/', async (req, res, next) => {
         profile = { id: admin.id, name: admin.name, role: 'super_admin', type: 'super_admin' };
       }
     } else if (type === 'staff' && restaurantId) {
-      const [staffMember] = await db
-        .select()
-        .from(staff)
-        .where(and(eq(staff.id, userId), eq(staff.restaurantId, restaurantId)))
-        .limit(1);
+      const schemaName = req.tenant?.schemaName || await getSchemaName(restaurantId);
+      const [staffMember] = await db.execute<{
+        id: string;
+        name: string;
+        role: string;
+        restaurant_id: string;
+      }>(
+        sql`SELECT id, name, role, restaurant_id FROM ${sql.identifier(schemaName)}.${sql.identifier('staff')} WHERE id = ${userId} AND restaurant_id = ${restaurantId} LIMIT 1`
+      );
       if (staffMember) {
-        profile = { id: staffMember.id, name: staffMember.name, role: staffMember.role, type: 'staff', restaurantId: staffMember.restaurantId };
+        profile = { id: staffMember.id, name: staffMember.name, role: staffMember.role, type: 'staff', restaurantId: staffMember.restaurant_id };
       }
     } else if (type === 'delivery' && restaurantId) {
-      const [agent] = await db
-        .select()
-        .from(deliveryAgents)
-        .where(and(eq(deliveryAgents.id, userId), eq(deliveryAgents.restaurantId, restaurantId)))
-        .limit(1);
+      const schemaName = req.tenant?.schemaName || await getSchemaName(restaurantId);
+      const [agent] = await db.execute<{
+        id: string;
+        name: string;
+        restaurant_id: string;
+      }>(
+        sql`SELECT id, name, restaurant_id FROM ${sql.identifier(schemaName)}.${sql.identifier('delivery_agents')} WHERE id = ${userId} AND restaurant_id = ${restaurantId} LIMIT 1`
+      );
       if (agent) {
-        profile = { id: agent.id, name: agent.name, role: 'driver', type: 'delivery', restaurantId: agent.restaurantId };
+        profile = { id: agent.id, name: agent.name, role: 'driver', type: 'delivery', restaurantId: agent.restaurant_id };
       }
     }
 
     if (!profile) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     res.json(profile);
@@ -62,5 +69,14 @@ router.get('/', async (req, res, next) => {
     next(error);
   }
 });
+
+async function getSchemaName(restaurantId: string): Promise<string> {
+  const [restaurant] = await db
+    .select({ schemaName: restaurants.schemaName })
+    .from(restaurants)
+    .where(eq(restaurants.id, restaurantId))
+    .limit(1);
+  return restaurant?.schemaName || 'public';
+}
 
 export default router;

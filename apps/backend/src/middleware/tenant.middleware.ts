@@ -60,20 +60,20 @@ export async function tenantMiddleware(
 
     if (!tenant) {
       await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
-      _res.status(404).json({ error: 'Restaurant not found' });
+      _res.status(404).json({ message: 'Restaurant not found' });
       return;
     }
 
     if (tenant.status === 'suspended') {
       await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
-      _res.status(403).json({ error: 'Restaurant is suspended' });
+      _res.status(403).json({ message: 'Restaurant is suspended' });
       return;
     }
 
     const isAuthRoute = req.path?.includes('/auth/');
     if (!isAuthRoute && (tenant.status === 'inactive' || tenant.status === 'draft')) {
       await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
-      _res.status(403).json({ error: 'Restaurant is not active' });
+      _res.status(403).json({ message: 'Restaurant is not active' });
       return;
     }
 

@@ -27,7 +27,7 @@ export function authMiddleware(
     '';
 
   if (!token) {
-    return res.status(401).json({ error: 'Authentication required' });
+    return res.status(401).json({ message: 'Authentication required' });
   }
 
   try {
@@ -38,17 +38,17 @@ export function authMiddleware(
     req.auth = decoded;
     next();
   } catch {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    return res.status(401).json({ message: 'Invalid or expired token' });
   }
 }
 
 export function requireRole(...roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.auth) {
-      return res.status(401).json({ error: 'Authentication required' });
+      return res.status(401).json({ message: 'Authentication required' });
     }
     if (!roles.includes(req.auth.role)) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
+      return res.status(403).json({ message: 'Insufficient permissions' });
     }
     next();
   };
@@ -56,7 +56,7 @@ export function requireRole(...roles: string[]) {
 
 export function requireTenant(req: Request, res: Response, next: NextFunction) {
   if (!req.tenant) {
-    return res.status(400).json({ error: 'Tenant context required' });
+    return res.status(400).json({ message: 'Tenant context required' });
   }
   next();
 }

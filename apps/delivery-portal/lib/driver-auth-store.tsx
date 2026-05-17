@@ -33,7 +33,7 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await apiClient<{ token: string; user: { id: string; name: string; restaurantId: string } }>('/auth/login', {
         method: 'POST',
@@ -46,9 +46,10 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
         driverName: res.user.name,
         hydrated: true,
       });
-      return true;
-    } catch {
-      return false;
+      return { success: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Invalid username or password';
+      return { success: false, error: message };
     }
   };
 

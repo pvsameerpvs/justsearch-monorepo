@@ -3,20 +3,19 @@ dotenv.config();
 
 import { client } from './index';
 import { seedRestaurant } from './seed/seed.restaurant';
-import { seedStaff, seedDeliveryAgent, seedTable } from './seed/seed.staff';
-import { seedMenu } from './seed/seed.menu';
-import { seedCustomer, seedSuperAdmin } from './seed/seed.users';
+import { seedSuperAdmin } from './seed/seed.users';
 import { seedGames } from './seed/seed.games';
+import { createTenantSchema, seedTenantSchema } from './tenant-template';
 
 async function seed() {
   try {
-    const restaurantId = await seedRestaurant();
-    if (restaurantId) {
-      await seedStaff(restaurantId);
-      await seedDeliveryAgent(restaurantId);
-      await seedTable(restaurantId);
-      await seedMenu(restaurantId);
-      await seedCustomer(restaurantId);
+    const restaurant = await seedRestaurant();
+    if (restaurant) {
+      await createTenantSchema(restaurant.schemaName);
+      await seedTenantSchema(restaurant.schemaName, restaurant.id, {
+        username: 'owner',
+        password: 'owner123',
+      });
     }
     await seedSuperAdmin();
     await seedGames();

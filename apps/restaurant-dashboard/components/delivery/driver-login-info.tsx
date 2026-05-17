@@ -1,6 +1,6 @@
 "use client";
 
-import { Globe, Copy, Check, ExternalLink, Lock } from "lucide-react";
+import { Globe, Copy, Check, ExternalLink } from "lucide-react";
 import { useClipboardCopy } from "@/lib/hooks/use-clipboard-copy";
 import { useRestaurantQuery } from "@/lib/hooks/use-restaurant-query";
 import { CredentialRow, CredentialCard } from "./driver-credential-parts";
@@ -10,10 +10,9 @@ const SEPARATOR = "--";
 
 interface DriverLoginInfoProps {
   uniqueId: string;
-  password: string;
 }
 
-export function DriverLoginInfo({ uniqueId, password }: DriverLoginInfoProps) {
+export function DriverLoginInfo({ uniqueId }: DriverLoginInfoProps) {
   const { copied, handleCopy } = useClipboardCopy();
   const { data: restaurant } = useRestaurantQuery();
   const slug = restaurant?.subdomain ?? restaurant?.slug ?? "";
@@ -23,14 +22,6 @@ export function DriverLoginInfo({ uniqueId, password }: DriverLoginInfoProps) {
     <div className="mt-3 space-y-2">
       <CredentialCard>
         <CredentialRow label="Username" value={uniqueId} copyKey="user" copied={copied} onCopy={handleCopy} />
-        <CredentialRow
-          label="Password"
-          value={password}
-          copyKey="pass"
-          copied={copied}
-          onCopy={handleCopy}
-          icon={<Lock className="h-3 w-3 text-indigo-400" />}
-        />
       </CredentialCard>
 
       <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">

@@ -2,12 +2,14 @@
 
 import { useLoginForm } from "./hooks/use-login-form";
 import { LoginLogo } from "./parts/login-logo";
-import { LoginDriverBanner } from "./parts/login-driver-banner";
 import { LoginFormPresenter } from "./login-form-presenter";
 import { DemoCredentials } from "./parts/demo-credentials";
 
 export function LoginContainer() {
   const {
+    subdomain,
+    setSubdomain,
+    subdomainError,
     username,
     setUsername,
     password,
@@ -23,6 +25,9 @@ export function LoginContainer() {
         <LoginLogo />
 
         <LoginFormPresenter
+          subdomain={subdomain}
+          onSubdomainChange={setSubdomain}
+          subdomainError={subdomainError}
           username={username}
           onUsernameChange={setUsername}
           password={password}

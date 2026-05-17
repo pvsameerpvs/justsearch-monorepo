@@ -23,7 +23,7 @@ export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onVie
       {/* Top bar with status + actions */}
       <div className={`flex items-center justify-between border-b px-4 py-2 ${meta.bg} ${meta.border}`}>
         <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${meta.dot} ${agent.status === "available" ? "animate-pulse" : ""}`} />
+          <span className={`h-2 w-2 rounded-full ${meta.dot} ${agent.status === "online" ? "animate-pulse" : ""}`} />
           <span className={`text-[10px] font-bold uppercase tracking-wider ${meta.text}`}>{meta.label}</span>
         </div>
         <div className="flex items-center gap-1">
@@ -56,7 +56,7 @@ export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onVie
         </div>
 
         <CardInfoGrid agent={agent} />
-        <DriverLoginInfo uniqueId={agent.username} password="••••••" />
+        <DriverLoginInfo uniqueId={agent.username} />
       </div>
 
       {/* View Orders Button */}

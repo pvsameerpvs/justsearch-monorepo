@@ -27,11 +27,11 @@ export async function resolveUser(
     userType = 'super_admin';
   } else if (type === 'delivery') {
     if (!tenant) throw new Error('Tenant context required');
-    user = await findDeliveryAgent(tenant.id, username, password);
+    user = await findDeliveryAgent(tenant.schemaName, tenant.id, username, password);
     userType = 'delivery';
   } else {
     if (!tenant) throw new Error('Tenant context required');
-    user = await findStaffMember(tenant.id, username, password);
+    user = await findStaffMember(tenant.schemaName, tenant.id, username, password);
     userType = 'staff';
   }
 
