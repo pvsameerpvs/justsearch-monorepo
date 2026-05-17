@@ -37,7 +37,7 @@ export async function createTenantSchema(schemaName: string): Promise<void> {
   }
 }
 
-export async function seedTenantSchema(
+export async function setupTenantDefaults(
   schemaName: string,
   restaurantId: string,
   ownerCredentials?: { username?: string; password?: string }
@@ -54,17 +54,12 @@ export async function seedTenantSchema(
 
   await client.unsafe(
     `INSERT INTO "${schemaName}"."delivery_agents" (restaurant_id, name, phone, username, password_hash, vehicle_type, status, rating, completed_today, shift_label, is_active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true)`,
-    [restaurantId, 'Delivery Rider', '+971 50 000 0000', 'rider', riderHash, 'scooter', 'offline', '5.0', 0, 'Flexible']
+    [restaurantId, 'Delivery Rider', '', 'rider', riderHash, 'scooter', 'offline', '5.0', 0, 'Flexible']
   );
 
   await client.unsafe(
     `INSERT INTO "${schemaName}"."restaurant_tables" (restaurant_id, table_number, capacity, status) VALUES ($1, $2, $3, $4)`,
     [restaurantId, 'T1', 4, 'available']
-  );
-
-  await client.unsafe(
-    `INSERT INTO "${schemaName}"."users" (restaurant_id, phone, name, role, is_active) VALUES ($1, $2, $3, $4, true)`,
-    [restaurantId, '+971 50 111 1111', 'Guest Customer', 'customer']
   );
 
   await client.unsafe(

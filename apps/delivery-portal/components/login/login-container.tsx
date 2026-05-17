@@ -3,7 +3,6 @@
 import { useLoginForm } from "./hooks/use-login-form";
 import { LoginLogo } from "./parts/login-logo";
 import { LoginFormPresenter } from "./login-form-presenter";
-import { DemoCredentials } from "./parts/demo-credentials";
 
 export function LoginContainer() {
   const {
@@ -37,8 +36,6 @@ export function LoginContainer() {
           showUsernameHint={true}
           onSubmit={onSubmit}
         />
-
-        <DemoCredentials />
       </div>
     </div>
   );

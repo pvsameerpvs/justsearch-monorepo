@@ -7,11 +7,9 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
   const normalizedHost = host.replace(/:\d+$/, '').toLowerCase();
 
-  // Allow localhost for development
+  // Allow localhost for development — frontend api-client sends slug via header
   if (normalizedHost === 'localhost' || normalizedHost.endsWith('.localhost')) {
-    const response = NextResponse.next();
-    response.headers.set('x-restaurant-slug', 'demo-bistro');
-    return response;
+    return NextResponse.next();
   }
 
   // Only allow delivery subdomain patterns

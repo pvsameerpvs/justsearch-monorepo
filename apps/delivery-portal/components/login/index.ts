@@ -6,5 +6,4 @@ export { LoginUsernameInput } from "./parts/login-username-input";
 export { LoginLogo } from "./parts/login-logo";
 export { LoginSubmitButton } from "./parts/login-submit-button";
 export { PasswordInput } from "./parts/password-input";
-export { DemoCredentials } from "./parts/demo-credentials";
 export { useLoginForm } from "./hooks/use-login-form";

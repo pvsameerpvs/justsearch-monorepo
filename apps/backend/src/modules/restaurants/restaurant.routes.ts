@@ -4,7 +4,7 @@ import { db } from '../../db';
 import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 import { createRestaurantSchema, buildSettings } from './restaurant-create.utils';
-import { createTenantSchema, seedTenantSchema } from '../../db/tenant-template';
+import { createTenantSchema, setupTenantDefaults } from '../../db/tenant-template';
 
 const router = Router();
 
@@ -27,7 +27,7 @@ router.post('/', authMiddleware, requireRole('super_admin'), async (req, res, ne
       .returning();
 
     await createTenantSchema(schemaName);
-    await seedTenantSchema(schemaName, restaurant.id, {
+    await setupTenantDefaults(schemaName, restaurant.id, {
       username: body.dashboardUsername,
       password: body.dashboardPassword,
     });

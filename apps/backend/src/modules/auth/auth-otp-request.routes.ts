@@ -39,16 +39,7 @@ router.post('/request', async (req, res, next) => {
       expiresAt,
     });
 
-    const payload: Record<string, unknown> = { requestId };
-
-    const debugOtpEnabled =
-      process.env.DEBUG_OTP === 'true' || process.env.NODE_ENV === 'development';
-
-    if (debugOtpEnabled) {
-      payload.demoOtp = otp;
-    }
-
-    res.json(payload);
+    res.json({ requestId });
   } catch (error) {
     next(error);
   }

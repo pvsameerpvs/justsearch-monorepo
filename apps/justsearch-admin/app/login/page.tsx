@@ -1,6 +1,5 @@
 import { LogIn } from "lucide-react";
 import { LoginContainer } from "./login-container";
-import { LoginDemoCredentials } from "./demo-credentials";
 
 export default function AdminLoginPage() {
   return (
@@ -14,7 +13,6 @@ export default function AdminLoginPage() {
           <p className="mt-1 text-sm text-slate-500">Sign in to platform admin</p>
         </div>
         <LoginContainer />
-        <LoginDemoCredentials />
       </div>
     </div>
   );

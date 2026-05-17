@@ -42,7 +42,7 @@ export function calculatePlayerLevel(roundsPlayed: number) {
  * or returns a consistent ID for the session.
  */
 export function getStablePlayerId(seed?: string) {
-  if (!seed) return '7342'; // Fallback
+  if (!seed) return '';
   // Simple hash for stable ID generation
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {

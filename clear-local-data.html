@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clear JustSearch Local Data</title>
+  <style>
+    body { font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f8fafc; }
+    .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 480px; width: 90%; }
+    h1 { margin: 0 0 0.5rem; font-size: 1.25rem; color: #0f172a; }
+    p { margin: 0 0 1.5rem; color: #64748b; font-size: 0.875rem; line-height: 1.5; }
+    button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    button:hover { opacity: 0.9; }
+    .btn-clear { background: #ef4444; color: white; margin-bottom: 0.75rem; }
+    .btn-refresh { background: #e2e8f0; color: #334155; }
+    .status { margin-top: 1rem; padding: 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; display: none; }
+    .status.success { background: #dcfce7; color: #166534; display: block; }
+    .status.error { background: #fee2e2; color: #991b1b; display: block; }
+    ul { margin: 0.5rem 0 0; padding-left: 1.25rem; color: #64748b; font-size: 0.8rem; }
+    li { margin-bottom: 0.25rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Clear JustSearch Browser Data</h1>
+    <p>This will remove all locally stored data (cart, game stats, loyalty points, vouchers, auth tokens) from your browser for all JustSearch apps.</p>
+
+    <ul>
+      <li>Customer Frontend: cart, orders, user, loyalty, game stats, vouchers</li>
+      <li>Delivery Portal: driver auth, restaurant slug</li>
+      <li>Restaurant Dashboard: staff auth, restaurant slug</li>
+    </ul>
+
+    <button class="btn-clear" onclick="clearAllData()">Clear All Local Data</button>
+    <button class="btn-refresh" onclick="location.reload()">Refresh Page</button>
+
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    function clearAllData() {
+      const statusEl = document.getElementById('status');
+      try {
+        const removed = [];
+
+        // Remove localStorage keys
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('justsearch:') || key === 'restaurant-slug' || key === 'driver-auth')) {
+            localStorage.removeItem(key);
+            removed.push(key);
+          }
+        }
+
+        // Remove sessionStorage keys
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+          const key = sessionStorage.key(i);
+          if (key && key.startsWith('justsearch:')) {
+            sessionStorage.removeItem(key);
+            removed.push(key + ' (session)');
+          }
+        }
+
+        if (removed.length === 0) {
+          statusEl.textContent = 'No JustSearch data found in browser storage.';
+          statusEl.className = 'status success';
+        } else {
+          statusEl.textContent = 'Cleared ' + removed.length + ' item(s). You can now close this page and reload your apps.';
+          statusEl.className = 'status success';
+        }
+      } catch (err) {
+        statusEl.textContent = 'Error clearing data: ' + (err?.message || 'Unknown error');
+        statusEl.className = 'status error';
+      }
+    }
+  </script>
+</body>
+</html>

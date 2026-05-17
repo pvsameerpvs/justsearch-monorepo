@@ -38,7 +38,7 @@ export type VoucherWalletEntry = {
   discount: VoucherDiscount;
   expiryLabel: string;
   isUsed: boolean;
-  source: RewardTrigger | 'seed';
+  source: RewardTrigger;
   createdAt: number;
   mobile?: string;
   orderId?: string;
