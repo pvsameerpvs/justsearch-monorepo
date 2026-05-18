@@ -695,14 +695,22 @@ Each restaurant gets its own PostgreSQL schema (namespace). Same table names exi
 Database: justsearch
 ├── Schema: public
 │   ├── restaurants (registry)
+│   ├── users (global accounts)
+│   ├── user_restaurants (global links)
+│   ├── addresses (global address book)
+│   ├── loyalty_points (global points balance)
 │   ├── games (shared)
-│   └── advertisements (shared)
+│   ├── advertisements (shared)
+│   └── super_admins (global admin)
 ├── Schema: rest_mosaic
-│   ├── users, orders, menus, menu_items, drivers, staff, loyalty_points
+│   ├── orders, order_items, game_sessions
+│   ├── menu_categories, menus, menu_items, promo_codes
+│   ├── delivery_agents, delivery_assignments, staff
+│   └── otp_requests, daily_closeouts
 ├── Schema: rest_burger
-│   ├── users, orders, menus, menu_items, drivers, staff, loyalty_points
+│   ├── (same 12 tables)
 └── Schema: rest_sushi
-    └── users, orders, menus, menu_items, drivers, staff, loyalty_points
+    └── (same 12 tables)
 ```
 
 ### 14.3 Public Schema Tables (Shared)
@@ -713,6 +721,18 @@ public.restaurants
   - subdomain (varchar), status (active|inactive|suspended)
   - settings (jsonb), created_at, updated_at
 
+public.users
+  - id, name, username, phone, email, password_hash, is_active, role, created_at
+
+public.user_restaurants
+  - id, user_id, restaurant_id, role, permissions, created_at
+
+public.addresses
+  - id, user_id, label, address, details, alternate_number, is_default, created_at
+
+public.loyalty_points
+  - id, user_id, points, total_earned, total_redeemed, updated_at
+
 public.games
   - id, name, type, config (jsonb), is_active, created_by, created_at
 
@@ -720,45 +740,50 @@ public.advertisements
   - id, name, type, content, image_url, target_restaurants (jsonb)
   - is_active, start_date, end_date
 
-public.restaurant_games (junction)
-  - id, restaurant_id, game_id, is_active, start_date, end_date
+public.super_admins
+  - id, username, password_hash, name, email, is_active
 ```
 
 ### 14.4 Per-Restaurant Schema Tables
 
 ```sql
-users
-  - id, email, phone, name, role (customer|owner|staff|driver)
-  - password_hash, supabase_auth_id, is_active, created_at
-
 orders
-  - id, code, customer_id, customer_name, customer_phone
-  - status, payment_mode, priority, subtotal, delivery_fee, tax, total
-  - delivery_address, lat, lng, notes, driver_id, eta_minutes
-  - created_at, updated_at
+  - id, restaurant_id, code, customer_id, customer_name, customer_phone
+  - status, payment_status, fulfillment_type, source, subtotal, delivery_fee, tax, total
+  - delivery_address, lat, lng, notes, driver_id, payment_method, eta_minutes, created_at
 
 order_items
-  - id, order_id, name, quantity, price, currency
+  - id, restaurant_id, order_id, menu_item_id, name, quantity, price, currency, created_at
+
+menu_categories
+  - id, restaurant_id, name, description, sort_order, status, created_at
 
 menus
-  - id, name, description, status, sort_order
+  - id, restaurant_id, name, description, status, sort_order, created_at
 
 menu_items
-  - id, menu_id, name, description, price, image_url
-  - category, tags, is_available, sort_order
+  - id, restaurant_id, menu_id, name, description, price, image_url, category, tags, is_available, sort_order, created_at
+
+promo_codes
+  - id, restaurant_id, code, type, value, min_order, max_discount, is_active, created_at
 
 delivery_agents
-  - id, user_id, name, phone, vehicle_type, status
-  - rating, completed_today, shift_label
+  - id, restaurant_id, name, phone, username, password_hash, vehicle_type, status, rating, completed_today, shift_label, is_active
+
+delivery_assignments
+  - id, restaurant_id, order_id, agent_id, status, assigned_at, picked_up_at, delivered_at
 
 staff
-  - id, user_id, role (owner|manager|staff), permissions (jsonb)
-
-loyalty_points
-  - id, customer_id, points, total_earned, total_redeemed
+  - id, restaurant_id, name, username, password_hash, role, permissions, is_active
 
 game_sessions
-  - id, game_id, customer_id, score, reward, played_at
+  - id, restaurant_id, game_id, customer_id, score, points_awarded, level, scoring_version, played_at, metadata
+
+otp_requests
+  - id, restaurant_id, request_id, mobile, otp, name, attempts, expires_at, created_at
+
+daily_closeouts
+  - id, restaurant_id, date, cash_total, card_total, order_count, grand_total, closed_by, closed_at
 ```
 
 ### 14.5 Tenant Resolution Flow
@@ -861,15 +886,34 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=[anon-key]
 
 ```typescript
 async function backupRestaurant(schemaName: string) {
-  const tables = ['users', 'orders', 'menus', 'menu_items', 'loyalty_points'];
+  // Per-tenant tables (business data isolated per restaurant)
+  const tenantTables = [
+    'orders', 'order_items', 'game_sessions',
+    'menu_categories', 'menus', 'menu_items', 'promo_codes',
+    'delivery_agents', 'delivery_assignments', 'staff',
+    'otp_requests', 'daily_closeouts'
+  ];
   const backup: Record<string, any[]> = {};
-  for (const table of tables) {
+  for (const table of tenantTables) {
     backup[table] = await db.execute(
       sql`SELECT * FROM ${sql.identifier(schemaName)}.${sql.identifier(table)}`
     );
   }
   await supabase.storage.from('backups').upload(
     `${schemaName}/${Date.now()}.json`,
+    JSON.stringify(backup)
+  );
+}
+
+async function backupGlobalTables() {
+  // Global tables (platform-wide data)
+  const globalTables = ['users', 'user_restaurants', 'addresses', 'loyalty_points'];
+  const backup: Record<string, any[]> = {};
+  for (const table of globalTables) {
+    backup[table] = await db.execute(sql`SELECT * FROM public.${sql.identifier(table)}`);
+  }
+  await supabase.storage.from('backups').upload(
+    `global/${Date.now()}.json`,
     JSON.stringify(backup)
   );
 }
@@ -897,10 +941,10 @@ the super admin (justsearch-admin) **cannot** query tenant tables directly from 
 
 | Query | Before (single public schema) | After (schema-per-tenant) |
 |-------|------------------------------|--------------------------|
-| List all users | `SELECT * FROM public.users` | Loop: `SELECT * FROM "rest_X"."users"` UNION ALL |
+| List all users | `SELECT * FROM public.users` | `SELECT * FROM public.users` (global table, no loop) |
 | List all orders | `SELECT * FROM public.orders` | Loop: `SELECT * FROM "rest_X"."orders"` UNION ALL |
 | Revenue aggregation | `SELECT SUM(total) FROM public.orders` | Loop + aggregate per schema |
-| Per-restaurant user detail | `WHERE restaurant_id = X` | Already per-schema, just query that schema directly |
+| Per-restaurant user detail | `WHERE restaurant_id = X` | `public.users` JOIN `public.user_restaurants` |
 
 #### 14.11.2 Cross-Schema Query Approaches
 
@@ -910,9 +954,10 @@ Super admin endpoints iterate over active restaurant schemas:
 
 ```
 GET /api/v1/admin/users
-  → 1. SELECT schema_name FROM public.restaurants WHERE status = 'active'
-  → 2. For each: db.execute(sql`SELECT * FROM "${schema}"."users"`)
-  → 3. UNION ALL results → flat array → return
+  → Single query: SELECT u.*, ur.role, r.name FROM public.users u
+    JOIN public.user_restaurants ur ON u.id = ur.user_id
+    JOIN public.restaurants r ON ur.restaurant_id = r.id
+  → Return flat array
 ```
 
 **Characteristics:**
@@ -943,10 +988,11 @@ public.platform_game_sessions ← synced from each tenant's game_sessions
 
 | Endpoint | Approach | Complexity | Why |
 |----------|----------|------------|-----|
-| GET /api/v1/admin/users | Option A (loop) | Low | Simple SELECT per schema, UNION ALL |
-| GET /api/v1/admin/users/:restaurantId | Direct query | None | Single schema, no loop needed |
-| GET /api/v1/revenue | Option A or B | Medium | Needs aggregation across schemas |
-| GET /api/v1/analytics/admin/summary | Option A | Medium | Counts across schemas |
+| GET /api/v1/admin/users | Single query | None | `public.users` JOIN `public.user_restaurants` |
+| GET /api/v1/admin/users/:restaurantId | Single query | None | `public.users` JOIN `public.user_restaurants` WHERE restaurant_id |
+| GET /api/v1/revenue | Loop schemas | Medium | Needs `orders` aggregation across schemas |
+| GET /api/v1/analytics/admin/summary | Loop + global | Medium | Count `public.users` + loop `orders` |
+| GET /api/v1/orders/my-all | Loop schemas | Medium | `orders` per schema for given customer |
 | GET /api/v1/games | None | None | Stays in public schema |
 | GET /api/v1/advertisements | None | None | Stays in public schema |
 | GET /api/v1/restaurants | None | None | Stays in public schema |
@@ -958,7 +1004,7 @@ public.platform_game_sessions ← synced from each tenant's game_sessions
 | Public tables (restaurants, games, ads, super_admins) | Still in `public`, query directly |
 | Restaurant-scoped queries | Tenant middleware `SET search_path` handles routing |
 | Super admin login | Checks `public.super_admins` — no loop needed |
-| Games catalog | Shared via `public.games` + `restaurant_games` junction |
+| Games catalog | Shared via `public.games` |
 | Frontend pages | All API endpoints return same shape, frontend unchanged |
 
 #### 14.11.5 Implementation Order

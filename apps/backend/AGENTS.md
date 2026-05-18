@@ -64,23 +64,38 @@ No Docker required — database is managed by Supabase.
 PostgreSQL: justsearch_dev
 ├── Schema: public                    ← shared platform data
 │   ├── restaurants        (registry: subdomain → schema_name)
+│   ├── users              (global customers: one account everywhere)
+│   ├── user_restaurants   (junction: which restaurants a user visited)
+│   ├── addresses          (global address book, shared across restaurants)
+│   ├── loyalty_points     (global points balance, summed across restaurants)
 │   ├── games              (shared game catalog)
 │   ├── advertisements     (shared ads catalog)
-│   ├── restaurant_games   (junction: who gets which game)
 │   └── super_admins       (justsearch-admin login)
 │
 ├── Schema: rest_mosaic               ← Mosaic Table isolated data
-│   ├── users, restaurant_users, restaurant_tables
+│   ├── orders, order_items
 │   ├── menu_categories, menus, menu_items, promo_codes
-│   ├── orders, order_items, payments
 │   ├── delivery_agents, delivery_assignments, staff
-│   ├── loyalty_points, table_sessions, game_sessions
-│   ├── audit_logs, otp_requests
-│   └── (18 tenant tables total)
+│   ├── game_sessions, otp_requests, daily_closeouts
+│   └── (12 tenant tables total)
 │
 ├── Schema: rest_<slug>               ← each new restaurant gets one
-│   └── (same 18 tables, empty + seeded on creation)
+│   └── (same 12 tables, empty + seeded on creation)
 ```
+
+### Global vs Per-Tenant Split
+
+| Data Type | Schema | Why |
+|-----------|--------|-----|
+| **Users** | `public` | Same phone = same person everywhere |
+| **User-Restaurant Links** | `public` | Tracks which restaurants a user visited |
+| **Addresses** | `public` | One address book, appears at every restaurant checkout |
+| **Loyalty Points** | `public` | Points sum across all restaurants (A:100 + B:200 = 300 total) |
+| **Orders** | `rest_<slug>` | Each restaurant manages its own orders |
+| **Order Items** | `rest_<slug>` | Line items belong to specific restaurant |
+| **Game Sessions** | `rest_<slug>` | Game plays happen at specific restaurant |
+| **Menu Data** | `rest_<slug>` | Each restaurant has different menu |
+| **Staff / Riders** | `rest_<slug>` | Restaurant's own employees and delivery agents |
 
 ### 1.1 Why Schema-Per-Tenant
 
@@ -98,38 +113,35 @@ PostgreSQL: justsearch_dev
 | Table | Purpose | Queried By |
 |-------|---------|------------|
 | `restaurants` | Registry — maps `subdomain` → `schema_name` | All apps |
+| `users` | Global customer accounts (one phone = one user everywhere) | All apps |
+| `user_restaurants` | Junction: which restaurants each user visited | All apps |
+| `addresses` | Global address book (shared across restaurants) | customer-frontend |
+| `loyalty_points` | Global points balance (summed across all restaurants) | customer-frontend |
 | `games` | Platform game catalog | justsearch-admin, customer-frontend |
 | `advertisements` | Platform ads catalog | justsearch-admin, customer-frontend |
-| `restaurant_games` | Junction — which restaurant has which game | customer-frontend |
 | `super_admins` | Global admin login credentials | justsearch-admin |
 
-**Rule**: Public tables never contain per-restaurant business data.
+**Rule**: `users`, `user_restaurants`, `addresses`, `loyalty_points` are global because customers are platform-wide. All other business data is per-tenant.
 
 ---
 
 ## 3. Tenant Schema Tables (Per-Restaurant)
 
-Each `rest_<slug>` schema contains these 18 tables:
+Each `rest_<slug>` schema contains these 12 tables:
 
 ```sql
-users                  — customers, staff-linked users
-restaurant_users       — staff role assignments (junction)
-restaurant_tables      — physical tables, qr_code_url, qr_payload
+orders                 — order headers (per-restaurant)
+order_items            — line items per order
 menu_categories        — menu groupings
 menus                  — menu containers
 menu_items             — individual dishes/drinks
 promo_codes            — discount codes
-orders                 — order headers
-order_items            — line items per order
-payments               — payment records
 delivery_agents        — rider accounts
 delivery_assignments   — order-rider links
 staff                  — dashboard staff accounts
-loyalty_points         — customer reward balances
-table_sessions         — active dine-in sessions
-game_sessions          — played game records
-audit_logs             — change history
+game_sessions          — played game records (per-restaurant)
 otp_requests           — mobile verification codes
+daily_closeouts        — end-of-day cash summaries
 ```
 
 **Rule**: Every query in tenant-scoped routes uses **unqualified table names** after `SET search_path`.
@@ -175,8 +187,16 @@ All unqualified queries hit rest_mosaic.* first, public.* as fallback
 
 | Context | search_path Set To | Effect |
 |---------|-------------------|--------|
-| Tenant resolved | `rest_<schema>, public` | Unqualified queries hit tenant schema first |
+| Tenant resolved | `rest_<schema>, public` | Unqualified queries hit tenant schema first, fall back to `public` for global tables |
 | Admin / no subdomain | `public` | Resets to shared tables only |
+
+**How `search_path` resolves global tables:**
+```sql
+SET search_path TO "rest_naples", public;
+SELECT * FROM orders     → hits rest_naples.orders     ✅ (per-tenant)
+SELECT * FROM users      → tries rest_naples.users      ❌ not found → falls back to public.users ✅ (global)
+SELECT * FROM addresses  → tries rest_naples.addresses  ❌ not found → falls back to public.addresses ✅ (global)
+```
 
 **Caution**: `postgres-js` pools connections (`max: 10`). `SET search_path` is session-scoped. Admin routes **must** reset to `public` to avoid stale tenant resolution from pooled connections.
 
@@ -197,9 +217,9 @@ Body: { slug, subdomain, name }
 2. CREATE SCHEMA IF NOT EXISTS "rest_<slug>"
     │
     ▼
-3. Clone 18 tenant tables:
-   CREATE TABLE "rest_<slug>"."users" (LIKE public.users INCLUDING ALL);
-   ... repeat for all 18 tables
+3. Clone 12 tenant tables:
+   CREATE TABLE "rest_<slug>"."orders" (LIKE public.orders INCLUDING ALL);
+   ... repeat for all 12 tables (skip users, user_restaurants, addresses, loyalty_points)
     │
     ▼
 4. Seed default data into tenant schema:
@@ -227,20 +247,23 @@ Since each restaurant's data lives in its own schema, super-admin endpoints **ca
 
 ### 6.1 Option A — Dynamic Loop (Used Here)
 
+### 6.1 When Cross-Schema Loop Is Needed
+
+Since `orders`, `order_items`, `game_sessions` are per-tenant, platform-wide queries must loop schemas:
+
 ```typescript
-// 1. Get all active schemas
+// Revenue: loop all schemas, aggregate orders
 const schemas = await db
   .select({ schemaName: restaurants.schemaName })
   .from(restaurants)
   .where(eq(restaurants.status, 'active'));
 
-// 2. Loop + UNION ALL
-const results = [];
+let totalRevenue = 0;
 for (const { schemaName } of schemas) {
   const rows = await db.execute(
-    sql`SELECT * FROM ${sql.identifier(schemaName)}."users"`
+    sql`SELECT SUM(total) as revenue FROM ${sql.identifier(schemaName)}."orders"`
   );
-  results.push(...rows);
+  totalRevenue += Number(rows[0]?.revenue ?? 0);
 }
 ```
 
@@ -250,24 +273,35 @@ for (const { schemaName } of schemas) {
 - No data duplication
 - Frontend unchanged — same API response shape
 
-### 6.2 What Stays Simple (No Cross-Schema Needed)
+### 6.2 What Is Simple (No Cross-Schema Needed)
 
 | Query | Schema | Why |
 |-------|--------|-----|
+| `public.users` | `public` | Global — one query gets all customers |
+| `public.user_restaurants` | `public` | Global — one JOIN gets all restaurant links |
+| `public.addresses` | `public` | Global — one query gets all addresses |
+| `public.loyalty_points` | `public` | Global — one query gets all points |
 | `public.restaurants` | `public` | Registry stays in public |
 | `public.games` | `public` | Shared catalog |
 | `public.advertisements` | `public` | Shared catalog |
 | `public.super_admins` | `public` | Global admin login |
 | Per-restaurant detail | `rest_<schema>` | Single schema, direct query |
 
-### 6.3 Cross-Schema Endpoints
+### 6.3 Cross-Schema Endpoints (Loop Required)
 
-| Endpoint | Approach | Complexity |
-|----------|----------|------------|
-| `GET /api/v1/admin/users` | Loop schemas, UNION ALL `users` | Low |
-| `GET /api/v1/revenue` | Loop schemas, aggregate `orders` | Medium |
-| `GET /api/v1/analytics/admin/summary` | Loop schemas, count `users` + `orders` | Medium |
-| `GET /api/v1/admin/users/:restaurantId` | Direct query into single schema | None |
+| Endpoint | Tables Looped | Complexity |
+|----------|--------------|------------|
+| `GET /api/v1/revenue` | `orders` per schema | Medium |
+| `GET /api/v1/analytics/admin/summary` | `orders` per schema | Medium |
+| `GET /api/v1/orders/my-all` | `orders` per schema | Medium |
+
+### 6.4 Global Endpoints (Single Query)
+
+| Endpoint | Table | Complexity |
+|----------|-------|------------|
+| `GET /api/v1/admin/users` | `public.users` + `public.user_restaurants` JOIN | None |
+| `GET /api/v1/admin/users/:restaurantId` | `public.users` + `public.user_restaurants` JOIN | None |
+| `GET /api/v1/addresses` | `public.addresses` | None |
 
 ---
 
@@ -426,13 +460,15 @@ Before marking schema-per-tenant complete:
 
 - [ ] `migrate-tenants.ts` ran successfully — `rest_mosaic` has cloned tables + data
 - [ ] `tsc --noEmit` passes across all 5 apps
-- [ ] `POST /api/v1/restaurants` creates `rest_<slug>` schema with 18 tables
-- [ ] New restaurant has default seed data (owner, rider, table, categories, menu, customer)
+- [ ] `POST /api/v1/restaurants` creates `rest_<slug>` schema with 12 tables (not users/addresses/loyalty)
+- [ ] New restaurant has default seed data (owner, rider, categories, menu)
 - [ ] Tenant middleware sets `search_path` — `GET /menus` resolves to tenant schema
+- [ ] Global tables (`users`, `addresses`, `loyalty_points`) resolve via `public` fallback
 - [ ] Admin middleware resets `search_path` — super-admin routes don't leak tenant data
-- [ ] `GET /api/v1/admin/users` returns users from all active schemas
-- [ ] `GET /api/v1/revenue` aggregates orders across all schemas
-- [ ] `GET /api/v1/analytics/admin/summary` counts users + orders across schemas
+- [ ] `GET /api/v1/admin/users` returns users from `public.users` JOIN `public.user_restaurants`
+- [ ] `GET /api/v1/revenue` loops schemas, aggregates `orders`
+- [ ] `GET /api/v1/analytics/admin/summary` counts `public.users` + loops `orders`
+- [ ] `GET /api/v1/orders/my-all` returns cross-restaurant order history
 - [ ] `GET /api/v1/restaurants/qr?type=delivery` returns valid PNG
 - [ ] No `console.log` statements in seed or template code
 - [ ] No git mutations executed automatically

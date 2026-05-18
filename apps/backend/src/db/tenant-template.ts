@@ -4,7 +4,11 @@ import { client } from './index';
 import fs from 'fs';
 import path from 'path';
 
+// Per-tenant tables cloned into each restaurant schema
+// Global tables (users, user_restaurants, addresses, loyalty_points) stay in public schema only
 export const TENANT_TABLES = [
+  'orders',
+  'order_items',
   'menu_categories',
   'menus',
   'menu_items',
@@ -12,6 +16,7 @@ export const TENANT_TABLES = [
   'delivery_agents',
   'delivery_assignments',
   'staff',
+  'game_sessions',
   'otp_requests',
   'daily_closeouts',
 ];

@@ -18,7 +18,7 @@ router.get('/', requireRole('super_admin'), async (_req, res, next) => {
 
     for (const schema of activeSchemas) {
       const orderRows = await db.execute(
-        sql`SELECT COUNT(*) as count, COALESCE(SUM(CAST(total AS DECIMAL)), 0) as revenue FROM public.orders WHERE restaurant_id = ${schema.id}`
+        sql`SELECT COUNT(*) as count, COALESCE(SUM(CAST(total AS DECIMAL)), 0) as revenue FROM ${sql.identifier(schema.schemaName)}."orders"`
       );
       const data = orderRows[0] as { count: number; revenue: number } | undefined;
       if (data) {

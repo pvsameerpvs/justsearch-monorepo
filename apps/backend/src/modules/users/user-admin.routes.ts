@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { restaurants, users, userRestaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
@@ -7,89 +7,72 @@ import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 const router = Router();
 router.use(authMiddleware);
 
+// GET /api/v1/admin/users — all users across all restaurants
 router.get('/', requireRole('super_admin'), async (_req, res, next) => {
   try {
-    const schemas = await db
-      .select({ schemaName: restaurants.schemaName, id: restaurants.id, name: restaurants.name })
-      .from(restaurants)
-      .where(eq(restaurants.status, 'active'));
+    const rows = await db
+      .select({
+        userId: users.id,
+        name: users.name,
+        email: users.email,
+        phone: users.phone,
+        role: users.role,
+        isActive: users.isActive,
+        createdAt: users.createdAt,
+        restaurantId: userRestaurants.restaurantId,
+        restaurantRole: userRestaurants.role,
+      })
+      .from(users)
+      .innerJoin(userRestaurants, eq(users.id, userRestaurants.userId))
+      .innerJoin(restaurants, eq(userRestaurants.restaurantId, restaurants.id));
 
-    const allUsers: Array<Record<string, unknown>> = [];
-    for (const schema of schemas) {
-      const links = await db
-        .select()
-        .from(userRestaurants)
-        .where(eq(userRestaurants.restaurantId, schema.id));
+    const enriched = rows.map((r) => ({
+      id: r.userId,
+      name: r.name,
+      email: r.email,
+      phone: r.phone,
+      role: r.role,
+      isActive: r.isActive,
+      createdAt: r.createdAt,
+      restaurantId: r.restaurantId,
+      restaurantRole: r.restaurantRole,
+    }));
 
-      for (const link of links) {
-        const [user] = await db
-          .select({
-            id: users.id,
-            email: users.email,
-            phone: users.phone,
-            name: users.name,
-            role: users.role,
-            isActive: users.isActive,
-            createdAt: users.createdAt,
-          })
-          .from(users)
-          .where(eq(users.id, link.userId))
-          .limit(1);
-
-        if (user) {
-          allUsers.push({
-            ...user,
-            restaurantId: schema.id,
-            restaurantName: schema.name,
-            restaurantRole: link.role,
-          });
-        }
-      }
-    }
-
-    res.json({ users: allUsers });
+    res.json({ users: enriched });
   } catch (error) {
     next(error);
   }
 });
 
+// GET /api/v1/admin/users/:restaurantId — users for specific restaurant
 router.get('/:restaurantId', requireRole('super_admin'), async (req, res, next) => {
   try {
+    const restaurantId = req.params.restaurantId;
+
     const [restaurant] = await db
       .select()
       .from(restaurants)
-      .where(eq(restaurants.id, req.params.restaurantId))
+      .where(eq(restaurants.id, restaurantId))
       .limit(1);
 
     if (!restaurant) {
       return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    const links = await db
-      .select()
-      .from(userRestaurants)
-      .where(eq(userRestaurants.restaurantId, restaurant.id));
-
-    const rows = [];
-    for (const link of links) {
-      const [user] = await db
-        .select({
-          id: users.id,
-          email: users.email,
-          phone: users.phone,
-          name: users.name,
-          role: users.role,
-          isActive: users.isActive,
-          createdAt: users.createdAt,
-        })
-        .from(users)
-        .where(eq(users.id, link.userId))
-        .limit(1);
-
-      if (user) {
-        rows.push({ ...user, restaurantRole: link.role });
-      }
-    }
+    const rows = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        phone: users.phone,
+        name: users.name,
+        role: users.role,
+        isActive: users.isActive,
+        createdAt: users.createdAt,
+        restaurantRole: userRestaurants.role,
+      })
+      .from(users)
+      .innerJoin(userRestaurants, eq(users.id, userRestaurants.userId))
+      .where(eq(userRestaurants.restaurantId, restaurantId));
 
     res.json({ users: rows, restaurant: { id: restaurant.id, name: restaurant.name } });
   } catch (error) {
