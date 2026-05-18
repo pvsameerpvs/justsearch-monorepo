@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
-import { addresses } from '../../db/schema';
+import { addresses, users } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -13,6 +13,12 @@ router.get('/', async (req, res, next) => {
   try {
     if (!req.auth) {
       return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Validate user still exists (stale JWT after migration 0007)
+    const [user] = await db.select().from(users).where(eq(users.id, req.auth.id)).limit(1);
+    if (!user) {
+      return res.status(401).json({ error: 'Session expired. Please sign in again.' });
     }
 
     const list = await db
@@ -32,6 +38,12 @@ router.post('/', async (req, res, next) => {
   try {
     if (!req.auth) {
       return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Validate user still exists (stale JWT after migration 0007)
+    const [user] = await db.select().from(users).where(eq(users.id, req.auth.id)).limit(1);
+    if (!user) {
+      return res.status(401).json({ error: 'Session expired. Please sign in again.' });
     }
 
     const body = req.body as {

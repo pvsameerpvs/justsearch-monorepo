@@ -6,6 +6,7 @@ import { useCheckoutAddress } from './use-checkout-address';
 import { useCheckoutPromo } from './use-checkout-promo';
 import { useCheckoutPlace } from './use-checkout-place';
 import { getCheckoutLineTotal } from './checkout.constants';
+import { ApiError } from '@/lib/api/client';
 import { useRegistration } from '@/components/auth/registration-context';
 import { useCheckoutValidation } from './use-checkout-validation';
 
@@ -14,7 +15,7 @@ export function useCheckoutState() {
   const address = useCheckoutAddress();
   const promo = useCheckoutPromo(total);
   const place = useCheckoutPlace();
-  const { isRegistered, user } = useRegistration();
+  const { isRegistered, user, clearUser } = useRegistration();
 
   const [restaurantNote, setRestaurantNote] = useState('');
   const [riderNote, setRiderNote] = useState('');
@@ -74,8 +75,15 @@ export function useCheckoutState() {
           details: address.addressDetails.trim(),
           alternateNumber: address.alternateNumber || undefined,
         });
-      } catch {
-        // Non-blocking: if save fails, still proceed with order
+      } catch (e) {
+        if (e instanceof ApiError && e.status === 401) {
+          clearUser();
+          place.setPlaceError('Session expired. Please sign in again.');
+          setIsSubmitting(false);
+          return;
+        }
+        // Non-blocking for other errors: log but still proceed with order
+        console.error('Failed to save address:', e);
       }
     }
 

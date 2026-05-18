@@ -1,4 +1,4 @@
--- Migration 0007: Restore global users, addresses, loyalty_points, user_restaurants to public schema
+pleaReferenced resource does not exist.-- Migration 0007: Restore global users, addresses, loyalty_points, user_restaurants to public schema
 -- Makes users global (one account everywhere) while keeping orders, game_sessions per-tenant.
 -- Tables that stay per-tenant: orders, order_items, game_sessions, menu_categories, menus, menu_items,
 --   promo_codes, delivery_agents, delivery_assignments, staff, otp_requests, daily_closeouts

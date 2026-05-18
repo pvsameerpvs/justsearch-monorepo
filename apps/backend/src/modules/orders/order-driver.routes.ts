@@ -26,13 +26,38 @@ router.patch('/:id/driver', requireRole('owner', 'manager', 'cashier'), async (r
 
     if (!updated) return res.status(404).json({ error: 'Order not found' });
 
-    await db.insert(deliveryAssignments).values({
-      restaurantId: req.tenant.id,
-      orderId: updated.id,
-      agentId: driverId,
-      status: 'assigned',
-      assignedAt: new Date(),
-    });
+    // Check if an assignment already exists for this order — update instead of duplicating
+    const [existing] = await db
+      .select()
+      .from(deliveryAssignments)
+      .where(
+        and(
+          eq(deliveryAssignments.orderId, updated.id),
+          eq(deliveryAssignments.restaurantId, req.tenant.id)
+        )
+      )
+      .limit(1);
+
+    if (existing) {
+      await db
+        .update(deliveryAssignments)
+        .set({
+          agentId: driverId,
+          status: 'assigned',
+          assignedAt: new Date(),
+          pickedUpAt: null,
+          deliveredAt: null,
+        })
+        .where(eq(deliveryAssignments.id, existing.id));
+    } else {
+      await db.insert(deliveryAssignments).values({
+        restaurantId: req.tenant.id,
+        orderId: updated.id,
+        agentId: driverId,
+        status: 'assigned',
+        assignedAt: new Date(),
+      });
+    }
 
     res.json({ order: updated });
   } catch (error) {
