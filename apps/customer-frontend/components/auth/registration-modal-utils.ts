@@ -2,6 +2,7 @@ export type OtpRequestResponse = {
   requestId: string;
   expiresIn?: number;
   demoOtp?: string;
+  flow?: 'signin' | 'signup';
 };
 
 export type OtpVerifyResponse = {

@@ -2,11 +2,13 @@
 import type { UseFormReturn } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { isValidOtp } from './registration-modal-utils';
+import type { AuthMode } from './use-otp-registration';
 
 type FormValues = { name: string; mobile: string; otp: string };
 
 interface OtpStepProps {
   form: UseFormReturn<FormValues>;
+  mode: AuthMode;
   busy: boolean;
   error: string | null;
   mobileFull: string;
@@ -18,14 +20,14 @@ interface OtpStepProps {
   onVerifyOtp: () => void;
 }
 
-export function OtpStep({ form, busy, error, mobileFull, demoOtp, canRequestOtp, canVerifyOtp, onBack, onRequestOtp, onVerifyOtp }: OtpStepProps) {
+export function OtpStep({ form, mode, busy, error, mobileFull, demoOtp, canRequestOtp, canVerifyOtp, onBack, onRequestOtp, onVerifyOtp }: OtpStepProps) {
   const { control, formState: { errors } } = form;
 
   return (
     <>
       <div className="rounded-[22px] border border-[rgb(var(--border)/0.9)] bg-white/70 p-4">
         <p className="text-xs font-semibold text-[rgb(var(--ink))]">OTP sent to <span className="font-mono">{mobileFull}</span></p>
-        <p className="mt-1 text-xs text-[rgb(var(--muted))]">Enter the 4-digit code to continue.</p>
+        <p className="mt-1 text-xs text-[rgb(var(--muted))]">Enter the 4-digit code to {mode === 'login' ? 'log in' : 'sign up'}.</p>
         {demoOtp ? (
           <p className="mt-2 text-xs font-bold text-[rgb(var(--brand))]">
             Demo OTP: <span className="font-mono tracking-widest">{demoOtp}</span>
@@ -57,7 +59,7 @@ export function OtpStep({ form, busy, error, mobileFull, demoOtp, canRequestOtp,
 
       <div className="grid gap-3 sm:grid-cols-2">
         <button type="button" onClick={onBack} className="inline-flex h-12 w-full items-center justify-center rounded-2xl border border-[rgb(var(--border)/0.9)] bg-white px-5 text-sm font-semibold text-[rgb(var(--ink))] transition-all hover:bg-[rgb(var(--card-surface-muted)/0.6)] active:scale-[0.99]">Edit details</button>
-        <button type="button" disabled={!canVerifyOtp || busy} onClick={onVerifyOtp} className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[rgb(var(--brand))] px-5 text-sm font-semibold text-white shadow-[0_14px_36px_rgb(var(--brand)/0.25)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.99]">{busy ? 'Verifying…' : 'Verify & Continue'}</button>
+        <button type="button" disabled={!canVerifyOtp || busy} onClick={onVerifyOtp} className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[rgb(var(--brand))] px-5 text-sm font-semibold text-white shadow-[0_14px_36px_rgb(var(--brand)/0.25)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.99]">{busy ? 'Verifying…' : (mode === 'login' ? 'Log In' : 'Sign Up')}</button>
       </div>
 
       <button type="button" disabled={!canRequestOtp || busy} onClick={onRequestOtp} className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-[rgb(var(--border)/0.9)] bg-white px-5 text-sm font-semibold text-[rgb(var(--brand))] transition-all hover:bg-[rgb(var(--brand-soft)/0.35)] disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.99]">Resend OTP</button>

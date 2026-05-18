@@ -30,7 +30,9 @@ router.post('/request', otpRequestLimiter, async (req, res, next) => {
 
     const flow = existingUser ? 'signin' : 'signup';
 
-    if (flow === 'signup' && !isValidName(rawName)) {
+    // For signup flow: if no name provided, return flow hint so frontend can auto-switch to signup tab
+    // If name is provided but invalid, return 400
+    if (flow === 'signup' && rawName.trim() !== '' && !isValidName(rawName)) {
       return res.status(400).json({ error: 'Invalid name' });
     }
 
