@@ -8,7 +8,6 @@ export const users = pgTable('users', {
   phone: varchar('phone', { length: 20 }).notNull().unique(),
   email: varchar('email', { length: 255 }).unique(),
   passwordHash: varchar('password_hash', { length: 255 }),
-  supabaseAuthId: uuid('supabase_auth_id'),
   isActive: boolean('is_active').default(true).notNull(),
   role: userRoleEnum('role').default('customer').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

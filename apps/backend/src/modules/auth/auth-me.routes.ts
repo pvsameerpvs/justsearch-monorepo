@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { users, userRestaurants, superAdmins, restaurants } from '../../db/schema';
+import { users, userRestaurants, superAdmins, restaurants, loyaltyPoints } from '../../db/schema';
 
 const router = Router();
 
@@ -28,6 +28,17 @@ router.get('/', async (req, res, next) => {
           .where(and(eq(userRestaurants.userId, id), eq(userRestaurants.restaurantId, restaurantId)))
           .limit(1);
 
+        // Fetch loyalty points for customers
+        let points = 0;
+        if (type === 'customer') {
+          const [lp] = await db
+            .select()
+            .from(loyaltyPoints)
+            .where(eq(loyaltyPoints.userId, id))
+            .limit(1);
+          points = lp?.points ?? 0;
+        }
+
         profile = {
           id: user.id,
           name: user.name,
@@ -36,6 +47,7 @@ router.get('/', async (req, res, next) => {
           role: link?.role || user.role,
           restaurantId,
           type,
+          ...(type === 'customer' && { points }),
         };
       }
 

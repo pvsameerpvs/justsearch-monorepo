@@ -49,7 +49,7 @@ router.get('/', requireRole('driver', 'owner', 'manager'), async (req, res, next
         o.eta_minutes,
         o.created_at
       FROM ${sql.identifier(schemaName)}.${sql.identifier('delivery_assignments')} da
-      INNER JOIN ${sql.identifier(schemaName)}.${sql.identifier('orders')} o ON da.order_id = o.id
+      INNER JOIN public.orders o ON da.order_id = o.id
       WHERE da.restaurant_id = ${req.tenant.id} AND da.agent_id = ${driverId}
       ORDER BY da.assigned_at DESC
       LIMIT 50`
@@ -61,7 +61,7 @@ router.get('/', requireRole('driver', 'owner', 'manager'), async (req, res, next
       const orderId = (a as Record<string, unknown>).order_id as string;
       const items = await db.execute<Record<string, unknown>>(
         sql`SELECT name, quantity, price, currency 
-        FROM ${sql.identifier(schemaName)}.${sql.identifier('order_items')} 
+        FROM public.order_items 
         WHERE order_id = ${orderId} 
         ORDER BY created_at ASC`
       );
@@ -112,7 +112,7 @@ router.patch('/:id/status', requireRole('driver', 'owner', 'manager'), async (re
     const orderId = updated.order_id as string;
 
     await db.execute(
-      sql`UPDATE ${sql.identifier(schemaName)}.${sql.identifier('orders')} 
+      sql`UPDATE public.orders 
       SET status = ${orderStatusMap[status as keyof typeof orderStatusMap]}, 
           updated_at = NOW()
           ${status === 'delivered' ? sql`, payment_status = 'paid'` : sql``}

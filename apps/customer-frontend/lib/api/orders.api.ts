@@ -36,7 +36,7 @@ export async function fetchOrder(orderId: string): Promise<{ order: Order; items
 }
 
 export type MyOrdersResponse = {
-  orders: Array<{ order: Order; items: OrderItem[] }>;
+  orders: Array<{ order: Order & { restaurantName?: string }; items: OrderItem[] }>;
 };
 
 export async function fetchMyOrders(): Promise<MyOrdersResponse> {

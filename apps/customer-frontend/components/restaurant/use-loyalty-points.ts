@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from 'react';
+import { apiClient } from '@/lib/api/client';
 
 const STORAGE_KEY = 'justsearch:loyaltyPoints';
 const UPDATED_EVENT = 'justsearch:loyaltyPointsUpdated';
@@ -36,7 +37,17 @@ export function useLoyaltyPoints() {
   useEffect(() => {
     const initial = readStoredPoints();
     setPointsState(initial);
-    writeStoredPoints(initial);
+
+    // Fetch from backend as source of truth
+    apiClient<{ points: number }>('/games/sessions/total-points')
+      .then((data) => {
+        const remote = Math.max(0, Math.floor(data.points));
+        setPointsState(remote);
+        writeStoredPoints(remote);
+      })
+      .catch(() => {
+        // Fall back to localStorage value already set above
+      });
   }, []);
 
   useEffect(() => {

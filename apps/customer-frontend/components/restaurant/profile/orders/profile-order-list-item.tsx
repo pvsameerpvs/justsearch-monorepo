@@ -42,7 +42,7 @@ export function ProfileOrderListItem({
         <div className="min-w-0">
           <div className="flex items-center gap-1">
             <p className="truncate text-sm font-semibold text-[rgb(var(--ink))]">
-              {restaurant.name}
+              {(order as any).restaurantName || restaurant.name}
             </p>
             <ChevronRight className="h-4 w-4 shrink-0 text-[rgb(var(--muted))]" />
           </div>

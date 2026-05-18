@@ -14,12 +14,6 @@ async function cleanupTenantSchemas(): Promise<void> {
     await client.unsafe(`DROP TABLE IF EXISTS "${schema}"."restaurant_users" CASCADE`);
     console.log(`[${schema}] Dropped obsolete tables: users, restaurant_users`);
 
-    // Add new tenant tables that were introduced after initial creation
-    // (addresses is now in TENANT_TABLES but may be missing in older schemas)
-    await client.unsafe(
-      `CREATE TABLE IF NOT EXISTS "${schema}"."addresses" (LIKE public."addresses" INCLUDING ALL)`
-    );
-    console.log(`[${schema}] Ensured table: addresses`);
   }
 
   console.log('Tenant schema cleanup complete.');

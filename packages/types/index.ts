@@ -31,6 +31,7 @@ export interface Order {
   paymentStatus: PaymentStatus;
   driverId: string | null;
   restaurantId: string;
+  restaurantName?: string;
   deliveryAddress: string | null;
   notes: string | null;
   createdAt: string;

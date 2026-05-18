@@ -136,7 +136,7 @@ export function useVoucherWallet() {
       setWallet((current) => {
         const next = sortEntries(updater(current));
         writeJsonStorage(VOUCHER_WALLET_STORAGE_KEY, next);
-        window.dispatchEvent(new Event(UPDATED_EVENT));
+        setTimeout(() => window.dispatchEvent(new Event(UPDATED_EVENT)), 0);
         return next;
       });
     },

@@ -29,6 +29,20 @@
       "when": 1779087263197,
       "tag": "0003_mature_texas_twister",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1779200000000,
+      "tag": "0004_global_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1779250000000,
+      "tag": "0005_cleanup_unused",
+      "breakpoints": true
     }
   ]
 }

@@ -23,7 +23,7 @@ router.get('/admin/summary', requireRole('super_admin'), async (_req, res, next)
 
     for (const schema of schemas) {
       const orderRows = await db.execute(
-        sql`SELECT COUNT(*) as count, COALESCE(SUM(CAST(total AS DECIMAL)), 0) as revenue FROM ${sql.identifier(schema.schemaName)}.orders`
+        sql`SELECT COUNT(*) as count, COALESCE(SUM(CAST(total AS DECIMAL)), 0) as revenue FROM public.orders WHERE restaurant_id = ${schema.id}`
       );
       const orderData = orderRows[0] as { count: number; revenue: number } | undefined;
       if (orderData) {
@@ -32,7 +32,7 @@ router.get('/admin/summary', requireRole('super_admin'), async (_req, res, next)
       }
 
       const pointsRows = await db.execute(
-        sql`SELECT COALESCE(SUM(total_earned), 0) as points FROM ${sql.identifier(schema.schemaName)}.loyalty_points`
+        sql`SELECT COALESCE(SUM(total_earned), 0) as points FROM public.loyalty_points`
       );
       const pointsData = pointsRows[0] as { points: number } | undefined;
       if (pointsData) {
