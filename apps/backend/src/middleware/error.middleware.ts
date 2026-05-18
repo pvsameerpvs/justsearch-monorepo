@@ -35,7 +35,7 @@ export const errorHandler = (
     }
     if (err.code === '23503') {
       statusCode = 400;
-      message = 'Referenced resource does not exist.';
+      message = 'Referenced resource does not exist. If this happened after placing an order, your session may be expired — please sign in again.';
     }
   }
 

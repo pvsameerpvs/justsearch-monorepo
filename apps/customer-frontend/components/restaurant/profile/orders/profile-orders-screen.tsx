@@ -5,7 +5,6 @@ import { Container } from '@/components/shared/container';
 import type { Restaurant } from '@/lib/restaurant-types';
 import { useMyOrdersQuery } from '@/lib/hooks/use-my-orders-query';
 import { ProfileOrderListItem } from './profile-order-list-item';
-import { mapOrderToDeliveryOrder } from './profile-order-mapper';
 
 type ProfileOrdersScreenProps = {
   restaurant: Restaurant;
@@ -27,7 +26,6 @@ function LoadingRows() {
 export function ProfileOrdersScreen({ restaurant }: ProfileOrdersScreenProps) {
   const { data, isLoading } = useMyOrdersQuery();
   const orders = data?.orders ?? [];
-  const currency = restaurant.menu[0]?.items[0]?.currency ?? 'AED';
 
   return (
     <section className="py-4 sm:py-6">
@@ -51,11 +49,11 @@ export function ProfileOrdersScreen({ restaurant }: ProfileOrdersScreenProps) {
           />
         ) : (
           <div className="space-y-2.5 sm:space-y-3">
-            {orders.map(({ order, items }) => (
+            {orders.map((order) => (
               <ProfileOrderListItem
                 key={order.id}
                 restaurant={restaurant}
-                order={mapOrderToDeliveryOrder(order, items, currency)}
+                order={order}
               />
             ))}
           </div>

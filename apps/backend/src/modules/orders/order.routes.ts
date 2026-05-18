@@ -10,13 +10,13 @@ import allOrderRoutes from './order-all.routes';
 
 const router = Router();
 
+router.use('/my', myOrderRoutes);
+router.use('/my-all', allOrderRoutes);
 router.use('/', createOrderRoutes);
 router.use('/', listOrderRoutes);
 router.use('/', detailOrderRoutes);
 router.use('/', statusOrderRoutes);
 router.use('/', driverOrderRoutes);
 router.use('/', paymentOrderRoutes);
-router.use('/my', myOrderRoutes);
-router.use('/my-all', allOrderRoutes);
 
 export default router;

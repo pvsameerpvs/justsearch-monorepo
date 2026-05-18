@@ -7,8 +7,8 @@ import { authMiddleware } from '../../middleware/auth.middleware';
 const router = Router();
 router.use(authMiddleware);
 
-// GET /api/v1/orders/my — list ALL orders for the authenticated customer across all restaurants
-router.get('/my', async (req, res, next) => {
+// GET /api/v1/orders/my — list ALL orders for the authenticated customer (tenant-scoped)
+router.get('/', async (req, res, next) => {
   try {
     if (!req.auth?.id) return res.status(401).json({ error: 'Authentication required' });
 

@@ -3,15 +3,24 @@ import { ChevronRight } from 'lucide-react';
 import { RestaurantLogoBadge } from '@/components/restaurant/restaurant-logo-badge';
 import { formatCurrency } from '@/lib/format';
 import type { Restaurant } from '@/lib/restaurant-types';
-import type { DeliveryOrder } from '../../use-restaurant-fulfillment';
 import {
   getOrderItemsPreview,
   getOrderListStatusLine,
 } from './profile-order-utils';
 
+type OrderListItemData = {
+  id: string;
+  code?: string;
+  restaurantName?: string;
+  status: string;
+  total: number | string;
+  createdAt: string | number;
+  items?: Array<{ name: string; quantity: number; currency?: string }>;
+};
+
 type ProfileOrderListItemProps = {
   restaurant: Restaurant;
-  order: DeliveryOrder;
+  order: OrderListItemData;
 };
 
 export function ProfileOrderListItem({
@@ -19,7 +28,9 @@ export function ProfileOrderListItem({
   order,
 }: ProfileOrderListItemProps) {
   const orderCurrency =
-    order.items[0]?.currency ?? restaurant.menu[0]?.items[0]?.currency ?? 'AED';
+    order.items?.[0]?.currency ?? restaurant.menu[0]?.items[0]?.currency ?? 'AED';
+
+  const totalNumber = typeof order.total === 'string' ? Number(order.total) : order.total;
 
   return (
     <div className="flex items-center gap-3 rounded-[22px] border border-[rgb(var(--border)/0.72)] bg-white/[0.92] px-3 py-3 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
@@ -42,7 +53,7 @@ export function ProfileOrderListItem({
         <div className="min-w-0">
           <div className="flex items-center gap-1">
             <p className="truncate text-sm font-semibold text-[rgb(var(--ink))]">
-              {(order as any).restaurantName || restaurant.name}
+              {order.restaurantName || restaurant.name}
             </p>
             <ChevronRight className="h-4 w-4 shrink-0 text-[rgb(var(--muted))]" />
           </div>
@@ -50,12 +61,14 @@ export function ProfileOrderListItem({
             {getOrderListStatusLine(order)}
           </p>
           <p className="mt-1 truncate text-[12px] text-[rgb(var(--muted))]">
-            {getOrderItemsPreview(order)}
+            {order.items && order.items.length > 0
+              ? getOrderItemsPreview(order as any)
+              : `Order #${order.code}`}
           </p>
         </div>
 
         <p className="shrink-0 pt-0.5 text-sm font-semibold text-[rgb(var(--ink))]">
-          {formatCurrency(order.total, orderCurrency)}
+          {formatCurrency(totalNumber, orderCurrency)}
         </p>
       </Link>
     </div>

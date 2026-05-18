@@ -61,7 +61,7 @@ export function getOrderStatusLabel(status: OrderStatus | string) {
   }
 }
 
-export function getOrderListStatusLine(order: DeliveryOrder) {
+export function getOrderListStatusLine(order: { status: string; createdAt: number | string }) {
   return `${getOrderStatusLabel(order.status)} · Placed ${formatOrderCompletionTime(order.createdAt)}`;
 }
 

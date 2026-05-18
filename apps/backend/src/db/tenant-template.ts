@@ -26,9 +26,18 @@ const DEFAULT_RIDER_PASSWORD = process.env.SEED_RIDER_PASSWORD || 'rider123';
 export async function createTenantSchema(schemaName: string): Promise<void> {
   await client.unsafe(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
 
+  // Find an existing active schema that has the orders table to use as template
+  // (public.orders may not exist after schema-per-tenant migration)
+  const templateResult = await client.unsafe(
+    `SELECT r.schema_name FROM public.restaurants r ` +
+    `JOIN information_schema.tables t ON t.table_schema = r.schema_name AND t.table_name = 'orders' ` +
+    `WHERE r.status = 'active' LIMIT 1`
+  );
+  const sourceSchema = templateResult[0]?.schema_name || 'public';
+
   for (const table of TENANT_TABLES) {
     await client.unsafe(
-      `CREATE TABLE IF NOT EXISTS "${schemaName}"."${table}" (LIKE public."${table}" INCLUDING ALL)`
+      `CREATE TABLE IF NOT EXISTS "${schemaName}"."${table}" (LIKE "${sourceSchema}"."${table}" INCLUDING ALL)`
     );
   }
 }

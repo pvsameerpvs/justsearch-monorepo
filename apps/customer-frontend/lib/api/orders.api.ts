@@ -35,10 +35,22 @@ export async function fetchOrder(orderId: string): Promise<{ order: Order; items
   return apiClient<{ order: Order; items: OrderItem[] }>(`/orders/${orderId}`);
 }
 
-export type MyOrdersResponse = {
-  orders: Array<{ order: Order & { restaurantName?: string }; items: OrderItem[] }>;
+// Cross-restaurant order history (all restaurants mixed together)
+export type CrossRestaurantOrder = {
+  id: string;
+  code: string;
+  restaurantId: string;
+  restaurantName: string;
+  status: string;
+  total: string;
+  createdAt: string;
+  fulfillmentType: string;
 };
 
-export async function fetchMyOrders(): Promise<MyOrdersResponse> {
-  return apiClient<MyOrdersResponse>('/orders/my');
+export type MyOrdersAllResponse = {
+  orders: CrossRestaurantOrder[];
+};
+
+export async function fetchMyOrders(): Promise<MyOrdersAllResponse> {
+  return apiClient<MyOrdersAllResponse>('/orders/my-all');
 }
