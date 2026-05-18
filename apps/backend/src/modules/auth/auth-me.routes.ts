@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { users, superAdmins, restaurants } from '../../db/schema';
-
+import { users, userRestaurants, superAdmins, restaurants } from '../../db/schema';
 
 const router = Router();
 
@@ -19,10 +18,24 @@ router.get('/', async (req, res, next) => {
       const [user] = await db
         .select()
         .from(users)
-        .where(and(eq(users.id, userId), eq(users.restaurantId, restaurantId)))
+        .where(eq(users.id, userId))
         .limit(1);
+
       if (user) {
-        profile = { id: user.id, name: user.name, phone: user.phone, email: user.email, role: user.role, restaurantId: user.restaurantId };
+        const [link] = await db
+          .select()
+          .from(userRestaurants)
+          .where(and(eq(userRestaurants.userId, userId), eq(userRestaurants.restaurantId, restaurantId)))
+          .limit(1);
+
+        profile = {
+          id: user.id,
+          name: user.name,
+          phone: user.phone,
+          email: user.email,
+          role: link?.role || user.role,
+          restaurantId,
+        };
       }
     } else if (type === 'super_admin') {
       const [admin] = await db

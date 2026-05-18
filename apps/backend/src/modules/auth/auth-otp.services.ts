@@ -1,6 +1,6 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
-import { otpRequests, users } from '../../db/schema';
+import { otpRequests, users, userRestaurants } from '../../db/schema';
 import { OTP_TTL_MS, MAX_ATTEMPTS } from './auth.utils';
 
 export async function validateOtpRequest(
@@ -47,14 +47,14 @@ export async function validateOtpRequest(
   const [existingUser] = await db
     .select()
     .from(users)
-    .where(and(eq(users.restaurantId, restaurantId), eq(users.phone, mobile)))
+    .where(eq(users.phone, mobile))
     .limit(1);
 
   let user = existingUser;
   if (!user) {
     const [newUser] = await db
       .insert(users)
-      .values({ restaurantId, phone: mobile, name: record.name, role: 'customer', isActive: true })
+      .values({ phone: mobile, name: record.name, role: 'customer', isActive: true })
       .returning();
     user = newUser;
   }
@@ -63,5 +63,20 @@ export async function validateOtpRequest(
     return { ok: false, error: 'User creation failed' };
   }
 
-  return { ok: true, user };
+  const [existingLink] = await db
+    .select()
+    .from(userRestaurants)
+    .where(and(eq(userRestaurants.userId, user.id), eq(userRestaurants.restaurantId, restaurantId)))
+    .limit(1);
+
+  let userRole = user.role;
+  if (!existingLink) {
+    await db
+      .insert(userRestaurants)
+      .values({ userId: user.id, restaurantId, role: user.role, permissions: {} });
+  } else {
+    userRole = existingLink.role;
+  }
+
+  return { ok: true, user, userRole };
 }

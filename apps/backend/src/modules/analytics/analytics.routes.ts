@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { eq, and, sql, gte, lte } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders, orderItems, users } from '../../db/schema';
+import { orders, orderItems, userRestaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -35,8 +35,8 @@ router.get('/summary', requireRole('owner', 'manager'), async (req, res, next) =
 
     const customerCount = await db
       .select({ count: sql<number>`count(*)` })
-      .from(users)
-      .where(eq(users.restaurantId, req.tenant.id));
+      .from(userRestaurants)
+      .where(eq(userRestaurants.restaurantId, req.tenant.id));
 
     res.json({
       today: {

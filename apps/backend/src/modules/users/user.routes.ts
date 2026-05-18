@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, inArray } from 'drizzle-orm';
 import { db } from '../../db';
-import { users } from '../../db/schema';
+import { users, userRestaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -13,10 +13,20 @@ router.get('/', requireRole('owner', 'manager', 'cashier'), async (req, res, nex
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
+    const links = await db
+      .select({ userId: userRestaurants.userId })
+      .from(userRestaurants)
+      .where(eq(userRestaurants.restaurantId, req.tenant.id));
+
+    const userIds = links.map((l) => l.userId);
+    if (userIds.length === 0) {
+      return res.json({ users: [] });
+    }
+
     const list = await db
       .select()
       .from(users)
-      .where(eq(users.restaurantId, req.tenant.id))
+      .where(inArray(users.id, userIds))
       .orderBy(desc(users.createdAt));
 
     res.json({ users: list });

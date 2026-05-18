@@ -5,7 +5,7 @@ export * from './advertisements';
 export * from './restaurant-games';
 export * from './super-admins';
 export * from './users';
-export * from './restaurant-users';
+export * from './user-restaurants';
 export * from './restaurant-tables';
 export * from './menu-categories';
 export * from './menus';

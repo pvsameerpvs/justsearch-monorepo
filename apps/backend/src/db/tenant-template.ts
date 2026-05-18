@@ -5,8 +5,6 @@ import fs from 'fs';
 import path from 'path';
 
 export const TENANT_TABLES = [
-  'users',
-  'restaurant_users',
   'restaurant_tables',
   'menu_categories',
   'menus',
@@ -23,6 +21,8 @@ export const TENANT_TABLES = [
   'game_sessions',
   'audit_logs',
   'otp_requests',
+  'addresses',
+  'daily_closeouts',
 ];
 
 const DEFAULT_RIDER_PASSWORD = process.env.SEED_RIDER_PASSWORD || 'rider123';

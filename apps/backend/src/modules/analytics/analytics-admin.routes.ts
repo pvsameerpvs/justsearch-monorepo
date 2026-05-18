@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql, eq, desc } from 'drizzle-orm';
 import { db } from '../../db';
-import { restaurants, advertisements } from '../../db/schema';
+import { restaurants, advertisements, users, userRestaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -17,22 +17,11 @@ router.get('/admin/summary', requireRole('super_admin'), async (_req, res, next)
     const allRestaurants = await db.select().from(restaurants).orderBy(desc(restaurants.createdAt));
     const allAds = await db.select().from(advertisements);
 
-    let totalUsers = 0;
-    let activeUsers = 0;
     let totalOrders = 0;
     let totalRevenue = 0;
     let totalGamePoints = 0;
 
     for (const schema of schemas) {
-      const userRows = await db.execute(
-        sql`SELECT COUNT(*) as count, COALESCE(SUM(CASE WHEN is_active = true THEN 1 ELSE 0 END), 0) as active_count FROM ${sql.identifier(schema.schemaName)}.users`
-      );
-      const userData = userRows[0] as { count: number; active_count: number } | undefined;
-      if (userData) {
-        totalUsers += Number(userData.count);
-        activeUsers += Number(userData.active_count);
-      }
-
       const orderRows = await db.execute(
         sql`SELECT COUNT(*) as count, COALESCE(SUM(CAST(total AS DECIMAL)), 0) as revenue FROM ${sql.identifier(schema.schemaName)}.orders`
       );
@@ -50,6 +39,16 @@ router.get('/admin/summary', requireRole('super_admin'), async (_req, res, next)
         totalGamePoints += Number(pointsData.points);
       }
     }
+
+    // Count global users via public.users + public.user_restaurants
+    const totalUsersResult = await db.select({ count: sql<number>`count(*)` }).from(users);
+    const activeUsersResult = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(users)
+      .where(eq(users.isActive, true));
+
+    const totalUsers = totalUsersResult[0]?.count ?? 0;
+    const activeUsers = activeUsersResult[0]?.count ?? 0;
 
     const activeRestaurants = allRestaurants.filter((r) => r.status === 'active').length;
     const activeCampaigns = allAds.filter((a) => a.isActive).length;

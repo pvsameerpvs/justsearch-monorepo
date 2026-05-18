@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql, eq } from 'drizzle-orm';
 import { db } from '../../db';
-import { restaurants } from '../../db/schema';
+import { restaurants, users, userRestaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -16,18 +16,34 @@ router.get('/', requireRole('super_admin'), async (_req, res, next) => {
 
     const allUsers: Array<Record<string, unknown>> = [];
     for (const schema of schemas) {
-      const rows = await db.execute(
-        sql`SELECT id, email, phone, name, role, is_active, created_at 
-            FROM ${sql.identifier(schema.schemaName)}.users 
-            ORDER BY created_at DESC 
-            LIMIT 500`
-      );
-      for (const row of rows) {
-        allUsers.push({
-          ...(row as Record<string, unknown>),
-          restaurantId: schema.id,
-          restaurantName: schema.name,
-        });
+      const links = await db
+        .select()
+        .from(userRestaurants)
+        .where(eq(userRestaurants.restaurantId, schema.id));
+
+      for (const link of links) {
+        const [user] = await db
+          .select({
+            id: users.id,
+            email: users.email,
+            phone: users.phone,
+            name: users.name,
+            role: users.role,
+            isActive: users.isActive,
+            createdAt: users.createdAt,
+          })
+          .from(users)
+          .where(eq(users.id, link.userId))
+          .limit(1);
+
+        if (user) {
+          allUsers.push({
+            ...user,
+            restaurantId: schema.id,
+            restaurantName: schema.name,
+            restaurantRole: link.role,
+          });
+        }
       }
     }
 
@@ -49,11 +65,31 @@ router.get('/:restaurantId', requireRole('super_admin'), async (req, res, next) 
       return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    const rows = await db.execute(
-      sql`SELECT id, email, phone, name, role, is_active, created_at 
-          FROM ${sql.identifier(restaurant.schemaName)}.users 
-          ORDER BY created_at DESC`
-    );
+    const links = await db
+      .select()
+      .from(userRestaurants)
+      .where(eq(userRestaurants.restaurantId, restaurant.id));
+
+    const rows = [];
+    for (const link of links) {
+      const [user] = await db
+        .select({
+          id: users.id,
+          email: users.email,
+          phone: users.phone,
+          name: users.name,
+          role: users.role,
+          isActive: users.isActive,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .where(eq(users.id, link.userId))
+        .limit(1);
+
+      if (user) {
+        rows.push({ ...user, restaurantRole: link.role });
+      }
+    }
 
     res.json({ users: rows, restaurant: { id: restaurant.id, name: restaurant.name } });
   } catch (error) {

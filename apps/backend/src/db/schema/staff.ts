@@ -1,6 +1,5 @@
 import { pgTable, uuid, varchar, timestamp, boolean, jsonb } from 'drizzle-orm/pg-core';
 import { restaurants } from './restaurants';
-import { users } from './users';
 import { staffRoleEnum } from './enums';
 
 export const staff = pgTable('staff', {
@@ -8,7 +7,6 @@ export const staff = pgTable('staff', {
   restaurantId: uuid('restaurant_id')
     .notNull()
     .references(() => restaurants.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   name: varchar('name', { length: 255 }).notNull(),
   username: varchar('username', { length: 100 }).notNull(),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),

@@ -1,6 +1,5 @@
 import { pgTable, uuid, varchar, timestamp, integer, boolean, decimal } from 'drizzle-orm/pg-core';
 import { restaurants } from './restaurants';
-import { users } from './users';
 import { deliveryAgentStatusEnum, vehicleTypeEnum } from './enums';
 
 export const deliveryAgents = pgTable('delivery_agents', {
@@ -8,7 +7,6 @@ export const deliveryAgents = pgTable('delivery_agents', {
   restaurantId: uuid('restaurant_id')
     .notNull()
     .references(() => restaurants.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   name: varchar('name', { length: 255 }).notNull(),
   phone: varchar('phone', { length: 20 }).notNull(),
   username: varchar('username', { length: 100 }).notNull(),

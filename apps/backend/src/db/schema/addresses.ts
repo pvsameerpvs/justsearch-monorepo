@@ -1,8 +1,9 @@
 import { pgTable, uuid, varchar, timestamp, boolean, text } from 'drizzle-orm/pg-core';
+import { users } from './users';
 
 export const addresses = pgTable('addresses', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').notNull(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   label: varchar('label', { length: 20 }).notNull(),
   address: text('address').notNull(),
   details: varchar('details', { length: 255 }),
