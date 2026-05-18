@@ -48,6 +48,7 @@ export function RestaurantGamePreviewCard({
                   fill
                   sizes="(max-width: 640px) 50vw, 160px"
                   className="object-cover"
+                  unoptimized
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(140deg,rgb(var(--brand-soft)/0.55),rgb(var(--accent-soft)/0.45))] text-6xl">

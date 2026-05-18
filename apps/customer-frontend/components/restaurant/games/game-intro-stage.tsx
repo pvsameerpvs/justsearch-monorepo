@@ -40,6 +40,7 @@ export function GameIntroStage({
                 priority
                 sizes="(max-width: 640px) 74vw, 340px"
                 className="rounded-full object-cover"
+                unoptimized
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-8xl drop-shadow-[0_20px_40px_rgba(15,23,42,0.22)]">

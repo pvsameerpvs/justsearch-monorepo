@@ -21,6 +21,7 @@ export function GameCard({ game, onToggleAvailability, onSaveScoring }: GameCard
               fill
               className="object-cover"
               sizes="64px"
+              unoptimized
             />
           </div>
         ) : (
