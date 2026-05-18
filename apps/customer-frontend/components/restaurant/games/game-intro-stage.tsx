@@ -7,6 +7,7 @@ import { GameIntroScores } from './game-intro-scores';
 type GameIntroStageProps = {
   game: Game;
   onStart: () => void;
+  isNavigating?: boolean;
   hasPlayed?: boolean;
   lastScore?: number;
   highScore?: number;
@@ -16,6 +17,7 @@ type GameIntroStageProps = {
 export function GameIntroStage({
   game,
   onStart,
+  isNavigating = false,
   hasPlayed = false,
   lastScore = 0,
   highScore = 0,
@@ -62,9 +64,10 @@ export function GameIntroStage({
       <button
         type="button"
         onClick={onStart}
-        className="mt-8 inline-flex h-14 items-center justify-center rounded-full border border-white/80 bg-[linear-gradient(180deg,#fff5d5,#ffd965)] px-12 text-base font-semibold tracking-[0.08em] text-[#755000] shadow-[0_20px_44px_rgba(255,213,94,0.35)] transition-all hover:brightness-105 active:scale-[0.98]"
+        disabled={isNavigating}
+        className="mt-8 inline-flex h-14 items-center justify-center rounded-full border border-white/80 bg-[linear-gradient(180deg,#fff5d5,#ffd965)] px-12 text-base font-semibold tracking-[0.08em] text-[#755000] shadow-[0_20px_44px_rgba(255,213,94,0.35)] transition-all hover:brightness-105 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
       >
-        Start
+        {isNavigating ? 'Loading...' : 'Start'}
       </button>
 
       <GameIntroScores hasPlayed={hasPlayed} lastScore={lastScore} highScore={highScore} communityTopScore={communityTopScore} />

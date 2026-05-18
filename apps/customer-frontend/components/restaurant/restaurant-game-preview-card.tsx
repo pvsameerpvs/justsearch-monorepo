@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { Surface } from '@/components/shared/surface';
+import { TransitionLoader } from '@/components/shared/transition-loader';
 import Image from 'next/image';
 import type { Game } from '@/lib/restaurant-types';
 import { useRegistration } from '@/components/auth/registration-context';
@@ -19,6 +20,7 @@ export function RestaurantGamePreviewCard({
   const { isRegistered, openModal } = useRegistration();
   const router = useRouter();
   const [showAd, setShowAd] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleClick = useCallback(() => {
     if (!isRegistered) { openModal(); return; }
@@ -26,7 +28,7 @@ export function RestaurantGamePreviewCard({
   }, [isRegistered, openModal]);
 
   const navigateToGame = useCallback(() => {
-    setShowAd(false);
+    setIsTransitioning(true);
     router.push(`/eat-play/${game.id}`);
   }, [game.id, router]);
 
@@ -35,7 +37,8 @@ export function RestaurantGamePreviewCard({
       <button
         type="button"
         onClick={handleClick}
-        className="group block w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand))] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        disabled={showAd || isTransitioning}
+        className="group block w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand))] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:pointer-events-none disabled:opacity-60"
         aria-label={`Play ${game.name}`}
       >
         <Surface className="flex h-full flex-col overflow-hidden rounded-[18px] border-[rgb(var(--border)/0.9)] bg-white/90 p-0 shadow-sm transition-all duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_46px_rgba(15,23,42,0.10)]">
@@ -74,6 +77,8 @@ export function RestaurantGamePreviewCard({
           completeLabel="Continue"
         />
       )}
+
+      {isTransitioning && <TransitionLoader />}
     </>
   );
 }
