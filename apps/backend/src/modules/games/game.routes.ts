@@ -7,18 +7,21 @@ import { createGameSchema, updateGameSchema } from './game.schema';
 import { updateGame } from './game.service';
 
 const router = Router();
+
+// Public: active games list (customer frontend reads this without auth)
+router.get('/active', async (_req, res, next) => {
+  try {
+    const list = await db.select().from(games).where(eq(games.isActive, true));
+    res.json({ games: list });
+  } catch (error) { next(error); }
+});
+
+// Auth required for admin-only routes below
 router.use(authMiddleware);
 
 router.get('/', requireRole('super_admin'), async (_req, res, next) => {
   try {
     const list = await db.select().from(games).orderBy(desc(games.createdAt));
-    res.json({ games: list });
-  } catch (error) { next(error); }
-});
-
-router.get('/active', async (_req, res, next) => {
-  try {
-    const list = await db.select().from(games).where(eq(games.isActive, true));
     res.json({ games: list });
   } catch (error) { next(error); }
 });

@@ -16,7 +16,6 @@ export const TENANT_TABLES = [
   'delivery_agents',
   'delivery_assignments',
   'staff',
-  'game_sessions',
   'otp_requests',
   'daily_closeouts',
 ];

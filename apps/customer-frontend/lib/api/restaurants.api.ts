@@ -15,11 +15,7 @@ export async function fetchCurrentRestaurant(host: string): Promise<ApiRestauran
     return await apiClient<ApiRestaurantData>('/restaurants/current', {
       tenantHost: host,
     });
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
-      console.error('[fetchCurrentRestaurant] failed:', error);
-    }
+  } catch {
     return null;
   }
 }

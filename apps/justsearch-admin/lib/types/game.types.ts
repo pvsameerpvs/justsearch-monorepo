@@ -12,6 +12,7 @@ export type AdminGame = {
   description: string;
   localGameId: string;
   icon: string;
+  coverImageUrl?: string;
   prize: string;
   maxPoints: number;
   isActive: boolean;

@@ -64,6 +64,20 @@
       "when": 1779360000000,
       "tag": "0008_add_payment_method_to_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1779446400000,
+      "tag": "0009_global_game_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1779450000000,
+      "tag": "0010_replace_games_with_correct_ones",
+      "breakpoints": true
     }
   ]
 }

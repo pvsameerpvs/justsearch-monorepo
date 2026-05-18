@@ -1,18 +1,22 @@
 export const HOW_TO_PLAY_GAMES = [
   {
-    title: 'Spin the Wheel',
-    steps: ['Tap Spin', 'Wait for the wheel to stop', 'Your points are added automatically'],
+    title: 'Jump & Bite',
+    steps: ['Tap to jump over obstacles', 'Collect food items along the way', 'Survive longer for higher scores'],
   },
   {
-    title: 'Scratch Card',
-    steps: ['Scratch with finger or mouse', 'Scratch about half to unlock', 'Points are added automatically'],
+    title: 'Hungry Bird Rush',
+    steps: ['Tap to fly upward', 'Avoid the pipes', 'Score points for each pipe passed'],
   },
   {
-    title: 'Tap Challenge',
-    steps: ['Tap as fast as you can', 'You have 10 seconds', 'Points = taps × 2 (max 120)'],
+    title: 'Cheddar Chase',
+    steps: ['Swipe to move the mouse', 'Collect all cheese in the maze', 'Avoid traps and finish fast'],
   },
   {
-    title: 'Quick Quiz',
-    steps: ['Tap an answer', 'It moves to the next question automatically', 'Points per correct answer'],
+    title: 'Gem Match',
+    steps: ['Tap two cards to flip them', 'Match identical gems', 'Clear all pairs to win'],
+  },
+  {
+    title: 'Slice Master',
+    steps: ['Swipe to slice fruits', 'Avoid bombs', 'Combo slices give bonus points'],
   },
 ] as const;

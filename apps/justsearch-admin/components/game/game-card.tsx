@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { ToggleLeft, ToggleRight } from 'lucide-react';
 import type { AdminGame } from '@/lib/types/game.types';
 import { GameScoringEditor } from './game-scoring-editor';
@@ -12,9 +13,21 @@ export function GameCard({ game, onToggleAvailability, onSaveScoring }: GameCard
   return (
     <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-xl">
-          {game.icon}
-        </div>
+        {game.coverImageUrl ? (
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+            <Image
+              src={game.coverImageUrl}
+              alt={game.name}
+              fill
+              className="object-cover"
+              sizes="64px"
+            />
+          </div>
+        ) : (
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-xl">
+            {game.icon}
+          </div>
+        )}
         <div className="min-w-0 flex-1">
           <p className="font-bold text-slate-900">{game.name}</p>
           <p className="text-xs text-slate-500">{game.description}</p>

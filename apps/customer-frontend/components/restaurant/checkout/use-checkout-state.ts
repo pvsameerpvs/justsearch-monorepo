@@ -82,8 +82,7 @@ export function useCheckoutState() {
           setIsSubmitting(false);
           return;
         }
-        // Non-blocking for other errors: log but still proceed with order
-        console.error('Failed to save address:', e);
+        // Non-blocking for other errors: silently proceed with order
       }
     }
 

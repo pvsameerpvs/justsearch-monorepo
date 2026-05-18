@@ -5,11 +5,13 @@ import { fetchActiveGames } from '@/lib/api/games.api';
 
 export default async function EatPlayPage() {
   const restaurant = await getCurrentRestaurant();
-  const activeGameNames = await fetchActiveGames();
+  const { names: activeGameNames, ok } = await fetchActiveGames();
 
   const games = PLATFORM_GAMES.map((g) => ({
     ...g,
-    isAvailable: activeGameNames.length > 0 ? activeGameNames.includes(g.name) : g.isAvailable,
+    // If API call succeeded, use whatever it returned (even if empty = no games active)
+    // If API call failed, fall back to hardcoded isAvailable
+    isAvailable: ok ? activeGameNames.includes(g.name) : g.isAvailable,
   }));
 
   return <RestaurantEatPlayShowcase restaurant={{ ...restaurant, games }} />;

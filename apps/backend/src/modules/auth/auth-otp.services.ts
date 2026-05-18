@@ -1,7 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
 import { otpRequests, users, userRestaurants } from '../../db/schema';
-import { OTP_TTL_MS, MAX_ATTEMPTS } from './auth.utils';
+import { MAX_ATTEMPTS } from './auth.utils';
 
 export async function validateOtpRequest(
   restaurantId: string,

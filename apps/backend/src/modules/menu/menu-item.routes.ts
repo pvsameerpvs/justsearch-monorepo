@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
-import { menuItems, menuCategories, menus } from '../../db/schema';
+import { menuItems, menus } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
