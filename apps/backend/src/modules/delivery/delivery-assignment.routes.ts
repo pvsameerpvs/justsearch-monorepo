@@ -14,7 +14,7 @@ router.get('/', requireRole('driver', 'owner', 'manager'), async (req, res, next
     if (!req.tenant) return res.status(400).json({ message: 'Tenant context required' });
 
     const driverId =
-      req.auth?.role === 'driver' ? req.auth.userId : (req.query.agentId as string);
+      req.auth?.role === 'driver' ? req.auth.id : (req.query.agentId as string);
 
     if (!driverId) {
       return res.status(400).json({ message: 'Driver ID required' });

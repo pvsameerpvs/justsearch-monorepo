@@ -51,12 +51,15 @@ export async function validateOtpRequest(
     .limit(1);
 
   let user = existingUser;
+  let isNewLink = false;
+
   if (!user) {
     const [newUser] = await db
       .insert(users)
       .values({ phone: mobile, name: record.name, role: 'customer', isActive: true })
       .returning();
     user = newUser;
+    isNewLink = true;
   }
 
   if (!user) {
@@ -74,9 +77,10 @@ export async function validateOtpRequest(
     await db
       .insert(userRestaurants)
       .values({ userId: user.id, restaurantId, role: user.role, permissions: {} });
+    isNewLink = true;
   } else {
     userRole = existingLink.role;
   }
 
-  return { ok: true, user, userRole };
+  return { ok: true, user, userRole, isNewLink };
 }

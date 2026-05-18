@@ -36,7 +36,7 @@ router.get('/', async (req, res, next) => {
       .from(deliveryAgents)
       .where(
         and(
-          eq(deliveryAgents.id, req.auth.userId),
+          eq(deliveryAgents.id, req.auth.id),
           eq(deliveryAgents.restaurantId, req.tenant.id)
         )
       )
@@ -68,7 +68,7 @@ router.patch('/status', async (req, res, next) => {
       .set({ status, updatedAt: new Date() })
       .where(
         and(
-          eq(deliveryAgents.id, req.auth.userId),
+          eq(deliveryAgents.id, req.auth.id),
           eq(deliveryAgents.restaurantId, req.tenant.id)
         )
       )

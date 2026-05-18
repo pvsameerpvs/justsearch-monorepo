@@ -8,7 +8,8 @@ if (!JWT_SECRET) {
 }
 
 export interface TokenPayload {
-  userId: string;
+  id: string;
+  name: string;
   role: string;
   restaurantId?: string;
   type: 'customer' | 'staff' | 'delivery' | 'super_admin';

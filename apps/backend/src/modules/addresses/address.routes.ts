@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
     const list = await db
       .select()
       .from(addresses)
-      .where(eq(addresses.userId, req.auth.userId))
+      .where(eq(addresses.userId, req.auth.id))
       .orderBy(addresses.createdAt);
 
     res.json({ addresses: list });
@@ -49,7 +49,7 @@ router.post('/', async (req, res, next) => {
     const [created] = await db
       .insert(addresses)
       .values({
-        userId: req.auth.userId,
+        userId: req.auth.id,
         label: body.label,
         address: body.address,
         details: body.details || null,
@@ -76,7 +76,7 @@ router.delete('/:id', async (req, res, next) => {
     const [existing] = await db
       .select()
       .from(addresses)
-      .where(and(eq(addresses.id, id), eq(addresses.userId, req.auth.userId)))
+      .where(and(eq(addresses.id, id), eq(addresses.userId, req.auth.id)))
       .limit(1);
 
     if (!existing) {

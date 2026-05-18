@@ -24,7 +24,8 @@ router.post('/', async (req, res, next) => {
     }
 
     const token = signToken({
-      userId: user.id,
+      id: user.id,
+      name: user.name,
       role: user.role,
       restaurantId: user.restaurantId,
       type: userType,

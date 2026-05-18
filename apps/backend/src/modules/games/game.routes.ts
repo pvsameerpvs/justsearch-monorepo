@@ -31,7 +31,7 @@ router.post('/', requireRole('super_admin'), async (req, res, next) => {
       type: body.type,
       config: body.config ?? {},
       isActive: body.isActive ?? true,
-      createdBy: req.auth?.userId,
+      createdBy: req.auth?.id,
     }).returning();
     res.status(201).json({ game });
   } catch (error) { next(error); }

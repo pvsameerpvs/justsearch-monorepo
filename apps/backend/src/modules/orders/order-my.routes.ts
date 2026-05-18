@@ -11,9 +11,9 @@ router.use(authMiddleware);
 router.get('/my', async (req, res, next) => {
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
-    if (!req.auth?.userId) return res.status(401).json({ error: 'Authentication required' });
+    if (!req.auth?.id) return res.status(401).json({ error: 'Authentication required' });
 
-    const customerId = req.auth.userId;
+    const customerId = req.auth.id;
 
     const orderList = await db
       .select()

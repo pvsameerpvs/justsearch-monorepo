@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 export interface AuthContext {
-  userId: string;
+  id: string;
+  name: string;
   role: string;
   restaurantId?: string;
   type: 'customer' | 'staff' | 'delivery' | 'super_admin';

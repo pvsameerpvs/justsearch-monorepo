@@ -11,21 +11,21 @@ router.get('/', async (req, res, next) => {
       return res.status(401).json({ message: 'Not authenticated' });
     }
 
-    const { type, userId, restaurantId } = req.auth;
+    const { type, id, name, restaurantId } = req.auth;
     let profile: Record<string, unknown> | null = null;
 
-    if (type === 'customer' && restaurantId) {
+    if ((type === 'customer' || type === 'staff' || type === 'delivery') && restaurantId) {
       const [user] = await db
         .select()
         .from(users)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, id))
         .limit(1);
 
       if (user) {
         const [link] = await db
           .select()
           .from(userRestaurants)
-          .where(and(eq(userRestaurants.userId, userId), eq(userRestaurants.restaurantId, restaurantId)))
+          .where(and(eq(userRestaurants.userId, id), eq(userRestaurants.restaurantId, restaurantId)))
           .limit(1);
 
         profile = {
@@ -35,41 +35,46 @@ router.get('/', async (req, res, next) => {
           email: user.email,
           role: link?.role || user.role,
           restaurantId,
+          type,
         };
+      }
+
+      if (!profile && type === 'staff') {
+        const schemaName = req.tenant?.schemaName || await getSchemaName(restaurantId);
+        const [staffMember] = await db.execute<{
+          id: string;
+          name: string;
+          role: string;
+          restaurant_id: string;
+        }>(
+          sql`SELECT id, name, role, restaurant_id FROM ${sql.identifier(schemaName)}.${sql.identifier('staff')} WHERE id = ${id} AND restaurant_id = ${restaurantId} LIMIT 1`
+        );
+        if (staffMember) {
+          profile = { id: staffMember.id, name: staffMember.name, role: staffMember.role, type: 'staff', restaurantId: staffMember.restaurant_id };
+        }
+      }
+
+      if (!profile && type === 'delivery') {
+        const schemaName = req.tenant?.schemaName || await getSchemaName(restaurantId);
+        const [agent] = await db.execute<{
+          id: string;
+          name: string;
+          restaurant_id: string;
+        }>(
+          sql`SELECT id, name, restaurant_id FROM ${sql.identifier(schemaName)}.${sql.identifier('delivery_agents')} WHERE id = ${id} AND restaurant_id = ${restaurantId} LIMIT 1`
+        );
+        if (agent) {
+          profile = { id: agent.id, name: agent.name, role: 'driver', type: 'delivery', restaurantId: agent.restaurant_id };
+        }
       }
     } else if (type === 'super_admin') {
       const [admin] = await db
         .select()
         .from(superAdmins)
-        .where(eq(superAdmins.id, userId))
+        .where(eq(superAdmins.id, id))
         .limit(1);
       if (admin) {
         profile = { id: admin.id, name: admin.name, role: 'super_admin', type: 'super_admin' };
-      }
-    } else if (type === 'staff' && restaurantId) {
-      const schemaName = req.tenant?.schemaName || await getSchemaName(restaurantId);
-      const [staffMember] = await db.execute<{
-        id: string;
-        name: string;
-        role: string;
-        restaurant_id: string;
-      }>(
-        sql`SELECT id, name, role, restaurant_id FROM ${sql.identifier(schemaName)}.${sql.identifier('staff')} WHERE id = ${userId} AND restaurant_id = ${restaurantId} LIMIT 1`
-      );
-      if (staffMember) {
-        profile = { id: staffMember.id, name: staffMember.name, role: staffMember.role, type: 'staff', restaurantId: staffMember.restaurant_id };
-      }
-    } else if (type === 'delivery' && restaurantId) {
-      const schemaName = req.tenant?.schemaName || await getSchemaName(restaurantId);
-      const [agent] = await db.execute<{
-        id: string;
-        name: string;
-        restaurant_id: string;
-      }>(
-        sql`SELECT id, name, restaurant_id FROM ${sql.identifier(schemaName)}.${sql.identifier('delivery_agents')} WHERE id = ${userId} AND restaurant_id = ${restaurantId} LIMIT 1`
-      );
-      if (agent) {
-        profile = { id: agent.id, name: agent.name, role: 'driver', type: 'delivery', restaurantId: agent.restaurant_id };
       }
     }
 

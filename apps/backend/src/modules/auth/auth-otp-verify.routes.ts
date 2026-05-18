@@ -32,7 +32,8 @@ router.post('/verify', otpVerifyLimiter, async (req, res, next) => {
     }
 
     const token = signToken({
-      userId: result.user.id,
+      id: result.user.id,
+      name: result.user.name,
       role: result.userRole,
       restaurantId: req.tenant.id,
       type: 'customer',
@@ -48,6 +49,7 @@ router.post('/verify', otpVerifyLimiter, async (req, res, next) => {
     res.json({
       verified: true,
       token,
+      isNewLink: result.isNewLink,
       user: { id: result.user.id, name: result.user.name, phone: result.user.phone, role: result.userRole },
     });
   } catch (error) {

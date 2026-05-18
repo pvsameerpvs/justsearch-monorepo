@@ -1,6 +1,6 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, or, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { superAdmins } from '../../db/schema';
+import { superAdmins, users, userRestaurants } from '../../db/schema';
 import { comparePassword } from '../../lib/hash';
 
 export async function findSuperAdmin(username: string, password: string) {
@@ -9,6 +9,38 @@ export async function findSuperAdmin(username: string, password: string) {
   const valid = await comparePassword(password, admin.passwordHash);
   if (!valid) return null;
   return { id: admin.id, name: admin.name, role: 'super_admin' };
+}
+
+export async function findPublicUser(
+  username: string,
+  password: string,
+  restaurantId: string
+) {
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(or(eq(users.email, username), eq(users.phone, username), eq(users.username, username)))
+    .limit(1);
+
+  if (!user || !user.passwordHash) return null;
+
+  const valid = await comparePassword(password, user.passwordHash);
+  if (!valid) return null;
+
+  const [link] = await db
+    .select()
+    .from(userRestaurants)
+    .where(and(eq(userRestaurants.userId, user.id), eq(userRestaurants.restaurantId, restaurantId)))
+    .limit(1);
+
+  const role = link?.role || user.role;
+
+  return {
+    id: user.id,
+    name: user.name,
+    role,
+    restaurantId,
+  };
 }
 
 export async function findDeliveryAgent(

@@ -52,7 +52,7 @@ router.post('/', requireRole('owner', 'manager', 'cashier'), async (req, res, ne
         cardTotal: String(cardTotal),
         orderCount,
         grandTotal: String(grandTotal),
-        closedBy: req.auth!.userId,
+        closedBy: req.auth!.id,
       })
       .returning();
 

@@ -20,12 +20,12 @@ router.post('/sessions', async (req, res, next) => {
     if (!req.tenant) {
       return res.status(400).json({ error: 'Tenant context required' });
     }
-    if (!req.auth?.userId) {
+    if (!req.auth?.id) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
     const body = createSessionSchema.parse(req.body);
-    const customerId = req.auth.userId;
+    const customerId = req.auth.id;
     const restaurantId = req.tenant.id;
 
     const [game] = await db.select().from(games).where(eq(games.id, body.gameId)).limit(1);

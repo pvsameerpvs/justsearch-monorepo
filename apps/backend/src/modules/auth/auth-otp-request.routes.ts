@@ -1,7 +1,8 @@
 import { randomUUID } from 'crypto';
 import { Router } from 'express';
+import { eq } from 'drizzle-orm';
 import { db } from '../../db';
-import { otpRequests } from '../../db/schema';
+import { otpRequests, users } from '../../db/schema';
 import { otpRequestLimiter } from '../../middleware/rate-limit.middleware';
 import { normalizeMobile, isValidMobile, isValidName, randomOtp, OTP_TTL_MS } from './auth.utils';
 
@@ -14,15 +15,26 @@ router.post('/request', otpRequestLimiter, async (req, res, next) => {
     }
 
     const body = req.body as { name?: string; mobile?: string };
-    const name = typeof body.name === 'string' ? body.name : '';
+    const rawName = typeof body.name === 'string' ? body.name : '';
     const mobile = normalizeMobile(typeof body.mobile === 'string' ? body.mobile : '');
 
-    if (!isValidName(name)) {
-      return res.status(400).json({ error: 'Invalid name' });
-    }
     if (!isValidMobile(mobile)) {
       return res.status(400).json({ error: 'Invalid mobile number' });
     }
+
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.phone, mobile))
+      .limit(1);
+
+    const flow = existingUser ? 'signin' : 'signup';
+
+    if (flow === 'signup' && !isValidName(rawName)) {
+      return res.status(400).json({ error: 'Invalid name' });
+    }
+
+    const name = flow === 'signin' && existingUser ? existingUser.name : rawName.trim();
 
     const requestId = randomUUID();
     const otp = randomOtp();
@@ -32,7 +44,7 @@ router.post('/request', otpRequestLimiter, async (req, res, next) => {
     await db.insert(otpRequests).values({
       restaurantId: req.tenant.id,
       requestId,
-      name: name.trim(),
+      name,
       mobile,
       otp,
       attempts: 0,
@@ -41,7 +53,7 @@ router.post('/request', otpRequestLimiter, async (req, res, next) => {
     });
 
     const isDev = process.env.NODE_ENV !== 'production';
-    res.json({ requestId, ...(isDev ? { demoOtp: otp } : {}) });
+    res.json({ requestId, flow, ...(isDev ? { demoOtp: otp } : {}) });
   } catch (error) {
     next(error);
   }
