@@ -1,4 +1,4 @@
-import { AdOverlay } from '@/components/restaurant/games/ad-overlay';
+import { AdOverlay } from '@/components/restaurant/games/ad/ad-overlay';
 
 interface GameAdOverlaysProps {
   showAdOnGameEnd: boolean;
@@ -6,22 +6,20 @@ interface GameAdOverlaysProps {
   restaurantId: string;
   gameId: string;
   onGameEndComplete: () => void;
-  onGameEndSkip: () => void;
   onBackComplete: () => void;
-  onBackSkip: () => void;
 }
 
 export function GameAdOverlays({
   showAdOnGameEnd, showAdOnBack, restaurantId, gameId,
-  onGameEndComplete, onGameEndSkip, onBackComplete, onBackSkip,
+  onGameEndComplete, onBackComplete,
 }: GameAdOverlaysProps) {
   return (
     <>
       {showAdOnGameEnd && (
-        <AdOverlay onComplete={onGameEndComplete} onSkip={onGameEndSkip} restaurantId={restaurantId} gameId={gameId} completeLabel="Continue" />
+        <AdOverlay onComplete={onGameEndComplete} restaurantId={restaurantId} gameId={gameId} completeLabel="Continue" />
       )}
       {showAdOnBack && (
-        <AdOverlay onComplete={onBackComplete} onSkip={onBackSkip} restaurantId={restaurantId} gameId={gameId} completeLabel="Continue" />
+        <AdOverlay onComplete={onBackComplete} restaurantId={restaurantId} gameId={gameId} completeLabel="Continue" />
       )}
     </>
   );

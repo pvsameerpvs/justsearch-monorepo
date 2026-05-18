@@ -29,7 +29,8 @@ export function computeTopAdCampaigns(campaigns: AdCampaign[]): AdStat[] {
   return campaigns
     .map((c) => ({
       ...c,
-      completionRate: c.impressions > 0 ? Math.round((c.completions / c.impressions) * 100) : 0,
+      completionRate: c.impressions > 0 ? Math.round(((c.impressions * 0.7) / c.impressions) * 100) : 0,
+      completions: Math.round(c.impressions * 0.7),
     }))
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 5);

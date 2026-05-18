@@ -6,7 +6,7 @@ import { Surface } from '@/components/shared/surface';
 import Image from 'next/image';
 import type { Game } from '@/lib/restaurant-types';
 import { useRegistration } from '@/components/auth/registration-context';
-import { AdOverlay } from './games/ad-overlay';
+import { AdOverlay } from './games/ad/ad-overlay';
 
 type RestaurantGamePreviewCardProps = { game: Game };
 
@@ -69,7 +69,6 @@ export function RestaurantGamePreviewCard({
       {showAd && (
         <AdOverlay
           onComplete={navigateToGame}
-          onSkip={navigateToGame}
           restaurantId={RESTAURANT_ID}
           gameId={game.id}
           completeLabel="Continue"

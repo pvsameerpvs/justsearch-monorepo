@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import type { Game } from '@/lib/restaurant-types';
@@ -16,6 +16,7 @@ import { useScrollLock } from '@/components/restaurant/use-scroll-lock';
 import { GameBackground } from '@/components/restaurant/game-background';
 import { GameHeader } from '@/components/restaurant/game-header';
 import { GameAdOverlays } from '@/components/restaurant/game-ad-overlays';
+import { useAdStore } from '@/components/restaurant/games/ad/ad-store';
 interface Props { game: Game; mode?: 'intro' | 'play'; }
 
 export function RestaurantGameScreen({ game, mode = 'intro' }: Props) {
@@ -33,6 +34,9 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: Props) {
   const goBack = useSmartBackNavigation(pathname, backFallbackPath);
   const gameStat = getGameStat(game.id);
   useScrollLock(true);
+
+  // Kickstart ad prefetch while user plays for instant ad display when game ends
+  useEffect(() => { useAdStore.getState().prefetch(game.id, 'mosaic-table'); }, [game.id]);
 
   const processAward = useCallback(async (result: GameAwardResult) => {
     const { pointsAwarded } = await submitScore(game.id, result.score, result.level);
@@ -73,7 +77,7 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: Props) {
           </div>
         </>
       ) : <GamePlayerStage game={game} onAward={onAward} coins={points} />}
-      <GameAdOverlays showAdOnGameEnd={showAdOnGameEnd} showAdOnBack={showAdOnBack} restaurantId="mosaic-table" gameId={game.id} onGameEndComplete={handleGameEndAdDone} onGameEndSkip={handleGameEndAdDone} onBackComplete={handleBackAdDone} onBackSkip={handleBackAdDone} />
+      <GameAdOverlays showAdOnGameEnd={showAdOnGameEnd} showAdOnBack={showAdOnBack} restaurantId="mosaic-table" gameId={game.id} onGameEndComplete={handleGameEndAdDone} onBackComplete={handleBackAdDone} />
       <GameExitConfirmDialog open={isExitDialogOpen} onCancel={() => setIsExitDialogOpen(false)} onConfirm={handleExitConfirm} />
     </section>
   );

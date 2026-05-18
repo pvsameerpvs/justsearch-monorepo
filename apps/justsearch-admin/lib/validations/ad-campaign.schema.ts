@@ -12,6 +12,9 @@ export const adCampaignSchema = z.object({
   restaurantName: z.string().nullable(),
   assignedGames: z.array(z.string()).min(1, 'Select at least one game'),
   isActive: z.boolean().optional(),
+  category: z.string().min(1, 'Category is required'),
+  budget: z.coerce.number().min(0, 'Budget must be 0 or more'),
+  costPerImpression: z.coerce.number().min(0, 'Cost per impression must be 0 or more'),
 }).refine(
   (data) => {
     if (data.type === 'restaurant_brought') {

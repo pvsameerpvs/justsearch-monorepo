@@ -1,20 +1,23 @@
-import type { AdCampaign, AdCampaignFormData, AdCampaignType, AdMediaType } from '@/lib/stores/ad-campaign-types';
+import type { AdCampaign } from '@/lib/stores/ad-campaign-types';
 
-export type DbAd = {
+export interface DbAd {
   id: string;
   name: string;
-  type: AdCampaignType;
-  mediaType: AdMediaType;
+  type: string;
+  mediaType: string;
   content: string | null;
   imageUrl: string | null;
   duration: number;
+  category: string | null;
+  budget: string | null;
+  costPerImpression: string | null;
+  impressions: number;
+  spent: string | null;
   assignedGames: string[];
   targetRestaurants: string[];
   isActive: boolean;
-  startDate: string | null;
-  endDate: string | null;
   createdAt: string;
-};
+}
 
 export function mapDbToCampaign(db: DbAd): AdCampaign {
   const nameParts = db.name.split(' — ');
@@ -23,23 +26,39 @@ export function mapDbToCampaign(db: DbAd): AdCampaign {
     title: nameParts[0] || db.name,
     clientName: db.content ?? '',
     companyName: nameParts[1] || '',
-    mediaType: db.mediaType,
+    mediaType: db.mediaType as 'image' | 'video' | 'gif',
     mediaUrl: db.imageUrl ?? '',
     duration: db.duration ?? 15,
-    type: db.type,
+    type: db.type as 'restaurant_brought' | 'platform',
     restaurantId: db.targetRestaurants?.[0] ?? null,
     restaurantName: null,
     assignedGames: db.assignedGames ?? [],
     isActive: db.isActive,
-    impressions: 0,
-    skips: 0,
-    completions: 0,
+    category: db.category ?? null,
+    budget: Number(db.budget ?? 0),
+    costPerImpression: Number(db.costPerImpression ?? 0),
+    impressions: db.impressions ?? 0,
+    spent: Number(db.spent ?? 0),
     revenue: 0,
     createdAt: db.createdAt,
   };
 }
 
-export function mapFormToDb(data: AdCampaignFormData) {
+export function mapCampaignToDb(data: {
+  title: string;
+  clientName: string;
+  companyName: string;
+  mediaType: string;
+  mediaUrl: string;
+  duration: number;
+  type: string;
+  restaurantId: string | null;
+  assignedGames: string[];
+  isActive?: boolean;
+  category: string;
+  budget: number;
+  costPerImpression: number;
+}) {
   return {
     name: `${data.title} — ${data.companyName}`,
     type: data.type,
@@ -47,24 +66,11 @@ export function mapFormToDb(data: AdCampaignFormData) {
     content: data.clientName,
     imageUrl: data.mediaUrl,
     duration: data.duration,
+    category: data.category || null,
+    budget: String(data.budget),
+    costPerImpression: String(data.costPerImpression),
     assignedGames: data.assignedGames,
     targetRestaurants: data.restaurantId ? [data.restaurantId] : [],
     isActive: data.isActive ?? true,
   };
-}
-
-export function mapPartialFormToDb(data: Partial<AdCampaignFormData>): Record<string, unknown> {
-  const mapped: Record<string, unknown> = {};
-  if (data.title !== undefined || data.companyName !== undefined) {
-    mapped.name = `${data.title ?? ''} — ${data.companyName ?? ''}`;
-  }
-  if (data.type !== undefined) mapped.type = data.type;
-  if (data.mediaType !== undefined) mapped.mediaType = data.mediaType;
-  if (data.clientName !== undefined) mapped.content = data.clientName;
-  if (data.mediaUrl !== undefined) mapped.imageUrl = data.mediaUrl;
-  if (data.duration !== undefined) mapped.duration = data.duration;
-  if (data.assignedGames !== undefined) mapped.assignedGames = data.assignedGames;
-  if (data.restaurantId !== undefined) mapped.targetRestaurants = data.restaurantId ? [data.restaurantId] : [];
-  if (data.isActive !== undefined) mapped.isActive = data.isActive;
-  return mapped;
 }

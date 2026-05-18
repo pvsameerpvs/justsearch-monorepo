@@ -2,19 +2,15 @@
 
 import { X, Volume2, VolumeX } from "lucide-react";
 
-export function AdOverlayHeader({
-  index,
-  total,
-  isMuted,
-  onMuteToggle,
-  onSkip,
-}: {
+interface AdOverlayHeaderProps {
   index: number;
   total: number;
   isMuted: boolean;
   onMuteToggle: () => void;
   onSkip: () => void;
-}) {
+}
+
+export function AdOverlayHeader({ index, total, isMuted, onMuteToggle, onSkip }: AdOverlayHeaderProps) {
   return (
     <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
       <div className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-md">

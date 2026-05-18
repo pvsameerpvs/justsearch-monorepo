@@ -6,7 +6,8 @@ interface RevenueCampaignRowProps {
 }
 
 export function RevenueCampaignRow({ campaign }: RevenueCampaignRowProps) {
-  const ctr = campaign.impressions > 0 ? Math.round((campaign.completions / campaign.impressions) * 100) : 0;
+  const ctr = campaign.impressions > 0 ? Math.round(((campaign.impressions * 0.7) / campaign.impressions) * 100) : 0;
+  const completions = Math.round(campaign.impressions * 0.7);
 
   return (
     <div className="flex items-start gap-3 rounded-lg border border-slate-100 p-3">

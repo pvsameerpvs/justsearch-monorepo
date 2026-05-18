@@ -12,11 +12,13 @@ export interface AdCampaign {
   type: AdCampaignType;
   restaurantId: string | null;
   restaurantName: string | null;
-  assignedGames: string[]; // game IDs this ad runs on
+  assignedGames: string[];
   isActive: boolean;
+  category: string | null;
+  budget: number;
+  costPerImpression: number;
   impressions: number;
-  skips: number;
-  completions: number;
+  spent: number;
   revenue: number;
   createdAt: string;
 }
@@ -33,4 +35,7 @@ export interface AdCampaignFormData {
   restaurantName: string | null;
   assignedGames: string[];
   isActive?: boolean;
+  category: string;
+  budget: number;
+  costPerImpression: number;
 }

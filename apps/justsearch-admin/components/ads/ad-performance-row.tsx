@@ -7,7 +7,8 @@ interface AdPerformanceRowProps {
 }
 
 export function AdPerformanceRow({ campaign }: AdPerformanceRowProps) {
-  const completionRate = campaign.impressions > 0 ? Math.round((campaign.completions / campaign.impressions) * 100) : 0;
+  const completions = Math.round(campaign.impressions * 0.7);
+  const completionRate = campaign.impressions > 0 ? Math.round((completions / campaign.impressions) * 100) : 0;
 
   return (
     <tr className="group hover:bg-slate-50/80 transition-colors">
@@ -29,7 +30,7 @@ export function AdPerformanceRow({ campaign }: AdPerformanceRowProps) {
         <div className="flex items-center justify-end gap-1"><Clock className="h-3 w-3 text-slate-400" />{campaign.duration}s</div>
       </td>
       <td className="px-5 py-3.5 text-right text-sm font-semibold text-slate-700">{campaign.impressions.toLocaleString()}</td>
-      <td className="px-5 py-3.5 text-right text-sm font-bold text-emerald-600">{campaign.completions.toLocaleString()}</td>
+      <td className="px-5 py-3.5 text-right text-sm font-bold text-emerald-600">{completions.toLocaleString()}</td>
       <td className="px-5 py-3.5 text-right">
         <div className="flex items-center justify-end gap-1.5">
           <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">

@@ -35,6 +35,9 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
       restaurantName: campaign?.restaurantName ?? firstRestaurant?.name ?? null,
       assignedGames: campaign?.assignedGames ?? [],
       isActive: campaign?.isActive ?? true,
+      category: campaign?.category ?? "Restaurant",
+      budget: campaign?.budget ?? 0,
+      costPerImpression: campaign?.costPerImpression ?? 5,
     },
   });
 
@@ -52,6 +55,9 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
         restaurantName: campaign.restaurantName ?? firstRestaurant?.name ?? null,
         assignedGames: campaign.assignedGames,
         isActive: campaign.isActive,
+        category: campaign.category ?? "Restaurant",
+        budget: campaign.budget ?? 0,
+        costPerImpression: campaign.costPerImpression ?? 5,
       });
     }
   }, [campaign, form, firstRestaurant]);

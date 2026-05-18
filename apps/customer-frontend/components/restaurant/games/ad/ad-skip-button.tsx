@@ -1,8 +1,8 @@
-type AdSkipButtonProps = {
+interface AdSkipButtonProps {
   isLastAd: boolean;
   onSkip: () => void;
   completeLabel?: string;
-};
+}
 
 export function AdSkipButton({ isLastAd, onSkip, completeLabel = "Continue" }: AdSkipButtonProps) {
   return (

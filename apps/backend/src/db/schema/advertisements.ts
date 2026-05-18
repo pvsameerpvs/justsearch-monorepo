@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, timestamp, jsonb, boolean, integer } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, timestamp, jsonb, boolean, integer, decimal } from 'drizzle-orm/pg-core';
 
 export const advertisements = pgTable('advertisements', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -8,6 +8,11 @@ export const advertisements = pgTable('advertisements', {
   content: varchar('content', { length: 2000 }),
   imageUrl: varchar('image_url', { length: 500 }),
   duration: integer('duration').default(15).notNull(),
+  category: varchar('category', { length: 50 }),
+  budget: decimal('budget', { precision: 10, scale: 2 }).default('0'),
+  costPerImpression: decimal('cost_per_impression', { precision: 10, scale: 2 }).default('0'),
+  impressions: integer('impressions').default(0),
+  spent: decimal('spent', { precision: 10, scale: 2 }).default('0'),
   assignedGames: jsonb('assigned_games').default('[]').notNull(),
   targetRestaurants: jsonb('target_restaurants').default('[]').notNull(),
   isActive: boolean('is_active').default(true).notNull(),

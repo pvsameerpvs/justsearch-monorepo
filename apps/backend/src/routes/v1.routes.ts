@@ -73,9 +73,9 @@ router.use('/admin/users', userAdminRoutes);
 router.use('/games', gameRoutes);
 router.use('/games', gameSessionRoutes);
 
-// Advertisements (super-admin)
-router.use('/advertisements', adRoutes);
+// Advertisements — public MUST come before auth-protected routes
 router.use('/advertisements/public', publicAdRoutes);
+router.use('/advertisements', adRoutes);
 
 // Revenue (super-admin)
 router.use('/revenue', revenueRoutes);
