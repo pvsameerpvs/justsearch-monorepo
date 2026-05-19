@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, desc, and, or, sql } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { db } from '../../db';
 import { advertisements } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
@@ -14,6 +14,7 @@ const createSchema = z.object({
   mediaType: z.enum(['image', 'video', 'gif']).optional(),
   content: z.string().optional(),
   imageUrl: z.string().optional(),
+  linkUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   duration: z.number().int().positive().optional(),
   category: z.string().optional(),
   budget: z.coerce.number().nonnegative().optional(),
@@ -23,6 +24,11 @@ const createSchema = z.object({
   isActive: z.boolean().optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
+  visibility: z.object({
+    title: z.boolean(),
+    description: z.boolean(),
+    linkUrl: z.boolean(),
+  }).optional(),
 });
 
 const updateSchema = createSchema.partial();
@@ -76,34 +82,6 @@ router.delete('/:id', requireRole('super_admin'), async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// POST /api/v1/advertisements/:id/impression — track ad view, auto-deactivate if budget exhausted
-router.post('/:id/impression', async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    const [ad] = await db.select().from(advertisements).where(eq(advertisements.id, id)).limit(1);
-    if (!ad) return res.status(404).json({ error: 'Ad not found' });
-
-    const newImpressions = (ad.impressions ?? 0) + 1;
-    const costPerImp = Number(ad.costPerImpression ?? 0);
-    const budget = Number(ad.budget ?? 0);
-    const newSpent = costPerImp * newImpressions;
-    const isBudgetExhausted = budget > 0 && newSpent >= budget;
-
-    await db
-      .update(advertisements)
-      .set({
-        impressions: newImpressions,
-        spent: String(newSpent),
-        isActive: isBudgetExhausted ? false : ad.isActive,
-      })
-      .where(eq(advertisements.id, id));
-
-    res.json({ success: true, impressions: newImpressions, spent: newSpent, budgetExhausted: isBudgetExhausted });
-  } catch (error) { next(error); }
-});
-
-export default router;
-
 // Safely parse JSONB array columns (handles null, string, array)
 function safeStringArray(value: unknown): string[] {
   if (Array.isArray(value)) return value as string[];
@@ -121,12 +99,17 @@ publicAdRoutes.get('/active', async (req, res, next) => {
     const gameId = req.query.gameId as string | undefined;
     const restaurantId = req.query.restaurantId as string | undefined;
     const excludeCategories = req.query.excludeCategories as string | undefined;
+    const now = new Date();
 
     // Step 1: Fetch all active ads from Drizzle ORM (safe, no raw SQL)
     const allAds = await db.select().from(advertisements).where(eq(advertisements.isActive, true));
 
     // Step 2: Filter in memory (ads table is small — platform-wide, not per-tenant)
     let result = allAds.filter((ad) => {
+      // Date range check: skip if not yet started or already expired
+      if (ad.startDate && new Date(ad.startDate) > now) return false;
+      if (ad.endDate && new Date(ad.endDate) < now) return false;
+
       // Budget check: skip if budget is set and exhausted
       const budget = Number(ad.budget ?? 0);
       const spent = Number(ad.spent ?? 0);
@@ -161,6 +144,7 @@ publicAdRoutes.get('/active', async (req, res, next) => {
       mediaType: row.mediaType,
       content: row.content,
       imageUrl: row.imageUrl,
+      linkUrl: row.linkUrl,
       duration: row.duration,
       category: row.category,
       budget: row.budget,
@@ -173,17 +157,40 @@ publicAdRoutes.get('/active', async (req, res, next) => {
       startDate: row.startDate,
       endDate: row.endDate,
       createdAt: row.createdAt,
+      visibility: row.visibility,
     }));
 
     // Step 5: Shuffle for smart rotation
     const shuffled = camelized.sort(() => Math.random() - 0.5);
 
     res.json({ advertisements: shuffled });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('[Ads] Public fetch error:', error);
-    next(error);
-  }
+  } catch (error) { next(error); }
+});
+
+// POST /api/v1/advertisements/public/:id/impression — track ad view, auto-deactivate if budget exhausted
+publicAdRoutes.post('/:id/impression', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const [ad] = await db.select().from(advertisements).where(eq(advertisements.id, id)).limit(1);
+    if (!ad) return res.status(404).json({ error: 'Ad not found' });
+
+    const newImpressions = (ad.impressions ?? 0) + 1;
+    const costPerImp = Number(ad.costPerImpression ?? 0);
+    const budget = Number(ad.budget ?? 0);
+    const newSpent = costPerImp * newImpressions;
+    const isBudgetExhausted = budget > 0 && newSpent >= budget;
+
+    await db
+      .update(advertisements)
+      .set({
+        impressions: newImpressions,
+        spent: String(newSpent),
+        isActive: isBudgetExhausted ? false : ad.isActive,
+      })
+      .where(eq(advertisements.id, id));
+
+    res.json({ success: true, impressions: newImpressions, spent: newSpent, budgetExhausted: isBudgetExhausted });
+  } catch (error) { next(error); }
 });
 
 // Debug endpoint: list all active ads with their match status (no auth)
@@ -205,3 +212,5 @@ publicAdRoutes.get('/debug', async (req, res, next) => {
     });
   } catch (error) { next(error); }
 });
+
+export default router;

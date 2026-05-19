@@ -1,4 +1,4 @@
-import type { AdCampaign } from '@/lib/stores/ad-campaign-types';
+import type { AdCampaign, AdCampaignFormData } from '@/lib/stores/ad-campaign-types';
 
 export interface DbAd {
   id: string;
@@ -7,6 +7,7 @@ export interface DbAd {
   mediaType: string;
   content: string | null;
   imageUrl: string | null;
+  linkUrl: string | null;
   duration: number;
   category: string | null;
   budget: string | null;
@@ -16,7 +17,10 @@ export interface DbAd {
   assignedGames: string[];
   targetRestaurants: string[];
   isActive: boolean;
+  startDate: string | null;
+  endDate: string | null;
   createdAt: string;
+  visibility: Record<string, boolean> | null;
 }
 
 export function mapDbToCampaign(db: DbAd): AdCampaign {
@@ -28,6 +32,7 @@ export function mapDbToCampaign(db: DbAd): AdCampaign {
     companyName: nameParts[1] || '',
     mediaType: db.mediaType as 'image' | 'video' | 'gif',
     mediaUrl: db.imageUrl ?? '',
+    linkUrl: db.linkUrl ?? null,
     duration: db.duration ?? 15,
     type: db.type as 'restaurant_brought' | 'platform',
     restaurantId: db.targetRestaurants?.[0] ?? null,
@@ -40,31 +45,21 @@ export function mapDbToCampaign(db: DbAd): AdCampaign {
     impressions: db.impressions ?? 0,
     spent: Number(db.spent ?? 0),
     revenue: 0,
+    startDate: db.startDate ?? null,
+    endDate: db.endDate ?? null,
     createdAt: db.createdAt,
+    visibility: db.visibility ?? { title: true, description: false, linkUrl: true },
   };
 }
 
-export function mapCampaignToDb(data: {
-  title: string;
-  clientName: string;
-  companyName: string;
-  mediaType: string;
-  mediaUrl: string;
-  duration: number;
-  type: string;
-  restaurantId: string | null;
-  assignedGames: string[];
-  isActive?: boolean;
-  category: string;
-  budget: number;
-  costPerImpression: number;
-}) {
+export function mapCampaignToDb(data: AdCampaignFormData) {
   return {
     name: `${data.title} — ${data.companyName}`,
     type: data.type,
     mediaType: data.mediaType,
     content: data.clientName,
     imageUrl: data.mediaUrl,
+    linkUrl: data.linkUrl || undefined,
     duration: data.duration,
     category: data.category || null,
     budget: String(data.budget),
@@ -72,5 +67,8 @@ export function mapCampaignToDb(data: {
     assignedGames: data.assignedGames,
     targetRestaurants: data.restaurantId ? [data.restaurantId] : [],
     isActive: data.isActive ?? true,
+    startDate: data.startDate ? new Date(data.startDate).toISOString() : undefined,
+    endDate: data.endDate ? new Date(data.endDate).toISOString() : undefined,
+    visibility: data.visibility ?? { title: true, description: false, linkUrl: true },
   };
 }

@@ -47,7 +47,7 @@ export function useUpdateAdMutation() {
 
       // Full edit (has title) → map to DB shape; partial (toggle) → pass through
       const payload = 'title' in data && data.title !== undefined
-        ? mapCampaignToDb({ ...data, mediaUrl } as any)
+        ? mapCampaignToDb({ ...data, mediaUrl } as AdCampaignFormData)
         : mediaUrl !== undefined ? { ...data, mediaUrl } : data;
 
       return apiClient<DbAd>(`/advertisements/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });

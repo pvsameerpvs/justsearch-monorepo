@@ -29,6 +29,7 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
       companyName: campaign?.companyName ?? "",
       mediaType: campaign?.mediaType ?? "image",
       mediaUrl: campaign?.mediaUrl ?? "",
+      linkUrl: campaign?.linkUrl ?? "",
       duration: campaign?.duration ?? 15,
       type: campaign?.type ?? "restaurant_brought",
       restaurantId: campaign?.restaurantId ?? firstRestaurant?.id ?? null,
@@ -38,6 +39,9 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
       category: campaign?.category ?? "Restaurant",
       budget: campaign?.budget ?? 0,
       costPerImpression: campaign?.costPerImpression ?? 5,
+      startDate: campaign?.startDate ? campaign.startDate.slice(0, 16) : "",
+      endDate: campaign?.endDate ? campaign.endDate.slice(0, 16) : "",
+      visibility: campaign?.visibility ?? { title: true, description: false, linkUrl: true },
     },
   });
 
@@ -49,6 +53,7 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
         companyName: campaign.companyName,
         mediaType: campaign.mediaType,
         mediaUrl: campaign.mediaUrl,
+        linkUrl: campaign.linkUrl ?? "",
         duration: campaign.duration,
         type: campaign.type,
         restaurantId: campaign.restaurantId ?? firstRestaurant?.id ?? null,
@@ -58,6 +63,9 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
         category: campaign.category ?? "Restaurant",
         budget: campaign.budget ?? 0,
         costPerImpression: campaign.costPerImpression ?? 5,
+        startDate: campaign.startDate ? campaign.startDate.slice(0, 16) : "",
+        endDate: campaign.endDate ? campaign.endDate.slice(0, 16) : "",
+        visibility: campaign.visibility,
       });
     }
   }, [campaign, form, firstRestaurant]);

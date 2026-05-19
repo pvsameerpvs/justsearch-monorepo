@@ -6,11 +6,12 @@ import Image from "next/image";
 interface AdMediaRendererProps {
   mediaType: string;
   mediaUrl: string;
+  linkUrl: string;
   isMuted: boolean;
   onEnded?: () => void;
 }
 
-export function AdMediaRenderer({ mediaType, mediaUrl, isMuted, onEnded }: AdMediaRendererProps) {
+export function AdMediaRenderer({ mediaType, mediaUrl, linkUrl, isMuted, onEnded }: AdMediaRendererProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
@@ -21,6 +22,8 @@ export function AdMediaRenderer({ mediaType, mediaUrl, isMuted, onEnded }: AdMed
       </div>
     );
   }
+
+  const hasLink = typeof linkUrl === 'string' && linkUrl.startsWith("http");
 
   if (mediaType === "video") {
     return (
@@ -40,6 +43,8 @@ export function AdMediaRenderer({ mediaType, mediaUrl, isMuted, onEnded }: AdMed
           onLoadedData={() => setIsLoading(false)}
           onError={() => { setHasError(true); setIsLoading(false); }}
           onEnded={onEnded}
+          onClick={() => hasLink && window.open(linkUrl, '_blank', 'noopener,noreferrer')}
+          style={{ cursor: hasLink ? 'pointer' : undefined }}
         />
       </div>
     );
@@ -51,7 +56,7 @@ export function AdMediaRenderer({ mediaType, mediaUrl, isMuted, onEnded }: AdMed
     return <div className="flex h-full items-center justify-center text-6xl">{mediaUrl}</div>;
   }
 
-  return (
+  const imageContent = (
     <div className="relative h-full w-full">
       {isLoading && (
         <div className="absolute inset-0 flex animate-pulse items-center justify-center bg-slate-800" />
@@ -68,4 +73,14 @@ export function AdMediaRenderer({ mediaType, mediaUrl, isMuted, onEnded }: AdMed
       />
     </div>
   );
+
+  if (hasLink) {
+    return (
+      <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block h-full w-full">
+        {imageContent}
+      </a>
+    );
+  }
+
+  return imageContent;
 }

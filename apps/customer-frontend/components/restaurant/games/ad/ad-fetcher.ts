@@ -5,12 +5,13 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v
 export interface CampaignItem {
   id: string;
   title: string;
-  companyName: string;
   mediaType: string;
   mediaUrl: string;
+  linkUrl: string;
   duration: number;
   description?: string;
   category?: string;
+  visibility: Record<string, boolean>;
 }
 
 interface PublicAd {
@@ -18,9 +19,23 @@ interface PublicAd {
   name: string;
   mediaType?: string;
   imageUrl?: string;
+  linkUrl?: string;
   duration?: number;
   content?: string;
   category?: string;
+  visibility?: Record<string, boolean>;
+}
+
+interface PublicAd {
+  id: string;
+  name: string;
+  mediaType?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  duration?: number;
+  content?: string;
+  category?: string;
+  visibility?: Record<string, boolean>;
 }
 
 let lastFetchKey = '';
@@ -45,13 +60,14 @@ export async function fetchActiveAds(gameId: string, restaurantId: string): Prom
     const data = (await res.json()) as { advertisements: PublicAd[] };
     const ads = (data.advertisements ?? []).map((ad) => ({
       id: ad.id,
-      title: ad.name?.split(' — ')?.[0] ?? ad.name,
-      companyName: ad.name?.split(' — ')?.[1] ?? '',
+      title: ad.name?.split(' — ')?.[0] ?? ad.name ?? '',
       mediaType: ad.mediaType ?? 'image',
       mediaUrl: ad.imageUrl ?? '',
+      linkUrl: ad.linkUrl ?? '',
       duration: (ad.duration ?? 15) * 1000,
       description: ad.content ?? undefined,
       category: ad.category ?? undefined,
+      visibility: ad.visibility ?? { title: true, description: false, linkUrl: true },
     }));
 
     lastFetchKey = fetchKey;
@@ -82,7 +98,7 @@ export function preloadMedia(campaigns: CampaignItem[]): void {
 
 export async function recordImpression(adId: string): Promise<void> {
   try {
-    await fetch(`${API_BASE}/advertisements/${adId}/impression`, {
+    await fetch(`${API_BASE}/advertisements/public/${adId}/impression`, {
       method: 'POST',
       credentials: 'include',
     });

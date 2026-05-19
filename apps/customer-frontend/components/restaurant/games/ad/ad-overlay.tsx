@@ -46,7 +46,7 @@ export function AdOverlay({ onComplete, restaurantId = "mosaic-table", gameId = 
           />
           <div className="w-full max-w-md space-y-4">
             <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-900">
-              <AdMediaRenderer mediaType={ad.mediaType} mediaUrl={ad.mediaUrl} isMuted={isMuted} onEnded={handleTimerEnd} />
+              <AdMediaRenderer mediaType={ad.mediaType} mediaUrl={ad.mediaUrl} linkUrl={ad.linkUrl} isMuted={isMuted} onEnded={handleTimerEnd} />
               <div className="absolute bottom-0 left-0 right-0">
                 <AdDurationTimer duration={ad.duration} onComplete={handleTimerEnd} key={currentIndex} />
               </div>
@@ -58,7 +58,7 @@ export function AdOverlay({ onComplete, restaurantId = "mosaic-table", gameId = 
                 completeLabel={completeLabel}
               />
             </div>
-            <AdInfo title={ad.title} companyName={ad.companyName} description={ad.description} />
+            <AdInfo title={ad.title} linkUrl={ad.linkUrl} description={ad.description} visibility={ad.visibility} />
           </div>
         </motion.div>
       )}

@@ -8,6 +8,7 @@ export interface AdCampaign {
   companyName: string;
   mediaType: AdMediaType;
   mediaUrl: string;
+  linkUrl: string | null;
   duration: number;
   type: AdCampaignType;
   restaurantId: string | null;
@@ -20,7 +21,10 @@ export interface AdCampaign {
   impressions: number;
   spent: number;
   revenue: number;
+  startDate: string | null;
+  endDate: string | null;
   createdAt: string;
+  visibility: Record<string, boolean>;
 }
 
 export interface AdCampaignFormData {
@@ -29,6 +33,7 @@ export interface AdCampaignFormData {
   companyName: string;
   mediaType: AdMediaType;
   mediaUrl: string;
+  linkUrl: string;
   duration: number;
   type: AdCampaignType;
   restaurantId: string | null;
@@ -38,4 +43,7 @@ export interface AdCampaignFormData {
   category: string;
   budget: number;
   costPerImpression: number;
+  startDate: string;
+  endDate: string;
+  visibility: Record<string, boolean>;
 }

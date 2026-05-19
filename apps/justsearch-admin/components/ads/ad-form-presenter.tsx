@@ -109,6 +109,35 @@ export function AdFormPresenter({ control, formState, watch, setValue, isEdit, r
         <AdFormDetails control={control} errors={errors} />
       </section>
 
+      <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+        <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">📅 Schedule</h4>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">Start Date (optional)</label>
+            <Controller name="startDate" control={control} render={({ field }) => (
+              <input
+                type="datetime-local"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none"
+              />
+            )} />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">End Date (optional)</label>
+            <Controller name="endDate" control={control} render={({ field }) => (
+              <input
+                type="datetime-local"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none"
+              />
+            )} />
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-slate-500">Leave blank for immediate / no expiry</p>
+      </section>
+
       {type === "restaurant_brought" && (
         <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
           <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">🏪 Restaurant</h4>
