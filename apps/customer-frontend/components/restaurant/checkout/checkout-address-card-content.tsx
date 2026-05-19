@@ -10,7 +10,7 @@ import { CheckoutPaymentMethod } from './checkout-payment-method';
 export function CheckoutAddressCardContent({
   addressTitle, address, addressDetails, userPhone, alternateNumber, savedAddressesCount = 0,
   note, setAlternateNumber, setNote, onOpenAddressBook,
-  paymentMethod, setPaymentMethod,
+  paymentMethod, setPaymentMethod, addressSaveWarn,
 }: CheckoutAddressCardProps) {
   return (
     <>
@@ -24,6 +24,9 @@ export function CheckoutAddressCardContent({
         </CheckoutAddressCardActions>
         {!address && (
           <p className="mt-3 text-xs font-bold text-red-500">Please select or add a delivery address</p>
+        )}
+        {addressSaveWarn && (
+          <p className="mt-3 text-xs font-bold text-amber-500">{addressSaveWarn}</p>
         )}
       </div>
       <div className="border-b border-[rgb(var(--border)/0.4)] px-6 py-5">

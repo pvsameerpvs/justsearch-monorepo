@@ -15,6 +15,7 @@ export type CheckoutAddressCardProps = {
   onOpenAddressBook?: () => void;
   paymentMethod: 'cash' | 'card';
   setPaymentMethod: (value: 'cash' | 'card') => void;
+  addressSaveWarn?: string | null;
 };
 
 export function CheckoutAddressCard(props: CheckoutAddressCardProps) {

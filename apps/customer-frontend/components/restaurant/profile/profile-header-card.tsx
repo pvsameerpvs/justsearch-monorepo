@@ -11,7 +11,7 @@ export function ProfileHeaderCard() {
   const { points } = useLoyaltyPoints();
   const { user, isRegistered, openModal } = useRegistration();
 
-  const userName = user?.name ?? 'Guest explorer';
+  const userName = user?.name ?? 'Player';
   const tier = getLoyaltyTier(points);
   const playerId = getStablePlayerId(user?.mobile || userName);
 

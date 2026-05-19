@@ -20,7 +20,7 @@ export function EatPlayProfileScreen() {
   const { points } = useLoyaltyPoints();
   const { getGameStat } = useUserGameStats();
   const { user } = useRegistration();
-  const userName = user?.name ?? 'Guest Explorer';
+  const userName = user?.name ?? 'Player';
 
   const tierLabel = getLoyaltyTier(points);
   const playerId = getStablePlayerId(user?.mobile || userName);

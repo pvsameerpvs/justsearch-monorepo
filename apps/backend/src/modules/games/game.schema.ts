@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const createGameSchema = z.object({
+  id: z.string().min(1).optional(),
   name: z.string().min(1),
   type: z.string().min(1),
   config: z.record(z.unknown()).optional(),

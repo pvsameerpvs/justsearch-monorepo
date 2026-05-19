@@ -26,8 +26,8 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const { isRegistered, openModal } = useRegistration();
-  const { points, addPoints } = useLoyaltyPoints();
-  const { updateGameStat, getGameStat } = useUserGameStats();
+  const { points, addPoints, refresh: refreshPoints } = useLoyaltyPoints();
+  const { updateGameStat, getGameStat, refresh: refreshStats } = useUserGameStats();
   const [isExitDialogOpen, setIsExitDialogOpen] = useState(false);
   const [showAdOnGameEnd, setShowAdOnGameEnd] = useState(false);
   const [showAdOnBack, setShowAdOnBack] = useState(false);
@@ -49,19 +49,30 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: Props) {
     const { pointsAwarded } = await submitScore(game.id, result.score, result.level);
     addPoints(pointsAwarded);
     updateGameStat(game.id, result.score, pointsAwarded, result.level);
-  }, [addPoints, game.id, updateGameStat]);
+    // Immediately re-fetch server truth to ensure UI matches database
+    await Promise.all([refreshPoints(), refreshStats()]);
+  }, [addPoints, game.id, updateGameStat, refreshPoints, refreshStats]);
 
   const onAward = useCallback((result: GameAwardResult) => { setPendingAward(result); setShowAdOnGameEnd(true); }, []);
 
+  const [awardError, setAwardError] = useState<string | null>(null);
+
   const handleGameEndAdDone = useCallback(async () => {
     setShowAdOnGameEnd(false);
+    setAwardError(null);
     if (pendingAward) {
       setTransition('processing');
       try {
         await processAward(pendingAward);
-      } catch {
-        // Score submission failed (likely 401 — auth required). Don't award fake points.
-        // The user stays on the game screen; they can retry after logging in.
+      } catch (error) {
+        // Log the full technical error for debugging, but show a clean message to users
+        // eslint-disable-next-line no-console
+        console.error('Game score submission failed:', error);
+        const isAuthError = error instanceof Error && (error.message.includes('401') || error.message.includes('Authentication'));
+        const friendlyMessage = isAuthError
+          ? 'Please log in to save your score'
+          : 'Score could not be saved. Please try again.';
+        setAwardError(friendlyMessage);
       }
       setPendingAward(null);
       setTransition('idle');
@@ -96,6 +107,12 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: Props) {
         </>
       ) : <GamePlayerStage game={game} onAward={onAward} coins={points} />}
       <GameAdOverlays showAdOnGameEnd={showAdOnGameEnd} showAdOnBack={showAdOnBack} restaurantId="mosaic-table" gameId={game.id} onGameEndComplete={handleGameEndAdDone} onBackComplete={handleBackAdDone} />
+      {awardError && (
+        <div className="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+80px)] left-1/2 z-30 w-[90%] max-w-sm -translate-x-1/2 rounded-xl border border-red-200 bg-red-50/95 px-4 py-3 text-center shadow-lg backdrop-blur-sm">
+          <p className="text-xs font-semibold text-red-700">{awardError}</p>
+          <p className="mt-1 text-[10px] text-red-500">Score was not saved. Please try again.</p>
+        </div>
+      )}
       <GameExitConfirmDialog open={isExitDialogOpen} onCancel={() => setIsExitDialogOpen(false)} onConfirm={handleExitConfirm} />
       {transition !== 'idle' && <TransitionLoader />}
     </section>

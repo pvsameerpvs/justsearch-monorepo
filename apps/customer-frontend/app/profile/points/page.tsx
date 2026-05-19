@@ -6,7 +6,7 @@ import { ButtonLink } from '@/components/shared/button-link';
 import { useLoyaltyPoints } from '@/components/restaurant/use-loyalty-points';
 
 export default function ProfilePointsPage() {
-  const { points, resetPoints } = useLoyaltyPoints();
+  const { points } = useLoyaltyPoints();
 
   return (
     <section className="py-8 sm:py-10">
@@ -17,21 +17,11 @@ export default function ProfilePointsPage() {
               Loyalty points
             </p>
             <h1 className="mt-2 font-display text-4xl font-semibold tracking-[-0.06em] text-[rgb(var(--ink))]">
-              {points}
+              {points.toLocaleString()}
             </h1>
             <p className="mt-3 text-sm leading-6 text-[rgb(var(--muted))]">
               Points are earned by playing games. Each game awards points based on your performance using a scoring formula.
             </p>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-1 max-w-[200px]">
-              <button
-                type="button"
-                onClick={() => resetPoints(0)}
-                className="inline-flex w-full items-center justify-center rounded-full border border-[rgb(var(--border)/0.9)] bg-white/70 px-4 py-2.5 text-sm font-medium text-[rgb(var(--ink))] transition-all hover:bg-white"
-              >
-                Reset points
-              </button>
-            </div>
           </Surface>
 
           <Surface className="rounded-[32px] border-white/70 bg-[linear-gradient(140deg,rgb(var(--brand-soft)/0.25),rgba(255,255,255,0.92),rgb(var(--accent-soft)/0.22))] p-6 sm:p-8">

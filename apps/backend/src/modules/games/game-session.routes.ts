@@ -29,7 +29,12 @@ router.post('/sessions', async (req, res, next) => {
     const customerId = req.auth.id;
     const restaurantId = req.tenant.id;
 
-    const [game] = await db.select().from(games).where(eq(games.id, body.gameId)).limit(1);
+    // Look up game by localGameId inside config JSONB (works with both old uuid id and new varchar id)
+    const [game] = await db
+      .select()
+      .from(games)
+      .where(eq(sql`config->>'localGameId'`, body.gameId))
+      .limit(1);
     if (!game) return res.status(404).json({ error: 'Game not found' });
     if (!game.isActive) return res.status(400).json({ error: 'Game is not active' });
 

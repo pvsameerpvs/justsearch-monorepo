@@ -1,117 +1,119 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { apiClient } from '@/lib/api/client';
+import {
+  readStoredStats,
+  writeStoredStats,
+  EMPTY_GAME_STAT,
+  UPDATED_EVENT,
+  type GameStat,
+  type GameStatsMap,
+} from './games/game-stats-storage';
+import { computeStats } from './games/game-stats-compute';
 
-export type GameStat = {
-  highScore: number;
-  lastScore: number;
-  lastPoints: number;
-  totalPoints: number;
-  maxLevel: number;
-  roundsPlayed: number;
-  lastPlayed: string;
-};
-
-type GameStatsMap = Record<string, GameStat>;
+export { type GameStat } from './games/game-stats-storage';
 
 const STORAGE_KEY = 'justsearch:gameStats';
-const EMPTY_GAME_STAT: GameStat = {
-  highScore: 0,
-  lastScore: 0,
-  lastPoints: 0,
-  totalPoints: 0,
-  maxLevel: 1,
-  roundsPlayed: 0,
-  lastPlayed: '',
-};
-
-type BackendSession = {
-  gameId: string;
-  score: number;
-  pointsAwarded: number;
-  level: number | null;
-  playedAt: string;
-};
-
-function readStoredStats(): GameStatsMap {
-  if (typeof window === 'undefined') return {};
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeStoredStats(stats: GameStatsMap) {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-  } catch {
-    // ignore
-  }
-}
-
-function computeStats(sessions: BackendSession[]): GameStatsMap {
-  const map: GameStatsMap = {};
-  for (const s of sessions) {
-    const gid = s.gameId;
-    const existing = map[gid] ?? { ...EMPTY_GAME_STAT };
-    map[gid] = {
-      highScore: Math.max(existing.highScore, s.score),
-      lastScore: s.score,
-      lastPoints: s.pointsAwarded,
-      totalPoints: existing.totalPoints + s.pointsAwarded,
-      maxLevel: Math.max(existing.maxLevel, s.level ?? 1),
-      roundsPlayed: existing.roundsPlayed + 1,
-      lastPlayed: s.playedAt,
-    };
-  }
-  return map;
-}
+const REFRESH_INTERVAL_MS = 10_000;
 
 export function useUserGameStats() {
   const [gameStats, setGameStats] = useState<GameStatsMap>({});
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const syncFromServer = useCallback(async () => {
+    try {
+      const data = await apiClient<{ sessions: Parameters<typeof computeStats>[0] }>('/games/sessions/my-stats');
+      const computed = computeStats(data.sessions);
+      setGameStats(computed);
+      writeStoredStats(computed);
+    } catch {
+      // Auth errors must NOT wipe local stats. Keep existing state.
+    }
+  }, []);
 
   useEffect(() => {
     const local = readStoredStats();
     setGameStats(local);
+    syncFromServer();
+  }, [syncFromServer]);
 
-    apiClient<{ sessions: BackendSession[] }>('/games/sessions/my-stats')
-      .then((data) => {
-        const computed = computeStats(data.sessions);
-        setGameStats(computed);
-        writeStoredStats(computed);
-      })
-      .catch(() => {
-        // Fall back to localStorage
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== STORAGE_KEY) return;
+      setGameStats(readStoredStats());
+    };
+    window.addEventListener('storage', onStorage);
+    const onUpdated = () => setGameStats(readStoredStats());
+    window.addEventListener(UPDATED_EVENT, onUpdated);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener(UPDATED_EVENT, onUpdated);
+    };
+  }, []);
+
+  useEffect(() => {
+    const startInterval = () => {
+      if (intervalRef.current) return;
+      intervalRef.current = setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          syncFromServer();
+        }
+      }, REFRESH_INTERVAL_MS);
+    };
+    const stopInterval = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+    startInterval();
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        syncFromServer();
+        startInterval();
+      } else {
+        stopInterval();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stopInterval();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [syncFromServer]);
+
+  const updateGameStat = useCallback(
+    (gameId: string, score: number, points: number, level: number = 1) => {
+      setGameStats((current) => {
+        const existing = { ...EMPTY_GAME_STAT, ...current[gameId] };
+        const updated: GameStat = {
+          highScore: Math.max(existing.highScore, score),
+          lastScore: score,
+          lastPoints: points,
+          totalPoints: existing.totalPoints + points,
+          maxLevel: Math.max(existing.maxLevel, level),
+          roundsPlayed: existing.roundsPlayed + 1,
+          lastPlayed: new Date().toISOString(),
+        };
+        const next = { ...current, [gameId]: updated };
+        writeStoredStats(next);
+        return next;
       });
-  }, []);
+    },
+    []
+  );
 
-  const updateGameStat = useCallback((gameId: string, score: number, points: number, level: number = 1) => {
-    setGameStats((current) => {
-      const existing = { ...EMPTY_GAME_STAT, ...current[gameId] };
+  const getGameStat = useCallback(
+    (gameId: string) => {
+      return { ...EMPTY_GAME_STAT, ...gameStats[gameId] };
+    },
+    [gameStats]
+  );
 
-      const updated: GameStat = {
-        highScore: Math.max(existing.highScore, score),
-        lastScore: score,
-        lastPoints: points,
-        totalPoints: existing.totalPoints + points,
-        maxLevel: Math.max(existing.maxLevel, level),
-        roundsPlayed: existing.roundsPlayed + 1,
-        lastPlayed: new Date().toISOString(),
-      };
+  const refresh = useCallback(() => {
+    return syncFromServer();
+  }, [syncFromServer]);
 
-      const next = { ...current, [gameId]: updated };
-      writeStoredStats(next);
-      return next;
-    });
-  }, []);
-
-  const getGameStat = useCallback((gameId: string) => {
-    return { ...EMPTY_GAME_STAT, ...gameStats[gameId] };
-  }, [gameStats]);
-
-  return { gameStats, updateGameStat, getGameStat };
+  return { gameStats, updateGameStat, getGameStat, refresh };
 }

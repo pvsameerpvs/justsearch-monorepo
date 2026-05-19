@@ -12,7 +12,6 @@ import { useCheckoutState } from './checkout/use-checkout-state';
 
 export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restaurant }) {
   const state = useCheckoutState();
-
   if (state.cartCount === 0 && !state.placingOrder) {
     return <CheckoutEmptyState />;
   }
@@ -37,6 +36,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             onOpenAddressBook={() => state.setIsAddressBookOpen(true)}
             paymentMethod={state.paymentMethod}
             setPaymentMethod={state.setPaymentMethod}
+            addressSaveWarn={state.addressSaveWarn}
           />
 
           <CheckoutSummaryCard
@@ -69,8 +69,7 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         onClose={() => state.setIsAddressBookOpen(false)}
         onSelectAddress={state.applySavedAddress}
         onAddAddress={async (newAddress) => {
-          const createdAddress = await state.addAddress(newAddress);
-          state.applySavedAddress(createdAddress);
+          state.applySavedAddress(await state.addAddress(newAddress));
         }}
         onUseCurrentLocation={state.applyCurrentLocationAddress}
       />

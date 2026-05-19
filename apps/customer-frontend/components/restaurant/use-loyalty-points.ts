@@ -1,74 +1,83 @@
 "use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { apiClient } from '@/lib/api/client';
+import {
+  readStoredPoints,
+  writeStoredPoints,
+  STORAGE_KEY,
+  UPDATED_EVENT,
+  DEFAULT_POINTS,
+} from './loyalty-storage';
 
-const STORAGE_KEY = 'justsearch:loyaltyPoints';
-const UPDATED_EVENT = 'justsearch:loyaltyPointsUpdated';
-const DEFAULT_POINTS = 0;
-
-function readStoredPoints() {
-  if (typeof window === 'undefined') return DEFAULT_POINTS;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_POINTS;
-    const parsed = Number(raw);
-    if (!Number.isFinite(parsed)) return DEFAULT_POINTS;
-    return Math.max(0, Math.floor(parsed));
-  } catch {
-    return DEFAULT_POINTS;
-  }
-}
-
-function writeStoredPoints(value: number) {
-  if (typeof window === 'undefined') return;
-
-  try {
-    window.localStorage.setItem(STORAGE_KEY, String(Math.max(0, Math.floor(value))));
-    window.dispatchEvent(new Event(UPDATED_EVENT));
-  } catch {
-    // ignore
-  }
-}
+const REFRESH_INTERVAL_MS = 10_000;
 
 export function useLoyaltyPoints() {
   const [points, setPointsState] = useState<number>(DEFAULT_POINTS);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const syncFromServer = useCallback(async () => {
+    try {
+      const data = await apiClient<{ points: number }>('/games/sessions/total-points');
+      const remote = Math.max(0, Math.floor(data.points));
+      setPointsState(remote);
+      writeStoredPoints(remote);
+    } catch {
+      // Auth errors or network failures must NOT reset points.
+      // The database is the source of truth; local state stays as-is.
+    }
+  }, []);
 
   useEffect(() => {
     const initial = readStoredPoints();
     setPointsState(initial);
-
-    // Fetch from backend as source of truth
-    apiClient<{ points: number }>('/games/sessions/total-points')
-      .then((data) => {
-        const remote = Math.max(0, Math.floor(data.points));
-        setPointsState(remote);
-        writeStoredPoints(remote);
-      })
-      .catch((error) => {
-        // On 401, clear points to force re-login; otherwise keep localStorage
-        if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
-          setPointsState(0);
-          writeStoredPoints(0);
-        }
-      });
-  }, []);
+    syncFromServer();
+  }, [syncFromServer]);
 
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.key !== STORAGE_KEY) return;
       setPointsState(readStoredPoints());
     };
-
     window.addEventListener('storage', onStorage);
     const onUpdated = () => setPointsState(readStoredPoints());
-
     window.addEventListener(UPDATED_EVENT, onUpdated);
     return () => {
       window.removeEventListener('storage', onStorage);
       window.removeEventListener(UPDATED_EVENT, onUpdated);
     };
   }, []);
+
+  useEffect(() => {
+    const startInterval = () => {
+      if (intervalRef.current) return;
+      intervalRef.current = setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          syncFromServer();
+        }
+      }, REFRESH_INTERVAL_MS);
+    };
+    const stopInterval = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+    startInterval();
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        syncFromServer();
+        startInterval();
+      } else {
+        stopInterval();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stopInterval();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [syncFromServer]);
 
   const setPoints = useCallback((value: number) => {
     const normalized = Math.max(0, Math.floor(value));
@@ -85,9 +94,16 @@ export function useLoyaltyPoints() {
     });
   }, []);
 
-  const resetPoints = useCallback((value: number = DEFAULT_POINTS) => {
-    setPoints(value);
-  }, [setPoints]);
+  const resetPoints = useCallback(
+    (value: number = DEFAULT_POINTS) => {
+      setPoints(value);
+    },
+    [setPoints]
+  );
 
-  return { points, setPoints, addPoints, resetPoints };
+  const refresh = useCallback(() => {
+    return syncFromServer();
+  }, [syncFromServer]);
+
+  return { points, setPoints, addPoints, resetPoints, refresh };
 }

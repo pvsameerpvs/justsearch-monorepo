@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from 'react';
-
-const STORAGE_KEY = 'justsearch:vipTiers';
+import { useMemo } from 'react';
+import { useLoyaltyPoints } from '../use-loyalty-points';
 
 export type VipTier = 'bronze' | 'silver' | 'gold' | 'platinum';
 
@@ -38,27 +37,6 @@ export const VIP_TIER_CONFIG: Record<
 
 export const VIP_TIERS: VipTier[] = ['bronze', 'silver', 'gold', 'platinum'];
 
-function readVipData(): { tier: VipTier; points: number } {
-  if (typeof window === 'undefined') return { tier: 'bronze', points: 0 };
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (!stored) return { tier: 'bronze', points: 0 };
-    const parsed = JSON.parse(stored);
-    return { tier: parsed.tier ?? 'bronze', points: parsed.points ?? 0 };
-  } catch {
-    return { tier: 'bronze', points: 0 };
-  }
-}
-
-function writeVipData(data: { tier: VipTier; points: number }) {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {
-    // ignore
-  }
-}
-
 function resolveTierFromPoints(points: number): VipTier {
   if (points >= VIP_TIER_CONFIG.platinum.minPoints) return 'platinum';
   if (points >= VIP_TIER_CONFIG.gold.minPoints) return 'gold';
@@ -66,60 +44,35 @@ function resolveTierFromPoints(points: number): VipTier {
   return 'bronze';
 }
 
-export function useVipTier() {
-  const [tier, setTierState] = useState<VipTier>('bronze');
-  const [points, setPointsState] = useState(0);
+export function useVipTier(externalPoints?: number) {
+  const { points: loyaltyPoints } = useLoyaltyPoints();
+  const points = externalPoints ?? loyaltyPoints;
 
-  useEffect(() => {
-    const data = readVipData();
-    setTierState(data.tier);
-    setPointsState(data.points);
-  }, []);
+  const tier = useMemo(() => resolveTierFromPoints(points), [points]);
 
-  const setTier = useCallback((newTier: VipTier) => {
-    setTierState(newTier);
-    setPointsState((current) => {
-      const nextPoints = Math.max(current, VIP_TIER_CONFIG[newTier].minPoints);
-      writeVipData({ tier: newTier, points: nextPoints });
-      return nextPoints;
-    });
-  }, []);
-
-  const addPoints = useCallback((delta: number) => {
-    setPointsState((current) => {
-      const next = current + Math.max(0, delta);
-      const nextTier = resolveTierFromPoints(next);
-      setTierState(nextTier);
-      writeVipData({ tier: nextTier, points: next });
-      return next;
-    });
-  }, []);
-
-  const nextTier = (() => {
+  const nextTier = useMemo(() => {
     const currentIndex = VIP_TIERS.indexOf(tier);
     if (currentIndex >= VIP_TIERS.length - 1) return null;
     return VIP_TIERS[currentIndex + 1];
-  })();
+  }, [tier]);
 
-  const pointsToNextTier = (() => {
+  const pointsToNextTier = useMemo(() => {
     if (!nextTier) return 0;
     return Math.max(0, VIP_TIER_CONFIG[nextTier].minPoints - points);
-  })();
+  }, [nextTier, points]);
 
-  const progressPercent = (() => {
+  const progressPercent = useMemo(() => {
     if (!nextTier) return 100;
     const currentMin = VIP_TIER_CONFIG[tier].minPoints;
     const nextMin = VIP_TIER_CONFIG[nextTier].minPoints;
     const range = nextMin - currentMin;
     if (range <= 0) return 100;
     return Math.min(100, Math.floor(((points - currentMin) / range) * 100));
-  })();
+  }, [tier, nextTier, points]);
 
   return {
     tier,
     points,
-    setTier,
-    addPoints,
     nextTier,
     pointsToNextTier,
     progressPercent,

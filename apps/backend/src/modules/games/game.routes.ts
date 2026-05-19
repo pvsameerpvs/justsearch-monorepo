@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { randomUUID } from 'crypto';
 import { eq, desc } from 'drizzle-orm';
 import { db } from '../../db';
 import { games } from '../../db/schema';
@@ -30,6 +31,7 @@ router.post('/', requireRole('super_admin'), async (req, res, next) => {
   try {
     const body = createGameSchema.parse(req.body);
     const [game] = await db.insert(games).values({
+      id: body.id || randomUUID(),
       name: body.name,
       type: body.type,
       config: body.config ?? {},
