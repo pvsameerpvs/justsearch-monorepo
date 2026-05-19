@@ -73,11 +73,15 @@ export function useAdOverlay({ onComplete, gameId, restaurantId, skipDelay = 400
     advance();
   }, [ad?.id, advance, gameId]);
 
-  // Skip / early exit: if 3s reached but full didn't → bill 3sCost only
+  // Skip / early exit
   const handleSkipAll = useCallback(() => {
     if (ad?.id) {
       if (view3sReached.current && !fullViewTracked.current) {
+        // Skipped after 3s but before full view → charge 3s view cost
         trackAdEvent(ad.id, 'view_3s');
+      } else if (!view3sReached.current && !fullViewTracked.current) {
+        // Skipped before 3s → no charge, but track for analytics
+        trackAdEvent(ad.id, 'skip');
       }
       skipAll(ad.id, gameId);
     }

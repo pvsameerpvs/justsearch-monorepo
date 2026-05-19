@@ -10,6 +10,8 @@ interface AnalyticsSummary {
     revenue: number;
     avgOrderValue: number;
   };
+  adRevenue: number;
+  adViews: number;
   totalCustomers: number;
 }
 

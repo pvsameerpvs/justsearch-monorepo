@@ -15,6 +15,9 @@ interface RevenuePresenterProps {
   topRestaurants: RestaurantRevenue[];
   recentCampaigns: AdCampaign[];
   splitData: AdSplitData;
+  trendMonths: string[];
+  trendData: number[];
+  trendLoading: boolean;
 }
 
 export function RevenuePresenter({
@@ -23,6 +26,9 @@ export function RevenuePresenter({
   topRestaurants,
   recentCampaigns,
   splitData,
+  trendMonths,
+  trendData,
+  trendLoading,
 }: RevenuePresenterProps) {
   return (
     <div className="space-y-6">
@@ -30,7 +36,7 @@ export function RevenuePresenter({
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <RevenueChart monthlyTrend={[32000, 34500, 31000, 38000, 42000, 45000]} />
+          <RevenueChart months={trendMonths} trend={trendData} isLoading={trendLoading} />
         </div>
         <RevenueAdSplit splitData={splitData} />
       </div>

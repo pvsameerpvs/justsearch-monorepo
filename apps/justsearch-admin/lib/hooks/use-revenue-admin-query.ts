@@ -26,9 +26,19 @@ export interface RevenueResponse {
 }
 
 const REVENUE_KEY = ['revenue'] as const;
+const REVENUE_TREND_KEY = ['revenue', 'trend'] as const;
 
 async function fetchRevenue(): Promise<RevenueResponse> {
   return apiClient<RevenueResponse>('/revenue');
+}
+
+export interface RevenueTrendResponse {
+  months: string[];
+  trend: number[];
+}
+
+async function fetchRevenueTrend(): Promise<RevenueTrendResponse> {
+  return apiClient<RevenueTrendResponse>('/revenue/trend');
 }
 
 export function useRevenueAdminQuery() {
@@ -39,6 +49,19 @@ export function useRevenueAdminQuery() {
   return {
     summary: data ?? null,
     restaurants: data?.restaurants ?? [],
+    isLoading,
+    error,
+  };
+}
+
+export function useRevenueTrendQuery() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: REVENUE_TREND_KEY,
+    queryFn: fetchRevenueTrend,
+  });
+  return {
+    months: data?.months ?? [],
+    trend: data?.trend ?? [],
     isLoading,
     error,
   };

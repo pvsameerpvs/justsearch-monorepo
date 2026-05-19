@@ -87,10 +87,10 @@ export function preloadMedia(campaigns: CampaignItem[]): void {
   }
 }
 
-// Track ad event: view_3s, view_full, click_pending. Returns eventId for click tracking.
+// Track ad event: view_3s, view_full, click_pending, skip. Returns eventId for click tracking.
 export async function trackAdEvent(
   adId: string,
-  eventType: 'view_3s' | 'view_full' | 'click_pending'
+  eventType: 'view_3s' | 'view_full' | 'click_pending' | 'skip'
 ): Promise<string | null> {
   try {
     const res = await fetch(`${API_BASE}/advertisements/public/${adId}/event`, {

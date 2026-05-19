@@ -48,7 +48,11 @@ export function requireRole(...roles: string[]) {
     if (!req.auth) {
       return res.status(401).json({ message: 'Authentication required' });
     }
-    if (!roles.includes(req.auth.role)) {
+    const userRole = req.auth.role;
+    const userType = req.auth.type;
+    // Accept either role match OR super_admin type for admin-only routes
+    const isAllowed = roles.includes(userRole) || (roles.includes('super_admin') && userType === 'super_admin');
+    if (!isAllowed) {
       return res.status(403).json({ message: 'Insufficient permissions' });
     }
     next();

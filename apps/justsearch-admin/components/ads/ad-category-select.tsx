@@ -40,8 +40,11 @@ export function AdCategorySelect({ value, categories, isLoading, error, onChange
         <span>{value || "Select category"}</span>
         <ChevronDown className="h-4 w-4 text-slate-400" />
       </button>
-      {isUnknownValue && <p className="mt-1 text-xs text-amber-600">Category not in current list — will be created on save</p>}
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error ? (
+        <p className="mt-1 text-xs text-red-500">{error}</p>
+      ) : isUnknownValue ? (
+        <p className="mt-1 text-xs text-amber-600">This category will be saved with the campaign even though it is not in the global list yet.</p>
+      ) : null}
 
       {isOpen && (
         <div className="absolute z-10 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg">

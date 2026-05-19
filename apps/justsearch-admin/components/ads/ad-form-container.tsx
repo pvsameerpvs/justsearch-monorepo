@@ -7,7 +7,7 @@ import { adCampaignSchema, type AdCampaignSchema } from "@/lib/validations/ad-ca
 import type { AdCampaign, AdCampaignFormData } from "@/lib/stores/ad-campaign-types";
 import type { GameOption, RestaurantOption } from "./ad-campaign.types";
 import { AdFormPresenter } from "./ad-form-presenter";
-import { useAdCategoriesQuery, useCreateAdCategoryMutation } from "@/lib/hooks/use-ad-categories-query";
+import { useAdCategoriesQuery, useCreateAdCategoryMutation, getCreateCategoryErrorMessage } from "@/lib/hooks/use-ad-categories-query";
 
 interface AdFormContainerProps {
   campaign: AdCampaign | null;
@@ -92,8 +92,9 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
     setCategoryError(null);
     try {
       await createCategory.mutateAsync(name);
-    } catch {
-      setCategoryError(`Failed to save "${name}" to database. It will still be used for this campaign.`);
+    } catch (err) {
+      const reason = getCreateCategoryErrorMessage(err);
+      setCategoryError(`Could not add "${name}" to category list: ${reason} The category name will still be saved with this campaign.`);
     }
   };
 

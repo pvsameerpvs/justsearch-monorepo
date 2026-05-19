@@ -1,6 +1,6 @@
 "use client";
 
-import { Gamepad2, Gift, DollarSign, Users } from 'lucide-react';
+import { Gamepad2, DollarSign, Users, Megaphone } from 'lucide-react';
 import { AnalyticsCard } from './analytics-cards';
 import { GamePerformancePanel } from './game-performance-panel';
 import { RevenueBreakdownPanel } from './revenue-breakdown-panel';
@@ -11,7 +11,10 @@ export function AnalyticsDashboard() {
 
   const today = summary.data?.today;
   const totalCustomers = summary.data?.totalCustomers ?? 0;
-  const revenue = today?.revenue ?? 0;
+  const orderRevenue = today?.revenue ?? 0;
+  const adRevenue = summary.data?.adRevenue ?? 0;
+  const adViews = summary.data?.adViews ?? 0;
+  const totalRevenue = orderRevenue + adRevenue;
 
   return (
     <div className="space-y-6">
@@ -23,15 +26,15 @@ export function AnalyticsDashboard() {
           color="bg-purple-50 text-purple-600"
         />
         <AnalyticsCard
-          label="Today's Revenue"
-          value={`AED ${revenue.toLocaleString()}`}
+          label="Order Revenue"
+          value={`AED ${orderRevenue.toLocaleString()}`}
           icon={DollarSign}
           color="bg-emerald-50 text-emerald-600"
         />
         <AnalyticsCard
-          label="Avg Order Value"
-          value={`AED ${Number(today?.avgOrderValue ?? 0).toFixed(2)}`}
-          icon={Gift}
+          label="Ad Revenue"
+          value={`AED ${adRevenue.toLocaleString()}`}
+          icon={Megaphone}
           color="bg-amber-50 text-amber-600"
         />
         <AnalyticsCard
@@ -44,7 +47,7 @@ export function AnalyticsDashboard() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <GamePerformancePanel />
-        <RevenueBreakdownPanel totalRevenue={revenue} />
+        <RevenueBreakdownPanel orderRevenue={orderRevenue} adRevenue={adRevenue} adViews={adViews} />
       </div>
     </div>
   );

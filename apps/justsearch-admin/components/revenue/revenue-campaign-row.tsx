@@ -6,8 +6,9 @@ interface RevenueCampaignRowProps {
 }
 
 export function RevenueCampaignRow({ campaign }: RevenueCampaignRowProps) {
-  const ctr = campaign.impressions > 0 ? Math.round(((campaign.impressions * 0.7) / campaign.impressions) * 100) : 0;
-  const completions = Math.round(campaign.impressions * 0.7);
+  const impressions = campaign.impressions || campaign.totalViews3s;
+  const ctr = impressions > 0 ? Math.round((campaign.totalClicks / impressions) * 100) : 0;
+  const totalRevenue = campaign.revenueJustsearch + campaign.revenueRestaurant;
 
   return (
     <div className="flex items-start gap-3 rounded-lg border border-slate-100 p-3">
@@ -18,12 +19,12 @@ export function RevenueCampaignRow({ campaign }: RevenueCampaignRowProps) {
         <p className="truncate text-sm font-semibold text-slate-900">{campaign.title}</p>
         <p className="truncate text-xs text-slate-500">{campaign.companyName}</p>
         <div className="mt-1 flex items-center gap-3 text-[10px] text-slate-400">
-          <span className="flex items-center gap-0.5"><Eye className="h-3 w-3" />{campaign.impressions.toLocaleString()}</span>
+          <span className="flex items-center gap-0.5"><Eye className="h-3 w-3" />{impressions.toLocaleString()}</span>
           <span className="flex items-center gap-0.5"><CheckCircle className="h-3 w-3" />{ctr}% CTR</span>
         </div>
       </div>
       <div className="text-right">
-        <p className="text-sm font-bold text-slate-900">AED {(campaign.revenueJustsearch + campaign.revenueRestaurant).toLocaleString()}</p>
+        <p className="text-sm font-bold text-slate-900">AED {totalRevenue.toLocaleString()}</p>
         <span className={`inline-block rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${campaign.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
           {campaign.isActive ? 'Active' : 'Paused'}
         </span>

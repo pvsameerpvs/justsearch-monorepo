@@ -18,48 +18,58 @@ function formatYAxis(value: number) {
 }
 
 interface RevenueChartProps {
-  monthlyTrend: number[];
+  months: string[];
+  trend: number[];
+  isLoading: boolean;
 }
 
-export function RevenueChart({ monthlyTrend }: RevenueChartProps) {
-  const data = buildChartData(monthlyTrend);
+export function RevenueChart({ months, trend, isLoading }: RevenueChartProps) {
+  const data = buildChartData(months, trend);
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-slate-900">Revenue Trend</h3>
-        <span className="text-xs font-medium text-slate-400">Last 6 months</span>
+        <span className="text-xs font-medium text-slate-400">
+          {months.length > 0 ? `${months[0]} – ${months[months.length - 1]}` : 'Last 6 months'}
+        </span>
       </div>
 
       <div className="mt-4 h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            margin={{ top: 8, right: 8, bottom: 0, left: -12 }}
-            barCategoryGap="20%"
-          >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-            <XAxis
-              dataKey="month"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 10, fill: "#94a3b8" }}
-              tickFormatter={formatYAxis}
-            />
-            <Tooltip
-              content={<RevenueChartTooltip />}
-              cursor={{ fill: "rgba(16, 185, 129, 0.06)" }}
-            />
-            <Bar dataKey="revenue" radius={[6, 6, 0, 0]} animationDuration={1000}>
-              <RevenueChartBars dataLength={data.length} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center text-sm text-slate-400">Loading trend data...</div>
+        ) : trend.length === 0 ? (
+          <div className="flex h-full items-center justify-center text-sm text-slate-400">No revenue data yet</div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data}
+              margin={{ top: 8, right: 8, bottom: 0, left: -12 }}
+              barCategoryGap="20%"
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                tickFormatter={formatYAxis}
+              />
+              <Tooltip
+                content={<RevenueChartTooltip />}
+                cursor={{ fill: "rgba(16, 185, 129, 0.06)" }}
+              />
+              <Bar dataKey="revenue" radius={[6, 6, 0, 0]} animationDuration={1000}>
+                <RevenueChartBars dataLength={data.length} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

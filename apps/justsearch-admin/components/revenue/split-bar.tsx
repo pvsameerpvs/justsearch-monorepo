@@ -6,7 +6,7 @@ interface SplitBarProps {
 }
 
 export function SplitBar({ label, value, total, color }: SplitBarProps) {
-  const percent = Math.round((value / total) * 100);
+  const percent = total > 0 ? Math.round((value / total) * 100) : 0;
   return (
     <div>
       <div className="flex justify-between text-sm">

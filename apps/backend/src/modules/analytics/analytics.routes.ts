@@ -1,12 +1,21 @@
 import { Router } from 'express';
 import { eq, and, sql, gte, lte } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders, orderItems, userRestaurants } from '../../db/schema';
+import { orders, orderItems, userRestaurants, advertisements } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 
 const router = Router();
 
 router.use(authMiddleware);
+
+// Safely parse JSONB array
+function safeStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value as string[];
+  if (typeof value === 'string') {
+    try { return JSON.parse(value) as string[]; } catch { return []; }
+  }
+  return [];
+}
 
 // GET /api/v1/analytics/summary — restaurant summary stats
 router.get('/summary', requireRole('owner', 'manager'), async (req, res, next) => {
@@ -17,6 +26,7 @@ router.get('/summary', requireRole('owner', 'manager'), async (req, res, next) =
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
+    // ── Order stats ──
     const todayOrders = await db
       .select()
       .from(orders)
@@ -30,21 +40,36 @@ router.get('/summary', requireRole('owner', 'manager'), async (req, res, next) =
 
     const totalOrders = todayOrders.length;
     const completedOrders = todayOrders.filter((o) => o.status === 'completed');
-    const revenue = completedOrders.reduce((sum, o) => sum + Number(o.total), 0);
-    const avgOrderValue = completedOrders.length > 0 ? revenue / completedOrders.length : 0;
+    const orderRevenue = completedOrders.reduce((sum, o) => sum + Number(o.total), 0);
+    const avgOrderValue = completedOrders.length > 0 ? orderRevenue / completedOrders.length : 0;
 
     const customerCount = await db
       .select({ count: sql<number>`count(*)` })
       .from(userRestaurants)
       .where(eq(userRestaurants.restaurantId, req.tenant.id));
 
+    // ── Ad revenue for this restaurant ──
+    const allAds = await db.select().from(advertisements);
+    let adRevenue = 0;
+    let adViews = 0;
+
+    for (const ad of allAds) {
+      const targets = safeStringArray(ad.targetRestaurants);
+      if (targets.length === 0 || targets.includes(req.tenant.id)) {
+        adRevenue += Number(ad.revenueRestaurant ?? 0);
+        adViews += Number(ad.totalViews3s ?? 0) + Number(ad.totalViewsFull ?? 0);
+      }
+    }
+
     res.json({
       today: {
         orders: totalOrders,
         completed: completedOrders.length,
-        revenue,
+        revenue: orderRevenue,
         avgOrderValue: Number(avgOrderValue.toFixed(2)),
       },
+      adRevenue: Math.round(adRevenue),
+      adViews,
       totalCustomers: customerCount[0]?.count ?? 0,
     });
   } catch (error) {

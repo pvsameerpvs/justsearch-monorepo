@@ -12,12 +12,12 @@ export function RevenueAdSplit({ splitData }: RevenueAdSplitProps) {
         title="Restaurant Partner Ads"
         subtitle="Advertiser brought by restaurant"
         total={splitData.restaurantBrought.total}
-        primaryLabel="Restaurant (60%)"
-        primaryValue={splitData.restaurantBrought.restaurantShare}
-        secondaryLabel="JustSearch (40%)"
-        secondaryValue={splitData.restaurantBrought.platformShare}
-        primaryColor="bg-amber-500"
-        secondaryColor="bg-slate-500"
+        primaryLabel="JustSearch (60%)"
+        primaryValue={splitData.restaurantBrought.platformShare}
+        secondaryLabel="Restaurant (40%)"
+        secondaryValue={splitData.restaurantBrought.restaurantShare}
+        primaryColor="bg-slate-500"
+        secondaryColor="bg-amber-500"
         highlightLabel="Restaurant gets"
         highlightValue={splitData.restaurantBrought.restaurantShare}
       />
@@ -25,9 +25,9 @@ export function RevenueAdSplit({ splitData }: RevenueAdSplitProps) {
         title="Platform Partner Ads"
         subtitle="Advertiser brought by JustSearch"
         total={splitData.platformBrought.total}
-        primaryLabel="JustSearch (60%)"
+        primaryLabel="JustSearch (100%)"
         primaryValue={splitData.platformBrought.platformShare}
-        secondaryLabel="Restaurant (40%)"
+        secondaryLabel="Restaurant (0%)"
         secondaryValue={splitData.platformBrought.restaurantShare}
         primaryColor="bg-emerald-500"
         secondaryColor="bg-slate-400"

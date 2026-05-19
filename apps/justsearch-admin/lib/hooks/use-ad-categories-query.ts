@@ -37,3 +37,16 @@ export function useCreateAdCategoryMutation() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY }),
   });
 }
+
+export function getCreateCategoryErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes('cannot reach')) return 'Backend server is not running.';
+    if (msg.includes('insufficient permissions')) return 'You need super-admin access to create categories.';
+    if (msg.includes('authentication required')) return 'Please log in as a super admin.';
+    if (msg.includes('invalid or expired token')) return 'Your session expired. Please log in again.';
+    if (msg.includes('400')) return 'Invalid category name.';
+    return error.message;
+  }
+  return 'Unknown error creating category.';
+}

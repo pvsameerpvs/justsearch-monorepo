@@ -18,7 +18,6 @@ export interface AdCampaign {
   isActive: boolean;
   category: string | null;
   budget: number;
-  costPerImpression: number;
   costPerView3s: number;
   costPerViewFull: number;
   costPerClick: number;
@@ -29,6 +28,7 @@ export interface AdCampaign {
   totalClicks: number;
   totalConfirmedClicks: number;
   totalAbandonedClicks: number;
+  totalSkips: number;
   revenueJustsearch: number;
   revenueRestaurant: number;
   startDate: string | null;

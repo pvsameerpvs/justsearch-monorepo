@@ -12,28 +12,28 @@ export function RevenueStatsCards({ summary }: RevenueStatsCardsProps) {
       <RevenueCard
         label="Total Revenue"
         value={`AED ${summary.totalRevenue.toLocaleString()}`}
-        change={`+${summary.growthPercent}%`}
+        change={`${summary.growthPercent > 0 ? '+' : ''}${summary.growthPercent}%`}
         icon={DollarSign}
         color="bg-emerald-100 text-emerald-700"
       />
       <RevenueCard
         label="Ad Revenue"
         value={`AED ${summary.adRevenue.toLocaleString()}`}
-        change="+24%"
+        change={`${summary.totalViews.toLocaleString()} views`}
         icon={TrendingUp}
         color="bg-amber-100 text-amber-700"
       />
       <RevenueCard
         label="Subscription Revenue"
         value={`AED ${summary.subscriptionRevenue.toLocaleString()}`}
-        change="+12%"
+        change="Coming soon"
         icon={PieChart}
         color="bg-blue-100 text-blue-700"
       />
       <RevenueCard
         label="Active Restaurants"
         value={String(summary.activeRestaurants)}
-        change={`${summary.totalOrders} orders`}
+        change={`${summary.totalOrders.toLocaleString()} orders`}
         icon={Store}
         color="bg-violet-100 text-violet-700"
       />

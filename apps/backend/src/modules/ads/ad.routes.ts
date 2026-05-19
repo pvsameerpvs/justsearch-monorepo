@@ -19,7 +19,6 @@ const createSchema = z.object({
   duration: z.number().int().positive().optional(),
   category: z.string().max(50).optional(),
   budget: z.coerce.number().nonnegative().optional(),
-  costPerImpression: z.coerce.number().nonnegative().optional(),
   costPerView3s: z.coerce.number().nonnegative().optional(),
   costPerViewFull: z.coerce.number().nonnegative().optional(),
   costPerClick: z.coerce.number().nonnegative().optional(),
@@ -50,7 +49,6 @@ router.post('/', requireRole('super_admin'), async (req, res, next) => {
     const values = {
       ...body,
       budget: body.budget !== undefined ? String(body.budget) : undefined,
-      costPerImpression: body.costPerImpression !== undefined ? String(body.costPerImpression) : undefined,
       costPerView3s: body.costPerView3s !== undefined ? String(body.costPerView3s) : undefined,
       costPerViewFull: body.costPerViewFull !== undefined ? String(body.costPerViewFull) : undefined,
       costPerClick: body.costPerClick !== undefined ? String(body.costPerClick) : undefined,
@@ -71,7 +69,6 @@ router.patch('/:id', requireRole('super_admin'), async (req, res, next) => {
       endDate: body.endDate ? new Date(body.endDate) : undefined,
     };
   if (body.budget !== undefined) values.budget = String(body.budget);
-  if (body.costPerImpression !== undefined) values.costPerImpression = String(body.costPerImpression);
   if (body.costPerView3s !== undefined) values.costPerView3s = String(body.costPerView3s);
   if (body.costPerViewFull !== undefined) values.costPerViewFull = String(body.costPerViewFull);
   if (body.costPerClick !== undefined) values.costPerClick = String(body.costPerClick);
@@ -159,7 +156,6 @@ publicAdRoutes.get('/active', async (req, res, next) => {
       duration: row.duration,
       category: row.category,
       budget: row.budget,
-      costPerImpression: row.costPerImpression,
       costPerView3s: row.costPerView3s,
       costPerViewFull: row.costPerViewFull,
       costPerClick: row.costPerClick,
@@ -188,12 +184,12 @@ publicAdRoutes.get('/active', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// POST /api/v1/advertisements/public/:id/event — track ad view / click events
+// POST /api/v1/advertisements/public/:id/event — track ad view / click / skip events
 publicAdRoutes.post('/:id/event', async (req, res, next) => {
   try {
     const id = req.params.id;
     const body = z.object({
-      eventType: z.enum(['view_3s', 'view_full', 'click_pending']),
+      eventType: z.enum(['view_3s', 'view_full', 'click_pending', 'skip']),
       deviceFingerprint: z.string().optional(),
     }).parse(req.body);
 
@@ -201,10 +197,12 @@ publicAdRoutes.post('/:id/event', async (req, res, next) => {
     if (!ad) return res.status(404).json({ error: 'Ad not found' });
 
     // Cost per event — uses the campaign's custom pricing (defaults: 0.30, 1.00, 5.00)
+    // skip events are free (no charge) but tracked for analytics
     const EVENT_COSTS: Record<string, number> = {
       view_3s: Number(ad.costPerView3s ?? 0.30),
       view_full: Number(ad.costPerViewFull ?? 1.00),
       click_pending: 0,
+      skip: 0,
     };
     const amount = EVENT_COSTS[body.eventType] ?? 0;
 
@@ -225,9 +223,13 @@ publicAdRoutes.post('/:id/event', async (req, res, next) => {
 
     // Update ad counters
     const counterUpdates: Record<string, number> = {};
-    if (body.eventType === 'view_3s') counterUpdates.totalViews3s = (ad.totalViews3s ?? 0) + 1;
+    if (body.eventType === 'view_3s') {
+      counterUpdates.totalViews3s = (ad.totalViews3s ?? 0) + 1;
+      counterUpdates.impressions = (ad.impressions ?? 0) + 1;
+    }
     if (body.eventType === 'view_full') counterUpdates.totalViewsFull = (ad.totalViewsFull ?? 0) + 1;
     if (body.eventType === 'click_pending') counterUpdates.totalClicks = (ad.totalClicks ?? 0) + 1;
+    if (body.eventType === 'skip') counterUpdates.totalSkips = (ad.totalSkips ?? 0) + 1;
 
     const newSpent = Number(ad.spent ?? 0) + amount;
     const budget = Number(ad.budget ?? 0);
@@ -381,7 +383,30 @@ publicAdRoutes.get('/categories', async (req, res, next) => {
 router.post('/categories', requireRole('super_admin'), async (req, res, next) => {
   try {
     const body = z.object({ name: z.string().min(1).max(50) }).parse(req.body);
-    const [category] = await db.insert(adCategories).values({ name: body.name }).returning();
+    const normalizedName = body.name.trim();
+
+    // Check if category already exists (including inactive)
+    const existing = await db
+      .select()
+      .from(adCategories)
+      .where(eq(adCategories.name, normalizedName))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Reactivate if it was soft-deleted
+      if (!existing[0].isActive) {
+        const [reactivated] = await db
+          .update(adCategories)
+          .set({ isActive: true })
+          .where(eq(adCategories.id, existing[0].id))
+          .returning();
+        return res.status(200).json({ category: reactivated });
+      }
+      // Already active — return it without error
+      return res.status(200).json({ category: existing[0] });
+    }
+
+    const [category] = await db.insert(adCategories).values({ name: normalizedName }).returning();
     res.status(201).json({ category });
   } catch (error) { next(error); }
 });
