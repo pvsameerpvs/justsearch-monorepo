@@ -7,6 +7,7 @@ export interface DbAd {
   mediaType: string;
   content: string | null;
   imageUrl: string | null;
+  mediaUrlLow: string | null;
   linkUrl: string | null;
   duration: number;
   category: string | null;
@@ -32,6 +33,7 @@ export function mapDbToCampaign(db: DbAd): AdCampaign {
     companyName: nameParts[1] || '',
     mediaType: db.mediaType as 'image' | 'video' | 'gif',
     mediaUrl: db.imageUrl ?? '',
+    mediaUrlLow: db.mediaUrlLow ?? null,
     linkUrl: db.linkUrl ?? null,
     duration: db.duration ?? 15,
     type: db.type as 'restaurant_brought' | 'platform',
@@ -59,6 +61,7 @@ export function mapCampaignToDb(data: AdCampaignFormData) {
     mediaType: data.mediaType,
     content: data.clientName,
     imageUrl: data.mediaUrl,
+    mediaUrlLow: data.mediaUrlLow || undefined,
     linkUrl: data.linkUrl || undefined,
     duration: data.duration,
     category: data.category || null,

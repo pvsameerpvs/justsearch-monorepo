@@ -6,6 +6,7 @@ export const adCampaignSchema = z.object({
   companyName: z.string().min(2, 'Company name is required').max(100),
   mediaType: z.enum(['image', 'video', 'gif']),
   mediaUrl: z.string().min(1, 'Media file is required'),
+  mediaUrlLow: z.string().optional().default(''),
   linkUrl: z.string().url('Must be a valid URL starting with https://').or(z.literal('')).optional().default(''),
   duration: z.coerce.number().min(5, 'Minimum 5 seconds').max(300, 'Maximum 300 seconds'),
   type: z.enum(['restaurant_brought', 'platform']),

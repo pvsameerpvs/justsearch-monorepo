@@ -8,6 +8,7 @@ export interface AdCampaign {
   companyName: string;
   mediaType: AdMediaType;
   mediaUrl: string;
+  mediaUrlLow: string | null;
   linkUrl: string | null;
   duration: number;
   type: AdCampaignType;
@@ -33,6 +34,7 @@ export interface AdCampaignFormData {
   companyName: string;
   mediaType: AdMediaType;
   mediaUrl: string;
+  mediaUrlLow: string;
   linkUrl: string;
   duration: number;
   type: AdCampaignType;

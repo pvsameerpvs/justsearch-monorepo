@@ -7,7 +7,8 @@ export const advertisements = pgTable('advertisements', {
   mediaType: varchar('media_type', { length: 10 }).default('image').notNull(),  // 'image' | 'video' | 'gif'
   content: varchar('content', { length: 2000 }),
   imageUrl: varchar('image_url', { length: 500 }),
-  linkUrl: varchar('link_url', { length: 1000 }),           // click-through URL when user taps the ad
+  linkUrl: varchar('link_url', { length: 1000 }),
+  mediaUrlLow: varchar('media_url_low', { length: 500 }),
   duration: integer('duration').default(15).notNull(),
   category: varchar('category', { length: 50 }),
   budget: decimal('budget', { precision: 10, scale: 2 }).default('0'),

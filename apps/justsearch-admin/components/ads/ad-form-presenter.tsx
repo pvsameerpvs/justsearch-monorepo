@@ -47,6 +47,14 @@ export function AdFormPresenter({ control, formState, watch, setValue, isEdit, r
           <AdMediaUpload mediaType={watch("mediaType")} mediaUrl={field.value} onChange={(t, u) => { setValue("mediaType", t); field.onChange(u); }} />
         )} />
         {errors.mediaUrl && <p className="mt-1 text-xs text-red-500">{errors.mediaUrl.message}</p>}
+        {watch("mediaType") === "video" && (
+          <div className="mt-3 border-t border-slate-200 pt-3">
+            <label className="mb-1 block text-xs font-medium text-slate-600">Low Quality Video (instant start, optional)</label>
+            <Controller name="mediaUrlLow" control={control} render={({ field }) => (
+              <AdMediaUpload mediaType="video" mediaUrl={field.value} onChange={(_, u) => field.onChange(u)} />
+            )} />
+          </div>
+        )}
       </section>
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">

@@ -1,19 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import Image from "next/image";
 
 interface AdMediaRendererProps {
   mediaType: string;
   mediaUrl: string;
+  mediaUrlLow: string;
   linkUrl: string;
   isMuted: boolean;
   onEnded?: () => void;
 }
 
-export function AdMediaRenderer({ mediaType, mediaUrl, linkUrl, isMuted, onEnded }: AdMediaRendererProps) {
-  const [isLoading, setIsLoading] = useState(true);
+export function AdMediaRenderer({ mediaType, mediaUrl, mediaUrlLow, linkUrl, isMuted, onEnded }: AdMediaRendererProps) {
+  const lowRef = useRef<HTMLVideoElement>(null);
+  const hdRef = useRef<HTMLVideoElement>(null);
+  const [hdReady, setHdReady] = useState(false);
   const [hasError, setHasError] = useState(false);
+
+  const hasLink = typeof linkUrl === "string" && linkUrl.startsWith("http");
+
+  const handleHdReady = useCallback(() => {
+    if (!lowRef.current || !hdRef.current) return;
+    // Sync playback position so swap is seamless
+    hdRef.current.currentTime = lowRef.current.currentTime;
+    hdRef.current.muted = lowRef.current.muted;
+    setHdReady(true);
+    hdRef.current.play().catch(() => {});
+  }, []);
+
+  const handleClick = useCallback(() => {
+    if (hasLink) window.open(linkUrl, "_blank", "noopener,noreferrer");
+  }, [hasLink, linkUrl]);
 
   if (hasError) {
     return (
@@ -23,64 +41,60 @@ export function AdMediaRenderer({ mediaType, mediaUrl, linkUrl, isMuted, onEnded
     );
   }
 
-  const hasLink = typeof linkUrl === 'string' && linkUrl.startsWith("http");
-
   if (mediaType === "video") {
+    const hasLow = typeof mediaUrlLow === "string" && mediaUrlLow.length > 0;
+    const lowSrc = hasLow ? mediaUrlLow : mediaUrl;
+
     return (
-      <div className="relative h-full w-full">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
-          </div>
-        )}
+      <div className="relative h-full w-full bg-black" onClick={handleClick} style={{ cursor: hasLink ? "pointer" : undefined }}>
+        {/* Low-quality layer: plays instantly, fades out when HD ready */}
         <video
-          src={mediaUrl}
+          ref={lowRef}
+          src={lowSrc}
           autoPlay
           muted={isMuted}
           loop={false}
           playsInline
-          className="h-full w-full object-cover"
-          onLoadedData={() => setIsLoading(false)}
-          onError={() => { setHasError(true); setIsLoading(false); }}
+          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
+          style={{ opacity: hdReady ? 0 : 1, zIndex: hdReady ? 0 : 10 }}
+          onError={() => setHasError(true)}
           onEnded={onEnded}
-          onClick={() => hasLink && window.open(linkUrl, '_blank', 'noopener,noreferrer')}
-          style={{ cursor: hasLink ? 'pointer' : undefined }}
         />
+
+        {/* High-quality layer: hidden, preloads, fades in when ready */}
+        {hasLow && (
+          <video
+            ref={hdRef}
+            src={mediaUrl}
+            muted={isMuted}
+            loop={false}
+            playsInline
+            preload="auto"
+            className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
+            style={{ opacity: hdReady ? 1 : 0, zIndex: hdReady ? 10 : 0 }}
+            onCanPlayThrough={handleHdReady}
+            onError={() => setHasError(true)}
+            onEnded={onEnded}
+          />
+        )}
       </div>
     );
   }
 
-  const isValidUrl = typeof mediaUrl === 'string' && (mediaUrl.startsWith("http://") || mediaUrl.startsWith("https://") || mediaUrl.startsWith("/"));
-
+  const isValidUrl = typeof mediaUrl === "string" && (mediaUrl.startsWith("http://") || mediaUrl.startsWith("https://") || mediaUrl.startsWith("/"));
   if (!isValidUrl) {
     return <div className="flex h-full items-center justify-center text-6xl">{mediaUrl}</div>;
   }
 
   const imageContent = (
     <div className="relative h-full w-full">
-      {isLoading && (
-        <div className="absolute inset-0 flex animate-pulse items-center justify-center bg-slate-800" />
-      )}
-      <Image
-        src={mediaUrl}
-        alt="Ad"
-        fill
-        className={`object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-        sizes="100vw"
-        unoptimized
-        onLoad={() => setIsLoading(false)}
-        onError={() => { setHasError(true); setIsLoading(false); }}
-      />
+      <Image src={mediaUrl} alt="Ad" fill className="object-cover" sizes="100vw" unoptimized onError={() => setHasError(true)} />
     </div>
   );
 
-  if (hasLink) {
-    return (
-      <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block h-full w-full">
-        {imageContent}
-      </a>
-    );
-  }
-
-  return imageContent;
+  return hasLink ? (
+    <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block h-full w-full">
+      {imageContent}
+    </a>
+  ) : imageContent;
 }

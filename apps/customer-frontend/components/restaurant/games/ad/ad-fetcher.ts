@@ -7,6 +7,7 @@ export interface CampaignItem {
   title: string;
   mediaType: string;
   mediaUrl: string;
+  mediaUrlLow: string;
   linkUrl: string;
   duration: number;
   description?: string;
@@ -19,6 +20,7 @@ interface PublicAd {
   name: string;
   mediaType?: string;
   imageUrl?: string;
+  mediaUrlLow?: string;
   linkUrl?: string;
   duration?: number;
   content?: string;
@@ -63,6 +65,7 @@ export async function fetchActiveAds(gameId: string, restaurantId: string): Prom
       title: ad.name?.split(' — ')?.[0] ?? ad.name ?? '',
       mediaType: ad.mediaType ?? 'image',
       mediaUrl: ad.imageUrl ?? '',
+      mediaUrlLow: ad.mediaUrlLow ?? '',
       linkUrl: ad.linkUrl ?? '',
       duration: (ad.duration ?? 15) * 1000,
       description: ad.content ?? undefined,

@@ -6,7 +6,6 @@ import { AdDurationTimer } from "./ad-duration-timer";
 import { AdVideoSkipControl } from "./ad-video-skip-control";
 import { AdMediaRenderer } from "./ad-media-renderer";
 import { AdInfo } from "./ad-info";
-import { AdLoadingSkeleton } from "./ad-loading-skeleton";
 import { useAdOverlay } from "./hooks/use-ad-overlay";
 
 interface AdOverlayProps {
@@ -20,7 +19,9 @@ export function AdOverlay({ onComplete, restaurantId = "mosaic-table", gameId = 
   const { ad, ads, status, currentIndex, isMuted, isLast, setMuted, canSkip, remaining, handleTimerEnd, handleSkipAll } =
     useAdOverlay({ onComplete, gameId, restaurantId });
 
-  if (status === "idle" || status === "prefetching") return <AdLoadingSkeleton />;
+  if (status === "idle" || status === "prefetching") {
+    return <div className="fixed inset-0 z-[10001] bg-black" />;
+  }
   if (status === "ready" && ads.length === 0) return null;
 
   const showOverlay = status !== "completed" && !!ad;
@@ -46,7 +47,14 @@ export function AdOverlay({ onComplete, restaurantId = "mosaic-table", gameId = 
           />
           <div className="w-full max-w-md space-y-4">
             <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-900">
-              <AdMediaRenderer mediaType={ad.mediaType} mediaUrl={ad.mediaUrl} linkUrl={ad.linkUrl} isMuted={isMuted} onEnded={handleTimerEnd} />
+              <AdMediaRenderer
+                mediaType={ad.mediaType}
+                mediaUrl={ad.mediaUrl}
+                mediaUrlLow={ad.mediaUrlLow}
+                linkUrl={ad.linkUrl}
+                isMuted={isMuted}
+                onEnded={handleTimerEnd}
+              />
               <div className="absolute bottom-0 left-0 right-0">
                 <AdDurationTimer duration={ad.duration} onComplete={handleTimerEnd} key={currentIndex} />
               </div>
