@@ -1,6 +1,6 @@
 export function AdLoadingSkeleton() {
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90">
+    <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/90">
       <div className="flex items-center gap-3">
         <span className="text-2xl">🎮</span>
         <div className="flex gap-1.5">

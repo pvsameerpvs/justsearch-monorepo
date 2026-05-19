@@ -1,5 +1,4 @@
 export { AdOverlay } from "./ad-overlay";
-export { AdSkipButton } from "./ad-skip-button";
 export { AdDurationTimer } from "./ad-duration-timer";
 export { AdMediaRenderer } from "./ad-media-renderer";
 export { AdInfo } from "./ad-info";

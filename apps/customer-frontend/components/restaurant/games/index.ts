@@ -1,4 +1,4 @@
-export { AdOverlay, AdSkipButton, AdDurationTimer, AdMediaRenderer, AdInfo } from "./ad";
+export { AdOverlay, AdDurationTimer, AdMediaRenderer, AdInfo } from "./ad";
 export { EmbeddedGamePlayer } from "./embedded-game-player";
 export { GameCoinPill } from "./game-coin-pill";
 export { GameExitConfirmDialog } from "./game-exit-confirm-dialog";

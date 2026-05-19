@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 
 interface AdDurationTimerProps {
   duration: number;
@@ -28,7 +27,7 @@ export function AdDurationTimer({ duration, onComplete }: AdDurationTimerProps) 
 
   return (
     <div className="h-1 w-full bg-slate-700">
-      <motion.div className="h-full bg-amber-500" style={{ width: `${progress}%` }} />
+      <div className="h-full bg-amber-500" style={{ width: `${progress}%` }} />
     </div>
   );
 }

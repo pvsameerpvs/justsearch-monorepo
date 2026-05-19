@@ -11,6 +11,7 @@ import { ActiveOrderTracker } from '@/components/restaurant/checkout/active-orde
 import { RewardManager } from '@/components/restaurant/checkout/reward-manager';
 import { FulfillmentProvider } from '@/components/restaurant/use-restaurant-fulfillment';
 import { useRestaurant } from '@/components/restaurant/restaurant-context';
+import { useChromeStore } from '@/lib/stores/chrome-store';
 import type { ReactNode } from 'react';
 
 type RestaurantLayoutManagerProps = {
@@ -29,21 +30,26 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
     pathname === '/menu/checkout' || pathname.startsWith('/menu/checkout/') || isGameDetailPage;
   const hideTrackerOnStatusPage = pathname.startsWith('/menu/checkout/status');
   
-  const showBottomNav = showRestaurantChrome && !hideBottomNavOnCheckout;
-  const showOrderTracker = showRestaurantChrome && !hideTrackerOnStatusPage;
+  const isChromeHidden = useChromeStore((s) => s.refCount > 0);
+
   const showRewardManager = !isGameDetailPage;
+
+  const showHeader = showRestaurantChrome && !isChromeHidden;
+  const showBottomNavFinal = showRestaurantChrome && !hideBottomNavOnCheckout && !isChromeHidden;
+  const showTracker = showRestaurantChrome && !hideTrackerOnStatusPage && !isChromeHidden;
+  const showReward = showRewardManager && !isChromeHidden;
 
   return (
     <RegistrationProvider>
       <FulfillmentProvider restaurant={restaurant}>
         <AuthRequiredHandler />
         <RegistrationRouteGuard />
-        {showRestaurantChrome && <RestaurantMobileHeader />}
-        {showOrderTracker && <ActiveOrderTracker />}
-        {showBottomNav && <RestaurantMobileNav />}
+        {showHeader && <RestaurantMobileHeader />}
+        {showTracker && <ActiveOrderTracker />}
+        {showBottomNavFinal && <RestaurantMobileNav />}
         {children}
         <RegistrationModal />
-        {showRewardManager && <RewardManager />}
+        {showReward && <RewardManager />}
       </FulfillmentProvider>
     </RegistrationProvider>
   );
