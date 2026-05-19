@@ -2,6 +2,33 @@ import { getShownAdIds } from '@/lib/ad-shown-tracker';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (typeof window !== 'undefined') {
+    const token = window.localStorage.getItem('justsearch:authToken');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+function getDeviceFingerprint(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+    ctx.textBaseline = 'top';
+    ctx.font = '14px Arial';
+    ctx.fillText('JustSearch FP', 2, 2);
+    const canvasHash = canvas.toDataURL().slice(-16);
+    const screenInfo = `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`;
+    const userAgent = navigator.userAgent.slice(-16);
+    return btoa(`${canvasHash}-${screenInfo}-${userAgent}`).slice(0, 64);
+  } catch {
+    return '';
+  }
+}
+
 export interface CampaignItem {
   id: string;
   title: string;
@@ -95,9 +122,9 @@ export async function trackAdEvent(
   try {
     const res = await fetch(`${API_BASE}/advertisements/public/${adId}/event`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
-      body: JSON.stringify({ eventType }),
+      body: JSON.stringify({ eventType, deviceFingerprint: getDeviceFingerprint() }),
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { eventId?: string };
@@ -112,7 +139,7 @@ export async function confirmAdClick(adId: string, eventId: string): Promise<voi
   try {
     await fetch(`${API_BASE}/advertisements/public/${adId}/click-confirm`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ eventId }),
     });
@@ -126,7 +153,7 @@ export async function abandonAdClick(adId: string, eventId: string): Promise<voi
   try {
     await fetch(`${API_BASE}/advertisements/public/${adId}/click-abandon`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ eventId }),
     });

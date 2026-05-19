@@ -84,7 +84,7 @@ export function useOtpRegistration() {
     setError(null); setBusy(true);
     try {
       const data = await postOtp('/api/auth/otp/verify', { requestId, mobile: `+971${mobileLocalDigits}`, otp: otp.trim() }) as OtpVerifyResponse;
-      setUser({ id: data.user.id, name: data.user.name, mobile: data.user.phone, verifiedAt: Date.now() });
+      setUser({ id: data.user.id, name: data.user.name, mobile: data.user.phone, verifiedAt: Date.now(), token: data.token });
       closeModal();
     } catch (e) { setError(e instanceof Error ? e.message : 'Failed to verify OTP'); }
     setBusy(false);

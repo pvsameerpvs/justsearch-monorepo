@@ -1,6 +1,7 @@
 import type { RegisteredUser } from './registered-user';
 
 const STORAGE_KEY = 'justsearch:registeredUser';
+const TOKEN_KEY = 'justsearch:authToken';
 const FRESH_REGISTRATION_KEY = 'justsearch:freshRegistration';
 
 function parseUser(raw: unknown): RegisteredUser | null {
@@ -10,10 +11,11 @@ function parseUser(raw: unknown): RegisteredUser | null {
     typeof obj.id !== 'string' ||
     typeof obj.name !== 'string' ||
     typeof obj.mobile !== 'string' ||
-    typeof obj.verifiedAt !== 'number'
+    typeof obj.verifiedAt !== 'number' ||
+    typeof obj.token !== 'string'
   )
     return null;
-  return { id: obj.id, name: obj.name, mobile: obj.mobile, verifiedAt: obj.verifiedAt };
+  return { id: obj.id, name: obj.name, mobile: obj.mobile, verifiedAt: obj.verifiedAt, token: obj.token };
 }
 
 export function readStoredUser(): RegisteredUser | null {
@@ -29,9 +31,23 @@ export function readStoredUser(): RegisteredUser | null {
 export function writeStoredUser(user: RegisteredUser | null) {
   if (typeof window === 'undefined') return;
   try {
-    if (!user) { window.localStorage.removeItem(STORAGE_KEY); return; }
+    if (!user) {
+      window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(TOKEN_KEY);
+      return;
+    }
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    window.localStorage.setItem(TOKEN_KEY, user.token);
   } catch { /* ignore */ }
+}
+
+export function readStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
 }
 
 export function readFreshRegistration(): RegisteredUser | null {

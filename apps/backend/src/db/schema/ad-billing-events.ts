@@ -4,6 +4,7 @@ export const adBillingEvents = pgTable('ad_billing_events', {
   id: uuid('id').defaultRandom().primaryKey(),
   adId: uuid('ad_id').notNull(),
   restaurantId: uuid('restaurant_id'),
+  customerId: uuid('customer_id'),
   eventType: varchar('event_type', { length: 20 }).notNull(),
   amount: decimal('amount', { precision: 10, scale: 2 }).default('0').notNull(),
   isConfirmed: boolean('is_confirmed').default(false),

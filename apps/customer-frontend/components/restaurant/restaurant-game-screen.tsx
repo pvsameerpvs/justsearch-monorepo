@@ -57,7 +57,12 @@ export function RestaurantGameScreen({ game, mode = 'intro' }: Props) {
     setShowAdOnGameEnd(false);
     if (pendingAward) {
       setTransition('processing');
-      await processAward(pendingAward);
+      try {
+        await processAward(pendingAward);
+      } catch {
+        // Score submission failed (likely 401 — auth required). Don't award fake points.
+        // The user stays on the game screen; they can retry after logging in.
+      }
       setPendingAward(null);
       setTransition('idle');
     }

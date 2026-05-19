@@ -148,6 +148,13 @@
       "when": 1780310400000,
       "tag": "0020_drop_cost_per_impression",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1780396800000,
+      "tag": "0021_add_customer_id_to_ad_billing_events",
+      "breakpoints": true
     }
   ]
 }

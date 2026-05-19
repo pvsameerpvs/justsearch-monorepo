@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 import { db } from '../../db';
 import { advertisements, adBillingEvents, adCategories } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
@@ -219,6 +219,7 @@ publicAdRoutes.post('/:id/event', async (req, res, next) => {
       amount: String(amount),
       isConfirmed: body.eventType !== 'click_pending',
       deviceFingerprint: body.deviceFingerprint ?? null,
+      customerId: req.auth?.id ?? null,
     }).returning();
 
     // Update ad counters
@@ -227,7 +228,10 @@ publicAdRoutes.post('/:id/event', async (req, res, next) => {
       counterUpdates.totalViews3s = (ad.totalViews3s ?? 0) + 1;
       counterUpdates.impressions = (ad.impressions ?? 0) + 1;
     }
-    if (body.eventType === 'view_full') counterUpdates.totalViewsFull = (ad.totalViewsFull ?? 0) + 1;
+    if (body.eventType === 'view_full') {
+      counterUpdates.totalViewsFull = (ad.totalViewsFull ?? 0) + 1;
+      counterUpdates.impressions = (ad.impressions ?? 0) + 1;
+    }
     if (body.eventType === 'click_pending') counterUpdates.totalClicks = (ad.totalClicks ?? 0) + 1;
     if (body.eventType === 'skip') counterUpdates.totalSkips = (ad.totalSkips ?? 0) + 1;
 
@@ -259,6 +263,15 @@ publicAdRoutes.post('/:id/click-confirm', async (req, res, next) => {
     const [ad] = await db.select().from(advertisements).where(eq(advertisements.id, id)).limit(1);
     if (!ad) return res.status(404).json({ error: 'Ad not found' });
 
+    // Security: verify the event belongs to this ad and is a pending click
+    const [event] = await db
+      .select()
+      .from(adBillingEvents)
+      .where(and(eq(adBillingEvents.id, body.eventId), eq(adBillingEvents.adId, id)))
+      .limit(1);
+    if (!event) return res.status(404).json({ error: 'Event not found for this ad' });
+    if (event.eventType !== 'click_pending') return res.status(400).json({ error: 'Event is not a pending click' });
+
     const clickCost = Number(ad.costPerClick ?? 5.00);
     const isRestaurantBrought = ad.type === 'restaurant_brought';
     const revenueJustsearch = isRestaurantBrought ? clickCost * 0.60 : clickCost;
@@ -268,9 +281,7 @@ publicAdRoutes.post('/:id/click-confirm', async (req, res, next) => {
     await db
       .update(adBillingEvents)
       .set({ eventType: 'click_confirmed', amount: String(clickCost), isConfirmed: true })
-      .where(
-        eq(adBillingEvents.id, body.eventId)
-      );
+      .where(eq(adBillingEvents.id, body.eventId));
 
     const newSpent = Number(ad.spent ?? 0) + clickCost;
     const budget = Number(ad.budget ?? 0);
@@ -299,6 +310,15 @@ publicAdRoutes.post('/:id/click-abandon', async (req, res, next) => {
 
     const [ad] = await db.select().from(advertisements).where(eq(advertisements.id, id)).limit(1);
     if (!ad) return res.status(404).json({ error: 'Ad not found' });
+
+    // Security: verify the event belongs to this ad and is a pending click
+    const [event] = await db
+      .select()
+      .from(adBillingEvents)
+      .where(and(eq(adBillingEvents.id, body.eventId), eq(adBillingEvents.adId, id)))
+      .limit(1);
+    if (!event) return res.status(404).json({ error: 'Event not found for this ad' });
+    if (event.eventType !== 'click_pending') return res.status(400).json({ error: 'Event is not a pending click' });
 
     // Mark ONLY the specific pending click as abandoned (no cost)
     await db

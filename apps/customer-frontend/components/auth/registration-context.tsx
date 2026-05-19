@@ -13,6 +13,7 @@ import { readStoredUser, writeStoredUser, saveFreshRegistration } from './regist
 
 type RegistrationContextValue = {
   user: RegisteredUser | null;
+  token: string | null;
   isRegistered: boolean;
   isModalOpen: boolean;
   openModal: () => void;
@@ -51,9 +52,10 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
+  const token = user?.token ?? null;
   const value = useMemo<RegistrationContextValue>(
-    () => ({ user, isRegistered: Boolean(user), isModalOpen, openModal, closeModal, setUser, clearUser }),
-    [user, isModalOpen, openModal, closeModal, setUser, clearUser],
+    () => ({ user, token, isRegistered: Boolean(user), isModalOpen, openModal, closeModal, setUser, clearUser }),
+    [user, token, isModalOpen, openModal, closeModal, setUser, clearUser],
   );
 
   return (

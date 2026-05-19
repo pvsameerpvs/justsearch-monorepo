@@ -73,8 +73,65 @@ export function useAdOverlay({ onComplete, gameId, restaurantId, skipDelay = 400
     advance();
   }, [ad?.id, advance, gameId]);
 
+  // --- CLICK TRACKING ---
+  const pendingClickEventId = useRef<string | null>(null);
+  const clickConfirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Abandon pending click helper (must be defined before handleSkipAll)
+  const abandonPendingClick = useCallback(() => {
+    if (clickConfirmTimer.current) {
+      clearTimeout(clickConfirmTimer.current);
+      clickConfirmTimer.current = null;
+    }
+    const stored = pendingClickEventId.current;
+    if (stored) {
+      const [storedAdId, eventId] = stored.split('|');
+      if (storedAdId && eventId) abandonAdClick(storedAdId, eventId);
+      pendingClickEventId.current = null;
+    }
+  }, []);
+
+  // Cleanup orphaned clicks when ad changes or unmounts
+  useEffect(() => {
+    return () => {
+      if (clickConfirmTimer.current) {
+        clearTimeout(clickConfirmTimer.current);
+        clickConfirmTimer.current = null;
+      }
+      if (pendingClickEventId.current) {
+        const stored = pendingClickEventId.current;
+        pendingClickEventId.current = null;
+        if (stored) {
+          const [storedAdId, eventId] = stored.split('|');
+          if (storedAdId && eventId) abandonAdClick(storedAdId, eventId);
+        }
+      }
+    };
+  }, [currentIndex]);
+
+  const handleLinkClick = useCallback(async () => {
+    if (!ad?.id || pendingClickEventId.current) return;
+
+    const eventId = await trackAdEvent(ad.id, 'click_pending');
+    if (!eventId) return;
+
+    // Store combined so cleanup has correct adId even after ad changes
+    pendingClickEventId.current = `${ad.id}|${eventId}`;
+
+    clickConfirmTimer.current = setTimeout(() => {
+      const stored = pendingClickEventId.current;
+      if (stored) {
+        const [, storedEventId] = stored.split('|');
+        if (storedEventId) confirmAdClick(ad.id, storedEventId);
+        pendingClickEventId.current = null;
+        clickConfirmTimer.current = null;
+      }
+    }, 3000);
+  }, [ad?.id]);
+
   // Skip / early exit
   const handleSkipAll = useCallback(() => {
+    abandonPendingClick();
     if (ad?.id) {
       if (view3sReached.current && !fullViewTracked.current) {
         // Skipped after 3s but before full view → charge 3s view cost
@@ -85,46 +142,7 @@ export function useAdOverlay({ onComplete, gameId, restaurantId, skipDelay = 400
       }
       skipAll(ad.id, gameId);
     }
-  }, [ad?.id, skipAll, gameId]);
-
-  // --- CLICK TRACKING ---
-  const pendingClickEventId = useRef<string | null>(null);
-  const clickConfirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    pendingClickEventId.current = null;
-    if (clickConfirmTimer.current) {
-      clearTimeout(clickConfirmTimer.current);
-      clickConfirmTimer.current = null;
-    }
-  }, [currentIndex]);
-
-  useEffect(() => {
-    return () => {
-      if (clickConfirmTimer.current) clearTimeout(clickConfirmTimer.current);
-      if (pendingClickEventId.current && ad?.id) {
-        abandonAdClick(ad.id, pendingClickEventId.current);
-        pendingClickEventId.current = null;
-      }
-    };
-  }, [ad?.id]);
-
-  const handleLinkClick = useCallback(async () => {
-    if (!ad?.id || pendingClickEventId.current) return;
-
-    const eventId = await trackAdEvent(ad.id, 'click_pending');
-    if (!eventId) return;
-
-    pendingClickEventId.current = eventId;
-
-    clickConfirmTimer.current = setTimeout(() => {
-      if (pendingClickEventId.current) {
-        confirmAdClick(ad.id, pendingClickEventId.current);
-        pendingClickEventId.current = null;
-        clickConfirmTimer.current = null;
-      }
-    }, 3000);
-  }, [ad?.id]);
+  }, [abandonPendingClick, ad?.id, skipAll, gameId]);
 
   return {
     ad,

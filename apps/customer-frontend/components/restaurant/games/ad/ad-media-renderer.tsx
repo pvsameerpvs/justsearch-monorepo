@@ -96,9 +96,19 @@ export function AdMediaRenderer({ mediaType, mediaUrl, mediaUrlLow, linkUrl, isM
     </div>
   );
 
-  return hasLink ? (
-    <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block h-full w-full">
-      {imageContent}
-    </a>
-  ) : imageContent;
+  if (hasLink) {
+    return (
+      <div
+        className="block h-full w-full cursor-pointer"
+        onClick={() => {
+          onLinkClick?.();
+          window.open(linkUrl, "_blank", "noopener,noreferrer");
+        }}
+      >
+        {imageContent}
+      </div>
+    );
+  }
+
+  return imageContent;
 }

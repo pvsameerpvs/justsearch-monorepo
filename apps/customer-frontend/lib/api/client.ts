@@ -15,6 +15,15 @@ export class ApiError extends Error {
   }
 }
 
+function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.localStorage.getItem('justsearch:authToken');
+  } catch {
+    return null;
+  }
+}
+
 export async function apiClient<T>(path: string, options: FetchOptions = {}): Promise<T> {
   const url = `${API_BASE}${path}`;
   const headers = new Headers(options.headers);
@@ -37,6 +46,11 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
   } else {
     const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
     headers.set('x-restaurant-slug', defaultSlug);
+  }
+
+  const token = getAuthToken();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
   }
 
   const response = await fetch(url, {

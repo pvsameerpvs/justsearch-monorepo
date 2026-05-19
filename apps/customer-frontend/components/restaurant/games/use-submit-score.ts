@@ -8,22 +8,25 @@ interface SubmitScoreResult {
   dailyCap: number;
 }
 
-export async function submitScore(gameId: string, rawScore: number, level?: number): Promise<SubmitScoreResult> {
-  try {
-    const res = await fetch(`${API_BASE}/games/sessions`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ gameId, rawScore, level }),
-    });
-    if (!res.ok) throw new Error('Score submission failed');
-    return res.json() as Promise<SubmitScoreResult>;
-  } catch {
-    const basePoints = 10;
-    const exponent = 0.7;
-    const multiplier = 2.5;
-    const maxPerPlay = 500;
-    const pointsAwarded = Math.min(basePoints + Math.floor(Math.pow(Math.max(0, rawScore), exponent) * multiplier), maxPerPlay);
-    return { pointsAwarded, totalToday: pointsAwarded, dailyCap: 2000 };
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'content-type': 'application/json' };
+  if (typeof window !== 'undefined') {
+    const token = window.localStorage.getItem('justsearch:authToken');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
   }
+  return headers;
+}
+
+export async function submitScore(gameId: string, rawScore: number, level?: number): Promise<SubmitScoreResult> {
+  const res = await fetch(`${API_BASE}/games/sessions`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+    body: JSON.stringify({ gameId, rawScore, level }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Score submission failed' }));
+    throw new Error(error.message || 'Score submission failed');
+  }
+  return res.json() as Promise<SubmitScoreResult>;
 }

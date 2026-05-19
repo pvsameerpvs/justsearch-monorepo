@@ -45,8 +45,12 @@ export function useLoyaltyPoints() {
         setPointsState(remote);
         writeStoredPoints(remote);
       })
-      .catch(() => {
-        // Fall back to localStorage value already set above
+      .catch((error) => {
+        // On 401, clear points to force re-login; otherwise keep localStorage
+        if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
+          setPointsState(0);
+          writeStoredPoints(0);
+        }
       });
   }, []);
 
