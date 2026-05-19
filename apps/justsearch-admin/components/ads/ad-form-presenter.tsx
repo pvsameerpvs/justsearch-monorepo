@@ -10,6 +10,7 @@ import { AdFormDetails } from "./ad-form-details";
 import { AdCategorySelect } from "./ad-category-select";
 import type { GameOption, RestaurantOption } from "./ad-campaign.types";
 import type { AdCampaignSchema } from "@/lib/validations/ad-campaign.schema";
+import type { AdCategory } from "@/lib/hooks/use-ad-categories-query";
 import type { Control, FormState, UseFormWatch, UseFormSetValue } from "react-hook-form";
 
 interface AdFormPresenterProps {
@@ -20,17 +21,24 @@ interface AdFormPresenterProps {
   isEdit: boolean;
   restaurants: RestaurantOption[];
   games: GameOption[];
+  categories: AdCategory[];
+  categoriesLoading: boolean;
+  onAddCategory: (name: string) => void;
+  categoryError: string | null;
   onSubmit: () => void;
   onCancel: () => void;
   isPending: boolean;
   serverError: string | null;
 }
 
-export function AdFormPresenter({ control, formState, watch, setValue, isEdit, restaurants, games, onSubmit, onCancel, isPending, serverError }: AdFormPresenterProps) {
+export function AdFormPresenter({
+  control, formState, watch, setValue, isEdit, restaurants, games,
+  categories, categoriesLoading, onAddCategory, categoryError,
+  onSubmit, onCancel, isPending, serverError,
+}: AdFormPresenterProps) {
   const type = watch("type");
   const { errors } = formState;
   const budget = watch("budget") ?? 0;
-  const costPerImpression = watch("costPerImpression") ?? 0;
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
@@ -42,7 +50,7 @@ export function AdFormPresenter({ control, formState, watch, setValue, isEdit, r
       )}
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-        <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">🎬 Ad Media</h4>
+        <h4 className="mb-3 text-sm font-bold text-slate-900">Ad Media</h4>
         <Controller name="mediaUrl" control={control} render={({ field }) => (
           <AdMediaUpload mediaType={watch("mediaType")} mediaUrl={field.value} onChange={(t, u) => { setValue("mediaType", t); field.onChange(u); }} />
         )} />
@@ -58,15 +66,22 @@ export function AdFormPresenter({ control, formState, watch, setValue, isEdit, r
       </section>
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-        <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">🏷️ Business Category</h4>
+        <h4 className="mb-3 text-sm font-bold text-slate-900">Business Category</h4>
         <Controller name="category" control={control} render={({ field }) => (
-          <AdCategorySelect value={field.value} onChange={field.onChange} />
+          <AdCategorySelect
+            value={field.value}
+            categories={categories}
+            isLoading={categoriesLoading}
+            error={categoryError}
+            onChange={field.onChange}
+            onAddCategory={onAddCategory}
+          />
         )} />
         {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category.message}</p>}
       </section>
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-        <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">💰 Revenue Split</h4>
+        <h4 className="mb-3 text-sm font-bold text-slate-900">Revenue Split</h4>
         <Controller name="type" control={control} render={({ field }) => (
           <AdCampaignTypeSelect value={field.value} onChange={field.onChange} />
         )} />
@@ -74,72 +89,64 @@ export function AdFormPresenter({ control, formState, watch, setValue, isEdit, r
       </section>
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-        <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">💵 Budget & Pricing</h4>
+        <h4 className="mb-3 text-sm font-bold text-slate-900">Budget and Pricing</h4>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600">Total Budget (AED)</label>
             <Controller name="budget" control={control} render={({ field }) => (
-              <input
-                type="number"
-                min={0}
-                step={0.01}
-                value={field.value}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none"
-              />
+              <input type="number" min={0} step={0.01} value={field.value} onChange={(e) => field.onChange(Number(e.target.value))} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none" />
             )} />
             {errors.budget && <p className="mt-1 text-xs text-red-500">{errors.budget.message}</p>}
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">Cost Per Impression (AED)</label>
-            <Controller name="costPerImpression" control={control} render={({ field }) => (
-              <input
-                type="number"
-                min={0}
-                step={0.01}
-                value={field.value}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none"
-              />
+            <label className="mb-1 block text-xs font-medium text-slate-600">3s View Cost (AED)</label>
+            <Controller name="costPerView3s" control={control} render={({ field }) => (
+              <input type="number" min={0} step={0.01} value={field.value} onChange={(e) => field.onChange(Number(e.target.value))} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none" />
             )} />
-            {errors.costPerImpression && <p className="mt-1 text-xs text-red-500">{errors.costPerImpression.message}</p>}
+            {errors.costPerView3s && <p className="mt-1 text-xs text-red-500">{errors.costPerView3s.message}</p>}
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">Full View Cost (AED)</label>
+            <Controller name="costPerViewFull" control={control} render={({ field }) => (
+              <input type="number" min={0} step={0.01} value={field.value} onChange={(e) => field.onChange(Number(e.target.value))} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none" />
+            )} />
+            {errors.costPerViewFull && <p className="mt-1 text-xs text-red-500">{errors.costPerViewFull.message}</p>}
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">Click Cost (AED)</label>
+            <Controller name="costPerClick" control={control} render={({ field }) => (
+              <input type="number" min={0} step={0.01} value={field.value} onChange={(e) => field.onChange(Number(e.target.value))} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none" />
+            )} />
+            {errors.costPerClick && <p className="mt-1 text-xs text-red-500">{errors.costPerClick.message}</p>}
           </div>
         </div>
-        {budget > 0 && costPerImpression > 0 && (
-          <p className="mt-2 text-xs text-slate-500">
-            ≈ {Math.floor(budget / costPerImpression)} impressions before budget runs out
-          </p>
+        {budget > 0 && (
+          <div className="mt-2 flex gap-3 text-xs text-slate-500">
+            <span>~ {Math.floor(budget / (watch("costPerView3s") ?? 0.30))} three-second views</span>
+            <span>~ {Math.floor(budget / (watch("costPerViewFull") ?? 1.00))} full views</span>
+            <span>~ {Math.floor(budget / (watch("costPerClick") ?? 5.00))} clicks</span>
+          </div>
         )}
       </section>
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-        <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">📝 Campaign Details</h4>
+        <h4 className="mb-3 text-sm font-bold text-slate-900">Campaign Details</h4>
         <AdFormDetails control={control} errors={errors} />
       </section>
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-        <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">📅 Schedule</h4>
+        <h4 className="mb-3 text-sm font-bold text-slate-900">Schedule</h4>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600">Start Date (optional)</label>
             <Controller name="startDate" control={control} render={({ field }) => (
-              <input
-                type="datetime-local"
-                value={field.value ?? ''}
-                onChange={field.onChange}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none"
-              />
+              <input type="datetime-local" value={field.value ?? ''} onChange={field.onChange} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none" />
             )} />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600">End Date (optional)</label>
             <Controller name="endDate" control={control} render={({ field }) => (
-              <input
-                type="datetime-local"
-                value={field.value ?? ''}
-                onChange={field.onChange}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none"
-              />
+              <input type="datetime-local" value={field.value ?? ''} onChange={field.onChange} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-amber-500 focus:outline-none" />
             )} />
           </div>
         </div>
@@ -148,7 +155,7 @@ export function AdFormPresenter({ control, formState, watch, setValue, isEdit, r
 
       {type === "restaurant_brought" && (
         <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-          <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">🏪 Restaurant</h4>
+          <h4 className="mb-3 text-sm font-bold text-slate-900">Restaurant</h4>
           <Controller name="restaurantId" control={control} render={({ field }) => (
             <AdRestaurantSelect value={field.value} restaurants={restaurants} onChange={(id) => { field.onChange(id); setValue("restaurantName", restaurants.find(r => r.id === id)?.name ?? null); }} />
           )} />
@@ -157,7 +164,7 @@ export function AdFormPresenter({ control, formState, watch, setValue, isEdit, r
       )}
 
       <section className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-        <h4 className="mb-3 text-sm font-bold text-slate-900 flex items-center gap-2">🎮 Target Games</h4>
+        <h4 className="mb-3 text-sm font-bold text-slate-900">Target Games</h4>
         <Controller name="assignedGames" control={control} render={({ field }) => (
           <AdGameSelector games={games} assignedGames={field.value} onToggle={(id) => field.onChange(field.value.includes(id) ? field.value.filter(g => g !== id) : [...field.value, id])} />
         )} />

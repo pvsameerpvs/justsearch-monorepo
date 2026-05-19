@@ -39,7 +39,7 @@ export function AdPerformanceRow({ campaign }: AdPerformanceRowProps) {
           <span className="text-xs font-bold text-emerald-600">{completionRate}%</span>
         </div>
       </td>
-      <td className="px-5 py-3.5 text-right text-sm font-bold text-amber-600">AED {campaign.revenue.toLocaleString()}</td>
+      <td className="px-5 py-3.5 text-right text-sm font-bold text-amber-600">AED {(campaign.revenueJustsearch + campaign.revenueRestaurant).toLocaleString()}</td>
       <td className="px-5 py-3.5 text-center">
         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${campaign.isActive ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" : "bg-slate-100 text-slate-500 ring-1 ring-slate-200"}`}>
           <Megaphone className="h-3 w-3" />{campaign.isActive ? "Active" : "Paused"}

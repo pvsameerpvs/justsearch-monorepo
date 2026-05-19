@@ -19,3 +19,5 @@ export * from './game-sessions';
 export * from './otp-requests';
 export * from './addresses';
 export * from './daily-closeouts';
+export * from './ad-billing-events';
+export * from './ad-categories';

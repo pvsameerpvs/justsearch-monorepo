@@ -20,7 +20,8 @@ export interface AdStat {
   type: "restaurant_brought" | "platform";
   impressions: number;
   completions: number;
-  revenue: number;
+  revenueJustsearch: number;
+  revenueRestaurant: number;
   completionRate: number;
   isActive: boolean;
 }

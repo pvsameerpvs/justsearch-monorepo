@@ -16,7 +16,7 @@ interface AdOverlayProps {
 }
 
 export function AdOverlay({ onComplete, restaurantId = "mosaic-table", gameId = "1", completeLabel }: AdOverlayProps) {
-  const { ad, ads, status, currentIndex, isMuted, isLast, setMuted, canSkip, remaining, handleTimerEnd, handleSkipAll } =
+  const { ad, ads, status, currentIndex, isMuted, isLast, setMuted, canSkip, remaining, handleTimerEnd, handleSkipAll, handleLinkClick } =
     useAdOverlay({ onComplete, gameId, restaurantId });
 
   if (status === "idle" || status === "prefetching") {
@@ -54,6 +54,7 @@ export function AdOverlay({ onComplete, restaurantId = "mosaic-table", gameId = 
                 linkUrl={ad.linkUrl}
                 isMuted={isMuted}
                 onEnded={handleTimerEnd}
+                onLinkClick={handleLinkClick}
               />
               <div className="absolute bottom-0 left-0 right-0">
                 <AdDurationTimer duration={ad.duration} onComplete={handleTimerEnd} key={currentIndex} />

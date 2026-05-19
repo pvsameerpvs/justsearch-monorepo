@@ -21,7 +21,7 @@ export function AdCampaignStatsCards() {
     total: campaigns.length,
     active: campaigns.filter((c) => c.isActive).length,
     totalImpressions: campaigns.reduce((sum, c) => sum + c.impressions, 0),
-    totalRevenue: campaigns.reduce((sum, c) => sum + c.revenue, 0),
+    totalRevenue: campaigns.reduce((sum, c) => sum + c.revenueJustsearch + c.revenueRestaurant, 0),
   };
 
   return (

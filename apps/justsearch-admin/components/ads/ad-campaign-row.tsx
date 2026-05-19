@@ -35,7 +35,7 @@ export function AdCampaignRow({ campaign, onEdit, onDelete, onToggle }: AdCampai
       </td>
       <td className="px-5 py-3.5 text-right text-sm font-mono text-slate-600">{campaign.duration}s</td>
       <td className="px-5 py-3.5 text-right">
-        <span className="text-sm font-bold text-amber-600">AED {campaign.revenue.toLocaleString()}</span>
+        <span className="text-sm font-bold text-amber-600">AED {(campaign.revenueJustsearch + campaign.revenueRestaurant).toLocaleString()}</span>
       </td>
       <td className="px-5 py-3.5 text-center">
         <button

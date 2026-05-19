@@ -47,7 +47,7 @@ export function AdPreviewCard({ campaign }: AdPreviewCardProps) {
             <span className="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle className="h-3 w-3" />{Math.round(campaign.impressions * 0.7)}</span>
             <span className="flex items-center gap-1 text-red-500"><XCircle className="h-3 w-3" />{Math.round(campaign.impressions * 0.3)}</span>
           </div>
-          <span className="font-bold text-amber-600">AED {campaign.revenue.toLocaleString()}</span>
+          <span className="font-bold text-amber-600">AED {(campaign.revenueJustsearch + campaign.revenueRestaurant).toLocaleString()}</span>
         </div>
       </div>
     </div>

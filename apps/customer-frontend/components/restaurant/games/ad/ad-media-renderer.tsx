@@ -10,9 +10,10 @@ interface AdMediaRendererProps {
   linkUrl: string;
   isMuted: boolean;
   onEnded?: () => void;
+  onLinkClick?: () => void;
 }
 
-export function AdMediaRenderer({ mediaType, mediaUrl, mediaUrlLow, linkUrl, isMuted, onEnded }: AdMediaRendererProps) {
+export function AdMediaRenderer({ mediaType, mediaUrl, mediaUrlLow, linkUrl, isMuted, onEnded, onLinkClick }: AdMediaRendererProps) {
   const lowRef = useRef<HTMLVideoElement>(null);
   const hdRef = useRef<HTMLVideoElement>(null);
   const [hdReady, setHdReady] = useState(false);
@@ -30,8 +31,11 @@ export function AdMediaRenderer({ mediaType, mediaUrl, mediaUrlLow, linkUrl, isM
   }, []);
 
   const handleClick = useCallback(() => {
-    if (hasLink) window.open(linkUrl, "_blank", "noopener,noreferrer");
-  }, [hasLink, linkUrl]);
+    if (hasLink) {
+      onLinkClick?.();
+      window.open(linkUrl, "_blank", "noopener,noreferrer");
+    }
+  }, [hasLink, linkUrl, onLinkClick]);
 
   if (hasError) {
     return (

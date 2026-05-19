@@ -17,16 +17,16 @@ export function RevenueContainer() {
     .slice(0, 3);
 
   const recentCampaigns = [...campaigns]
-    .sort((a, b) => b.revenue - a.revenue)
+    .sort((a, b) => (b.revenueJustsearch + b.revenueRestaurant) - (a.revenueJustsearch + a.revenueRestaurant))
     .slice(0, 5);
 
   const restaurantBroughtRevenue = campaigns
     .filter((c) => c.type === 'restaurant_brought')
-    .reduce((sum, c) => sum + c.revenue, 0);
+    .reduce((sum, c) => sum + c.revenueJustsearch + c.revenueRestaurant, 0);
 
   const platformBroughtRevenue = campaigns
     .filter((c) => c.type === 'platform')
-    .reduce((sum, c) => sum + c.revenue, 0);
+    .reduce((sum, c) => sum + c.revenueJustsearch + c.revenueRestaurant, 0);
 
   const splitData = {
     restaurantBrought: {

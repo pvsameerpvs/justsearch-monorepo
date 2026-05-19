@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { adCampaignSchema, type AdCampaignSchema } from "@/lib/validations/ad-campaign.schema";
 import type { AdCampaign, AdCampaignFormData } from "@/lib/stores/ad-campaign-types";
 import type { GameOption, RestaurantOption } from "./ad-campaign.types";
 import { AdFormPresenter } from "./ad-form-presenter";
+import { useAdCategoriesQuery, useCreateAdCategoryMutation } from "@/lib/hooks/use-ad-categories-query";
 
 interface AdFormContainerProps {
   campaign: AdCampaign | null;
@@ -20,6 +21,9 @@ interface AdFormContainerProps {
 
 export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel, isPending, serverError }: AdFormContainerProps) {
   const firstRestaurant = restaurants[0];
+  const { categories, isLoading: categoriesLoading } = useAdCategoriesQuery();
+  const createCategory = useCreateAdCategoryMutation();
+  const [categoryError, setCategoryError] = useState<string | null>(null);
 
   const form = useForm<AdCampaignSchema>({
     resolver: zodResolver(adCampaignSchema),
@@ -37,9 +41,11 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
       restaurantName: campaign?.restaurantName ?? firstRestaurant?.name ?? null,
       assignedGames: campaign?.assignedGames ?? [],
       isActive: campaign?.isActive ?? true,
-      category: campaign?.category ?? "Restaurant",
+      category: campaign?.category ?? "",
       budget: campaign?.budget ?? 0,
-      costPerImpression: campaign?.costPerImpression ?? 5,
+      costPerView3s: campaign?.costPerView3s ?? 0.30,
+      costPerViewFull: campaign?.costPerViewFull ?? 1.00,
+      costPerClick: campaign?.costPerClick ?? 5.00,
       startDate: campaign?.startDate ? campaign.startDate.slice(0, 16) : "",
       endDate: campaign?.endDate ? campaign.endDate.slice(0, 16) : "",
       visibility: campaign?.visibility ?? { title: true, description: false, linkUrl: true },
@@ -48,6 +54,10 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
 
   useEffect(() => {
     if (campaign) {
+      const matchedRestaurant = campaign.restaurantId
+        ? restaurants.find((r) => r.id === campaign.restaurantId)
+        : undefined;
+
       form.reset({
         title: campaign.title,
         clientName: campaign.clientName,
@@ -59,21 +69,32 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
         duration: campaign.duration,
         type: campaign.type,
         restaurantId: campaign.restaurantId ?? firstRestaurant?.id ?? null,
-        restaurantName: campaign.restaurantName ?? firstRestaurant?.name ?? null,
+        restaurantName: matchedRestaurant?.name ?? firstRestaurant?.name ?? null,
         assignedGames: campaign.assignedGames,
         isActive: campaign.isActive,
-        category: campaign.category ?? "Restaurant",
+        category: campaign.category ?? "",
         budget: campaign.budget ?? 0,
-        costPerImpression: campaign.costPerImpression ?? 5,
+        costPerView3s: campaign.costPerView3s ?? 0.30,
+        costPerViewFull: campaign.costPerViewFull ?? 1.00,
+        costPerClick: campaign.costPerClick ?? 5.00,
         startDate: campaign.startDate ? campaign.startDate.slice(0, 16) : "",
         endDate: campaign.endDate ? campaign.endDate.slice(0, 16) : "",
         visibility: campaign.visibility,
       });
     }
-  }, [campaign, form, firstRestaurant]);
+  }, [campaign, form, firstRestaurant, restaurants]);
 
   const handleSave = async (values: AdCampaignSchema) => {
     await onSave(values);
+  };
+
+  const handleAddCategory = async (name: string) => {
+    setCategoryError(null);
+    try {
+      await createCategory.mutateAsync(name);
+    } catch {
+      setCategoryError(`Failed to save "${name}" to database. It will still be used for this campaign.`);
+    }
   };
 
   return (
@@ -89,6 +110,10 @@ export function AdFormContainer({ campaign, restaurants, games, onSave, onCancel
       onCancel={onCancel}
       isPending={isPending}
       serverError={serverError}
+      categories={categories}
+      categoriesLoading={categoriesLoading}
+      onAddCategory={handleAddCategory}
+      categoryError={categoryError}
     />
   );
 }

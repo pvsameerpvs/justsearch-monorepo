@@ -23,7 +23,7 @@ export function RevenueCampaignRow({ campaign }: RevenueCampaignRowProps) {
         </div>
       </div>
       <div className="text-right">
-        <p className="text-sm font-bold text-slate-900">AED {campaign.revenue.toLocaleString()}</p>
+        <p className="text-sm font-bold text-slate-900">AED {(campaign.revenueJustsearch + campaign.revenueRestaurant).toLocaleString()}</p>
         <span className={`inline-block rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${campaign.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
           {campaign.isActive ? 'Active' : 'Paused'}
         </span>

@@ -28,18 +28,6 @@ interface PublicAd {
   visibility?: Record<string, boolean>;
 }
 
-interface PublicAd {
-  id: string;
-  name: string;
-  mediaType?: string;
-  imageUrl?: string;
-  linkUrl?: string;
-  duration?: number;
-  content?: string;
-  category?: string;
-  visibility?: Record<string, boolean>;
-}
-
 let lastFetchKey = '';
 let lastFetchResult: CampaignItem[] | null = null;
 
@@ -99,11 +87,48 @@ export function preloadMedia(campaigns: CampaignItem[]): void {
   }
 }
 
-export async function recordImpression(adId: string): Promise<void> {
+// Track ad event: view_3s, view_full, click_pending. Returns eventId for click tracking.
+export async function trackAdEvent(
+  adId: string,
+  eventType: 'view_3s' | 'view_full' | 'click_pending'
+): Promise<string | null> {
   try {
-    await fetch(`${API_BASE}/advertisements/public/${adId}/impression`, {
+    const res = await fetch(`${API_BASE}/advertisements/public/${adId}/event`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
+      body: JSON.stringify({ eventType }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { eventId?: string };
+    return data.eventId ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// Confirm a click after user stayed on linked page > 3 seconds
+export async function confirmAdClick(adId: string, eventId: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/advertisements/public/${adId}/click-confirm`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ eventId }),
+    });
+  } catch {
+    // Silently fail
+  }
+}
+
+// Mark click as accidental (user bounced quickly)
+export async function abandonAdClick(adId: string, eventId: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/advertisements/public/${adId}/click-abandon`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ eventId }),
     });
   } catch {
     // Silently fail

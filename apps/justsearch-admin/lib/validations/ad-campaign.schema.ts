@@ -14,9 +14,11 @@ export const adCampaignSchema = z.object({
   restaurantName: z.string().nullable(),
   assignedGames: z.array(z.string()).min(1, 'Select at least one game'),
   isActive: z.boolean().optional(),
-  category: z.string().min(1, 'Category is required'),
+  category: z.string().max(50).optional().default(''),
   budget: z.coerce.number().min(0, 'Budget must be 0 or more'),
-  costPerImpression: z.coerce.number().min(0, 'Cost per impression must be 0 or more'),
+  costPerView3s: z.coerce.number().min(0, 'Cost per 3s view must be 0 or more').optional().default(0.30),
+  costPerViewFull: z.coerce.number().min(0, 'Cost per full view must be 0 or more').optional().default(1.00),
+  costPerClick: z.coerce.number().min(0, 'Cost per click must be 0 or more').optional().default(5.00),
   startDate: z.string().optional().default(''),
   endDate: z.string().optional().default(''),
   visibility: z.object({

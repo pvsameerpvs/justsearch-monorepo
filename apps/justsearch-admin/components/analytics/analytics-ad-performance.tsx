@@ -49,7 +49,7 @@ export function AnalyticsAdPerformance({ campaigns }: AnalyticsAdPerformanceProp
                     <span className="text-sm font-bold text-emerald-600">{c.completionRate}%</span>
                   </div>
                 </td>
-                <td className="px-5 py-3 text-right text-sm font-bold text-amber-600">AED {c.revenue.toLocaleString()}</td>
+                <td className="px-5 py-3 text-right text-sm font-bold text-amber-600">AED {(c.revenueJustsearch + c.revenueRestaurant).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>

@@ -113,6 +113,27 @@
       "when": 1779878400000,
       "tag": "0015_add_video_poster_and_low_quality",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1779964800000,
+      "tag": "0016_add_ad_billing_system",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1780051200000,
+      "tag": "0017_add_per_event_cost_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1780137600000,
+      "tag": "0018_create_ad_categories",
+      "breakpoints": true
     }
   ]
 }

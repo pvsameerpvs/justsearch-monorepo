@@ -29,9 +29,9 @@ export function computeTopAdCampaigns(campaigns: AdCampaign[]): AdStat[] {
   return campaigns
     .map((c) => ({
       ...c,
-      completionRate: c.impressions > 0 ? Math.round(((c.impressions * 0.7) / c.impressions) * 100) : 0,
-      completions: Math.round(c.impressions * 0.7),
+      completionRate: c.totalViewsFull > 0 ? Math.round((c.totalConfirmedClicks / c.totalViewsFull) * 100) : 0,
+      completions: c.totalConfirmedClicks,
     }))
-    .sort((a, b) => b.revenue - a.revenue)
+    .sort((a, b) => (b.revenueJustsearch + b.revenueRestaurant) - (a.revenueJustsearch + a.revenueRestaurant))
     .slice(0, 5);
 }

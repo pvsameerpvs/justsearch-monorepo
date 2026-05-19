@@ -13,6 +13,9 @@ export interface DbAd {
   category: string | null;
   budget: string | null;
   costPerImpression: string | null;
+  costPerView3s: string | null;
+  costPerViewFull: string | null;
+  costPerClick: string | null;
   impressions: number;
   spent: string | null;
   assignedGames: string[];
@@ -22,6 +25,13 @@ export interface DbAd {
   endDate: string | null;
   createdAt: string;
   visibility: Record<string, boolean> | null;
+  totalViews3s: number | null;
+  totalViewsFull: number | null;
+  totalClicks: number | null;
+  totalConfirmedClicks: number | null;
+  totalAbandonedClicks: number | null;
+  revenueJustsearch: string | null;
+  revenueRestaurant: string | null;
 }
 
 export function mapDbToCampaign(db: DbAd): AdCampaign {
@@ -44,9 +54,18 @@ export function mapDbToCampaign(db: DbAd): AdCampaign {
     category: db.category ?? null,
     budget: Number(db.budget ?? 0),
     costPerImpression: Number(db.costPerImpression ?? 0),
+    costPerView3s: Number(db.costPerView3s ?? 0.30),
+    costPerViewFull: Number(db.costPerViewFull ?? 1.00),
+    costPerClick: Number(db.costPerClick ?? 5.00),
     impressions: db.impressions ?? 0,
     spent: Number(db.spent ?? 0),
-    revenue: 0,
+    totalViews3s: db.totalViews3s ?? 0,
+    totalViewsFull: db.totalViewsFull ?? 0,
+    totalClicks: db.totalClicks ?? 0,
+    totalConfirmedClicks: db.totalConfirmedClicks ?? 0,
+    totalAbandonedClicks: db.totalAbandonedClicks ?? 0,
+    revenueJustsearch: Number(db.revenueJustsearch ?? 0),
+    revenueRestaurant: Number(db.revenueRestaurant ?? 0),
     startDate: db.startDate ?? null,
     endDate: db.endDate ?? null,
     createdAt: db.createdAt,
@@ -66,7 +85,9 @@ export function mapCampaignToDb(data: AdCampaignFormData) {
     duration: data.duration,
     category: data.category || null,
     budget: String(data.budget),
-    costPerImpression: String(data.costPerImpression),
+    costPerView3s: String(data.costPerView3s ?? 0.30),
+    costPerViewFull: String(data.costPerViewFull ?? 1.00),
+    costPerClick: String(data.costPerClick ?? 5.00),
     assignedGames: data.assignedGames,
     targetRestaurants: data.restaurantId ? [data.restaurantId] : [],
     isActive: data.isActive ?? true,
