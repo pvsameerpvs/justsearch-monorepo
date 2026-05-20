@@ -30,6 +30,15 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json(data, { status: 200 });
 
+    // Always set the token cookie so middleware can see it on subsequent requests
+    if (data.token && typeof data.token === 'string') {
+      response.cookies.set('token', data.token, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7,
+        sameSite: 'lax',
+      });
+    }
+
     const setCookie = backendRes.headers.get('set-cookie');
     if (setCookie) {
       response.headers.set('set-cookie', setCookie);

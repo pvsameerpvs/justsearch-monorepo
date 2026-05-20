@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { ApiError } from '@/lib/api/client';
-import { useRegistration } from '@/components/auth/registration-context';
 import type { AddressLabel } from '../use-address-book';
 import type { PlaceApi, PromoApi, AddressApi } from './checkout-place-action.types';
 
@@ -16,7 +14,6 @@ export function useCheckoutPlaceAction(
   restaurantNote: string,
   paymentMethod: 'cash' | 'card',
 ) {
-  const { clearUser } = useRegistration();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [warn, setWarn] = useState<string | null>(null);
 
@@ -38,12 +35,7 @@ export function useCheckoutPlaceAction(
           alternateNumber: address.alternateNumber || undefined,
         });
       } catch (e) {
-        if (e instanceof ApiError && e.status === 401) {
-          clearUser();
-          place.setPlaceError('Session expired. Please sign in again.');
-          setIsSubmitting(false);
-          return;
-        }
+        // Let global auth health monitor handle 401s; never destroy session locally
         setWarn('Address could not be saved to your profile, but your order will still be placed.');
       }
     }

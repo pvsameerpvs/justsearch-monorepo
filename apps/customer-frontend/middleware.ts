@@ -2,24 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'js-restorant.com';
-const PROTECTED_PATHS = ['/profile', '/eat-play', '/menu/checkout'];
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const host = request.headers.get('host') ?? '';
   const normalizedHost = host.replace(/:\d+$/, '').toLowerCase();
-  const pathname = url.pathname;
-
-  const isProtected = PROTECTED_PATHS.some(p => pathname.startsWith(p));
-
-  if (isProtected) {
-    const token = request.cookies.get('token')?.value;
-    if (!token) {
-      const redirectUrl = new URL('/', url);
-      redirectUrl.searchParams.set('auth', 'required');
-      return NextResponse.redirect(redirectUrl);
-    }
-  }
 
   // Allow localhost for development — use env-configured default slug
   if (normalizedHost === 'localhost' || normalizedHost.endsWith('.localhost')) {

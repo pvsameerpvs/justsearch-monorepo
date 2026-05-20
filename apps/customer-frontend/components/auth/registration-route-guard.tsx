@@ -17,9 +17,9 @@ export function RegistrationRouteGuard() {
 
     if (isRegistered) return;
     if (isModalOpen) return;
-    if (!pathname.startsWith('/eat-play') && !pathname.startsWith('/menu/checkout') && !pathname.startsWith('/profile')) return;
+    // Only auto-prompt for checkout; games/profile stay open without forcing login
+    if (!pathname.startsWith('/menu/checkout')) return;
 
-    // If user closes the modal without verifying, send them home.
     if (wasModalOpen) {
       router.push('/');
       return;

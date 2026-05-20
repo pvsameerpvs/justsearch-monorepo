@@ -2,7 +2,6 @@
 
 import { useCallback } from 'react';
 import { createOrder } from '@/lib/api/orders.api';
-import { ApiError } from '@/lib/api/client';
 import { useRegistration } from '@/components/auth/registration-context';
 import type { StoredState, StoredOrder } from './fulfillment.types';
 import { computeTotal } from './fulfillment.constants';
@@ -14,40 +13,32 @@ export function usePlaceOrder(
   subtotal: number,
   deliveryFee: number,
 ) {
-  const { user, clearUser } = useRegistration();
+  const { user } = useRegistration();
 
   return useCallback(
     async ({ address, note, promoCode, promoDiscount, paymentMethod, alternateNumber }: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card'; alternateNumber?: string }) => {
       if (!user) throw new Error('Please sign in to place an order');
       if (cartCount === 0) return null;
       const totalVal = computeTotal(subtotal, deliveryFee, 0);
-      let res;
-      try {
-        res = await createOrder({
-          customerName: user.name,
-          customerPhone: user.mobile,
-          fulfillmentType: 'delivery',
-          items: cart.map((item) => ({
-            menuItemId: item.itemId,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          subtotal,
-          deliveryFee,
-          tax: 0,
-          total: totalVal,
-          deliveryAddress: address,
-          notes: note,
-          paymentMethod,
-          alternateNumber,
-        });
-      } catch (e) {
-        if (e instanceof ApiError && e.status === 401) {
-          clearUser();
-        }
-        throw e;
-      }
+      const res = await createOrder({
+        customerName: user.name,
+        customerPhone: user.mobile,
+        fulfillmentType: 'delivery',
+        items: cart.map((item) => ({
+          menuItemId: item.itemId,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal,
+        deliveryFee,
+        tax: 0,
+        total: totalVal,
+        deliveryAddress: address,
+        notes: note,
+        paymentMethod,
+        alternateNumber,
+      });
 
       const newOrder: StoredOrder = {
         id: res.order.id,
