@@ -63,6 +63,7 @@ export function OrderCard({ order, onAccept, onReject, onAdvance, onAssign, onVi
 
       <OrderCardFooter
         status={order.status}
+        type={order.type}
         hasAgent={!!order.assignedAgentId}
         onAccept={onAccept}
         onReject={onReject}

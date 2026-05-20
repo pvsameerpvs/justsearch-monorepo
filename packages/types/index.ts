@@ -34,6 +34,7 @@ export interface Order {
   restaurantName?: string;
   deliveryAddress: string | null;
   notes: string | null;
+  cancelReason: string | null;
   createdAt: string;
   updatedAt: string;
 }

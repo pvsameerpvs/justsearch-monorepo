@@ -8,7 +8,7 @@ import {
   type Address,
 } from '@/lib/api/addresses.api';
 
-export type AddressLabel = 'Home' | 'Work' | 'Other';
+export type AddressLabel = 'Home' | 'Work' | 'Hotel' | 'Other';
 
 export type SavedAddress = {
   id: string;
@@ -76,6 +76,8 @@ export function useAddressBook() {
     addresses,
     addAddress,
     removeAddress,
+    isSaving: addMutation.isPending,
+    isRemoving: removeMutation.isPending,
     hydrated: !isLoading,
   };
 }

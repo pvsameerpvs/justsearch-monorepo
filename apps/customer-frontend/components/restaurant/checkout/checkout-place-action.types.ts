@@ -18,5 +18,6 @@ export type AddressApi = {
   addressTitle: string;
   addressDetails: string;
   alternateNumber: string;
+  selectedAddressId: string | null;
   addAddress: (addr: Omit<SavedAddress, 'id'>) => Promise<SavedAddress>;
 };

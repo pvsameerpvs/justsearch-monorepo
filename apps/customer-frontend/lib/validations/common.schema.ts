@@ -25,11 +25,11 @@ export const addressSchema = z.object({
 });
 
 export const checkoutAddressSchema = z.object({
-  label: z.enum(['Home', 'Work', 'Other']),
-  address: z
-    .string()
-    .min(5, 'Address must be at least 5 characters'),
-  details: z.string().optional(),
+  label: z.enum(['Home', 'Work', 'Hotel', 'Other']),
+  areaStreet: z.string().min(2, 'Area / Street is required'),
+  buildingName: z.string().min(1, 'Building name is required'),
+  villaNo: z.string().min(1, 'Villa / Flat number is required'),
+  landmark: z.string().optional(),
   alternateNumber: z
     .string()
     .regex(/^\+?\d{0,15}$/, 'Invalid phone number')

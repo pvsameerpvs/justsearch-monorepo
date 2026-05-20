@@ -15,10 +15,11 @@ interface OrderDetailDrawerProps {
   orderId: string;
   onClose: () => void;
   onAssign: () => void;
+  onReject?: () => void;
   isKitchenStaff?: boolean;
 }
 
-export function OrderDetailDrawer({ orderId, onClose, onAssign, isKitchenStaff }: OrderDetailDrawerProps) {
+export function OrderDetailDrawer({ orderId, onClose, onAssign, onReject, isKitchenStaff }: OrderDetailDrawerProps) {
   const { data, isLoading } = useOrderDetailQuery(orderId);
   const { agents } = useDeliveryBoyStore();
 
@@ -73,6 +74,7 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign, isKitchenStaff }
           hasAgent={!!assignedAgent}
           isKitchenStaff={isKitchenStaff}
           onAssign={onAssign}
+          onReject={onReject}
         />
       </div>
     </div>

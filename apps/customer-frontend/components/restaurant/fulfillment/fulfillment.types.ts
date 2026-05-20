@@ -1,5 +1,7 @@
+import type { OrderStatus } from '@justsearch/types';
+
 export type FulfillmentMode = 'dine-in' | 'delivery';
-export type DeliveryOrderStatus = 'order_confirmed' | 'assigned_delivery_boy' | 'delivered';
+export type DeliveryOrderStatus = OrderStatus | 'order_confirmed' | 'assigned_delivery_boy' | 'delivered';
 
 export type StoredCartItem = {
   itemId: string;
@@ -24,6 +26,7 @@ export type StoredOrder = {
   promoCode?: string;
   promoDiscount?: number;
   total: number;
+  cancelReason?: string;
 };
 
 export type StoredState = {

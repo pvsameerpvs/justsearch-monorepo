@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ApiError } from '@/lib/api/client';
 import { useRegistration } from '@/components/auth/registration-context';
+import type { AddressLabel } from '../use-address-book';
 import type { PlaceApi, PromoApi, AddressApi } from './checkout-place-action.types';
 
 export function useCheckoutPlaceAction(
@@ -25,12 +26,13 @@ export function useCheckoutPlaceAction(
     setIsSubmitting(true);
     setWarn(null);
 
+    const isExplicitlySelected = Boolean(address.selectedAddressId);
     const isAlreadySaved = address.addresses.some((saved) => saved.address.trim() === address.address.trim() && saved.label === address.addressTitle);
 
-    if (!isAlreadySaved && address.address.trim().length >= 5) {
+    if (!isExplicitlySelected && !isAlreadySaved && address.address.trim().length >= 5) {
       try {
         await address.addAddress({
-          label: (address.addressTitle as 'Home' | 'Work' | 'Other') || 'Home',
+          label: (address.addressTitle as AddressLabel) || 'Home',
           address: address.address.trim(),
           details: address.addressDetails.trim(),
           alternateNumber: address.alternateNumber || undefined,

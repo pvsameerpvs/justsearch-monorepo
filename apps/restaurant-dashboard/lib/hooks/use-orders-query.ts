@@ -17,6 +17,7 @@ export interface ApiOrder {
   paymentMethod: string | null;
   driverId: string | null;
   notes: string | null;
+  cancelReason: string | null;
   items?: number;
 }
 
@@ -66,6 +67,7 @@ export function useOrderDetailQuery(orderId: string) {
     queryFn: () => fetchOrderDetail(orderId),
     staleTime: STALE_TIME,
     enabled: Boolean(orderId),
+    refetchInterval: POLLING_INTERVAL,
   });
 }
 
@@ -73,10 +75,10 @@ export function useUpdateOrderStatusMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
+    mutationFn: ({ orderId, status, cancelReason }: { orderId: string; status: string; cancelReason?: string }) =>
       apiClient(`/orders/${orderId}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status, cancelReason }),
       }),
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });

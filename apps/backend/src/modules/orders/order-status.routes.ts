@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { orders } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
@@ -14,7 +14,7 @@ router.patch('/:id/status', requireRole('owner', 'manager', 'cashier', 'kitchen_
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
     const orderId = req.params.id;
-    const { status } = updateStatusSchema.parse(req.body);
+    const { status, cancelReason } = updateStatusSchema.parse(req.body);
 
     const [updated] = await db
       .update(orders)
@@ -23,6 +23,18 @@ router.patch('/:id/status', requireRole('owner', 'manager', 'cashier', 'kitchen_
       .returning();
 
     if (!updated) return res.status(404).json({ error: 'Order not found' });
+
+    // Raw SQL for cancel_reason so it works regardless of Drizzle schema sync
+    if (status === 'cancelled' && cancelReason) {
+      try {
+        await db.execute(
+          sql`UPDATE ${sql.identifier(req.tenant.schemaName)}.${sql.identifier('orders')} SET cancel_reason = ${cancelReason}, updated_at = NOW() WHERE id = ${orderId} AND restaurant_id = ${req.tenant.id}`
+        );
+      } catch {
+        // Column may not exist until migration is run — ignore so status update still succeeds
+      }
+    }
+
     res.json({ order: updated });
   } catch (error) {
     next(error);

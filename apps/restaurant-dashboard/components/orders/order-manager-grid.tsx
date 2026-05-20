@@ -8,7 +8,7 @@ interface OrderManagerGridProps {
   isActiveTab: boolean;
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
-  onAdvance: (id: string, status: string) => void;
+  onAdvance: (id: string, status: string, type: string) => void;
   onAssign: (id: string) => void;
   onView: (id: string) => void;
 }
@@ -36,7 +36,7 @@ export function OrderManagerGrid({ orders, isActiveTab, onAccept, onReject, onAd
               order={order}
               onAccept={() => onAccept(order.id)}
               onReject={() => onReject(order.id)}
-              onAdvance={() => onAdvance(order.id, order.status)}
+              onAdvance={() => onAdvance(order.id, order.status, order.type)}
               onAssign={() => onAssign(order.id)}
               onView={() => onView(order.id)}
             />

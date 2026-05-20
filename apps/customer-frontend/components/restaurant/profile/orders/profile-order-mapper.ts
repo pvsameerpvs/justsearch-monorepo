@@ -25,5 +25,6 @@ export function mapOrderToDeliveryOrder(
     deliveryFee: Number(order.deliveryFee),
     total: Number(order.total),
     status: order.status as DeliveryOrder['status'],
+    cancelReason: order.cancelReason || undefined,
   };
 }

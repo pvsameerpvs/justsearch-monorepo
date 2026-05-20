@@ -50,8 +50,8 @@ export function useOrderManager() {
   const visibleOrders = isKitchen ? filteredKitchen : (isActiveTab ? filteredActive : filteredHistory);
   const statsOrders = isKitchen ? kitchenOrders : (isActiveTab ? activeOrders : historyOrders);
 
-  const updateStatus = (id: string, status: OrderStatus) => {
-    updateStatusApi({ orderId: id, status }, { onError: () => updateStoreStatus(id, status) });
+  const updateStatus = (id: string, status: OrderStatus, cancelReason?: string) => {
+    updateStatusApi({ orderId: id, status, cancelReason }, { onError: () => updateStoreStatus(id, status) });
   };
 
   return {

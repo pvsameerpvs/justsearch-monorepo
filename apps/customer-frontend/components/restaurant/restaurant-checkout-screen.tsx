@@ -69,7 +69,12 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         onClose={() => state.setIsAddressBookOpen(false)}
         onSelectAddress={state.applySavedAddress}
         onAddAddress={async (newAddress) => {
-          state.applySavedAddress(await state.addAddress(newAddress));
+          try {
+            state.applySavedAddress(await state.addAddress(newAddress));
+          } catch {
+            // Form or checkout place action will show inline error.
+            // Prevent unhandled rejection from crashing the UI.
+          }
         }}
         onUseCurrentLocation={state.applyCurrentLocationAddress}
       />

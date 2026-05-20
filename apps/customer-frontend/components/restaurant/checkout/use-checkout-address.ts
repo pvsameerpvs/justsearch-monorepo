@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { type SavedAddress, useAddressBook } from '../use-address-book';
 
 export function useCheckoutAddress() {
-  const { addresses, addAddress, hydrated: addressesHydrated } = useAddressBook();
+  const { addresses, addAddress, hydrated: addressesHydrated, isSaving } = useAddressBook();
 
   const [addressTitle, setAddressTitle] = useState('Home');
   const [address, setAddress] = useState('');
@@ -23,7 +23,7 @@ export function useCheckoutAddress() {
 
   const applyCurrentLocationAddress = (resolvedAddress: string) => {
     setSelectedAddressId(null);
-    setAddressTitle('Current location');
+    setAddressTitle('Other');
     setAddress(resolvedAddress);
     setAddressDetails('');
     setAlternateNumber('');
@@ -51,5 +51,6 @@ export function useCheckoutAddress() {
     addAddress,
     applySavedAddress,
     applyCurrentLocationAddress,
+    isSaving,
   };
 }

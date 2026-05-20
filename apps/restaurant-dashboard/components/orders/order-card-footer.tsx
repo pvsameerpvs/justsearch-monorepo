@@ -1,7 +1,8 @@
-import { Package, ChefHat, CheckCircle } from "lucide-react";
+import { Package, ChefHat, CheckCircle, Truck } from "lucide-react";
 
 interface OrderCardFooterProps {
   status: string;
+  type: string;
   hasAgent: boolean;
   onAccept: () => void;
   onReject: () => void;
@@ -9,7 +10,7 @@ interface OrderCardFooterProps {
   onAssign: () => void;
 }
 
-export function OrderCardFooter({ status, hasAgent, onAccept, onReject, onAdvance, onAssign }: OrderCardFooterProps) {
+export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, onAdvance, onAssign }: OrderCardFooterProps) {
   if (status === "pending") {
     return (
       <div className="flex border-t border-slate-100">
@@ -42,10 +43,27 @@ export function OrderCardFooter({ status, hasAgent, onAccept, onReject, onAdvanc
   }
 
   if (status === "ready") {
+    if (type === "delivery") {
+      return (
+        <button onClick={(e) => { e.stopPropagation(); onAssign(); }} className="w-full py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
+          <Package className="h-4 w-4" />
+          {hasAgent ? "Reassign Delivery Boy" : "Assign Delivery Boy"}
+        </button>
+      );
+    }
     return (
-      <button onClick={(e) => { e.stopPropagation(); onAssign(); }} className="w-full py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
-        <Package className="h-4 w-4" />
-        {hasAgent ? "Reassign Delivery Boy" : "Assign Delivery Boy"}
+      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
+        <CheckCircle className="h-4 w-4" />
+        Mark Completed
+      </button>
+    );
+  }
+
+  if (status === "out_for_delivery") {
+    return (
+      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
+        <Truck className="h-4 w-4" />
+        Mark Completed
       </button>
     );
   }

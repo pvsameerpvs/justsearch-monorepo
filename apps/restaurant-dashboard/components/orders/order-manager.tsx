@@ -1,15 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useOrderManager } from "./use-order-manager";
 import { OrdersStats } from "./orders-stats";
 import { OrderManagerTabs } from "./order-manager-tabs";
 import { OrderManagerFilters } from "./order-manager-filters";
 import { OrderManagerGrid } from "./order-manager-grid";
 import { OrderDateFilter } from "./order-date-filter";
-import { DeliveryBoyPicker } from "./delivery-boy-picker";
-import { OrderDetailDrawer } from "./order-detail-drawer";
 import { OrderSkeleton } from "./order-skeleton";
 import { OrderError } from "./order-error";
+import { OrderManagerModals } from "./order-manager-modals";
+import { getNextStatus } from "./order-flow.utils";
 
 export function OrderManager() {
   const {
@@ -22,23 +23,26 @@ export function OrderManager() {
     isLoading, error, refetch,
   } = useOrderManager();
 
-  const hasTabs = setTab !== (() => {});
+  const [rejectingOrderId, setRejectingOrderId] = useState<string | null>(null);
+  const rejectingOrder = rejectingOrderId ? visibleOrders.find((o) => o.id === rejectingOrderId) ?? null : null;
+
+  const handleReject = (id: string) => setRejectingOrderId(id);
+  const confirmReject = (reason: string) => {
+    if (!rejectingOrderId) return;
+    updateStatus(rejectingOrderId, "cancelled", reason);
+    setRejectingOrderId(null);
+  };
 
   return (
     <div className="space-y-5">
       <OrdersStats orders={statsOrders} />
 
-      {hasTabs && (
+      {setTab !== (() => {}) && (
         <OrderManagerTabs tab={tab} onTabChange={(t) => { setTab(t); setFilter("all"); }} />
       )}
 
-      {isActiveTab === false && hasTabs && (
-        <OrderDateFilter
-          date={historyDate}
-          view={historyView}
-          onDateChange={setHistoryDate}
-          onViewChange={setHistoryView}
-        />
+      {isActiveTab === false && setTab !== (() => {}) && (
+        <OrderDateFilter date={historyDate} view={historyView} onDateChange={setHistoryDate} onViewChange={setHistoryView} />
       )}
 
       <OrderManagerFilters filters={filters} activeFilter={filter} onFilterChange={setFilter} />
@@ -51,27 +55,26 @@ export function OrderManager() {
           orders={visibleOrders}
           isActiveTab={isActiveTab}
           onAccept={(id) => updateStatus(id, "confirmed")}
-          onReject={(id) => updateStatus(id, "cancelled")}
-          onAdvance={(id, status) => {
-            const next = status === 'confirmed' ? 'preparing' : 'ready';
-            updateStatus(id, next);
+          onReject={handleReject}
+          onAdvance={(id, status, type) => {
+            const next = getNextStatus(status, type);
+            if (next) updateStatus(id, next);
           }}
           onAssign={setAssigningOrderId}
           onView={setViewingOrderId}
         />
       )}
 
-      {assigningOrderId && (
-        <DeliveryBoyPicker orderId={assigningOrderId} onClose={() => setAssigningOrderId(null)} />
-      )}
-
-      {viewingOrderId && (
-        <OrderDetailDrawer
-          orderId={viewingOrderId}
-          onClose={() => setViewingOrderId(null)}
-          onAssign={() => { setViewingOrderId(null); setAssigningOrderId(viewingOrderId); }}
-        />
-      )}
+      <OrderManagerModals
+        assigningOrderId={assigningOrderId}
+        viewingOrderId={viewingOrderId}
+        rejectingOrder={rejectingOrder}
+        onCloseAssign={() => setAssigningOrderId(null)}
+        onCloseView={() => setViewingOrderId(null)}
+        onAssignFromView={() => { setViewingOrderId(null); setAssigningOrderId(viewingOrderId); }}
+        onRejectFromView={() => handleReject(viewingOrderId!)}
+        onConfirmReject={confirmReject}
+        onCloseReject={() => setRejectingOrderId(null)} />
     </div>
   );
 }

@@ -40,14 +40,14 @@ interface AssignmentsResponse {
   assignments: ApiAssignment[];
 }
 
-async function fetchAssignments(): Promise<AssignmentsResponse> {
-  return apiClient('/delivery-assignments');
+async function fetchAssignments(agentId: string): Promise<AssignmentsResponse> {
+  return apiClient(`/delivery-assignments?agentId=${encodeURIComponent(agentId)}`);
 }
 
 export function useDriverOrdersQuery(driverId: string | null) {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['driverAssignments'],
-    queryFn: fetchAssignments,
+    queryKey: ['driverAssignments', driverId],
+    queryFn: () => fetchAssignments(driverId!),
     enabled: Boolean(driverId),
     refetchInterval: POLL_INTERVAL_MS,
     staleTime: STALE_TIME,

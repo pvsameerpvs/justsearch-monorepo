@@ -13,7 +13,7 @@ export function ProfileAddressFormFields({ value, onChange, onGetCurrentLocation
       <div>
         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Label</label>
         <div className="mt-2 flex gap-2">
-          {(['Home', 'Work', 'Other'] as const).map(l => (
+          {(['Home', 'Work', 'Hotel', 'Other'] as const).map(l => (
             <button key={l} type="button" onClick={() => onChange({ ...value, label: l })} className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${value.label === l ? "bg-[rgb(var(--brand))] border-[rgb(var(--brand))] text-white" : "border-slate-100 text-slate-400"}`}>
               {l}
             </button>

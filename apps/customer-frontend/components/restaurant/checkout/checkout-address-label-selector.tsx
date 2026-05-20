@@ -2,19 +2,21 @@
 
 import { cn } from '@/lib/cn';
 
+type AddressLabel = 'Home' | 'Work' | 'Hotel' | 'Other';
+
 type Props = {
-  value: 'Home' | 'Work' | 'Other';
-  onChange: (label: 'Home' | 'Work' | 'Other') => void;
+  value: AddressLabel;
+  onChange: (label: AddressLabel) => void;
 };
 
 export function CheckoutAddressLabelSelector({ value, onChange }: Props) {
   return (
     <div>
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
-        Label
+      <p className="text-sm font-medium text-[rgb(var(--muted))]">
+        Save address as <span className="text-red-500">*</span>
       </p>
-      <div className="mt-2 grid grid-cols-3 gap-2">
-        {(['Home', 'Work', 'Other'] as const).map((label) => (
+      <div className="mt-2 grid grid-cols-4 gap-2">
+        {(['Home', 'Work', 'Hotel', 'Other'] as const).map((label) => (
           <button
             key={label}
             type="button"
