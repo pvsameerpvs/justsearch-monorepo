@@ -21,6 +21,37 @@ interface AdminAuthContextType extends AdminAuthState {
   logout: () => void;
 }
 
+const STORAGE_KEY = 'admin-auth-v1';
+
+function readStorage(): { isAuthenticated: boolean; user: AdminUser | null } | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(isAuthenticated: boolean, user: AdminUser | null) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ isAuthenticated, user }));
+  } catch {
+    // ignore
+  }
+}
+
+function clearStorage() {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
@@ -31,25 +62,53 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    const saved = readStorage();
+    if (saved) {
+      setState((prev) => ({ ...prev, isAuthenticated: saved.isAuthenticated, user: saved.user }));
+    }
+
     let cancelled = false;
     async function checkAuth() {
       try {
         const me = await apiClient<AdminUser>('/auth/me');
         if (!cancelled) {
           if (me.role === 'super_admin') {
-            setState({ isAuthenticated: true, user: me, isLoading: false });
+            const next = { isAuthenticated: true, user: me, isLoading: false };
+            setState(next);
+            writeStorage(true, me);
           } else {
-            setState({ isAuthenticated: false, user: null, isLoading: false });
+            // Wrong role: keep existing persisted state, do not auto-logout
+            setState((prev) => ({ ...prev, isLoading: false }));
           }
         }
       } catch {
         if (!cancelled) {
-          setState({ isAuthenticated: false, user: null, isLoading: false });
+          // Never auto-logout: if /auth/me fails, keep existing state from localStorage
+          setState((prev) => ({ ...prev, isLoading: false }));
         }
       }
     }
     checkAuth();
     return () => { cancelled = true; };
+  }, []);
+
+  // Re-verify on window focus in background — never clear state on failure
+  useEffect(() => {
+    function onFocus() {
+      apiClient<AdminUser>('/auth/me')
+        .then((me) => {
+          if (me.role === 'super_admin') {
+            const next = { isAuthenticated: true, user: me, isLoading: false };
+            setState(next);
+            writeStorage(true, me);
+          }
+        })
+        .catch(() => {
+          // intentionally ignore: never auto-logout
+        });
+    }
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, []);
 
   const login = useCallback(async (username: string, password: string) => {
@@ -59,7 +118,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ username, password, type: 'super_admin' }),
       });
       if (res.user.role === 'super_admin') {
-        setState({ isAuthenticated: true, user: res.user, isLoading: false });
+        const next = { isAuthenticated: true, user: res.user, isLoading: false };
+        setState(next);
+        writeStorage(true, res.user);
         return { success: true };
       }
       return { success: false, error: 'Not authorized as super admin' };
@@ -69,6 +130,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
+    clearStorage();
     document.cookie = 'token=; path=/; max-age=0; domain=' + window.location.hostname;
     setState({ isAuthenticated: false, user: null, isLoading: false });
     window.location.href = '/login';

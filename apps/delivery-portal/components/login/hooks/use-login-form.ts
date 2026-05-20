@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,13 +22,19 @@ export function useLoginForm() {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      subdomain: typeof window !== 'undefined'
-        ? localStorage.getItem('restaurant-slug') || ''
-        : '',
+      subdomain: "",
       username: "",
       password: "",
     },
   });
+
+  // Hydrate subdomain from localStorage after mount to avoid hydration mismatch.
+  useEffect(() => {
+    const saved = localStorage.getItem('restaurant-slug');
+    if (saved) {
+      form.setValue('subdomain', saved);
+    }
+  }, [form]);
 
   const subdomain = form.watch("subdomain");
   const username = form.watch("username");

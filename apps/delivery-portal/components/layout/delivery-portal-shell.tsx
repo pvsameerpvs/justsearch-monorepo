@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Bike } from 'lucide-react';
 import { PortalNav } from './portal-nav';
+import { DriverLogoutButton } from './driver-logout-button';
 import type { DeliveryAgent, DeliveryPortalRestaurant } from '@/lib/delivery-types';
 
 type DeliveryPortalShellProps = {
@@ -29,12 +30,15 @@ export function DeliveryPortalShell({
             </div>
             <p className="text-[11px] text-slate-500 truncate">{restaurant.zoneLabel}</p>
           </div>
-          <Link href="/earnings" className="shrink-0">
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600 active:bg-emerald-100 transition">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              {agent.name}
-            </span>
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/earnings">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600 active:bg-emerald-100 transition">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {agent.name}
+              </span>
+            </Link>
+            <DriverLogoutButton />
+          </div>
         </div>
       </div>
 

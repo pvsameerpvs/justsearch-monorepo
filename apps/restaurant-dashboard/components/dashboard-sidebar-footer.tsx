@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { LogOut } from "lucide-react";
 import { useDashboardAuth } from "@/lib/auth-context";
 
@@ -14,6 +15,12 @@ function getInitials(name: string): string {
 
 export function SidebarFooter() {
   const { user, logout } = useDashboardAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const name = user?.name ?? 'User';
   const role = user?.role ?? 'staff';
   const initials = getInitials(name);
@@ -22,11 +29,11 @@ export function SidebarFooter() {
     <div className="border-t border-white/5 p-3">
       <div className="flex items-center gap-3 rounded-lg bg-white/5 p-3">
         <div className="h-8 w-8 rounded-full bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-500">
-          {initials}
+          {mounted ? initials : 'U'}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-white truncate">{name}</p>
-          <p className="text-[10px] text-slate-500 capitalize">{role.replace('_', ' ')}</p>
+          <p className="text-xs font-semibold text-white truncate">{mounted ? name : 'User'}</p>
+          <p className="text-[10px] text-slate-500 capitalize">{mounted ? role.replace('_', ' ') : 'Staff'}</p>
         </div>
         <button
           onClick={logout}

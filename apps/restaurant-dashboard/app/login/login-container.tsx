@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { useDashboardAuth } from "@/lib/auth-context";
@@ -10,10 +10,11 @@ import { LoginForgotPresenter } from "./login-forgot-presenter";
 export function LoginContainer() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [subdomain, setSubdomain] = useState(() => {
-    if (typeof window === 'undefined') return "";
-    return localStorage.getItem('restaurant-slug') || "";
-  });
+  const [subdomain, setSubdomain] = useState("");
+
+  useEffect(() => {
+    setSubdomain(localStorage.getItem('restaurant-slug') || "");
+  }, []);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
