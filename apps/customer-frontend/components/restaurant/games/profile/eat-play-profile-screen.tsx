@@ -47,7 +47,7 @@ export function EatPlayProfileScreen() {
       }
     }
 
-    return { ...calculatePlayerLevel(roundsPlayed), roundsPlayed, totalPoints, playedGames, lastPlayed };
+    return { ...calculatePlayerLevel(totalPoints), roundsPlayed, totalPoints, playedGames, lastPlayed };
   }, [gameSnapshots]);
 
   return (
@@ -60,10 +60,10 @@ export function EatPlayProfileScreen() {
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
 
             <div className="relative flex flex-col items-stretch gap-10 md:flex-row md:items-center">
-              <EatPlayLevelBadge level={totals.level} />
+              <EatPlayLevelBadge level={totals.level} progress={totals.progress} />
               <div className="flex-1 space-y-6">
                 <EatPlayProfileHeader userName={userName} playerId={playerId} tierLabel={tierLabel} />
-                <EatPlayXpProgress totalXP={totals.totalXP} neededXP={totals.neededXP} level={totals.level} progress={totals.progress} />
+                <EatPlayXpProgress currentLevelXP={totals.currentLevelXP} xpPerLevel={totals.xpPerLevel} neededXP={totals.neededXP} level={totals.level} progress={totals.progress} />
               </div>
               <EatPlayWalletCard points={points} />
             </div>

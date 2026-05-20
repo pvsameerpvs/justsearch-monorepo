@@ -10,7 +10,7 @@ interface EatPlayProfileStatsProps {
 
 export function EatPlayProfileStats({ playedGames, totalGames, roundsPlayed, totalPoints, lastPlayed }: EatPlayProfileStatsProps) {
   const items = [
-    { label: 'CHALLENGES', value: `${playedGames} / ${totalGames}` },
+    { label: 'GAMES PLAYED', value: `${playedGames} / ${totalGames}` },
     { label: 'TOTAL ROUNDS', value: roundsPlayed.toLocaleString() },
     { label: 'TOTAL POINTS', value: totalPoints.toLocaleString() },
     { label: 'LAST PLAYED', value: lastPlayed ? formatLastPlayed(lastPlayed).toUpperCase() : 'NO HISTORY', isExtraSmall: true },

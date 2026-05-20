@@ -12,7 +12,7 @@ export const LOYALTY_CONFIG = {
     SILVER: { min: 1000, label: 'SILVER' },
     ELITE: { min: 0, label: 'ELITE' },
   },
-  XP_PER_LEVEL: 10, // rounds per level
+  XP_PER_LEVEL: 100, // points needed per level
 };
 
 export function getLoyaltyTier(points: number): LoyaltyTier {
@@ -22,9 +22,9 @@ export function getLoyaltyTier(points: number): LoyaltyTier {
   return 'ELITE';
 }
 
-export function calculatePlayerLevel(roundsPlayed: number) {
-  const level = Math.floor(roundsPlayed / LOYALTY_CONFIG.XP_PER_LEVEL) + 1;
-  const currentLevelXP = roundsPlayed % LOYALTY_CONFIG.XP_PER_LEVEL;
+export function calculatePlayerLevel(xp: number) {
+  const level = Math.floor(xp / LOYALTY_CONFIG.XP_PER_LEVEL) + 1;
+  const currentLevelXP = xp % LOYALTY_CONFIG.XP_PER_LEVEL;
   const progress = (currentLevelXP / LOYALTY_CONFIG.XP_PER_LEVEL) * 100;
   const neededXP = LOYALTY_CONFIG.XP_PER_LEVEL - currentLevelXP;
 
@@ -32,8 +32,8 @@ export function calculatePlayerLevel(roundsPlayed: number) {
     level,
     progress,
     neededXP,
-    totalXP: roundsPlayed,
-    nextLevelXP: LOYALTY_CONFIG.XP_PER_LEVEL
+    currentLevelXP,
+    xpPerLevel: LOYALTY_CONFIG.XP_PER_LEVEL,
   };
 }
 

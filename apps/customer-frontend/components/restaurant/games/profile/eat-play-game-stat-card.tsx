@@ -3,22 +3,13 @@
 import { Trophy, Coins } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
 import type { Game } from '@/lib/restaurant-types';
+import type { GameStat } from '@/components/restaurant/use-user-game-stats';
 import { EatPlayGameStatIcon } from './eat-play-game-stat-icon';
 import { EatPlayGameStatScore } from './eat-play-game-stat-score';
-import { EatPlayGameStatBar } from './eat-play-game-stat-bar';
-
-type GameStatSnapshot = {
-  highScore: number;
-  lastScore: number;
-  lastPoints: number;
-  totalPoints: number;
-  roundsPlayed: number;
-  lastPlayed: string;
-};
 
 type EatPlayGameStatCardProps = {
   game: Game;
-  stat: GameStatSnapshot;
+  stat: GameStat;
 };
 
 function getRankDetails(points: number, hasPlayed: boolean) {
@@ -72,7 +63,7 @@ export function EatPlayGameStatCard({ game, stat }: EatPlayGameStatCardProps) {
       </div>
 
       <EatPlayGameStatScore lastPoints={stat.lastPoints} highScore={stat.highScore} roundsPlayed={stat.roundsPlayed} />
-      <EatPlayGameStatBar gameId={game.id} lastPlayed={stat.lastPlayed} />
+      {/* <EatPlayGameStatBar gameId={game.id} lastPlayed={stat.lastPlayed} /> */}
     </Surface>
   );
 }

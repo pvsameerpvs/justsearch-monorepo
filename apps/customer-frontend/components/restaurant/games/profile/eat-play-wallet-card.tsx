@@ -25,12 +25,15 @@ export function EatPlayWalletCard({ points }: EatPlayWalletCardProps) {
         </div>
       </div>
       <div className="mt-8 space-y-3">
-        <button type="button" className="group/redeem relative w-full overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#f59e0b,#d97706)] p-4 text-white shadow-lg transition-all hover:scale-[1.02] active:scale-95">
+        <button
+          type="button"
+          disabled
+          className="group/redeem relative w-full overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#f59e0b,#d97706)] p-4 text-white shadow-lg opacity-60 cursor-not-allowed"
+        >
           <div className="relative z-10 flex items-center justify-center gap-2">
-            <Sparkles className="h-4 w-4 animate-pulse text-amber-200" />
+            <Sparkles className="h-4 w-4 text-amber-200" />
             <span className="text-sm font-black uppercase tracking-widest">Redeem Points</span>
           </div>
-          <div className="absolute inset-0 translate-x-[-100%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)] transition-transform duration-700 group-hover/redeem:translate-x-[100%]" />
         </button>
         <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-amber-700/70">
           <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
