@@ -5,7 +5,8 @@ export type DeliveryOrderStatus =
   | 'assigned'
   | 'picked_up'
   | 'on_route'
-  | 'delivered';
+  | 'delivered'
+  | 'cancelled';
 
 export type DeliveryPortalRestaurant = {
   slug: string;
@@ -46,6 +47,7 @@ export type DeliveryOrder = {
   code: string;
   customerName: string;
   customerPhone: string;
+  alternateNumber?: string;
   neighborhood: string;
   dropoffAddress: string;
   latitude: number;

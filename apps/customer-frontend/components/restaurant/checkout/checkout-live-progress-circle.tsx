@@ -3,10 +3,8 @@
 import Link from 'next/link';
 import { AnimatedStatusEmoji } from './animated-status-emoji';
 import { MultiOrderCircularProgress } from './multi-order-circular-progress';
-import {
-  type CheckoutActiveOrderSummary,
-  getCheckoutStatusHref,
-} from './checkout-live-status-utils';
+import { type CheckoutActiveOrderSummary } from './checkout-order-summaries';
+import { getCheckoutStatusHref } from './checkout-live-status-utils';
 
 type CheckoutLiveProgressCircleProps = {
   orders: CheckoutActiveOrderSummary[];

@@ -1,6 +1,7 @@
 interface CheckoutOrderMetaCardProps {
   customerName: string;
   customerPhone: string;
+  alternateNumber: string | null;
   deliveryAddress: string | null;
   notes: string | null;
   createdAt: string;
@@ -9,6 +10,7 @@ interface CheckoutOrderMetaCardProps {
 export function CheckoutOrderMetaCard({
   customerName,
   customerPhone,
+  alternateNumber,
   deliveryAddress,
   notes,
   createdAt,
@@ -23,6 +25,11 @@ export function CheckoutOrderMetaCard({
         <p>
           <span className="font-medium text-[rgb(var(--ink))]">Phone:</span> {customerPhone}
         </p>
+        {alternateNumber && (
+          <p>
+            <span className="font-medium text-[rgb(var(--ink))]">Alt number:</span> {alternateNumber}
+          </p>
+        )}
         <p>
           <span className="font-medium text-[rgb(var(--ink))]">Date:</span>{' '}
           {new Date(createdAt).toLocaleString()}

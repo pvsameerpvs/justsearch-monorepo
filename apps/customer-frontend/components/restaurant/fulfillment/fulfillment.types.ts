@@ -64,5 +64,6 @@ export type FulfillmentContextType = {
     promoCode?: string;
     promoDiscount?: number;
     paymentMethod?: 'cash' | 'card';
+    alternateNumber?: string;
   }) => Promise<string | null>;
 };

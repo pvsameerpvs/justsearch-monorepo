@@ -1,39 +1,30 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Container } from '@/components/shared/container';
 import { Surface } from '@/components/shared/surface';
 import { useRestaurantFulfillment } from '../use-restaurant-fulfillment';
-import { getActiveCheckoutOrders } from './checkout-live-status-utils';
+import { useMyOrdersQuery } from '@/lib/hooks/use-my-orders-query';
+import { mergeActiveOrders } from './use-active-order-list';
 import { CheckoutTrackingCard } from './checkout-tracking-card';
 import { CheckoutOrderStatusSkeleton } from './checkout-order-status-skeleton';
 
 export function CheckoutOrderStatusListScreen() {
   const router = useRouter();
-  const { hydrated, orders } = useRestaurantFulfillment();
-  const [now, setNow] = useState(() => Date.now());
+  const { hydrated, orders: localOrders } = useRestaurantFulfillment();
+  const { data: apiOrders, isLoading: apiLoading } = useMyOrdersQuery();
+
+  const activeOrders = mergeActiveOrders(apiOrders, localOrders);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const activeOrders = useMemo(() => {
-    if (!hydrated) {
-      return [];
+    if (hydrated && !apiLoading && activeOrders.length === 0) {
+      const timer = setTimeout(() => router.replace('/profile/orders'), 800);
+      return () => clearTimeout(timer);
     }
+  }, [activeOrders.length, hydrated, apiLoading, router]);
 
-    return getActiveCheckoutOrders(orders);
-  }, [hydrated, now, orders]);
-
-  useEffect(() => {
-    if (hydrated && activeOrders.length === 0) {
-      router.replace('/profile/orders');
-    }
-  }, [activeOrders.length, hydrated, router]);
-
-  if (!hydrated) {
+  if (!hydrated || apiLoading) {
     return <CheckoutOrderStatusSkeleton />;
   }
 
@@ -53,7 +44,7 @@ export function CheckoutOrderStatusListScreen() {
         <div className="space-y-3">
           <Surface className="rounded-[24px] border-[rgb(var(--border)/0.72)] bg-white/[0.96] p-4 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
-              {activeOrders.length} current orders
+              {activeOrders.length} current {activeOrders.length === 1 ? 'order' : 'orders'}
             </p>
             <h2 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[rgb(var(--ink))]">
               Live order tracking

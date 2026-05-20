@@ -71,7 +71,7 @@ export function OrderDetailActions({ orderId, status, type, hasAgent, isKitchenS
         </div>
       )}
 
-      {type === "delivery" && (
+      {type === "delivery" && (status === "ready" || status === "out_for_delivery") && (
         <button onClick={onAssign} className="w-full rounded-xl border border-slate-200 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">{hasAgent ? "Reassign Driver" : "Assign Driver"}</button>
       )}
     </div>

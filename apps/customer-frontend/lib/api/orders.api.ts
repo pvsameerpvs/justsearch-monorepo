@@ -18,6 +18,7 @@ export type CreateOrderPayload = {
   deliveryAddress?: string;
   notes?: string;
   paymentMethod?: 'cash' | 'card';
+  alternateNumber?: string;
 };
 
 export type CreateOrderResponse = {

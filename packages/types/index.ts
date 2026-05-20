@@ -35,6 +35,7 @@ export interface Order {
   deliveryAddress: string | null;
   notes: string | null;
   cancelReason: string | null;
+  alternateNumber: string | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,13 +1,15 @@
 import Link from 'next/link';
 import type { Order, OrderItem } from '@justsearch/types';
 import type { Restaurant } from '@/lib/restaurant-types';
-import { getCheckoutLiveStages, getCheckoutStageIndex } from './checkout-live-status-utils';
+import { getCheckoutLiveStages } from './checkout-live-status-utils';
+import { getCheckoutStageIndex } from './checkout-status-normalizer';
 import { STATUS_LABELS, STATUS_DESCRIPTIONS } from './checkout-status-constants';
 import { CheckoutOrderTimeline } from './checkout-order-timeline';
 import { CheckoutOrderItemsCard } from './checkout-order-items-card';
 import { CheckoutOrderBreakdownCard } from './checkout-order-breakdown-card';
 import { CheckoutOrderMetaCard } from './checkout-order-meta-card';
 import { CheckoutStatusCard } from './checkout-status-card';
+import { CheckoutCancelReasonCard } from './checkout-cancel-reason-card';
 
 interface OrderPresenterProps {
   order: Order;
@@ -17,7 +19,7 @@ interface OrderPresenterProps {
 
 export function CheckoutLiveOrderStatusPresenter({ order, items }: OrderPresenterProps) {
   const stageIndex = getCheckoutStageIndex(order.status);
-  const liveStages = getCheckoutLiveStages('Driver');
+  const liveStages = getCheckoutLiveStages();
   const isDelivered = order.status === 'completed';
   const isCancelled = order.status === 'cancelled';
   const headline = STATUS_LABELS[order.status] || 'Order update';
@@ -34,6 +36,7 @@ export function CheckoutLiveOrderStatusPresenter({ order, items }: OrderPresente
           supportText={supportText}
           isCancelled={isCancelled}
         />
+        {isCancelled && <CheckoutCancelReasonCard reason={order.cancelReason} />}
         {!isCancelled && <CheckoutOrderTimeline stages={liveStages} stageIndex={stageIndex} />}
         <CheckoutOrderItemsCard items={items} />
         <CheckoutOrderBreakdownCard
@@ -45,6 +48,7 @@ export function CheckoutLiveOrderStatusPresenter({ order, items }: OrderPresente
         <CheckoutOrderMetaCard
           customerName={order.customerName}
           customerPhone={order.customerPhone}
+          alternateNumber={order.alternateNumber}
           deliveryAddress={order.deliveryAddress}
           notes={order.notes}
           createdAt={order.createdAt}

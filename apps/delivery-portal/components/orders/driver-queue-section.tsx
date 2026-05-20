@@ -9,7 +9,7 @@ type DriverQueueSectionProps = {
 };
 
 export function DriverQueueSection({ orders, currentOrderId }: DriverQueueSectionProps) {
-  const queue = sortOrdersByUrgency(orders).filter((o) => o.id !== currentOrderId && o.status !== 'delivered');
+  const queue = sortOrdersByUrgency(orders).filter((o) => o.id !== currentOrderId && o.status !== 'delivered' && o.status !== 'cancelled');
 
   if (queue.length === 0) return null;
 

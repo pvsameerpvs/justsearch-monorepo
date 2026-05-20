@@ -21,6 +21,12 @@ export function OrderCustomerInfo({ order }: { order: DashboardOrder }) {
           <Phone className="h-4 w-4 text-slate-400 shrink-0" />
           {order.customerPhone}
         </div>
+        {order.alternateNumber && (
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <Phone className="h-4 w-4 text-slate-400 shrink-0" />
+            <span className="text-slate-500">Alt:</span> {order.alternateNumber}
+          </div>
+        )}
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
           {order.address}

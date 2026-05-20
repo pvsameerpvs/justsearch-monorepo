@@ -25,7 +25,7 @@ function LoadingRows() {
 
 export function ProfileOrdersScreen({ restaurant }: ProfileOrdersScreenProps) {
   const { data, isLoading } = useMyOrdersQuery();
-  const orders = data?.orders ?? [];
+  const orders = data ?? [];
 
   return (
     <section className="py-4 sm:py-6">

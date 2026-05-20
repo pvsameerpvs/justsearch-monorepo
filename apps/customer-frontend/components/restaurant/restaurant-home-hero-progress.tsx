@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { MultiOrderCircularProgress } from './checkout/multi-order-circular-progress';
 import { AnimatedStatusEmoji } from './checkout/animated-status-emoji';
 
-import type { CheckoutActiveOrderSummary } from './checkout/checkout-live-status-utils';
+import type { CheckoutActiveOrderSummary } from './checkout/checkout-order-summaries';
 
 export function RestaurantHomeHeroProgress({
   statusHref,

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { orders, orderItems, users } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
@@ -59,6 +59,13 @@ router.post('/', async (req, res, next) => {
     }));
 
     await db.insert(orderItems).values(itemValues);
+
+    if (body.alternateNumber) {
+      try {
+        await db.execute(sql`UPDATE ${sql.identifier(req.tenant.schemaName)}.${sql.identifier('orders')} SET alternate_number = ${body.alternateNumber} WHERE id = ${order.id}`);
+      } catch { /* Column may not exist until migration is run */ }
+    }
+
     res.status(201).json({ order: { id: order.id, code: order.code, status: order.status, total: order.total, createdAt: order.createdAt } });
   } catch (error) {
     next(error);

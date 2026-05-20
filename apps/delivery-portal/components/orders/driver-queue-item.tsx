@@ -33,16 +33,16 @@ export function DriverQueueItem({ order, index }: DriverQueueItemProps) {
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <a
-            href={`tel:${order.customerPhone.replace(/\s/g, '')}`}
-            className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white active:scale-95 transition"
-          >
+          <a href={`tel:${order.customerPhone.replace(/\s/g, '')}`} className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white active:scale-95 transition">
             <Phone className="h-3 w-3" />
           </a>
+          {order.alternateNumber && (
+            <a href={`tel:${order.alternateNumber.replace(/\s/g, '')}`} className="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2 py-1 text-[10px] font-bold text-slate-700 active:scale-95 transition">
+              <Phone className="h-3 w-3" />Alt
+            </a>
+          )}
           {order.paymentMode === "cash_on_delivery" && (
-            <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold text-amber-700 border border-amber-100">
-              COD
-            </span>
+            <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold text-amber-700 border border-amber-100">COD</span>
           )}
         </div>
       </div>

@@ -1,22 +1,21 @@
-"use client";
-
 import Link from 'next/link';
 import { ChevronRight, PackageCheck } from 'lucide-react';
 import { RestaurantDeliveryStatusBadge } from '../restaurant-delivery-status-badge';
-import type { DeliveryOrder } from '../use-restaurant-fulfillment';
+import type { ActiveListOrder } from './use-active-order-list';
 
-function formatOrderTime(value: number) {
+function formatOrderTime(value: string | number) {
+  const d = typeof value === 'string' ? new Date(value) : new Date(value);
   return new Intl.DateTimeFormat('en-US', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-  }).format(value);
+  }).format(d);
 }
 
 type CheckoutTrackingCardProps = {
-  orders: DeliveryOrder[];
+  orders: ActiveListOrder[];
 };
 
 export function CheckoutTrackingCard({ orders }: CheckoutTrackingCardProps) {
@@ -26,16 +25,12 @@ export function CheckoutTrackingCard({ orders }: CheckoutTrackingCardProps) {
         <PackageCheck className="h-5 w-5 text-[rgb(var(--brand))]" />
         <div>
           <p className="text-xl font-bold text-[rgb(var(--ink))]">Order tracking</p>
-          <p className="text-sm text-[rgb(var(--muted))]">
-            Tap any order to open its live status.
-          </p>
+          <p className="text-sm text-[rgb(var(--muted))]">Tap any order to open its live status.</p>
         </div>
       </div>
 
       {orders.length === 0 ? (
-        <p className="mt-4 text-sm text-[rgb(var(--muted))]">
-          Place the order to start tracking.
-        </p>
+        <p className="mt-4 text-sm text-[rgb(var(--muted))]">Place the order to start tracking.</p>
       ) : (
         <div className="mt-4 space-y-3">
           {orders.map((order) => (
@@ -46,15 +41,20 @@ export function CheckoutTrackingCard({ orders }: CheckoutTrackingCardProps) {
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-base font-semibold text-[rgb(var(--ink))]">Order #{order.id}</p>
+                  <p className="text-base font-semibold text-[rgb(var(--ink))]">Order #{order.code || order.id.slice(0, 8)}</p>
                   <p className="mt-1 text-xs text-[rgb(var(--muted))]">{formatOrderTime(order.createdAt)}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <RestaurantDeliveryStatusBadge status={order.status} />
+                  <RestaurantDeliveryStatusBadge status={order.status as import('@justsearch/types').OrderStatus | 'order_confirmed' | 'assigned_delivery_boy' | 'delivered'} />
                   <ChevronRight className="h-4 w-4 text-[rgb(var(--muted))]" />
                 </div>
               </div>
-              <p className="mt-3 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">{order.address}</p>
+              {order.address && (
+                <p className="mt-3 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">{order.address}</p>
+              )}
+              {order.restaurantName && !order.address && (
+                <p className="mt-3 text-sm text-[rgb(var(--muted))]">{order.restaurantName}</p>
+              )}
             </Link>
           ))}
         </div>

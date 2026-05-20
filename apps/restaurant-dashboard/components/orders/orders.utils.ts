@@ -21,6 +21,8 @@ export function mapApiOrderToDashboard(o: ApiOrder): DashboardOrder {
     paymentMethod,
     notes: o.notes || undefined,
     assignedAgentId: o.driverId || null,
+    cancelReason: o.cancelReason || undefined,
+    alternateNumber: o.alternateNumber || undefined,
     createdAt: o.createdAt,
     orderItems: [],
     timeline: [],

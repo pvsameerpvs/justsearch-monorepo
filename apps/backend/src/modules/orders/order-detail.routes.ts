@@ -58,16 +58,16 @@ router.get('/:id', async (req, res, next) => {
     );
 
     let cancelReason: string | null = null;
+    let alternateNumber: string | null = null;
     try {
-      const reasonRows = await db.execute<Record<string, unknown>>(
-        sql`SELECT cancel_reason FROM ${sql.identifier(req.tenant.schemaName)}.${sql.identifier('orders')} WHERE id = ${orderId} LIMIT 1`
+      const extraRows = await db.execute<Record<string, unknown>>(
+        sql`SELECT cancel_reason, alternate_number FROM ${sql.identifier(req.tenant.schemaName)}.${sql.identifier('orders')} WHERE id = ${orderId} LIMIT 1`
       );
-      cancelReason = toStr(reasonRows[0]?.cancel_reason) ?? null;
-    } catch {
-      // Column may not exist yet
-    }
+      cancelReason = toStr(extraRows[0]?.cancel_reason) ?? null;
+      alternateNumber = toStr(extraRows[0]?.alternate_number) ?? null;
+    } catch { /* Columns may not exist yet */ }
 
-    return res.json({ order: { ...order, cancelReason }, items });
+    return res.json({ order: { ...order, cancelReason, alternateNumber }, items });
   } catch (error) {
     next(error);
   }

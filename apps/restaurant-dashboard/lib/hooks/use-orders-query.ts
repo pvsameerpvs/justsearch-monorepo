@@ -18,6 +18,7 @@ export interface ApiOrder {
   driverId: string | null;
   notes: string | null;
   cancelReason: string | null;
+  alternateNumber: string | null;
   items?: number;
 }
 

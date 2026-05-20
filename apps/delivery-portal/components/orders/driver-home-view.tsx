@@ -35,9 +35,10 @@ export function DriverHomeView({ orders: initialOrders, onRefresh, isRefreshing 
     updateStatusApi({ assignmentId, status });
   };
 
-  const sorted = sortOrdersByUrgency(orders);
-  const current = sorted.find((o) => o.status !== "delivered");
-  const activeCount = orders.filter((o) => o.status !== "delivered").length;
+  const activeOrders = orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled");
+  const sorted = sortOrdersByUrgency(activeOrders);
+  const current = sorted[0] ?? null;
+  const activeCount = activeOrders.length;
 
   return (
     <div className="space-y-4">

@@ -16,8 +16,10 @@ const STATUS_PRIORITY: Record<string, number> = {
 
 export function sortOrdersByUrgency(orders: DeliveryOrder[]): DeliveryOrder[] {
   return [...orders].sort((a, b) => {
-    if (a.status === 'delivered' && b.status !== 'delivered') return 1;
-    if (b.status === 'delivered' && a.status !== 'delivered') return -1;
+    const aDone = a.status === 'delivered' || a.status === 'cancelled';
+    const bDone = b.status === 'delivered' || b.status === 'cancelled';
+    if (aDone && !bDone) return 1;
+    if (bDone && !aDone) return -1;
     const pa = STATUS_PRIORITY[a.status] ?? 99;
     const pb = STATUS_PRIORITY[b.status] ?? 99;
     return pa - pb;

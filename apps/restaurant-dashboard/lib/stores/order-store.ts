@@ -48,6 +48,8 @@ export type DashboardOrder = {
   paymentMethod: string;
   notes?: string;
   assignedAgentId: string | null;
+  cancelReason?: string;
+  alternateNumber?: string;
   createdAt: string;
   orderItems: OrderItem[];
   timeline: TimelineEvent[];

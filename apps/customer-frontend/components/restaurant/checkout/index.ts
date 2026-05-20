@@ -4,6 +4,8 @@ export * from './checkout-address-selector-sheet';
 export * from './checkout-add-address-form';
 export * from './checkout-live-order-status-screen';
 export * from './checkout-live-status-utils';
+export * from './checkout-order-summaries';
+export * from './checkout-status-normalizer';
 export * from './checkout-map-address-picker';
 export * from './checkout-sticky-footer';
 export * from './checkout-summary-card';

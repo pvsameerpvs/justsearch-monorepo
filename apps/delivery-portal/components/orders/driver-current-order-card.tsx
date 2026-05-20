@@ -18,7 +18,7 @@ export function DriverCurrentOrderCard({ order, onUpdateStatus }: DriverCurrentO
   return (
     <div className="rounded-[24px] border border-slate-200 bg-white shadow-[0_8px_30px_-12px_rgba(15,23,42,0.2)] overflow-hidden">
       <DriverAnimatedStepper order={order} />
-      <DriverOrderCardCustomer name={order.customerName} phone={order.customerPhone} />
+      <DriverOrderCardCustomer name={order.customerName} phone={order.customerPhone} alternateNumber={order.alternateNumber} />
       <DriverOrderCardMapSection address={order.dropoffAddress} lat={order.latitude} lng={order.longitude} />
       <DriverExpandableItems order={order} />
       {order.notes && <DriverOrderNotes notes={order.notes} />}

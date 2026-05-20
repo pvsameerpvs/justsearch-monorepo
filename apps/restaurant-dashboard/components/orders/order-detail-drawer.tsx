@@ -10,6 +10,7 @@ import { OrderTimeline } from "./order-timeline";
 import { OrderTotals } from "./order-totals";
 import { OrderDetailActions } from "./order-detail-actions";
 import { OrderStatusStepper } from "./order-status-stepper";
+import { OrderCancelReasonCard } from "./order-cancel-reason-card";
 
 interface OrderDetailDrawerProps {
   orderId: string;
@@ -29,9 +30,7 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign, onReject, isKitc
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
         <div className="relative w-full max-w-md bg-white shadow-2xl flex flex-col h-full overflow-hidden p-5 space-y-4">
           <div className="h-6 w-32 bg-slate-200 rounded animate-pulse" />
-          <div className="h-24 w-full bg-slate-200 rounded animate-pulse" />
-          <div className="h-24 w-full bg-slate-200 rounded animate-pulse" />
-          <div className="h-24 w-full bg-slate-200 rounded animate-pulse" />
+          {[1,2,3].map((k) => <div key={k} className="h-24 w-full bg-slate-200 rounded animate-pulse" />)}
         </div>
       </div>
     );
@@ -48,6 +47,7 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign, onReject, isKitc
 
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
           <OrderStatusStepper currentStatus={order.status} timeline={order.timeline} cancelled={order.status === "cancelled"} />
+          {order.status === "cancelled" && <OrderCancelReasonCard reason={order.cancelReason} />}
           <OrderCustomerInfo order={order} />
           <OrderItemsList items={order.orderItems} />
           <OrderTotals order={order} />
@@ -67,15 +67,7 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign, onReject, isKitc
           )}
         </div>
 
-        <OrderDetailActions
-          orderId={order.id}
-          status={order.status}
-          type={order.type}
-          hasAgent={!!assignedAgent}
-          isKitchenStaff={isKitchenStaff}
-          onAssign={onAssign}
-          onReject={onReject}
-        />
+        <OrderDetailActions orderId={order.id} status={order.status} type={order.type} hasAgent={!!assignedAgent} isKitchenStaff={isKitchenStaff} onAssign={onAssign} onReject={onReject} />
       </div>
     </div>
   );
