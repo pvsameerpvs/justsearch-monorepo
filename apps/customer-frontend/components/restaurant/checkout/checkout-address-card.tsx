@@ -16,6 +16,15 @@ export type CheckoutAddressCardProps = {
   paymentMethod: 'cash' | 'card';
   setPaymentMethod: (value: 'cash' | 'card') => void;
   addressSaveWarn?: string | null;
+  deliveryAvailable?: boolean;
+  deliveryReason?: string;
+  deliveryFee?: number;
+  deliveryDistanceKm?: number;
+  deliveryEmirate?: string;
+  currency?: string;
+  isDeliveryEnabled?: boolean;
+  locationSource?: 'saved' | 'gps' | 'pinned' | 'none';
+  quoteLoading?: boolean;
 };
 
 export function CheckoutAddressCard(props: CheckoutAddressCardProps) {

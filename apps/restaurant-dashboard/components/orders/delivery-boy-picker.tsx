@@ -26,7 +26,13 @@ export function DeliveryBoyPicker({ orderId, onClose }: DeliveryBoyPickerProps) 
   }, [apiData, setAgents]);
 
   const order = orders.find((o) => o.id === orderId);
-  const availableCount = agents.filter((a) => a.status === "online").length;
+  const sortedAgents = [...agents].sort((a, b) => {
+    const aFree = a.status === 'online' && (a.activeOrderCount ?? 0) === 0 ? 1 : 0;
+    const bFree = b.status === 'online' && (b.activeOrderCount ?? 0) === 0 ? 1 : 0;
+    if (aFree !== bFree) return bFree - aFree;
+    return (a.activeOrderCount ?? 0) - (b.activeOrderCount ?? 0);
+  });
+  const availableCount = agents.filter((a) => a.status === 'online' && (a.activeOrderCount ?? 0) === 0).length;
 
   const getAssignedOrderCode = (agentId: string) => {
     const assignedOrder = orders.find((o) => o.assignedAgentId === agentId && o.id !== orderId);
@@ -68,7 +74,7 @@ export function DeliveryBoyPicker({ orderId, onClose }: DeliveryBoyPickerProps) 
             </div>
           )}
 
-          {agents.map((agent) => (
+          {sortedAgents.map((agent) => (
             <DeliveryBoyRow
               key={agent.id}
               agent={agent}

@@ -6,13 +6,16 @@ import type { PlaceApi, PromoApi, AddressApi } from './checkout-place-action.typ
 
 export function useCheckoutPlaceAction(
   validation: { isValid: boolean; errors: string[] },
-  placeOrder: (data: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card'; alternateNumber?: string }) => Promise<string | null>,
+  placeOrder: (data: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card'; alternateNumber?: string; lat?: number; lng?: number; deliveryFee?: number }) => Promise<string | null>,
   place: PlaceApi,
   promo: PromoApi,
   address: AddressApi,
   getCombinedAddress: () => string,
   restaurantNote: string,
   paymentMethod: 'cash' | 'card',
+  lat?: number,
+  lng?: number,
+  deliveryFee?: number,
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [warn, setWarn] = useState<string | null>(null);
@@ -41,7 +44,7 @@ export function useCheckoutPlaceAction(
     }
 
     try {
-      const orderId = await placeOrder({ address: getCombinedAddress(), note: restaurantNote, promoCode: promo.appliedVoucher?.code, promoDiscount: promo.discount || undefined, paymentMethod, alternateNumber: address.alternateNumber || undefined });
+      const orderId = await placeOrder({ address: getCombinedAddress(), note: restaurantNote, promoCode: promo.appliedVoucher?.code, promoDiscount: promo.discount || undefined, paymentMethod, alternateNumber: address.alternateNumber || undefined, lat, lng, deliveryFee });
       if (!orderId) { place.setPlaceError('Failed to create order. Please try again.'); return; }
       promo.consumePromo();
       place.startPlacing(orderId);

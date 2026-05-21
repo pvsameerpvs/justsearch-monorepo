@@ -7,15 +7,19 @@ interface DeliveryBoyRowProps {
   onAssign: () => void;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; dot: string; bg: string; text: string; btn: string }> = {
-  online: { label: "Available", dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", btn: "bg-emerald-500 text-white hover:bg-emerald-600" },
-  busy: { label: "On Delivery", dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700", btn: "bg-slate-200 text-slate-400 cursor-not-allowed" },
-  offline: { label: "Offline", dot: "bg-slate-400", bg: "bg-slate-100", text: "text-slate-600", btn: "bg-slate-200 text-slate-400 cursor-not-allowed" },
-};
+function getAgentStatus(agent: DeliveryBoy) {
+  const count = agent.activeOrderCount ?? 0;
+  if (agent.status === "offline") {
+    return { label: "Offline", dot: "bg-slate-400", bg: "bg-slate-100", text: "text-slate-600", btn: "bg-slate-200 text-slate-400 cursor-not-allowed", canAssign: false };
+  }
+  if (count === 0) {
+    return { label: "Free", dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", btn: "bg-emerald-500 text-white hover:bg-emerald-600", canAssign: true };
+  }
+  return { label: `Busy (${count})`, dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700", btn: "bg-slate-200 text-slate-400 cursor-not-allowed", canAssign: false };
+}
 
 export function DeliveryBoyRow({ agent, assignedOrderCode, onAssign }: DeliveryBoyRowProps) {
-  const status = STATUS_CONFIG[agent.status] ?? STATUS_CONFIG.offline;
-  const canAssign = agent.status === "online";
+  const status = getAgentStatus(agent);
 
   return (
     <div className={`flex items-center gap-3 rounded-xl border p-3 ${status.bg} border-slate-200`}>
@@ -41,10 +45,10 @@ export function DeliveryBoyRow({ agent, assignedOrderCode, onAssign }: DeliveryB
       </div>
       <button
         onClick={onAssign}
-        disabled={!canAssign}
-        className={`shrink-0 rounded-lg px-4 py-2 text-xs font-bold transition-colors ${canAssign ? status.btn : status.btn}`}
+        disabled={!status.canAssign}
+        className={`shrink-0 rounded-lg px-4 py-2 text-xs font-bold transition-colors ${status.btn}`}
       >
-        {canAssign ? "Assign" : agent.status === "busy" ? "Busy" : "Offline"}
+        {status.canAssign ? "Assign" : status.label}
       </button>
     </div>
   );

@@ -11,6 +11,7 @@ type CheckoutStickyFooterProps = {
   isPlacing?: boolean;
   isValid?: boolean;
   onPlaceOrder: () => void;
+  deliveryUnavailable?: boolean;
 };
 
 export function CheckoutStickyFooter({
@@ -22,6 +23,7 @@ export function CheckoutStickyFooter({
   isPlacing = false,
   isValid = true,
   onPlaceOrder,
+  deliveryUnavailable = false,
 }: CheckoutStickyFooterProps) {
   return (
     <div className="fixed inset-x-0 z-[9998] px-3 sm:px-6" style={{ bottom: 'calc(var(--restaurant-mobile-nav-height,0px) + 12px)' }}>
@@ -45,7 +47,7 @@ export function CheckoutStickyFooter({
           disabled={cartCount === 0 || isPlacing || !isValid}
           className="inline-flex h-14 shrink-0 items-center justify-center rounded-[20px] bg-[rgb(var(--brand))] px-8 text-lg font-bold text-white shadow-[0_12px_36px_rgb(var(--brand)/0.25)] transition-all hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPlacing ? 'Placing...' : cartCount === 0 ? 'Cart Empty' : !isValid ? 'Add Address' : 'Place Order'}
+          {isPlacing ? 'Placing...' : cartCount === 0 ? 'Cart Empty' : deliveryUnavailable ? 'Unavailable' : !isValid ? 'Add Address' : 'Place Order'}
         </button>
       </div>
     </div>

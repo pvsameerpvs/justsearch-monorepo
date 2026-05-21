@@ -8,6 +8,7 @@ import { SettingsQrCard } from "@/components/settings/settings-qr-card";
 import { SettingsContactCard } from "@/components/settings/settings-contact-card";
 import { SettingsSocialsCard } from "@/components/settings/settings-socials-card";
 import { SettingsDietaryCard } from "@/components/settings/settings-dietary-card";
+import { SettingsDeliveryCard } from "@/components/settings/settings-delivery-card";
 
 export function SettingsContainer() {
   const { restaurant: profile, updateRestaurant } = useRestaurantProfile();
@@ -30,6 +31,7 @@ export function SettingsContainer() {
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <SettingsSocialsCard restaurant={profile} onUpdate={updateRestaurant} />
+        <SettingsDeliveryCard restaurant={profile} onUpdate={updateRestaurant} />
       </div>
     </div>
   );

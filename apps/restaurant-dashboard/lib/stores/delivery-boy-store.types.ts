@@ -8,6 +8,7 @@ export type DeliveryBoy = {
   vehicleType: string;
   rating: string;
   completedToday: number;
+  activeOrderCount: number;
   createdAt: string;
 };
 

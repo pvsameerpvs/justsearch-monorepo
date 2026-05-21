@@ -20,7 +20,11 @@ export function useCheckoutValidation(
   address: string,
   isRegistered: boolean,
   cartCount: number,
-  isPlacing: boolean
+  isPlacing: boolean,
+  isDeliveryEnabled: boolean,
+  hasCoords: boolean,
+  deliveryAvailable?: boolean,
+  deliveryError?: string
 ): CheckoutValidation {
   return useMemo(() => {
     if (isPlacing) {
@@ -33,11 +37,16 @@ export function useCheckoutValidation(
       cartCount,
     });
 
-    if (result.success) {
-      return { isValid: true, errors: [] };
+    const errors = result.success ? [] : result.error.issues.map((issue) => issue.message);
+
+    if (isDeliveryEnabled && !hasCoords) {
+      errors.push('Please set your delivery location to calculate the fee');
     }
 
-    const errors = result.error.issues.map((issue) => issue.message);
-    return { isValid: false, errors };
-  }, [address, isRegistered, cartCount, isPlacing]);
+    if (deliveryAvailable === false && deliveryError) {
+      errors.push(deliveryError);
+    }
+
+    return { isValid: errors.length === 0, errors };
+  }, [address, isRegistered, cartCount, isPlacing, isDeliveryEnabled, hasCoords, deliveryAvailable, deliveryError]);
 }

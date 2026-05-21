@@ -94,6 +94,20 @@ export type GoogleReview = {
   verified: boolean;
 };
 
+export type DeliveryTier = {
+  minKm: number;
+  maxKm: number;
+  fee: number;
+};
+
+export type DeliveryConfig = {
+  enabled: boolean;
+  maxRadiusKm: number;
+  restaurantLat: number;
+  restaurantLng: number;
+  tiers: DeliveryTier[];
+};
+
 export type PartyPackage = {
   id: string;
   name: string;
@@ -135,4 +149,5 @@ export type Restaurant = {
   reviews: GoogleReview[];
   partyPackages: PartyPackage[];
   isPureVeg?: boolean;
+  delivery?: DeliveryConfig;
 };

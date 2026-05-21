@@ -4,6 +4,7 @@ import { db } from '../../db';
 import { orders, orderItems, users } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
 import { createOrderSchema } from './order.validators';
+import { validateDeliveryOnCreate } from './order-delivery.utils';
 
 const router = Router();
 router.use(authMiddleware);
@@ -25,6 +26,17 @@ router.post('/', async (req, res, next) => {
     const body = createOrderSchema.parse(req.body);
     const restaurantId = req.tenant.id;
     const code = `JS-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const deliveryCheck = await validateDeliveryOnCreate(
+      restaurantId,
+      body.fulfillmentType,
+      body.lat,
+      body.lng,
+      body.deliveryFee
+    );
+    if ('error' in deliveryCheck) {
+      return res.status(400).json({ message: deliveryCheck.error });
+    }
 
     const [order] = await db.insert(orders).values({
       restaurantId,

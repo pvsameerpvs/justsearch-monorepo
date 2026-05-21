@@ -14,6 +14,7 @@ export interface DeliveryAgent {
   status: string;
   rating: string;
   completedToday: number;
+  activeOrderCount: number;
   isActive: boolean;
   createdAt: string;
 }

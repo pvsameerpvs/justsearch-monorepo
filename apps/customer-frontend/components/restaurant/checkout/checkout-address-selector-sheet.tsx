@@ -13,10 +13,11 @@ interface CheckoutAddressSelectorSheetProps {
   onSelectAddress: (address: SavedAddress) => void;
   onAddAddress: (address: Omit<SavedAddress, 'id'>) => Promise<void>;
   onUseCurrentLocation: (address: string) => void;
+  onUsePinnedLocation?: (address: string, lat: number, lng: number) => void;
 }
 
 export function CheckoutAddressSelectorSheet({
-  open, addresses, selectedAddressId, onClose, onSelectAddress, onAddAddress, onUseCurrentLocation,
+  open, addresses, selectedAddressId, onClose, onSelectAddress, onAddAddress, onUseCurrentLocation, onUsePinnedLocation,
 }: CheckoutAddressSelectorSheetProps) {
   const { mode, mapSelection, setMapSelection, currentLocationAddress, currentLocationCoords, isLocating, handleUseCurrentLocation, handleOpenMapChooser, handleSaveAddress, handlePrimaryMapAction, handlePinnedLocationChange, goToAdd, cancelAdd } = useAddressSelector(open, addresses, selectedAddressId, onClose, onSelectAddress, onAddAddress, onUseCurrentLocation);
   if (!open) return null;
@@ -34,7 +35,14 @@ export function CheckoutAddressSelectorSheet({
               currentLocationCoords={currentLocationCoords} isLocating={isLocating}
               onSelectAddress={onSelectAddress} onClose={onClose} onSaveAddress={handleSaveAddress}
               onCancelAdd={cancelAdd} onSetMapSelection={setMapSelection}
-              onUsePinnedForOrder={() => { onUseCurrentLocation(currentLocationAddress!); onClose(); }}
+              onUsePinnedForOrder={() => {
+                if (onUsePinnedLocation && currentLocationAddress && currentLocationCoords) {
+                  onUsePinnedLocation(currentLocationAddress, currentLocationCoords.latitude, currentLocationCoords.longitude);
+                } else if (currentLocationAddress) {
+                  onUseCurrentLocation(currentLocationAddress);
+                }
+                onClose();
+              }}
               onPinnedLocationChange={handlePinnedLocationChange} onPrimaryMapAction={handlePrimaryMapAction}
               onUseCurrentLocation={handleUseCurrentLocation} onOpenMapChooser={handleOpenMapChooser}
               onAddAddress={goToAdd}

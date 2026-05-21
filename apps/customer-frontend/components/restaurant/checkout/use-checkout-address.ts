@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { type SavedAddress, useAddressBook } from '../use-address-book';
 
+export type LocationSource = 'saved' | 'gps' | 'pinned' | 'none';
+
 export function useCheckoutAddress() {
   const { addresses, addAddress, hydrated: addressesHydrated, isSaving } = useAddressBook();
 
@@ -11,6 +13,7 @@ export function useCheckoutAddress() {
   const [addressDetails, setAddressDetails] = useState('');
   const [alternateNumber, setAlternateNumber] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [locationSource, setLocationSource] = useState<LocationSource>('none');
   const [isAddressBookOpen, setIsAddressBookOpen] = useState(false);
 
   const applySavedAddress = (savedAddress: SavedAddress) => {
@@ -19,14 +22,25 @@ export function useCheckoutAddress() {
     setAddress(savedAddress.address);
     setAddressDetails(savedAddress.details);
     setAlternateNumber(savedAddress.alternateNumber || '');
+    setLocationSource('saved');
   };
 
   const applyCurrentLocationAddress = (resolvedAddress: string) => {
     setSelectedAddressId(null);
-    setAddressTitle('Other');
+    setAddressTitle('Current Location');
     setAddress(resolvedAddress);
     setAddressDetails('');
     setAlternateNumber('');
+    setLocationSource('gps');
+  };
+
+  const applyPinnedLocation = (resolvedAddress: string, _lat: number, _lng: number) => {
+    setSelectedAddressId(null);
+    setAddressTitle('Pinned Location');
+    setAddress(resolvedAddress);
+    setAddressDetails('');
+    setAlternateNumber('');
+    setLocationSource('pinned');
   };
 
   useEffect(() => {
@@ -49,8 +63,10 @@ export function useCheckoutAddress() {
     setIsAddressBookOpen,
     addresses,
     addAddress,
+    locationSource,
     applySavedAddress,
     applyCurrentLocationAddress,
+    applyPinnedLocation,
     isSaving,
   };
 }

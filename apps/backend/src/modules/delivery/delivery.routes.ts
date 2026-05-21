@@ -21,7 +21,13 @@ router.get('/', async (req, res, next) => {
 
     const schemaName = req.tenant.schemaName;
     const list = await db.execute<Record<string, unknown>>(
-      sql`SELECT * FROM ${sql.identifier(schemaName)}.${sql.identifier('delivery_agents')} WHERE restaurant_id = ${req.tenant.id} ORDER BY created_at DESC`
+      sql`SELECT da.*,
+        (SELECT COUNT(*) FROM ${sql.identifier(schemaName)}.${sql.identifier('delivery_assignments')} da2
+         WHERE da2.agent_id = da.id AND da2.status NOT IN ('delivered','cancelled')
+        ) as active_order_count
+      FROM ${sql.identifier(schemaName)}.${sql.identifier('delivery_agents')} da
+      WHERE da.restaurant_id = ${req.tenant.id}
+      ORDER BY da.created_at DESC`
     );
 
     res.json({ agents: list.map(stripPassword) });

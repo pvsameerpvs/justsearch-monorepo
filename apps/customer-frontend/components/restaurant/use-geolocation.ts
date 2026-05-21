@@ -34,14 +34,14 @@ export function useGeolocation() {
             const { latitude, longitude } = position.coords;
             const at = `${latitude},${longitude}`;
             
-            // 1. First, get the standard address
-            const revUrl = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${at}&lang=en-GB&apiKey=${HERE_API_KEY}`;
+            // 1. First, get the standard address (locked to UAE)
+            const revUrl = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${at}&lang=en-US&apiKey=${HERE_API_KEY}`;
             const revRes = await fetch(revUrl);
             const revData = await revRes.json();
-            
+
             // 2. Secondly, discover the nearest BUILDING/PLACE name
             // This is what Noon/Talabat use to find building names like "Damas Tower"
-            const discUrl = `https://discover.search.hereapi.com/v1/discover?at=${at}&q=building&limit=1&lang=en-GB&apiKey=${HERE_API_KEY}`;
+            const discUrl = `https://discover.search.hereapi.com/v1/discover?at=${at}&q=building&limit=1&lang=en-US&apiKey=${HERE_API_KEY}`;
             const discRes = await fetch(discUrl);
             const discData = await discRes.json();
             

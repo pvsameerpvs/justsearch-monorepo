@@ -14,9 +14,14 @@ interface Props {
   onApplyPromo: (code: string) => void;
   promoDiscount: number;
   appliedPromoCode: string | null;
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  isDeliveryEnabled: boolean;
+  deliveryDistanceKm?: number;
 }
 
-export function CheckoutSummaryCard({ restaurantName, displayItems, currency, onApplyPromo, promoDiscount, appliedPromoCode }: Props) {
+export function CheckoutSummaryCard({ restaurantName, displayItems, currency, onApplyPromo, promoDiscount, appliedPromoCode, subtotal, deliveryFee, total, isDeliveryEnabled, deliveryDistanceKm }: Props) {
   const { register, watch, setValue } = useForm({ defaultValues: { note: '', promoCode: '' } });
   const promoValue = watch('promoCode');
 
@@ -48,6 +53,29 @@ export function CheckoutSummaryCard({ restaurantName, displayItems, currency, on
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-6 space-y-2 border-t border-slate-100 pt-5">
+        <div className="flex items-center justify-between text-sm font-medium text-slate-500">
+          <span>Subtotal</span>
+          <span className="font-bold text-[rgb(var(--ink))]">{formatCurrency(subtotal, currency)}</span>
+        </div>
+        {isDeliveryEnabled && (
+          <div className="flex items-center justify-between text-sm font-medium text-slate-500">
+            <span>Delivery{deliveryDistanceKm ? ` • ${deliveryDistanceKm.toFixed(1)} km` : ''}</span>
+            <span className="font-bold text-[rgb(var(--ink))]">{formatCurrency(deliveryFee, currency)}</span>
+          </div>
+        )}
+        {promoDiscount > 0 && (
+          <div className="flex items-center justify-between text-sm font-medium text-emerald-600">
+            <span>Discount</span>
+            <span className="font-bold">-{formatCurrency(promoDiscount, currency)}</span>
+          </div>
+        )}
+        <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-base font-bold text-[rgb(var(--ink))]">
+          <span>Total</span>
+          <span>{formatCurrency(total, currency)}</span>
+        </div>
       </div>
 
       <div className="mt-7 rounded-2xl border border-slate-100 bg-slate-50/30 px-4 py-4">

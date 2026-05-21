@@ -16,10 +16,11 @@ export function usePlaceOrder(
   const { user } = useRegistration();
 
   return useCallback(
-    async ({ address, note, promoCode, promoDiscount, paymentMethod, alternateNumber }: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card'; alternateNumber?: string }) => {
+    async ({ address, note, promoCode, promoDiscount, paymentMethod, alternateNumber, lat, lng, deliveryFee: dynamicFee }: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card'; alternateNumber?: string; lat?: number; lng?: number; deliveryFee?: number }) => {
       if (!user) throw new Error('Please sign in to place an order');
       if (cartCount === 0) return null;
-      const totalVal = computeTotal(subtotal, deliveryFee, 0);
+      const fee = dynamicFee ?? deliveryFee;
+      const totalVal = computeTotal(subtotal, fee, 0);
       const res = await createOrder({
         customerName: user.name,
         customerPhone: user.mobile,
@@ -31,13 +32,15 @@ export function usePlaceOrder(
           price: item.price,
         })),
         subtotal,
-        deliveryFee,
+        deliveryFee: fee,
         tax: 0,
         total: totalVal,
         deliveryAddress: address,
         notes: note,
         paymentMethod,
         alternateNumber,
+        lat,
+        lng,
       });
 
       const newOrder: StoredOrder = {
@@ -55,7 +58,7 @@ export function usePlaceOrder(
         note,
         riderName: '',
         subtotal,
-        deliveryFee,
+        deliveryFee: fee,
         total: totalVal,
         promoCode,
         promoDiscount,

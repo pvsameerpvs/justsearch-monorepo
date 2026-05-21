@@ -95,6 +95,27 @@ function parseCuisine(value: unknown): string[] {
   return [];
 }
 
+function parseDeliveryConfig(raw: unknown): Restaurant['delivery'] {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const d = raw as Record<string, unknown>;
+  const tiers = Array.isArray(d.tiers)
+    ? d.tiers.filter((t): t is { minKm: number; maxKm: number; fee: number } =>
+        typeof t === 'object' && t !== null &&
+        typeof (t as Record<string, unknown>).minKm === 'number' &&
+        typeof (t as Record<string, unknown>).maxKm === 'number' &&
+        typeof (t as Record<string, unknown>).fee === 'number'
+      )
+    : [];
+  if (!tiers.length && !d.enabled) return undefined;
+  return {
+    enabled: Boolean(d.enabled),
+    maxRadiusKm: Number(d.maxRadiusKm ?? 0),
+    restaurantLat: Number(d.restaurantLat ?? 0),
+    restaurantLng: Number(d.restaurantLng ?? 0),
+    tiers,
+  };
+}
+
 function mapApiToRestaurant(data: ApiRestaurantData): Restaurant {
   const s = (data.settings as Record<string, unknown> | null) ?? {};
 
@@ -161,6 +182,7 @@ function mapApiToRestaurant(data: ApiRestaurantData): Restaurant {
     reviews: arr(s.reviews),
     partyPackages: arr(s.partyPackages),
     isPureVeg: typeof s.isPureVeg === 'boolean' ? s.isPureVeg : false,
+    delivery: parseDeliveryConfig(s.delivery),
   };
 }
 

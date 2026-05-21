@@ -6,6 +6,8 @@ export type SocialLink = {
   handle: string;
 };
 
+import type { DeliveryConfig } from "@justsearch/types";
+
 export type AdminRestaurant = {
   id: string;
   name: string;
@@ -34,4 +36,5 @@ export type AdminRestaurant = {
   overallRating: number;
   totalReviews: number;
   isPureVeg: boolean;
+  delivery?: DeliveryConfig;
 };

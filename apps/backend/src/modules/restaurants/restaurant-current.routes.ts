@@ -36,6 +36,18 @@ const updateCurrentSchema = z.object({
   overallRating: z.number().min(0).max(5).optional(),
   totalReviews: z.number().int().nonnegative().optional(),
   isPureVeg: z.boolean().optional(),
+  delivery: z.object({
+    enabled: z.boolean(),
+    maxRadiusKm: z.number().positive().max(50),
+    restaurantLat: z.number().min(-90).max(90),
+    restaurantLng: z.number().min(-180).max(180),
+    emirates: z.array(z.enum(['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'])).max(7).optional(),
+    tiers: z.array(z.object({
+      minKm: z.number().nonnegative(),
+      maxKm: z.number().positive(),
+      fee: z.number().nonnegative(),
+    })).max(10),
+  }).optional(),
 });
 
 const router = Router();

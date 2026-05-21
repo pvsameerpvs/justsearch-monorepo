@@ -19,6 +19,8 @@ export type CreateOrderPayload = {
   notes?: string;
   paymentMethod?: 'cash' | 'card';
   alternateNumber?: string;
+  lat?: number;
+  lng?: number;
 };
 
 export type CreateOrderResponse = {
