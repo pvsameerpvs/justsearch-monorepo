@@ -12,6 +12,7 @@
     "db:generate": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push:pg",
     "db:migrate": "ts-node --transpile-only src/db/migrate.ts",
+    "db:repair": "ts-node --transpile-only src/db/repair-tenant-schemas.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {

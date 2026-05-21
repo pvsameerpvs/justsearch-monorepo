@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, AlertCircle } from "lucide-react";
+import { X, AlertCircle, AlertTriangle } from "lucide-react";
 import { CancelReasonList } from "./cancel-reason-list";
 import { CancelReasonFooter } from "./cancel-reason-footer";
 
@@ -33,6 +33,14 @@ export function CancelReasonPicker({ orderCode, onConfirm, onClose }: CancelReas
           </button>
         </div>
         <p className="mt-1 text-xs text-slate-500">Order {orderCode}</p>
+
+        <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3">
+          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-bold text-amber-800">This action cannot be undone</p>
+            <p className="text-xs text-amber-700 mt-0.5">The customer will be notified immediately. Please provide a clear reason.</p>
+          </div>
+        </div>
 
         <CancelReasonList
           selected={selected}

@@ -12,9 +12,10 @@ interface DeliveryBoyCardProps {
   onRemove: () => void;
   onEdit: () => void;
   onViewOrders: () => void;
+  canManage?: boolean;
 }
 
-export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onViewOrders }: DeliveryBoyCardProps) {
+export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onViewOrders, canManage }: DeliveryBoyCardProps) {
   const meta = STATUS_META[agent.status as keyof typeof STATUS_META] ?? STATUS_META.offline;
   const isDisabled = !agent.isActive;
 
@@ -27,13 +28,17 @@ export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onVie
           <span className={`text-[10px] font-bold uppercase tracking-wider ${meta.text}`}>{meta.label}</span>
         </div>
         <div className="flex items-center gap-1">
-          <EnableToggle isActive={agent.isActive} onToggle={onToggleActive} />
-          <button onClick={onEdit} className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
-            <Pencil className="h-3.5 w-3.5" />
-          </button>
-          <button onClick={onRemove} className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+          {canManage && (
+            <>
+              <EnableToggle isActive={agent.isActive} onToggle={onToggleActive} />
+              <button onClick={onEdit} className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+              <button onClick={onRemove} className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </>
+          )}
         </div>
       </div>
 

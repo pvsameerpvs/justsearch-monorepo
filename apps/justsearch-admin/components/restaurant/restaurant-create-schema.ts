@@ -15,10 +15,13 @@ export const restaurantSchema = z.object({
   photos: z.array(z.string()).max(4, "Maximum 4 photos"),
   cuisine: z.string().min(2, "Cuisine type is required"),
   tables: z.coerce.number().min(1).max(500),
-  dashboardUsername: z.string().min(3, "Username is required"),
-  dashboardPassword: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Confirm password is required"),
-}).refine((data) => data.dashboardPassword === data.confirmPassword, {
+  dashboardUsername: z.string().min(3, "Username is required").optional(),
+  dashboardPassword: z.string().min(6, "Password must be at least 6 characters").optional(),
+  confirmPassword: z.string().min(6, "Confirm password is required").optional(),
+}).refine((data) => {
+  if (!data.dashboardPassword) return true;
+  return data.dashboardPassword === data.confirmPassword;
+}, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
 });

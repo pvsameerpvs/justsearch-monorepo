@@ -155,6 +155,27 @@
       "when": 1780396800000,
       "tag": "0021_add_customer_id_to_ad_billing_events",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1780483200000,
+      "tag": "0022_games_id_to_varchar",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1780569600000,
+      "tag": "0023_add_cancel_reason_to_orders",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1780656000000,
+      "tag": "0024_add_alternate_number_to_orders",
+      "breakpoints": true
     }
   ]
 }

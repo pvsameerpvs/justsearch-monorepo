@@ -34,6 +34,8 @@ export const orders = pgTable('orders', {
   paymentMethod: paymentMethodEnum('payment_method'),
   etaMinutes: integer('eta_minutes'),
   tableId: uuid('table_id'),
+  cancelReason: text('cancel_reason'),
+  alternateNumber: varchar('alternate_number', { length: 20 }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

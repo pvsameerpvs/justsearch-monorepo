@@ -43,26 +43,9 @@ router.get('/', requireRole('owner', 'manager', 'cashier', 'kitchen_staff', 'dri
       }
     }
 
-    let extraMap: Record<string, { cancelReason: string | null; alternateNumber: string | null }> = {};
-    if (orderIds.length > 0) {
-      try {
-        const extraRows = await db.execute<Record<string, unknown>>(
-          sql`SELECT id, cancel_reason, alternate_number FROM ${sql.identifier(req.tenant.schemaName)}.${sql.identifier('orders')} WHERE id IN (${sql.join(orderIds.map((id) => sql`${id}`), sql`, `)})`
-        );
-        for (const row of extraRows) {
-          extraMap[String(row.id)] = {
-            cancelReason: row.cancel_reason ? String(row.cancel_reason) : null,
-            alternateNumber: row.alternate_number ? String(row.alternate_number) : null,
-          };
-        }
-      } catch { /* columns may not exist yet */ }
-    }
-
     const enriched = orderList.map((o) => ({
       ...o,
       items: itemsCountMap[o.id] || 0,
-      cancelReason: extraMap[o.id]?.cancelReason ?? null,
-      alternateNumber: extraMap[o.id]?.alternateNumber ?? null,
     }));
 
     res.json({ orders: enriched });

@@ -11,9 +11,14 @@ interface OrderDateFilterProps {
 
 const VIEWS = ["day", "month", "all"] as const;
 
+function getTodayUtc(): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+}
+
 export function OrderDateFilter({ date, view, onDateChange, onViewChange }: OrderDateFilterProps) {
   const label = view === "all" ? "All Time" : formatUtcDateLabel(date, view);
-  const today = new Date(Date.UTC(2026, 4, 13));
+  const today = getTodayUtc();
 
   const handlePrev = () => {
     onDateChange(view === "day" ? addUtcDays(date, -1) : addUtcMonths(date, -1));

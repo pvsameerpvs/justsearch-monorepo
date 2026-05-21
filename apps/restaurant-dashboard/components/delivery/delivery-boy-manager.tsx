@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useDeliveryAgentsQuery, useCreateDeliveryAgentMutation, useUpdateDeliveryAgentMutation, useDeleteDeliveryAgentMutation } from "@/lib/hooks/use-delivery-agents-query";
 import type { DeliveryAgent } from "@/lib/hooks/use-delivery-agents-query";
+import { useDashboardAuth } from "@/lib/auth-context";
+import { isRoleAtLeast } from "@/lib/utils/role-guards";
 import { DeliveryBoyStats } from "./delivery-boy-stats";
 import { DeliveryBoyHeader } from "./delivery-boy-header";
 import { DeliveryBoyList } from "./delivery-boy-list";
@@ -19,6 +21,8 @@ export function DeliveryBoyManager() {
   const createMutation = useCreateDeliveryAgentMutation();
   const updateMutation = useUpdateDeliveryAgentMutation();
   const deleteMutation = useDeleteDeliveryAgentMutation();
+  const { user } = useDashboardAuth();
+  const canManage = isRoleAtLeast(user?.role ?? "", "manager");
   const [showForm, setShowForm] = useState(false);
   const [editingAgentId, setEditingAgentId] = useState<string | null>(null);
   const [viewingAgentId, setViewingAgentId] = useState<string | null>(null);
@@ -33,23 +37,30 @@ export function DeliveryBoyManager() {
   return (
     <div className="space-y-5">
       {agents.length === 0 ? (
-        <DeliveryEmpty onAdd={() => { createMutation.reset(); setShowForm(true); }} />
+        <DeliveryEmpty onAdd={() => { createMutation.reset(); setShowForm(true); }} canManage={canManage} />
       ) : (
         <>
           <DeliveryBoyStats agents={agents} />
-          <DeliveryBoyHeader total={agents.length} onAdd={() => { createMutation.reset(); setShowForm(true); }} />
+          <DeliveryBoyHeader total={agents.length} onAdd={() => { createMutation.reset(); setShowForm(true); }} canManage={canManage} />
           <DeliveryBoyList
             agents={agents}
             onToggleActive={(id) => {
+              if (!canManage) return;
               const agent = agents.find((a) => a.id === id);
               if (agent) updateMutation.mutate({ id, data: { isActive: !agent.isActive } });
             }}
             onRemove={(id) => {
+              if (!canManage) return;
               const agent = agents.find((a) => a.id === id);
               if (agent) setDeletingAgent(agent);
             }}
-            onEdit={(id) => { updateMutation.reset(); setEditingAgentId(id); }}
+            onEdit={(id) => {
+              if (!canManage) return;
+              updateMutation.reset();
+              setEditingAgentId(id);
+            }}
             onViewOrders={setViewingAgentId}
+            canManage={canManage}
           />
         </>
       )}

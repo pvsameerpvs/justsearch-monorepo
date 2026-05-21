@@ -46,15 +46,15 @@ export function OrderDetailActions({ orderId, status, type, hasAgent, isKitchenS
       {status === "pending" && (
         <div className="grid grid-cols-2 gap-2">
           {onReject ? (
-            <button onClick={onReject} className="rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-bold text-red-600 hover:bg-red-100">
-              Reject
+            <button onClick={onReject} className="rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-bold text-red-600 hover:bg-red-100 flex items-center justify-center gap-1.5">
+              Cancel Order
             </button>
           ) : (
-            <button onClick={() => handleStatusChange("cancelled")} className="rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-bold text-red-600 hover:bg-red-100">
-              Reject
+            <button onClick={() => handleStatusChange("cancelled")} className="rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-bold text-red-600 hover:bg-red-100 flex items-center justify-center gap-1.5">
+              Cancel Order
             </button>
           )}
-          <button onClick={() => handleStatusChange("confirmed")} className="rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-white hover:bg-emerald-600">
+          <button onClick={() => handleStatusChange("confirmed")} className="rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-white hover:bg-emerald-600 flex items-center justify-center gap-1.5">
             {meta?.label ?? "Accept"}
           </button>
         </div>

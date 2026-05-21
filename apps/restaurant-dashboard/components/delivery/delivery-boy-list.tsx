@@ -7,9 +7,10 @@ interface DeliveryBoyListProps {
   onRemove: (id: string) => void;
   onEdit: (id: string) => void;
   onViewOrders: (id: string) => void;
+  canManage?: boolean;
 }
 
-export function DeliveryBoyList({ agents, onToggleActive, onRemove, onEdit, onViewOrders }: DeliveryBoyListProps) {
+export function DeliveryBoyList({ agents, onToggleActive, onRemove, onEdit, onViewOrders, canManage }: DeliveryBoyListProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {agents.map((agent) => (
@@ -20,6 +21,7 @@ export function DeliveryBoyList({ agents, onToggleActive, onRemove, onEdit, onVi
           onRemove={() => onRemove(agent.id)}
           onEdit={() => onEdit(agent.id)}
           onViewOrders={() => onViewOrders(agent.id)}
+          canManage={canManage}
         />
       ))}
     </div>

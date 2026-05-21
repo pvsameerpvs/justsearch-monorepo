@@ -21,6 +21,7 @@ export function canAccessRoute(role: StaffRole | string | undefined, route: stri
     "/menu": ["owner", "manager"],
     "/orders": ["owner", "manager", "cashier", "kitchen_staff"],
     "/delivery": ["owner", "manager"],
+    "/staff": ["owner", "manager"],
     "/vouchers": ["owner", "manager"],
     "/customers": ["owner", "manager"],
     "/analytics": ["owner", "manager"],

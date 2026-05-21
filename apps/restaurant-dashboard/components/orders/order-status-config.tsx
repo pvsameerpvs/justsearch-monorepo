@@ -1,4 +1,4 @@
-import { Clock, Check, ChefHat, Package, Truck, CheckCircle, AlertCircle } from 'lucide-react';
+import { Clock, Check, ChefHat, Package, Truck, CheckCircle, AlertCircle, Ban } from 'lucide-react';
 
 export const ORDER_FLOW = [
   { value: "pending", label: "Pending", icon: AlertCircle, class: "bg-orange-50 text-orange-700 border-orange-200" },
@@ -7,6 +7,7 @@ export const ORDER_FLOW = [
   { value: "ready", label: "Ready", icon: Package, class: "bg-violet-50 text-violet-700 border-violet-200" },
   { value: "out_for_delivery", label: "Out for Delivery", icon: Truck, class: "bg-indigo-50 text-indigo-700 border-indigo-200" },
   { value: "completed", label: "Completed", icon: CheckCircle, class: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { value: "cancelled", label: "Cancelled", icon: Ban, class: "bg-red-50 text-red-700 border-red-200" },
 ] as const;
 
 export type OrderStatusValue = (typeof ORDER_FLOW)[number]["value"];

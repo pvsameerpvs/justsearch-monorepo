@@ -20,6 +20,8 @@ export const client = postgres(connectionString, {
   // Force IPv4 to avoid Supabase IPv6 connection issues
   // @ts-expect-error — postgres-js accepts this but types don't declare it
   family: 4,
+  // Supabase Pooler doesn't support prepared statements well
+  prepare: false,
 });
 
 export const db = drizzle(client, { schema });

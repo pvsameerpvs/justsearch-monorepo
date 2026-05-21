@@ -1,4 +1,4 @@
-import { findSuperAdmin, findPublicUser, findDeliveryAgent, findStaffMember } from './auth-login.services';
+import { findSuperAdmin, findDeliveryAgent, findStaffMember } from './auth-login.services';
 import type { TenantContext } from '../../middleware/tenant.middleware';
 
 interface ResolvedUser {
@@ -27,17 +27,11 @@ export async function resolveUser(
     userType = 'super_admin';
   } else if (type === 'delivery') {
     if (!tenant) throw new Error('Tenant context required');
-    user = await findPublicUser(username, password, tenant.id);
-    if (!user) {
-      user = await findDeliveryAgent(tenant.schemaName, tenant.id, username, password);
-    }
+    user = await findDeliveryAgent(tenant.schemaName, tenant.id, username, password);
     userType = 'delivery';
   } else {
     if (!tenant) throw new Error('Tenant context required');
-    user = await findPublicUser(username, password, tenant.id);
-    if (!user) {
-      user = await findStaffMember(tenant.schemaName, tenant.id, username, password);
-    }
+    user = await findStaffMember(tenant.schemaName, tenant.id, username, password);
     userType = 'staff';
   }
 

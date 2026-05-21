@@ -1,4 +1,4 @@
-import { Package, ChefHat, CheckCircle, Truck } from "lucide-react";
+import { Package, ChefHat, CheckCircle, Truck, Ban, Check } from "lucide-react";
 
 interface OrderCardFooterProps {
   status: string;
@@ -14,10 +14,12 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
   if (status === "pending") {
     return (
       <div className="flex border-t border-slate-100">
-        <button onClick={(e) => { e.stopPropagation(); onReject(); }} className="flex-1 py-3 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors border-r border-slate-100">
-          Reject
+        <button onClick={(e) => { e.stopPropagation(); onReject(); }} className="flex-1 py-3 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors border-r border-slate-100 flex items-center justify-center gap-1.5">
+          <Ban className="h-3.5 w-3.5" />
+          Cancel Order
         </button>
-        <button onClick={(e) => { e.stopPropagation(); onAccept(); }} className="flex-1 py-3 text-sm font-semibold text-emerald-600 hover:bg-emerald-50 transition-colors">
+        <button onClick={(e) => { e.stopPropagation(); onAccept(); }} className="flex-1 py-3 text-sm font-semibold text-emerald-600 hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5">
+          <Check className="h-3.5 w-3.5" />
           Accept Order
         </button>
       </div>

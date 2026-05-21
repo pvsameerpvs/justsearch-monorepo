@@ -7,7 +7,10 @@ export type DriverDateFilter = "today" | "yesterday" | "week" | "month" | "all";
 export function useDriverOrderFilter(orders: DashboardOrder[]) {
   const [filter, setFilter] = useState<DriverDateFilter>("all");
 
-  const today = new Date(Date.UTC(2026, 4, 13));
+  const today = (() => {
+    const now = new Date();
+    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  })();
   const yesterday = new Date(today);
   yesterday.setUTCDate(yesterday.getUTCDate() - 1);
 

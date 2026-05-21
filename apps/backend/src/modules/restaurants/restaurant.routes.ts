@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { db } from '../../db';
 import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
@@ -27,12 +27,26 @@ router.post('/', authMiddleware, requireRole('super_admin'), async (req, res, ne
       .returning();
 
     await createTenantSchema(schemaName);
-    await setupTenantDefaults(schemaName, restaurant.id, {
+    const { username, password } = await setupTenantDefaults(schemaName, restaurant.id, {
       username: body.dashboardUsername,
       password: body.dashboardPassword,
     });
 
-    res.status(201).json({ restaurant });
+    // If credentials were auto-generated, persist them in settings so the super admin can retrieve them
+    if (!body.dashboardUsername || !body.dashboardPassword) {
+      const currentSettings = typeof restaurant.settings === 'object' && restaurant.settings !== null
+        ? (restaurant.settings as Record<string, unknown>)
+        : {};
+
+      await db
+        .update(restaurants)
+        .set({
+          settings: { ...currentSettings, dashboardUsername: username, dashboardPassword: password },
+        })
+        .where(eq(restaurants.id, restaurant.id));
+    }
+
+    res.status(201).json({ restaurant, credentials: { username, password } });
   } catch (error) {
     next(error);
   }

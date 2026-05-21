@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useOrderStore, type DashboardOrder, type OrderStatus } from "@/lib/stores/order-store";
 import { useOrdersQuery, useUpdateOrderStatusMutation } from "@/lib/hooks/use-orders-query";
 import { useDashboardAuth } from "@/lib/auth-context";
@@ -14,7 +14,10 @@ const ACTIVE_FILTERS = ["all", "pending", "confirmed", "preparing", "ready", "ou
 const HISTORY_FILTERS = ["all", "completed", "cancelled"] as const;
 const KITCHEN_FILTERS = ["all", "confirmed", "preparing", "ready"] as const;
 
-const DEFAULT_HISTORY_DATE = new Date(Date.UTC(2026, 4, 13));
+function getTodayUtc(): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+}
 
 export function useOrderManager() {
   const { user } = useDashboardAuth();
@@ -27,11 +30,11 @@ export function useOrderManager() {
   const [tab, setTab] = useState<Tab>("active");
   const [filter, setFilter] = useState("all");
   const [historyView, setHistoryView] = useState<"day" | "month" | "all">("day");
-  const [historyDate, setHistoryDate] = useState<Date>(DEFAULT_HISTORY_DATE);
+  const [historyDate, setHistoryDate] = useState<Date>(getTodayUtc);
   const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
   const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
 
-  const orders = apiOrders.map(mapApiOrderToDashboard);
+  const orders = useMemo(() => apiOrders.map(mapApiOrderToDashboard), [apiOrders]);
 
   useOrderSound(orders);
 
@@ -41,7 +44,7 @@ export function useOrderManager() {
   const activeOrders = orders.filter((o) => !["completed", "cancelled"].includes(o.status));
   const filteredActive = activeOrders.filter((o) => (filter === "all" ? true : o.status === filter));
 
-  const historyOrders = useOrderHistory(historyView, historyDate);
+  const historyOrders = useOrderHistory(orders, historyView, historyDate);
   const filteredHistory = historyOrders.filter((o) => (filter === "all" ? true : o.status === filter));
 
   const kitchenOrders = activeOrders.filter((o) => ["confirmed", "preparing", "ready"].includes(o.status));

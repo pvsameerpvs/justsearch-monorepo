@@ -10,6 +10,7 @@ import menuItemRoutes from '../modules/menu/menu-item.routes';
 import menuCategoryRoutes from '../modules/menu/menu-category.routes';
 import deliveryAgentRoutes from '../modules/delivery/delivery.routes';
 import deliveryMeRoutes from '../modules/delivery/delivery-me.routes';
+import staffRoutes from '../modules/staff/staff.routes';
 import deliveryAssignmentRoutes from '../modules/delivery/delivery-assignment.routes';
 import voucherRoutes from '../modules/vouchers/voucher.routes';
 import userRoutes from '../modules/users/user.routes';
@@ -32,6 +33,9 @@ router.get('/', (_req, res) => {
 
 // Auth routes (tenant-scoped)
 router.use('/auth', authRoutes);
+
+// Staff management (authenticated)
+router.use('/staff', staffRoutes);
 
 // Restaurant routes — ORDER MATTERS: specific routes (/current) must come BEFORE parameterized routes (/:id)
 router.use('/restaurants', restaurantCurrentRoutes);

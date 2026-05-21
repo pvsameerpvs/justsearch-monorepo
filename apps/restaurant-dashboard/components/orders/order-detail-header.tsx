@@ -13,7 +13,7 @@ export function OrderDetailHeader({ code, status, createdAt, onClose }: OrderDet
   return (
     <div className="flex items-center justify-between p-5 border-b border-slate-100">
       <div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-lg font-bold text-slate-900">{code}</span>
           <OrderStatusBadge status={status} />
         </div>

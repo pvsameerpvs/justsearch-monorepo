@@ -35,7 +35,7 @@ export function OrderManager() {
 
   return (
     <div className="space-y-5">
-      <OrdersStats orders={statsOrders} />
+      <OrdersStats orders={statsOrders} activeFilter={filter} onFilterClick={setFilter} />
 
       {setTab !== (() => {}) && (
         <OrderManagerTabs tab={tab} onTabChange={(t) => { setTab(t); setFilter("all"); }} />

@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import bcrypt from 'bcrypt';
 import { client } from './index';
 
@@ -20,7 +21,15 @@ export const TENANT_TABLES = [
   'daily_closeouts',
 ];
 
-const DEFAULT_RIDER_PASSWORD = process.env.SEED_RIDER_PASSWORD || 'rider123';
+export function generateSecurePassword(length = 12): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  const bytes = randomBytes(length);
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += chars[bytes[i] % chars.length];
+  }
+  return password;
+}
 
 export async function createTenantSchema(schemaName: string): Promise<void> {
   await client.unsafe(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
@@ -39,26 +48,31 @@ export async function createTenantSchema(schemaName: string): Promise<void> {
       `CREATE TABLE IF NOT EXISTS "${schemaName}"."${table}" (LIKE "${sourceSchema}"."${table}" INCLUDING ALL)`
     );
   }
+
+  // Ensure orders table has all columns defined in Drizzle schema,
+  // regardless of whether the source schema was created before migrations
+  await client.unsafe(
+    `ALTER TABLE "${schemaName}"."orders" ` +
+    `ADD COLUMN IF NOT EXISTS payment_method "payment_method", ` +
+    `ADD COLUMN IF NOT EXISTS cancel_reason text, ` +
+    `ADD COLUMN IF NOT EXISTS alternate_number varchar(20), ` +
+    `ADD COLUMN IF NOT EXISTS eta_minutes integer, ` +
+    `ADD COLUMN IF NOT EXISTS table_id uuid`
+  );
 }
 
 export async function setupTenantDefaults(
   schemaName: string,
   restaurantId: string,
   ownerCredentials?: { username?: string; password?: string }
-): Promise<void> {
+): Promise<{ username: string; password: string }> {
   const ownerUsername = ownerCredentials?.username || 'owner';
-  const ownerPassword = ownerCredentials?.password || (process.env.SEED_STAFF_PASSWORD || 'owner123');
+  const ownerPassword = ownerCredentials?.password || generateSecurePassword();
   const ownerHash = await bcrypt.hash(ownerPassword, 12);
-  const riderHash = await bcrypt.hash(DEFAULT_RIDER_PASSWORD, 12);
 
   await client.unsafe(
     `INSERT INTO "${schemaName}"."staff" (restaurant_id, name, username, password_hash, role, permissions, is_active) VALUES ($1, $2, $3, $4, $5, $6, true)`,
     [restaurantId, 'Restaurant Owner', ownerUsername, ownerHash, 'owner', JSON.stringify({ all: true })]
-  );
-
-  await client.unsafe(
-    `INSERT INTO "${schemaName}"."delivery_agents" (restaurant_id, name, phone, username, password_hash, vehicle_type, status, rating, completed_today, shift_label, is_active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true)`,
-    [restaurantId, 'Delivery Rider', '', 'rider', riderHash, 'scooter', 'offline', '5.0', 0, 'Flexible']
   );
 
   await client.unsafe(
@@ -74,6 +88,8 @@ export async function setupTenantDefaults(
     `INSERT INTO "${schemaName}"."menus" (restaurant_id, name, description, status, sort_order) VALUES ($1, $2, $3, $4, $5)`,
     [restaurantId, 'Main Menu', 'Our complete menu', 'active', 1]
   );
+
+  return { username: ownerUsername, password: ownerPassword };
 }
 
 export async function backupTenantSchema(

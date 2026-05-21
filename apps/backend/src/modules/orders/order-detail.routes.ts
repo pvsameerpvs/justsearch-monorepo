@@ -8,12 +8,6 @@ import { normalizeRawOrder, normalizeRawItem } from './order-normalizer';
 const router = Router();
 router.use(authMiddleware);
 
-function toStr(value: unknown): string | null {
-  if (typeof value === 'string') return value || null;
-  if (value == null) return null;
-  return String(value);
-}
-
 // GET /api/v1/orders/:id — get order details (cross-schema for customers)
 router.get('/:id', async (req, res, next) => {
   try {
@@ -57,17 +51,7 @@ router.get('/:id', async (req, res, next) => {
       and(eq(orderItems.orderId, orderId), eq(orderItems.restaurantId, req.tenant.id))
     );
 
-    let cancelReason: string | null = null;
-    let alternateNumber: string | null = null;
-    try {
-      const extraRows = await db.execute<Record<string, unknown>>(
-        sql`SELECT cancel_reason, alternate_number FROM ${sql.identifier(req.tenant.schemaName)}.${sql.identifier('orders')} WHERE id = ${orderId} LIMIT 1`
-      );
-      cancelReason = toStr(extraRows[0]?.cancel_reason) ?? null;
-      alternateNumber = toStr(extraRows[0]?.alternate_number) ?? null;
-    } catch { /* Columns may not exist yet */ }
-
-    return res.json({ order: { ...order, cancelReason, alternateNumber }, items });
+    return res.json({ order, items });
   } catch (error) {
     next(error);
   }
