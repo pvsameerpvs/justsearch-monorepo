@@ -1,7 +1,7 @@
 "use client";
 
 import { MapPin, AlertCircle } from 'lucide-react';
-import { formatCurrency } from '@/lib/format';
+import { formatDeliveryFeeBadge } from '@/lib/delivery-fee-format';
 
 interface CheckoutDeliveryFeeStatusProps {
   address: string;
@@ -46,7 +46,7 @@ export function CheckoutDeliveryFeeStatus({
   if (deliveryAvailable != null) {
     const parts: string[] = [];
     if (deliveryAvailable) {
-      parts.push(`Delivery ${formatCurrency(deliveryFee ?? 0, currency)}`);
+      parts.push(formatDeliveryFeeBadge(deliveryFee ?? 0, currency ?? 'AED'));
       if (deliveryDistanceKm) parts.push(`${deliveryDistanceKm.toFixed(1)} km`);
       if (deliveryEmirate) parts.push(deliveryEmirate);
     }

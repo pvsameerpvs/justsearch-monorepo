@@ -9,6 +9,7 @@ type RestaurantDeliveryCartBarProps = {
   cartCount: number;
   total: number;
   savings: number;
+  estimatedDeliveryFee?: number;
   onOpenCart: () => void;
 };
 
@@ -17,13 +18,19 @@ export function RestaurantDeliveryCartBar({
   cartCount,
   total,
   savings,
+  estimatedDeliveryFee,
   onOpenCart,
 }: RestaurantDeliveryCartBarProps) {
   const { handleCheckout } = useCheckoutGate();
+  const hasEstimatedFee = estimatedDeliveryFee != null && estimatedDeliveryFee > 0;
   return (
     <div className="fixed inset-x-0 z-[9998] px-3 sm:px-6" style={{ bottom: 'calc(var(--restaurant-mobile-nav-height,0px) + 12px)' }}>
       <div className="mx-auto w-full max-w-3xl">
-        {savings > 0 ? (
+        {hasEstimatedFee ? (
+          <div className="mx-auto w-fit rounded-t-2xl border border-b-0 border-[rgba(245,158,11,0.22)] bg-[rgba(254,249,195,0.96)] px-6 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-[rgb(120,53,15)] shadow-[0_-8px_20px_rgba(245,158,11,0.06)]">
+            Delivery from {formatCurrency(estimatedDeliveryFee, currency)}
+          </div>
+        ) : savings > 0 ? (
           <div className="mx-auto w-fit rounded-t-2xl border border-b-0 border-[rgba(245,158,11,0.22)] bg-[rgba(254,249,195,0.96)] px-6 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-[rgb(120,53,15)] shadow-[0_-8px_20px_rgba(245,158,11,0.06)]">
             {formatCurrency(savings, currency)} saved | Free delivery applied
           </div>
@@ -53,7 +60,7 @@ export function RestaurantDeliveryCartBar({
                 {formatCurrency(total, currency)}
               </p>
               <p className="truncate text-sm text-[rgb(var(--muted))]">
-                Tap to review cart items
+                {hasEstimatedFee ? `Delivery from ${formatCurrency(estimatedDeliveryFee, currency)}` : 'Tap to review cart items'}
               </p>
             </div>
           </div>

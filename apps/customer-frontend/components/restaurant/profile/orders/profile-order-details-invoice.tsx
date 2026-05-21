@@ -1,6 +1,7 @@
 import { Receipt } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
 import { formatCurrency } from '@/lib/format';
+import { formatDeliveryFeeLabel } from '@/lib/delivery-fee-format';
 import type { DeliveryOrder } from '../../use-restaurant-fulfillment';
 
 type Props = {
@@ -42,7 +43,7 @@ export function ProfileOrderDetailsInvoice({ order, currency }: Props) {
 
       <div className="mt-4 rounded-[18px] bg-[rgb(var(--card-surface-muted)/0.72)] p-3">
         <div className="flex items-center justify-between text-sm text-[rgb(var(--muted))]"><span>Subtotal</span><span>{formatCurrency(order.subtotal, currency)}</span></div>
-        <div className="mt-2 flex items-center justify-between text-sm text-[rgb(var(--muted))]"><span>Delivery fee</span><span>{formatCurrency(order.deliveryFee, currency)}</span></div>
+        <div className="mt-2 flex items-center justify-between text-sm text-[rgb(var(--muted))]"><span>Delivery fee</span><span className={order.deliveryFee <= 0 ? 'font-semibold text-emerald-600' : ''}>{formatDeliveryFeeLabel(order.deliveryFee, currency)}</span></div>
         {order.deliverySavings ? (
           <div className="mt-2 flex items-center justify-between text-sm text-[rgb(var(--brand))]"><span>Delivery savings</span><span>-{formatCurrency(order.deliverySavings, currency)}</span></div>
         ) : null}

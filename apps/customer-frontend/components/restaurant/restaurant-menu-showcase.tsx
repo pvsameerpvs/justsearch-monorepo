@@ -54,6 +54,7 @@ export function RestaurantMenuShowcase({ restaurant }: RestaurantMenuShowcasePro
           savings={state.deliverySavings}
           onUpdateQuantity={state.updateQuantity}
           onClear={state.clearCart}
+          deliveryConfig={restaurant.delivery}
         />
       )}
     </>

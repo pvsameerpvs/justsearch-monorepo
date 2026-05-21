@@ -1,3 +1,5 @@
+import { formatDeliveryFeeLabel } from '@/lib/delivery-fee-format';
+
 interface CheckoutOrderBreakdownCardProps {
   subtotal: number;
   deliveryFee: number;
@@ -24,8 +26,8 @@ export function CheckoutOrderBreakdownCard({
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-[rgb(var(--muted))]">Delivery fee</span>
-          <span className="font-medium text-[rgb(var(--ink))]">
-            {currency} {deliveryFee}
+          <span className={`font-medium ${deliveryFee <= 0 ? 'text-emerald-600' : 'text-[rgb(var(--ink))]'}`}>
+            {deliveryFee <= 0 ? formatDeliveryFeeLabel(deliveryFee, currency) : `${currency} ${deliveryFee}`}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm">

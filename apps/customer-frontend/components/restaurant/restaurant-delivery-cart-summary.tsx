@@ -3,15 +3,19 @@ import { formatCurrency } from '@/lib/format';
 type Props = {
   total: number;
   currency: string;
+  estimatedDeliveryFee?: number;
   onCheckout: () => void;
 };
 
-export function RestaurantDeliveryCartSummary({ total, currency, onCheckout }: Props) {
+export function RestaurantDeliveryCartSummary({ total, currency, estimatedDeliveryFee, onCheckout }: Props) {
+  const hasFee = estimatedDeliveryFee != null && estimatedDeliveryFee > 0;
   return (
     <div className="flex items-center justify-between gap-3 border-t border-[rgb(var(--border)/0.7)] px-5 py-4">
       <div className="min-w-0">
         <p className="text-2xl font-bold tracking-tight text-[rgb(var(--ink))]">{formatCurrency(total, currency)}</p>
-        <p className="text-sm text-[rgb(var(--muted))]">Free delivery</p>
+        <p className="text-sm text-[rgb(var(--muted))]">
+          {hasFee ? `Delivery from ${formatCurrency(estimatedDeliveryFee, currency)}` : 'Free delivery'}
+        </p>
       </div>
       <button
         type="button"

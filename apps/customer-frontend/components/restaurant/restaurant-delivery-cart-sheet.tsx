@@ -10,13 +10,16 @@ import { RestaurantDeliveryCartEmpty } from './restaurant-delivery-cart-empty';
 type RestaurantDeliveryCartSheetProps = {
   open: boolean; currency: string; cart: CartItem[]; total: number; savings: number;
   onClose: () => void; onClear: () => void; onUpdateQuantity: (itemId: string, quantity: number) => void;
+  estimatedDeliveryFee?: number;
 };
 
 export function RestaurantDeliveryCartSheet({
-  open, currency, cart, total, savings, onClose, onClear, onUpdateQuantity,
+  open, currency, cart, total, savings, estimatedDeliveryFee, onClose, onClear, onUpdateQuantity,
 }: RestaurantDeliveryCartSheetProps) {
   const { handleCheckout } = useCheckoutGate();
   if (!open) return null;
+
+  const hasEstimatedFee = estimatedDeliveryFee != null && estimatedDeliveryFee > 0;
 
   return (
     <div className="fixed inset-0 z-[10001] bg-black/40 backdrop-blur-[2px]">
@@ -25,7 +28,9 @@ export function RestaurantDeliveryCartSheet({
         <div className="overflow-hidden rounded-[28px] border border-[rgb(var(--border)/0.9)] bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]">
           <div className="flex justify-center pt-4">
             <div className="w-fit rounded-full border border-[rgba(245,158,11,0.2)] bg-[rgba(254,249,195,0.95)] px-5 py-1.5 text-center text-[10px] font-bold uppercase tracking-wider text-[rgb(120,53,15)]">
-              {formatCurrency(savings, currency)} saved | Free delivery applied
+              {hasEstimatedFee
+                ? `Delivery from ${formatCurrency(estimatedDeliveryFee, currency)}`
+                : `${formatCurrency(savings, currency)} saved | Free delivery applied`}
             </div>
           </div>
           <div className="flex items-center justify-between px-5 py-4">
@@ -45,7 +50,7 @@ export function RestaurantDeliveryCartSheet({
                   <RestaurantDeliveryCartItem key={item.itemId} item={item} onUpdateQuantity={onUpdateQuantity} />
                 ))}
               </div>
-              <RestaurantDeliveryCartSummary total={total} currency={currency} onCheckout={handleCheckout} />
+              <RestaurantDeliveryCartSummary total={total} currency={currency} estimatedDeliveryFee={estimatedDeliveryFee} onCheckout={handleCheckout} />
             </>
           )}
         </div>

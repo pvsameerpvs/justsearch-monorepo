@@ -25,7 +25,8 @@ export function SettingsDeliveryForm({ config, onChange }: Props) {
   const addTier = () => {
     const last = config.tiers[config.tiers.length - 1];
     const min = last ? last.maxKm : 0;
-    set('tiers', [...config.tiers, { minKm: min, maxKm: min + 1, fee: 0 }]);
+    const fee = last ? last.fee : 5;
+    set('tiers', [...config.tiers, { minKm: min, maxKm: min + 1, fee }]);
   };
 
   const removeTier = (index: number) => {

@@ -39,8 +39,8 @@ export function computeSubtotal(lines: { lineTotal: number }[]) {
   return lines.reduce((total, item) => total + item.lineTotal, 0);
 }
 
-export function computeDeliveryFee(cartCount: number) {
-  return cartCount > 0 ? DELIVERY_BASE_FEE : 0;
+export function computeDeliveryFee(_cartCount: number) {
+  return 0;
 }
 
 export function computeTotal(subtotal: number, fee: number, discount: number) {

@@ -2,6 +2,7 @@
 import { useForm } from 'react-hook-form';
 import { ButtonLink } from '@/components/shared/button-link';
 import { formatCurrency } from '@/lib/format';
+import { formatDeliveryFeeLabel } from '@/lib/delivery-fee-format';
 import { CheckoutPromoInput } from './checkout-promo-input';
 
 type SummaryItem = { itemId: string; quantity: number; name: string; price: number; currency: string; lineTotal: number; };
@@ -63,7 +64,7 @@ export function CheckoutSummaryCard({ restaurantName, displayItems, currency, on
         {isDeliveryEnabled && (
           <div className="flex items-center justify-between text-sm font-medium text-slate-500">
             <span>Delivery{deliveryDistanceKm ? ` • ${deliveryDistanceKm.toFixed(1)} km` : ''}</span>
-            <span className="font-bold text-[rgb(var(--ink))]">{formatCurrency(deliveryFee, currency)}</span>
+            <span className={`font-bold ${deliveryFee <= 0 ? 'text-emerald-600' : 'text-[rgb(var(--ink))]'}`}>{formatDeliveryFeeLabel(deliveryFee, currency)}</span>
           </div>
         )}
         {promoDiscount > 0 && (
