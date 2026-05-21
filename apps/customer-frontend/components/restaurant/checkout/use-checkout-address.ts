@@ -6,7 +6,7 @@ import { type SavedAddress, useAddressBook } from '../use-address-book';
 export type LocationSource = 'saved' | 'gps' | 'pinned' | 'none';
 
 export function useCheckoutAddress() {
-  const { addresses, addAddress, hydrated: addressesHydrated, isSaving } = useAddressBook();
+  const { addresses, addAddress, editAddress, hydrated: addressesHydrated, isSaving } = useAddressBook();
 
   const [addressTitle, setAddressTitle] = useState('Home');
   const [address, setAddress] = useState('');
@@ -63,6 +63,7 @@ export function useCheckoutAddress() {
     setIsAddressBookOpen,
     addresses,
     addAddress,
+    editAddress,
     locationSource,
     applySavedAddress,
     applyCurrentLocationAddress,

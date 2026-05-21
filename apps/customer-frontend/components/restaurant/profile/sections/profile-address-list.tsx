@@ -7,7 +7,7 @@ import { ProfileAddressCard } from './profile-address-card';
 import { ProfileAddAddressForm } from './profile-add-address-form';
 
 export function ProfileAddressList() {
-  const { addresses, addAddress, removeAddress, hydrated } = useAddressBook();
+  const { addresses, addAddress, editAddress, removeAddress, hydrated, isEditing, isRemoving } = useAddressBook();
   const [isAdding, setIsAdding] = useState(false);
 
   if (!hydrated) return null;
@@ -25,6 +25,9 @@ export function ProfileAddressList() {
             key={addr.id} 
             address={addr} 
             onRemove={removeAddress} 
+            onEdit={editAddress}
+            isEditing={isEditing}
+            isRemoving={isRemoving}
           />
         ))}
 

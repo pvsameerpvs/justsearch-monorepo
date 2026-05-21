@@ -12,14 +12,15 @@ interface CheckoutAddressSelectorSheetProps {
   onClose: () => void;
   onSelectAddress: (address: SavedAddress) => void;
   onAddAddress: (address: Omit<SavedAddress, 'id'>) => Promise<void>;
+  onEditAddress: (id: string, address: Omit<SavedAddress, 'id'>) => Promise<void>;
   onUseCurrentLocation: (address: string) => void;
   onUsePinnedLocation?: (address: string, lat: number, lng: number) => void;
 }
 
 export function CheckoutAddressSelectorSheet({
-  open, addresses, selectedAddressId, onClose, onSelectAddress, onAddAddress, onUseCurrentLocation, onUsePinnedLocation,
+  open, addresses, selectedAddressId, onClose, onSelectAddress, onAddAddress, onEditAddress, onUseCurrentLocation, onUsePinnedLocation,
 }: CheckoutAddressSelectorSheetProps) {
-  const { mode, mapSelection, setMapSelection, currentLocationAddress, currentLocationCoords, isLocating, handleUseCurrentLocation, handleOpenMapChooser, handleSaveAddress, handlePrimaryMapAction, handlePinnedLocationChange, goToAdd, cancelAdd } = useAddressSelector(open, addresses, selectedAddressId, onClose, onSelectAddress, onAddAddress, onUseCurrentLocation);
+  const { mode, mapSelection, setMapSelection, currentLocationAddress, currentLocationCoords, isLocating, editingAddress, handleUseCurrentLocation, handleOpenMapChooser, handleSaveAddress, handleEditSave, handlePrimaryMapAction, handlePinnedLocationChange, goToAdd, goToEdit, cancelAdd } = useAddressSelector(open, addresses, selectedAddressId, onClose, onSelectAddress, onAddAddress, onEditAddress);
   if (!open) return null;
 
   return (
@@ -33,7 +34,9 @@ export function CheckoutAddressSelectorSheet({
               mode={mode} addresses={addresses} selectedAddressId={selectedAddressId}
               mapSelection={mapSelection} currentLocationAddress={currentLocationAddress}
               currentLocationCoords={currentLocationCoords} isLocating={isLocating}
+              editingAddress={editingAddress}
               onSelectAddress={onSelectAddress} onClose={onClose} onSaveAddress={handleSaveAddress}
+              onEditSave={handleEditSave}
               onCancelAdd={cancelAdd} onSetMapSelection={setMapSelection}
               onUsePinnedForOrder={() => {
                 if (onUsePinnedLocation && currentLocationAddress && currentLocationCoords) {
@@ -45,7 +48,7 @@ export function CheckoutAddressSelectorSheet({
               }}
               onPinnedLocationChange={handlePinnedLocationChange} onPrimaryMapAction={handlePrimaryMapAction}
               onUseCurrentLocation={handleUseCurrentLocation} onOpenMapChooser={handleOpenMapChooser}
-              onAddAddress={goToAdd}
+              onAddAddress={goToAdd} onEditAddress={goToEdit}
             />
           </div>
         </div>

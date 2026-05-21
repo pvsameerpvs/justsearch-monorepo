@@ -32,6 +32,14 @@ export async function createAddress(payload: CreateAddressPayload): Promise<Addr
   return data.address;
 }
 
+export async function updateAddress(id: string, payload: CreateAddressPayload): Promise<Address> {
+  const data = await apiClient<{ address: Address }>(`/addresses/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+  return data.address;
+}
+
 export async function deleteAddress(id: string): Promise<void> {
   await apiClient<void>(`/addresses/${id}`, { method: 'DELETE' });
 }
