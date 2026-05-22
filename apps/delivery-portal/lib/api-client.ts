@@ -135,8 +135,9 @@ export async function apiClient<T>(
       return apiClient<T>(path, options);
     }
     if (refreshResult.reason === 'unauthorized') {
+      const hadToken = Boolean(token);
       clearTokens();
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && hadToken) {
         window.dispatchEvent(new CustomEvent('auth:session-invalidated'));
       }
       throw new ApiError('Session expired. Please log in again.', 401);
