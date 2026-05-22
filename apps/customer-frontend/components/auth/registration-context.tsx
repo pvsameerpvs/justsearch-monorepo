@@ -9,7 +9,15 @@ import {
   type ReactNode,
 } from 'react';
 import type { RegisteredUser } from './registered-user';
-import { readStoredUser, writeStoredUser, saveFreshRegistration, syncTokenCookie } from './registration-storage';
+import {
+  readStoredUser,
+  writeStoredUser,
+  writeStoredAuth,
+  saveFreshRegistration,
+  syncTokenCookie,
+  isSessionInvalidated,
+  clearSessionInvalidated,
+} from './registration-storage';
 
 type RegistrationContextValue = {
   user: RegisteredUser | null;
@@ -18,7 +26,7 @@ type RegistrationContextValue = {
   isModalOpen: boolean;
   openModal: () => void;
   closeModal: () => void;
-  setUser: (nextUser: RegisteredUser) => void;
+  setUser: (nextUser: RegisteredUser, accessToken?: string, refreshToken?: string) => void;
   clearUser: () => void;
 };
 
@@ -30,6 +38,7 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
 
   // Hydrate from localStorage on mount and sync cookie
   useEffect(() => {
+    if (isSessionInvalidated()) return; // don't restore dead session
     const stored = readStoredUser();
     if (stored) {
       setUserState(stored);
@@ -49,11 +58,20 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-  // AGGRESSIVE SAFEGUARD: Re-read storage on window focus.
-  // Some mobile browsers silently clear localStorage when backgrounding.
-  // This ensures auth is restored the moment the user returns to the tab.
+  // Listen for global 401 / session-invalidated event
+  useEffect(() => {
+    const onInvalidated = () => {
+      setUserState(null);
+      setIsModalOpen(true);
+    };
+    window.addEventListener('auth:session-invalidated', onInvalidated);
+    return () => window.removeEventListener('auth:session-invalidated', onInvalidated);
+  }, []);
+
+  // Re-read storage on window focus — but skip if session was invalidated
   useEffect(() => {
     const onFocus = () => {
+      if (isSessionInvalidated()) return;
       const stored = readStoredUser();
       if (stored) {
         setUserState((prev) => prev ?? stored);
@@ -66,15 +84,14 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('focus', onFocus);
   }, []);
 
-  // AGGRESSIVE SAFEGUARD: Poll storage every 5s to detect silent clears.
-  // If storage still has user but React state lost it, restore immediately.
+  // Poll storage every 5s — but skip if session was invalidated
   useEffect(() => {
     const interval = setInterval(() => {
+      if (isSessionInvalidated()) return;
       const stored = readStoredUser();
       if (stored) {
         setUserState((prev) => {
           if (prev) return prev;
-          // State was silently lost — restore from storage
           if (!document.cookie.includes('token=')) {
             syncTokenCookie(stored.token);
           }
@@ -85,10 +102,15 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, []);
 
-  const setUser = useCallback((nextUser: RegisteredUser) => {
+  const setUser = useCallback((nextUser: RegisteredUser, accessToken?: string, refreshToken?: string) => {
     setUserState(nextUser);
-    writeStoredUser(nextUser);
+    if (accessToken && refreshToken) {
+      writeStoredAuth(nextUser, accessToken, refreshToken);
+    } else {
+      writeStoredUser(nextUser);
+    }
     saveFreshRegistration(nextUser);
+    clearSessionInvalidated();
   }, []);
 
   const clearUser = useCallback(() => {

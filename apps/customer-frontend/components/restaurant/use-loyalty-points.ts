@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { apiClient } from '@/lib/api/client';
+import { apiClient, ApiError } from '@/lib/api/client';
 import {
   readStoredPoints,
   writeStoredPoints,
@@ -22,9 +22,11 @@ export function useLoyaltyPoints() {
       const remote = Math.max(0, Math.floor(data.points));
       setPointsState(remote);
       writeStoredPoints(remote);
-    } catch {
-      // Auth errors or network failures must NOT reset points.
-      // The database is the source of truth; local state stays as-is.
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        throw error; // let global auth handler manage silent refresh
+      }
+      // Network and other errors stay silent — do NOT reset local points.
     }
   }, []);
 

@@ -1,13 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { verifyAccessToken } from '../utils/jwt';
+import type { TokenPayload } from '../utils/jwt';
 
-export interface AuthContext {
-  id: string;
-  name: string;
-  role: string;
-  restaurantId?: string;
-  type: 'customer' | 'staff' | 'delivery' | 'super_admin';
-}
+export interface AuthContext extends TokenPayload {}
 
 declare global {
   namespace Express {
@@ -32,10 +27,7 @@ export function authMiddleware(
   }
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    ) as AuthContext;
+    const decoded = verifyAccessToken(token);
     req.auth = decoded;
     next();
   } catch {

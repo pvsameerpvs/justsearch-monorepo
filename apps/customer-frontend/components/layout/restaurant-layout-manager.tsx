@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { RestaurantMobileHeader } from '@/components/restaurant/restaurant-mobile-header';
 import { RestaurantMobileNav } from '@/components/restaurant/restaurant-mobile-nav';
 import { RegistrationProvider } from '@/components/auth/registration-context';
+import { AuthGuard } from '@/components/auth/auth-guard';
 import { RegistrationModal } from '@/components/auth/registration-modal';
 import { ActiveOrderTracker } from '@/components/restaurant/checkout/active-order-tracker';
 import { RewardManager } from '@/components/restaurant/checkout/reward-manager';
@@ -39,6 +40,7 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
 
   return (
     <RegistrationProvider>
+      <AuthGuard />
       <FulfillmentProvider restaurant={restaurant}>
         {showHeader && <RestaurantMobileHeader />}
         {showTracker && <ActiveOrderTracker />}

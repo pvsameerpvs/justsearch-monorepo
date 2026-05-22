@@ -79,12 +79,19 @@ export function useOtpRegistration() {
     }
   }, [mode, name, mobileLocalDigits, form]);
 
-  const verifyOtp = useCallback(async () => {
+    const verifyOtp = useCallback(async () => {
     if (!requestId) return;
     setError(null); setBusy(true);
     try {
       const data = await postOtp('/api/auth/otp/verify', { requestId, mobile: `+971${mobileLocalDigits}`, otp: otp.trim() }) as OtpVerifyResponse;
-      setUser({ id: data.user.id, name: data.user.name, mobile: data.user.phone, verifiedAt: Date.now(), token: data.token });
+      const accessToken = data.accessToken ?? data.token;
+      const refreshToken = data.refreshToken;
+      const user = { id: data.user.id, name: data.user.name, mobile: data.user.phone, verifiedAt: Date.now(), token: accessToken };
+      if (refreshToken) {
+        setUser(user, accessToken, refreshToken);
+      } else {
+        setUser(user);
+      }
       closeModal();
     } catch (e) { setError(e instanceof Error ? e.message : 'Failed to verify OTP'); }
     setBusy(false);

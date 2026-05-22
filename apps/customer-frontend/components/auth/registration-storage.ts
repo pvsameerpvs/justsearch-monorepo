@@ -1,7 +1,17 @@
 import type { RegisteredUser } from './registered-user';
+import {
+  writeAccessToken,
+  writeRefreshToken,
+  readAccessToken,
+  readRefreshToken,
+  clearTokens,
+  setSessionInvalidated,
+  clearSessionInvalidated,
+  isSessionInvalidated,
+} from '@/lib/auth/token-utils';
 
 const STORAGE_KEY = 'justsearch:registeredUser';
-const TOKEN_KEY = 'justsearch:authToken';
+const LEGACY_TOKEN_KEY = 'justsearch:authToken';
 const FRESH_REGISTRATION_KEY = 'justsearch:freshRegistration';
 const COOKIE_NAME = 'token';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -42,7 +52,6 @@ function readFromStorage(storage: Storage): RegisteredUser | null {
 
 export function readStoredUser(): RegisteredUser | null {
   if (typeof window === 'undefined') return null;
-  // Try localStorage first, then sessionStorage as backup
   return readFromStorage(window.localStorage) ?? readFromStorage(window.sessionStorage);
 }
 
@@ -50,27 +59,52 @@ export function writeStoredUser(user: RegisteredUser | null) {
   if (typeof window === 'undefined') return;
   try {
     if (!user) {
-      window.localStorage.removeItem(STORAGE_KEY);
-      window.localStorage.removeItem(TOKEN_KEY);
-      window.sessionStorage.removeItem(STORAGE_KEY);
-      window.sessionStorage.removeItem(TOKEN_KEY);
+      clearTokens();
       syncTokenCookie(null);
       return;
     }
     const payload = JSON.stringify(user);
-    // Write to BOTH localStorage and sessionStorage for maximum durability
     window.localStorage.setItem(STORAGE_KEY, payload);
-    window.localStorage.setItem(TOKEN_KEY, user.token);
     window.sessionStorage.setItem(STORAGE_KEY, payload);
-    window.sessionStorage.setItem(TOKEN_KEY, user.token);
+    writeAccessToken(user.token);
     syncTokenCookie(user.token);
   } catch { /* ignore */ }
 }
 
+/**
+ * Write dual tokens (access + refresh) alongside user profile.
+ * Use this for new logins after refresh-token migration.
+ */
+export function writeStoredAuth(
+  user: RegisteredUser,
+  accessToken: string,
+  refreshToken: string
+) {
+  if (typeof window === 'undefined') return;
+  try {
+    const payload = JSON.stringify({ ...user, token: accessToken });
+    window.localStorage.setItem(STORAGE_KEY, payload);
+    window.sessionStorage.setItem(STORAGE_KEY, payload);
+    writeAccessToken(accessToken);
+    writeRefreshToken(refreshToken);
+    syncTokenCookie(accessToken);
+    clearSessionInvalidated();
+  } catch { /* ignore */ }
+}
+
 export function readStoredToken(): string | null {
+  // Prefer new dual-token storage, fall back to legacy single token
+  return readAccessToken() ?? readLegacyToken();
+}
+
+export function readStoredRefreshToken(): string | null {
+  return readRefreshToken();
+}
+
+function readLegacyToken(): string | null {
   if (typeof window === 'undefined') return null;
   try {
-    return window.localStorage.getItem(TOKEN_KEY) ?? window.sessionStorage.getItem(TOKEN_KEY);
+    return window.localStorage.getItem(LEGACY_TOKEN_KEY) ?? window.sessionStorage.getItem(LEGACY_TOKEN_KEY) ?? null;
   } catch {
     return null;
   }
@@ -101,3 +135,11 @@ export function saveFreshRegistration(user: RegisteredUser | null) {
 export function clearFreshRegistration() {
   writeFreshRegistration(null);
 }
+
+export function invalidateSession() {
+  clearTokens();
+  setSessionInvalidated();
+  syncTokenCookie(null);
+}
+
+export { isSessionInvalidated, clearSessionInvalidated };

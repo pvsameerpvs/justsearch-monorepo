@@ -83,7 +83,7 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  // Re-verify on window focus in background — never clear state on failure
+  // Re-verify on window focus in background
   useEffect(() => {
     function onFocus() {
       apiClient<{ id: string; name: string; restaurantId: string }>('/auth/me')
@@ -99,19 +99,38 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
           writeStorage(next);
         })
         .catch(() => {
-          // intentionally ignore: never auto-logout
+          // apiClient handles 401 internally (silent refresh); if it reaches here, refresh failed
+          // The auth:session-invalidated listener below will handle logout
         });
     }
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
   }, []);
 
+  // Listen for global session-invalidated event
+  useEffect(() => {
+    function onSessionInvalidated() {
+      clearStorage();
+      setState({ isLoggedIn: false, driverId: null, restaurantSlug: null, driverName: null, hydrated: true });
+      window.location.href = '/login';
+    }
+    window.addEventListener('auth:session-invalidated', onSessionInvalidated);
+    return () => window.removeEventListener('auth:session-invalidated', onSessionInvalidated);
+  }, []);
+
   const login = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const res = await apiClient<{ token: string; user: { id: string; name: string; restaurantId: string } }>('/auth/login', {
+      const res = await apiClient<{ token: string; accessToken?: string; refreshToken?: string; user: { id: string; name: string; restaurantId: string } }>('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ username, password, type: 'delivery' }),
       });
+      const access = res.accessToken ?? res.token;
+      if (access && res.refreshToken) {
+        window.localStorage.setItem('justsearch:accessToken', access);
+        window.localStorage.setItem('justsearch:refreshToken', res.refreshToken);
+        window.sessionStorage.setItem('justsearch:accessToken', access);
+        window.sessionStorage.setItem('justsearch:refreshToken', res.refreshToken);
+      }
       const next: AuthState = {
         isLoggedIn: true,
         driverId: res.user.id,
@@ -130,8 +149,11 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     clearStorage();
-    // Attempt to clear auth cookie client-side (works for non-HttpOnly; backend logout needed for HttpOnly)
     document.cookie = 'token=; path=/; max-age=0; domain=' + window.location.hostname;
+    window.localStorage.removeItem('justsearch:accessToken');
+    window.localStorage.removeItem('justsearch:refreshToken');
+    window.sessionStorage.removeItem('justsearch:accessToken');
+    window.sessionStorage.removeItem('justsearch:refreshToken');
     setState({
       isLoggedIn: false,
       driverId: null,

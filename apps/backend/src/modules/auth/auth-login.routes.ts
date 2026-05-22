@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { signToken } from '../../utils/jwt';
+import { signAccessToken, signRefreshToken } from '../../utils/jwt';
+import { createRefreshToken } from './auth-refresh.services';
 import { resolveUser } from './auth-login.utils';
 
 const router = Router();
@@ -23,23 +24,27 @@ router.post('/', async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = signToken({
+    const accessToken = signAccessToken({
       id: user.id,
       name: user.name,
       role: user.role,
       restaurantId: user.restaurantId,
       type: userType,
     });
+    const refreshToken = signRefreshToken(user.id, user.name, user.role, userType, user.restaurantId);
+    await createRefreshToken(user.id, refreshToken);
 
-    res.cookie('token', token, {
+    res.cookie('token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 30 * 60 * 1000, // 30 minutes
     });
 
     res.json({
-      token,
+      token: accessToken, // legacy field for backward compatibility
+      accessToken,
+      refreshToken,
       user: {
         id: user.id,
         name: user.name,

@@ -17,7 +17,20 @@ interface LoginBody {
 
 interface LoginResponse {
   token: string;
+  accessToken?: string;
+  refreshToken?: string;
   user: AuthMeResponse;
+}
+
+function saveTokens(res: LoginResponse) {
+  const access = res.accessToken ?? res.token;
+  const refresh = res.refreshToken;
+  if (access && refresh) {
+    window.localStorage.setItem('justsearch:accessToken', access);
+    window.localStorage.setItem('justsearch:refreshToken', refresh);
+    window.sessionStorage.setItem('justsearch:accessToken', access);
+    window.sessionStorage.setItem('justsearch:refreshToken', refresh);
+  }
 }
 
 async function fetchMe(): Promise<AuthMeResponse> {
@@ -44,7 +57,8 @@ export function useLoginMutation() {
 
   return useMutation({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      saveTokens(res);
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
     },
   });

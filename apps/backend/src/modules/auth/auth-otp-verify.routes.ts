@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { signToken } from '../../utils/jwt';
+import { signAccessToken, signRefreshToken } from '../../utils/jwt';
+import { createRefreshToken } from './auth-refresh.services';
 import { otpVerifyLimiter } from '../../middleware/rate-limit.middleware';
 import { normalizeMobile } from './auth.utils';
 import { validateOtpRequest } from './auth-otp.services';
@@ -31,24 +32,28 @@ router.post('/verify', otpVerifyLimiter, async (req, res, next) => {
       return res.status(500).json({ error: 'User creation failed' });
     }
 
-    const token = signToken({
+    const accessToken = signAccessToken({
       id: result.user.id,
       name: result.user.name,
       role: result.userRole,
       restaurantId: req.tenant.id,
       type: 'customer',
     });
+    const refreshToken = signRefreshToken(result.user.id, result.user.name, result.userRole, 'customer', req.tenant.id);
+    await createRefreshToken(result.user.id, refreshToken);
 
-    res.cookie('token', token, {
+    res.cookie('token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 30 * 60 * 1000, // 30 minutes
     });
 
     res.json({
       verified: true,
-      token,
+      token: accessToken, // legacy field for backward compatibility
+      accessToken,
+      refreshToken,
       isNewLink: result.isNewLink,
       user: { id: result.user.id, name: result.user.name, phone: result.user.phone, role: result.userRole },
     });

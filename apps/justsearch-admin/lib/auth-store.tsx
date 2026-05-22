@@ -92,7 +92,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
-  // Re-verify on window focus in background — never clear state on failure
+  // Re-verify on window focus in background
   useEffect(() => {
     function onFocus() {
       apiClient<AdminUser>('/auth/me')
@@ -104,20 +104,39 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
           }
         })
         .catch(() => {
-          // intentionally ignore: never auto-logout
+          // apiClient handles 401 internally (silent refresh); if it reaches here, refresh failed
+          // The auth:session-invalidated listener below will handle logout
         });
     }
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
   }, []);
 
+  // Listen for global session-invalidated event
+  useEffect(() => {
+    function onSessionInvalidated() {
+      clearStorage();
+      setState({ isAuthenticated: false, user: null, isLoading: false });
+      window.location.href = '/login';
+    }
+    window.addEventListener('auth:session-invalidated', onSessionInvalidated);
+    return () => window.removeEventListener('auth:session-invalidated', onSessionInvalidated);
+  }, []);
+
   const login = useCallback(async (username: string, password: string) => {
     try {
-      const res = await apiClient<{ token: string; user: AdminUser }>('/auth/login', {
+      const res = await apiClient<{ token: string; accessToken?: string; refreshToken?: string; user: AdminUser }>('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ username, password, type: 'super_admin' }),
       });
       if (res.user.role === 'super_admin') {
+        const access = res.accessToken ?? res.token;
+        if (access && res.refreshToken) {
+          window.localStorage.setItem('justsearch:accessToken', access);
+          window.localStorage.setItem('justsearch:refreshToken', res.refreshToken);
+          window.sessionStorage.setItem('justsearch:accessToken', access);
+          window.sessionStorage.setItem('justsearch:refreshToken', res.refreshToken);
+        }
         const next = { isAuthenticated: true, user: res.user, isLoading: false };
         setState(next);
         writeStorage(true, res.user);
@@ -132,6 +151,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     clearStorage();
     document.cookie = 'token=; path=/; max-age=0; domain=' + window.location.hostname;
+    window.localStorage.removeItem('justsearch:accessToken');
+    window.localStorage.removeItem('justsearch:refreshToken');
+    window.sessionStorage.removeItem('justsearch:accessToken');
+    window.sessionStorage.removeItem('justsearch:refreshToken');
     setState({ isAuthenticated: false, user: null, isLoading: false });
     window.location.href = '/login';
   }, []);

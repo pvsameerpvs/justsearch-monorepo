@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { apiClient } from '@/lib/api/client';
+import { apiClient, ApiError } from '@/lib/api/client';
 import {
   readStoredStats,
   writeStoredStats,
@@ -27,8 +27,11 @@ export function useUserGameStats() {
       const computed = computeStats(data.sessions);
       setGameStats(computed);
       writeStoredStats(computed);
-    } catch {
-      // Auth errors must NOT wipe local stats. Keep existing state.
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        throw error; // let global auth handler manage silent refresh
+      }
+      // Network and other errors stay silent — do NOT wipe local stats.
     }
   }, []);
 

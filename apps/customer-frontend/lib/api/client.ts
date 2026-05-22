@@ -1,3 +1,6 @@
+import { readAccessToken } from '@/lib/auth/token-utils';
+import { attemptSilentRefresh, invalidateAuthSession } from '@/lib/auth/auth-client';
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 interface FetchOptions extends RequestInit {
@@ -17,11 +20,7 @@ export class ApiError extends Error {
 
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
-  try {
-    return window.localStorage.getItem('justsearch:authToken');
-  } catch {
-    return null;
-  }
+  return readAccessToken();
 }
 
 export async function apiClient<T>(path: string, options: FetchOptions = {}): Promise<T> {
@@ -59,6 +58,21 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
     credentials: 'include',
     cache: 'no-store',
   });
+
+  if (response.status === 401) {
+    const refreshResult = await attemptSilentRefresh();
+    if (refreshResult.ok) {
+      // Retry with new token
+      return apiClient<T>(path, options);
+    }
+    if (refreshResult.reason === 'unauthorized') {
+      // Refresh token also expired — session truly dead
+      invalidateAuthSession();
+      throw new ApiError('Session expired. Please log in again.', 401);
+    }
+    // Network error during refresh — keep session alive, let caller retry later
+    throw new ApiError('Network error. Please check your connection and try again.', 0);
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Unknown error' }));

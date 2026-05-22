@@ -93,10 +93,26 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
     }
   }, [doLogin]);
 
+  // Listen for global session-invalidated event (from apiClient when refresh fails)
+  useEffect(() => {
+    function onSessionInvalidated() {
+      clearStorage();
+      setPersistedAuth(false);
+      setPersistedUser(null);
+      queryClient.clear();
+      window.location.href = '/login';
+    }
+    window.addEventListener('auth:session-invalidated', onSessionInvalidated);
+    return () => window.removeEventListener('auth:session-invalidated', onSessionInvalidated);
+  }, [queryClient]);
+
   const logout = useCallback(() => {
     clearStorage();
-    // Attempt to clear auth cookie client-side (works for non-HttpOnly; backend logout needed for HttpOnly)
     document.cookie = 'token=; path=/; max-age=0; domain=' + window.location.hostname;
+    window.localStorage.removeItem('justsearch:accessToken');
+    window.localStorage.removeItem('justsearch:refreshToken');
+    window.sessionStorage.removeItem('justsearch:accessToken');
+    window.sessionStorage.removeItem('justsearch:refreshToken');
     setPersistedAuth(false);
     setPersistedUser(null);
     queryClient.clear();
