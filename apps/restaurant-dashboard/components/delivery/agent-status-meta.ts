@@ -1,4 +1,4 @@
-type AgentStatus = "online" | "busy" | "offline";
+export type AgentStatus = "online" | "busy" | "offline";
 
 export const STATUS_META: Record<AgentStatus, { label: string; dot: string; bg: string; text: string; border: string }> = {
   online:  { label: "Available", dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" },

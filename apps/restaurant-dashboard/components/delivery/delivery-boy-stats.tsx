@@ -17,8 +17,8 @@ export function DeliveryBoyStats({ agents }: DeliveryBoyStatsProps) {
   const counts = {
     total: agents.length,
     active: agents.filter((a) => a.isActive).length,
-    online: agents.filter((a) => a.isActive && a.status === "online").length,
-    busy: agents.filter((a) => a.isActive && a.status === "busy").length,
+    online: agents.filter((a) => a.isActive && a.status === "online" && (a.activeOrderCount ?? 0) === 0).length,
+    busy: agents.filter((a) => a.isActive && (a.status === "busy" || (a.status === "online" && (a.activeOrderCount ?? 0) > 0))).length,
     offline: agents.filter((a) => a.isActive && a.status === "offline").length,
   };
 

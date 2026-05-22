@@ -22,6 +22,7 @@ export function useAssignDriver() {
     mutationFn: assignDriver,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['delivery-agents'] });
     },
   });
 }

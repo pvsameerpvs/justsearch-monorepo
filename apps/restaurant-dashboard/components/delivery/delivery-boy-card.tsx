@@ -1,6 +1,5 @@
-import { Trash2, Star, ClipboardList, Pencil } from "lucide-react";
-import { EnableToggle } from "./enable-toggle";
-import { STATUS_META } from "./agent-status-meta";
+import { Star, ClipboardList } from "lucide-react";
+import { DeliveryBoyCardHeader } from "./delivery-boy-card-header";
 import { CardDisabledFooter } from "./card-disabled-footer";
 import { CardInfoGrid } from "./card-info-grid";
 import { DriverLoginInfo } from "./driver-login-info";
@@ -16,33 +15,18 @@ interface DeliveryBoyCardProps {
 }
 
 export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onViewOrders, canManage }: DeliveryBoyCardProps) {
-  const meta = STATUS_META[agent.status as keyof typeof STATUS_META] ?? STATUS_META.offline;
   const isDisabled = !agent.isActive;
 
   return (
     <div className={`elegant-card p-0 overflow-hidden transition-opacity ${isDisabled ? "opacity-60" : ""}`}>
-      {/* Top bar with status + actions */}
-      <div className={`flex items-center justify-between border-b px-4 py-2 ${meta.bg} ${meta.border}`}>
-        <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${meta.dot} ${agent.status === "online" ? "animate-pulse" : ""}`} />
-          <span className={`text-[10px] font-bold uppercase tracking-wider ${meta.text}`}>{meta.label}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          {canManage && (
-            <>
-              <EnableToggle isActive={agent.isActive} onToggle={onToggleActive} />
-              <button onClick={onEdit} className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
-              <button onClick={onRemove} className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+      <DeliveryBoyCardHeader
+        agent={agent}
+        canManage={canManage}
+        onToggleActive={onToggleActive}
+        onEdit={onEdit}
+        onRemove={onRemove}
+      />
 
-      {/* Body */}
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -64,7 +48,6 @@ export function DeliveryBoyCard({ agent, onToggleActive, onRemove, onEdit, onVie
         <DriverLoginInfo uniqueId={agent.username} />
       </div>
 
-      {/* View Orders Button */}
       <button
         onClick={onViewOrders}
         className="w-full flex items-center justify-center gap-2 border-t border-slate-100 py-2.5 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 transition-colors"

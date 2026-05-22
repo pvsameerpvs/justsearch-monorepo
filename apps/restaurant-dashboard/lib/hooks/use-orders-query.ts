@@ -84,6 +84,7 @@ export function useUpdateOrderStatusMutation() {
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['order', vars.orderId] });
+      queryClient.invalidateQueries({ queryKey: ['delivery-agents'] });
     },
   });
 }

@@ -1,24 +1,16 @@
-import { Phone, Star, Package } from "lucide-react";
+import { Phone, Star, Package, Sparkles } from "lucide-react";
+import { getAgentStatus } from "./delivery-boy-status.utils";
 import type { DeliveryBoy } from "@/lib/stores/delivery-boy-store";
 
 interface DeliveryBoyRowProps {
   agent: DeliveryBoy;
   assignedOrderCode: string | null;
+  isRecommended?: boolean;
+  isCurrentlyAssigned?: boolean;
   onAssign: () => void;
 }
 
-function getAgentStatus(agent: DeliveryBoy) {
-  const count = agent.activeOrderCount ?? 0;
-  if (agent.status === "offline") {
-    return { label: "Offline", dot: "bg-slate-400", bg: "bg-slate-100", text: "text-slate-600", btn: "bg-slate-200 text-slate-400 cursor-not-allowed", canAssign: false };
-  }
-  if (count === 0) {
-    return { label: "Free", dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", btn: "bg-emerald-500 text-white hover:bg-emerald-600", canAssign: true };
-  }
-  return { label: `Busy (${count})`, dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700", btn: "bg-slate-200 text-slate-400 cursor-not-allowed", canAssign: false };
-}
-
-export function DeliveryBoyRow({ agent, assignedOrderCode, onAssign }: DeliveryBoyRowProps) {
+export function DeliveryBoyRow({ agent, assignedOrderCode, isRecommended, isCurrentlyAssigned, onAssign }: DeliveryBoyRowProps) {
   const status = getAgentStatus(agent);
 
   return (
@@ -27,12 +19,20 @@ export function DeliveryBoyRow({ agent, assignedOrderCode, onAssign }: DeliveryB
         {agent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-bold text-slate-900 truncate">{agent.name}</p>
           <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${status.bg} ${status.text} border border-slate-200`}>
             <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
             {status.label}
           </span>
+          {isCurrentlyAssigned && (
+            <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">Assigned</span>
+          )}
+          {isRecommended && !isCurrentlyAssigned && (
+            <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
+              <Sparkles className="h-3 w-3" />Recommended
+            </span>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 text-[11px] text-slate-500">
           <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {agent.phone}</span>
@@ -48,7 +48,7 @@ export function DeliveryBoyRow({ agent, assignedOrderCode, onAssign }: DeliveryB
         disabled={!status.canAssign}
         className={`shrink-0 rounded-lg px-4 py-2 text-xs font-bold transition-colors ${status.btn}`}
       >
-        {status.canAssign ? "Assign" : status.label}
+        {isCurrentlyAssigned ? "Keep" : "Assign"}
       </button>
     </div>
   );
