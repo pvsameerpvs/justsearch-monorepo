@@ -11,7 +11,7 @@ interface PreviewHeroProps {
 
 export function PreviewHero({ restaurant }: PreviewHeroProps) {
   const t = restaurant.theme;
-  const domain = `${restaurant.subdomain}.js-restorant.com`;
+  const domain = `${restaurant.subdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN || 'eatygo.com'}`;
 
   return (
     <section className="pt-3 pb-2">

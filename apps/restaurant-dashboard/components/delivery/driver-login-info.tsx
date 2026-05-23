@@ -5,8 +5,7 @@ import { useClipboardCopy } from "@/lib/hooks/use-clipboard-copy";
 import { useRestaurantQuery } from "@/lib/hooks/use-restaurant-query";
 import { CredentialRow, CredentialCard } from "./driver-credential-parts";
 
-const BASE_DOMAIN = "js-restorant.com";
-const SEPARATOR = "--";
+const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "js-restorant.com";
 
 interface DriverLoginInfoProps {
   uniqueId: string;
@@ -16,7 +15,7 @@ export function DriverLoginInfo({ uniqueId }: DriverLoginInfoProps) {
   const { copied, handleCopy } = useClipboardCopy();
   const { data: restaurant } = useRestaurantQuery();
   const slug = restaurant?.subdomain ?? restaurant?.slug ?? "";
-  const portalUrl = slug ? `${slug}${SEPARATOR}${uniqueId}.${BASE_DOMAIN}` : "";
+  const portalUrl = slug ? `${slug}.delivery.${BASE_DOMAIN}/login?driver=${uniqueId}` : "";
 
   return (
     <div className="mt-3 space-y-2">

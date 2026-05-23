@@ -6,10 +6,11 @@
 
 | Platform | Domain Pattern | Real Example |
 |---|---|---|
-| **justsearch-admin** | `mydomain.com` | `justsearch.com` |
-| **customer-frontend** | `[restaurant].mydomain.com` | `mosaic-table.justsearch.com` |
-| **restaurant-dashboard** | `[restaurant]-admin.mydomain.com` | `mosaic-table-admin.justsearch.com` |
-| **delivery-portal** | `[restaurant]-delivery.mydomain.com` | `mosaic-table-delivery.justsearch.com` |
+| **justsearch-admin** | `admin.mydomain.com` | `admin.eatygo.com` |
+| **customer-frontend** | `[restaurant].mydomain.com` | `naples.eatygo.com` |
+| **restaurant-dashboard** | `[restaurant].admin.mydomain.com` | `naples.admin.eatygo.com` |
+| **delivery-portal** | `[restaurant].delivery.mydomain.com` | `naples.delivery.eatygo.com` |
+| **backend** | `api.mydomain.com` | `api.eatygo.com` |
 
 ---
 
@@ -39,11 +40,10 @@ Edit `/etc/hosts` file on your computer:
 ```bash
 # Add these lines
 127.0.0.1  localhost
-127.0.0.1  mosaic-table.localhost
-127.0.0.1  spice-garden.localhost
-127.0.0.1  mosaic-table-admin.localhost
-127.0.0.1  mosaic-table-delivery.localhost
-127.0.0.1  mydomain.localhost
+127.0.0.1  naples.localhost
+127.0.0.1  naples.admin.localhost
+127.0.0.1  naples.delivery.localhost
+127.0.0.1  admin.localhost
 ```
 
 **Windows:** `C:\Windows\System32\drivers\etc\hosts`
@@ -68,33 +68,33 @@ Browser sends:
 **customer-frontend middleware (`apps/customer-frontend/middleware.ts`):**
 ```typescript
 const host = request.headers.get('host') ?? '';
-// host = "mosaic-table.justsearch.com"
+// host = "naples.eatygo.com"
 
-if (host.endsWith('.mydomain.com')) {
-  subdomain = host.replace('.mydomain.com', '');
-  // subdomain = "mosaic-table"
+if (host.endsWith('.eatygo.com')) {
+  subdomain = host.replace('.eatygo.com', '');
+  // subdomain = "naples"
 }
 ```
 
-**restaurant-dashboard resolver (`apps/restaurant-dashboard/lib/get-current-restaurant.ts`):**
+**restaurant-dashboard middleware (`apps/restaurant-dashboard/middleware.ts`):**
 ```typescript
-const host = headers().get('host') ?? '';
-// host = "mosaic-table-admin.justsearch.com"
+const host = request.headers.get('host') ?? '';
+// host = "naples.admin.eatygo.com"
 
-if (host.endsWith('-admin.mydomain.com')) {
-  subdomain = host.replace('-admin.mydomain.com', '');
-  // subdomain = "mosaic-table"
+if (host.endsWith('.admin.eatygo.com')) {
+  subdomain = host.replace('.admin.eatygo.com', '');
+  // subdomain = "naples"
 }
 ```
 
-**delivery-portal resolver (`apps/delivery-portal/lib/portal-context.ts`):**
+**delivery-portal middleware (`apps/delivery-portal/middleware.ts`):**
 ```typescript
-const host = headers().get('host') ?? '';
-// host = "mosaic-table-delivery.justsearch.com"
+const host = request.headers.get('host') ?? '';
+// host = "naples.delivery.eatygo.com"
 
-if (host.endsWith('-delivery.mydomain.com')) {
-  subdomain = host.replace('-delivery.mydomain.com', '');
-  // subdomain = "mosaic-table"
+if (host.endsWith('.delivery.eatygo.com')) {
+  subdomain = host.replace('.delivery.eatygo.com', '');
+  // subdomain = "naples"
 }
 ```
 
@@ -150,7 +150,7 @@ const items = await db
 
 ```
 # All apps need this
-NEXT_PUBLIC_BASE_DOMAIN=mydomain.com
+NEXT_PUBLIC_BASE_DOMAIN=eatygo.com
 
 # Backend needs this
 DATABASE_URL=postgresql://...
@@ -213,10 +213,10 @@ pnpm --filter justsearch-admin dev
 
 | URL | Expected Result |
 |---|---|
-| `http://mosaic-table.localhost:3000` | Mosaic Table customer site |
-| `http://mosaic-table-admin.localhost:3002` | Mosaic Table staff dashboard |
-| `http://mosaic-table-delivery.localhost:3004` | Mosaic Table rider portal |
-| `http://mydomain.localhost:3003` | Super admin platform |
+| `http://naples.localhost:3000` | Naples customer site |
+| `http://naples.admin.localhost:3002` | Naples staff dashboard |
+| `http://naples.delivery.localhost:3004` | Naples rider portal |
+| `http://admin.localhost:3003` | Super admin platform |
 
 ---
 
@@ -245,18 +245,18 @@ customer-frontend (mosaic-table.mydomain.com)
 ### 3. Staff Manages Restaurant
 
 ```
-restaurant-dashboard (mosaic-table-admin.mydomain.com)
-  → Extracts "mosaic-table" (removes "-admin")
+restaurant-dashboard (naples.admin.eatygo.com)
+  → Extracts "naples" (removes ".admin.eatygo.com")
   → Staff logs in with owner/manager credentials
-  → Edits menu → Backend updates menu_items WHERE restaurant_id = mosaic-id
+  → Edits menu → Backend updates menu_items WHERE restaurant_id = naples-id
   → Changes immediately visible to customers
 ```
 
 ### 4. Rider Delivers Orders
 
 ```
-delivery-portal (mosaic-table-delivery.mydomain.com)
-  → Extracts "mosaic-table" (removes "-delivery")
+delivery-portal (naples.delivery.eatygo.com)
+  → Extracts "naples" (removes ".delivery.eatygo.com")
   → Rider logs in
   → Sees assigned orders
   → Updates status: picked_up → in_transit → delivered
@@ -315,9 +315,12 @@ Before going live:
 - [ ] Backend `.env` updated with real `DATABASE_URL`
 - [ ] `db:push` run against production database
 - [ ] `db:seed` run to create first restaurant
-- [ ] All 4 apps deployed (Vercel recommended)
-- [ ] Test: `curl https://your-restaurant.yourdomain.com/api/v1/restaurants/current`
-- [ ] Test: `curl https://your-restaurant-admin.yourdomain.com` (should redirect to login)
+- [ ] All 5 services deployed on Railway
+- [ ] Test: `curl https://naples.eatygo.com/api/v1/restaurants/current`
+- [ ] Test: `curl https://naples.admin.eatygo.com` (should redirect to login)
+- [ ] Test: `curl https://naples.delivery.eatygo.com` (should redirect to login)
+- [ ] Test: `curl https://admin.eatygo.com` (super admin dashboard)
+- [ ] Test: `curl https://api.eatygo.com/health` (backend health check)
 
 ---
 

@@ -14,8 +14,8 @@ export function ProfileLinksCard({ subdomain }: ProfileLinksCardProps) {
 
   const links = [
     { label: "Customer Site", url: `https://${subdomain}.${BASE_DOMAIN}`, icon: Globe, color: "indigo" },
-    { label: "Dashboard", url: `https://admin-${subdomain}.${BASE_DOMAIN}`, icon: ExternalLink, color: "slate" },
-    { label: "Driver Portal", url: `https://${subdomain}--driver.${BASE_DOMAIN}`, icon: Truck, color: "amber" },
+    { label: "Dashboard", url: `https://${subdomain}.admin.${BASE_DOMAIN}`, icon: ExternalLink, color: "slate" },
+    { label: "Driver Portal", url: `https://${subdomain}.delivery.${BASE_DOMAIN}`, icon: Truck, color: "amber" },
   ];
 
   const handleCopy = async (url: string, key: string) => {

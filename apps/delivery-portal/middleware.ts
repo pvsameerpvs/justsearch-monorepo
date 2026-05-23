@@ -12,18 +12,22 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Only allow delivery subdomain patterns
-  if (!normalizedHost.endsWith(`.${BASE_DOMAIN}`)) {
+  // Extract restaurant slug from *.delivery.eatygo.com
+  // e.g. naples.delivery.eatygo.com -> naples
+  let slug = '';
+  if (normalizedHost.endsWith(`.delivery.${BASE_DOMAIN}`)) {
+    slug = normalizedHost.replace(`.delivery.${BASE_DOMAIN}`, '');
+  } else {
+    // Reject non-delivery domains — this service only serves *.delivery.*
     return new NextResponse('Not Found', { status: 404 });
   }
 
-  const slug = normalizedHost.replace(`.${BASE_DOMAIN}`, '');
   if (!slug || slug.includes('.')) {
     return new NextResponse('Not Found', { status: 404 });
   }
 
   const response = NextResponse.next();
-  response.headers.set('x-restaurant-slug', slug.replace(/-delivery$/, ''));
+  response.headers.set('x-restaurant-slug', slug);
   return response;
 }
 

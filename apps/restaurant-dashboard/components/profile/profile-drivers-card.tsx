@@ -10,7 +10,6 @@ interface ProfileDriversCardProps {
 }
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "js-restorant.com";
-const SEPARATOR = "--";
 
 export function ProfileDriversCard({ subdomain }: ProfileDriversCardProps) {
   const { agents } = useDeliveryBoyStore();
@@ -52,7 +51,7 @@ export function ProfileDriversCard({ subdomain }: ProfileDriversCardProps) {
               status: agent.status,
               password: "driver123",
             }}
-            portalUrl={`https://${subdomain}${SEPARATOR}${agent.username}.${BASE_DOMAIN}/login`}
+            portalUrl={`https://${subdomain}.delivery.${BASE_DOMAIN}/login?driver=${agent.username}`}
             copied={copied}
             onCopy={handleCopy}
           />

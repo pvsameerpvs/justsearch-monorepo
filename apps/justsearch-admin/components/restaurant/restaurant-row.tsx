@@ -17,8 +17,8 @@ export function RestaurantRow({ restaurant, onRequestDelete, onUpdate }: Restaur
   const [detailOpen, setDetailOpen] = useState(false);
 
   const domains = [
-    { label: "Customer Site", url: `https://${restaurant.subdomain}.mydomain.com`, icon: Globe },
-    { label: "Dashboard", url: `https://admin-${restaurant.subdomain}.mydomain.com`, icon: Briefcase },
+    { label: "Customer Site", url: `https://${restaurant.subdomain}.eatygo.com`, icon: Globe },
+    { label: "Dashboard", url: `https://${restaurant.subdomain}.admin.eatygo.com`, icon: Briefcase },
   ];
 
   return (

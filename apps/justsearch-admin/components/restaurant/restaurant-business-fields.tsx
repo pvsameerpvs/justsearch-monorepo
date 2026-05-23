@@ -42,7 +42,7 @@ export function RestaurantBusinessFields({ form }: RestaurantBusinessFieldsProps
         <div className="grid grid-cols-1 gap-3">
           <FormInput label="Confirm Password" icon={KeyRound} type="password" {...register("confirmPassword")} error={errors.confirmPassword?.message} placeholder="Re-enter password" />
         </div>
-        <p className="text-[10px] text-slate-400">The restaurant owner will use these credentials to log in to their dashboard at admin-{watch("slug") || "slug"}.mydomain.com</p>
+        <p className="text-[10px] text-slate-400">The restaurant owner will use these credentials to log in to their dashboard at {watch("slug") || "slug"}.admin.eatygo.com</p>
       </div>
     </div>
   );

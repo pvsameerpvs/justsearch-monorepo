@@ -38,7 +38,7 @@ export function RestaurantRowInfo({ restaurant }: RestaurantRowInfoProps) {
           {restaurant.city}, {restaurant.area} · {restaurant.cuisine} · {restaurant.tables} tables · 1 QR code
         </p>
         <div className="flex items-center gap-2 mt-0.5">
-          <p className="text-xs font-mono text-slate-400">{restaurant.subdomain}.mydomain.com</p>
+          <p className="text-xs font-mono text-slate-400">{restaurant.subdomain}.eatygo.com</p>
           <span className="text-slate-300">·</span>
           <p className="flex items-center gap-1 text-[10px] text-slate-400">
             <Calendar className="h-3 w-3" />

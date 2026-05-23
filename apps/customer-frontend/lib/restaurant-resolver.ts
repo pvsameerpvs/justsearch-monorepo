@@ -6,6 +6,7 @@ import { fetchCurrentRestaurant } from '@/lib/api/restaurants.api';
 import type { ApiRestaurantData } from '@/lib/api/restaurants.api';
 
 const BASE_DOMAINS = [
+  'eatygo.com',
   'justsearchrestorant.com',
   'justsearch-restorantactivity.com',
   'justsearchrestaurant.com',
@@ -25,7 +26,10 @@ function extractSubdomain(host: string): string | null {
   for (const baseDomain of BASE_DOMAINS) {
     if (normalizedHost === baseDomain || normalizedHost === `www.${baseDomain}`) return null;
     if (normalizedHost.endsWith(`.${baseDomain}`)) {
-      return normalizedHost.slice(0, -(baseDomain.length + 1)).split('.').filter(Boolean).at(-1) ?? null;
+      // Extract the first segment before the base domain
+      // e.g. naples.eatygo.com -> naples
+      // e.g. naples.admin.eatygo.com (fallback) -> naples (first segment)
+      return normalizedHost.slice(0, -(baseDomain.length + 1)).split('.').filter(Boolean).at(0) ?? null;
     }
   }
   const hostParts = normalizedHost.split('.').filter(Boolean);
@@ -198,7 +202,7 @@ export const getCurrentRestaurant = cache(async (): Promise<Restaurant> => {
 });
 
 export function getRestaurantDomain(restaurant: Restaurant): string {
-  return `${restaurant.subdomain}.justsearchrestorant.com`;
+  return `${restaurant.subdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN || 'eatygo.com'}`;
 }
 
 export function getRestaurantInitials(name: string): string {

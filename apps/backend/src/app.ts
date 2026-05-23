@@ -11,17 +11,28 @@ const app: Express = express();
 // Security & parsing middleware
 app.use(helmet());
 
-const allowedOrigins = [
+const exactAllowedOrigins = [
   process.env.CLIENT_URL,
   'http://localhost:3000',
   'http://localhost:3002',
   'http://localhost:3003',
   'http://localhost:3004',
+  // Production domains (Railway)
+  'https://eatygo.com',
+  'https://admin.eatygo.com',
+  'https://api.eatygo.com',
 ].filter((o): o is string => !!o);
+
+function isOriginAllowed(origin: string): boolean {
+  if (exactAllowedOrigins.includes(origin)) return true;
+  // Allow all Railway frontend subdomains: *.eatygo.com, *.admin.eatygo.com, *.delivery.eatygo.com
+  if (origin.startsWith('https://') && origin.endsWith('.eatygo.com')) return true;
+  return false;
+}
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || isOriginAllowed(origin)) {
       callback(null, true);
     } else {
       callback(new Error(`Not allowed by CORS: ${origin}`));

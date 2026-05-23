@@ -24,7 +24,7 @@ export function ProfileInfoDisplay({ restaurant }: ProfileInfoDisplayProps) {
       <ProfileRow icon={Building2} label="Tables" value={`${restaurant.tables} tables`} />
       <ProfileRow icon={Lock} label="Dashboard Username" value={restaurant.dashboardUsername} />
       <ProfileRow icon={Link2} label="Slug" value={restaurant.slug} />
-      <ProfileRow icon={Globe} label="Subdomain" value={`${restaurant.subdomain}.js-restorant.com`} />
+      <ProfileRow icon={Globe} label="Subdomain" value={`${restaurant.subdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN || 'eatygo.com'}`} />
       <ProfileRow icon={Briefcase} label="Status" value={restaurant.status} />
       <ProfileRow icon={Calendar} label="Created" value={restaurant.createdAt} />
     </div>

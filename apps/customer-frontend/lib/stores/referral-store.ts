@@ -64,7 +64,7 @@ export const useReferralStore = create<ReferralStore>()(
         })),
       generateReferralLink: (restaurantSlug, userPhone) => {
         const code = generateReferralCode(userPhone);
-        return `https://${restaurantSlug}-booking.js-restorant.com/?ref=${code}`;
+        return `https://${restaurantSlug}.${process.env.NEXT_PUBLIC_BASE_DOMAIN || 'eatygo.com'}/?ref=${code}`;
       },
       getReferralsByUser: (phone) =>
         get().referrals.filter((r) => r.referrerPhone === phone),

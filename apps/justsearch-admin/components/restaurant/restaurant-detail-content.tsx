@@ -40,8 +40,8 @@ export function RestaurantDetailContent({
       </div>
 
       <div className="flex gap-2">
-        <DomainLink label="Customer Site" url={`https://${restaurant.subdomain}.mydomain.com`} icon={Globe} />
-        <DomainLink label="Dashboard" url={`https://admin-${restaurant.subdomain}.mydomain.com`} icon={ExternalLink} />
+        <DomainLink label="Customer Site" url={`https://${restaurant.subdomain}.eatygo.com`} icon={Globe} />
+        <DomainLink label="Dashboard" url={`https://${restaurant.subdomain}.admin.eatygo.com`} icon={ExternalLink} />
       </div>
 
       <RestaurantDetailForm restaurant={restaurant} isEditing={isEditing} form={form} onChange={onChange} />

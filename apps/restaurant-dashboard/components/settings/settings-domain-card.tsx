@@ -12,7 +12,7 @@ const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "js-restorant.com";
 export function SettingsDomainCard({ subdomain }: SettingsDomainCardProps) {
   const urls = [
     { label: "Customer Site", url: `https://${subdomain}.${BASE_DOMAIN}` },
-    { label: "Dashboard", url: `https://admin-${subdomain}.${BASE_DOMAIN}` },
+    { label: "Dashboard", url: `https://${subdomain}.admin.${BASE_DOMAIN}` },
   ];
 
   return (

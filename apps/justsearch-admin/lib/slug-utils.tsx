@@ -11,10 +11,13 @@ export function SlugPreview({ slug }: { slug: string }) {
     <div className="rounded-lg bg-slate-50 p-3">
       <p className="text-xs text-slate-500">Auto-generated domains:</p>
       <p className="mt-1 text-xs font-mono text-slate-700">
-        {slug}.mydomain.com
+        {slug}.eatygo.com
       </p>
       <p className="text-xs font-mono text-slate-700">
-        {slug}-booking.mydomain.com
+        {slug}.admin.eatygo.com
+      </p>
+      <p className="text-xs font-mono text-slate-700">
+        {slug}.delivery.eatygo.com
       </p>
     </div>
   );

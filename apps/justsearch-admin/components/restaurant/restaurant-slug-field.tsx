@@ -32,7 +32,7 @@ export function RestaurantSlugField({ slug, onChange, error }: RestaurantSlugFie
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <UrlPreviewCard label="Customer Site" icon={Globe} url={`https://${slug}.${BASE_DOMAIN}`} color="indigo" />
-        <UrlPreviewCard label="Dashboard" icon={Briefcase} url={`https://admin-${slug}.${BASE_DOMAIN}`} color="slate" />
+        <UrlPreviewCard label="Dashboard" icon={Briefcase} url={`https://${slug}.admin.${BASE_DOMAIN}`} color="slate" />
       </div>
     </div>
   );

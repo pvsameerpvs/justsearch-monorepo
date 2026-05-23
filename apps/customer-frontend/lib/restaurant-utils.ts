@@ -1,7 +1,7 @@
 import type { Restaurant } from './restaurant-types';
 
 const DEFAULT_PUBLIC_DOMAIN =
-  process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN ?? 'justsearchrestorant.com';
+  process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN ?? process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'eatygo.com';
 
 export function getRestaurantDomain(restaurant: Restaurant): string {
   return `${restaurant.subdomain}.${DEFAULT_PUBLIC_DOMAIN}`;

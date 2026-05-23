@@ -10,8 +10,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Only allow admin subdomain
-  if (!normalizedHost.startsWith(`admin.`)) {
+  // Only allow exact admin.eatygo.com (not *.admin.eatygo.com)
+  // Railway routes admin.eatygo.com here
+  // Railway routes *.admin.eatygo.com to restaurant-dashboard
+  const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'eatygo.com';
+  if (normalizedHost !== `admin.${baseDomain}`) {
     return new NextResponse('Not Found', { status: 404 });
   }
 

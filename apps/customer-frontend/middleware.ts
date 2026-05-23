@@ -16,12 +16,21 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Block admin subdomain
-  if (normalizedHost.startsWith(`admin.`)) {
+  // Block admin and reserved nested subdomains
+  // These are routed to other services by Railway:
+  // *.admin.eatygo.com -> restaurant-dashboard
+  // *.delivery.eatygo.com -> delivery-portal
+  // admin.eatygo.com -> justsearch-admin
+  if (
+    normalizedHost.startsWith(`admin.`) ||
+    normalizedHost.includes(`.admin.`) ||
+    normalizedHost.includes(`.delivery.`)
+  ) {
     return new NextResponse('Not Found', { status: 404 });
   }
 
-  // Extract subdomain
+  // Extract restaurant subdomain from *.eatygo.com
+  // e.g. naples.eatygo.com -> naples
   let subdomain = '';
   if (normalizedHost.endsWith(`.${BASE_DOMAIN}`)) {
     subdomain = normalizedHost.replace(`.${BASE_DOMAIN}`, '');
