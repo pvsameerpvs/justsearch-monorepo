@@ -20,13 +20,18 @@ async function doRefresh(): Promise<RefreshResult> {
   if (!refreshToken) return { ok: false, reason: 'unauthorized' };
 
   let res: Response;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
   try {
     res = await fetch(`${API_BASE}/auth/refresh`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
   } catch {
+    clearTimeout(timeoutId);
     return { ok: false, reason: 'network' };
   }
 

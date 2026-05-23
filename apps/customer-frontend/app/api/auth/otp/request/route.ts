@@ -15,12 +15,22 @@ export async function POST(request: Request) {
     if (slug === 'localhost') slug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
     if (slug && slug !== 'admin') headers.set('x-restaurant-slug', slug);
 
-    const backendRes = await fetch(`${API_BASE}/auth/otp/request`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body),
-      credentials: 'include',
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    let backendRes: Response;
+    try {
+      backendRes = await fetch(`${API_BASE}/auth/otp/request`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        credentials: 'include',
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+    } catch {
+      clearTimeout(timeoutId);
+      return NextResponse.json({ error: 'Backend request timed out' }, { status: 504 });
+    }
 
     const data = await backendRes.json().catch(() => ({ error: 'Unknown error' }));
 
