@@ -70,7 +70,9 @@ export async function attemptSilentRefresh(): Promise<RefreshResult> {
 export function invalidateAuthSession() {
   clearTokens();
   setSessionInvalidated();
-  window.dispatchEvent(new CustomEvent('auth:session-invalidated'));
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('auth:session-invalidated'));
+  }
 }
 
 export async function logoutFromBackend(): Promise<void> {

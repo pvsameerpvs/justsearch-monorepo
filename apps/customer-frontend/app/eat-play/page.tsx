@@ -1,11 +1,14 @@
 import { RestaurantEatPlayShowcase } from '@/components/restaurant/restaurant-eat-play-showcase';
 import { getCurrentRestaurant } from '@/lib/restaurant-resolver';
+import { headers } from 'next/headers';
 import { PLATFORM_GAMES } from '@/lib/constants/games.constants';
 import { fetchActiveGames } from '@/lib/api/games.api';
 
 export default async function EatPlayPage() {
   const restaurant = await getCurrentRestaurant();
-  const { names: activeGameNames, ok } = await fetchActiveGames();
+  const headerStore = await headers();
+  const host = headerStore.get('host') ?? '';
+  const { names: activeGameNames, ok } = await fetchActiveGames(host);
 
   const games = PLATFORM_GAMES.map((g) => ({
     ...g,

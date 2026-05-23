@@ -14,9 +14,11 @@ export type ActiveGamesResult = {
   ok: boolean;
 };
 
-export async function fetchActiveGames(): Promise<ActiveGamesResult> {
+export async function fetchActiveGames(host?: string): Promise<ActiveGamesResult> {
   try {
-    const data = await apiClient<ActiveGamesResponse>('/games/active');
+    const data = await apiClient<ActiveGamesResponse>('/games/active', {
+      tenantHost: host,
+    });
     return { names: data.games.map((g) => g.name), ok: true };
   } catch {
     return { names: [], ok: false };

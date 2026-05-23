@@ -29,7 +29,7 @@ export type ApiMenuResponse = {
 export async function fetchMenu(host: string): Promise<ApiMenuResponse | null> {
   try {
     return await apiClient<ApiMenuResponse>('/menus', {
-      headers: { host },
+      tenantHost: host,
     });
   } catch {
     return null;
