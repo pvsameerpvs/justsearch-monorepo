@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { client } from './index';
 
 import fs from 'fs';

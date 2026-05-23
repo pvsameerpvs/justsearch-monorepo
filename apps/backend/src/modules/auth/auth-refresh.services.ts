@@ -1,7 +1,7 @@
 import { eq, and, gt, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { refreshTokens } from '../../db/schema';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const SALT_ROUNDS = 10;
 
