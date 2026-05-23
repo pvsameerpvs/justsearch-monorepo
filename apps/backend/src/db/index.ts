@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 
+// Load .env only if it exists (Railway injects env vars directly)
 dotenv.config();
 
 import { drizzle } from 'drizzle-orm/postgres-js';
