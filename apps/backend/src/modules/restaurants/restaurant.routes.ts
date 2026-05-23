@@ -20,7 +20,7 @@ router.post('/', authMiddleware, requireRole('super_admin'), async (req, res, ne
         subdomain: body.subdomain,
         schemaName,
         name: body.name,
-        status: 'draft',
+        status: 'active',
         settings: buildSettings(body),
         theme: {},
       })

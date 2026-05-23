@@ -43,8 +43,16 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
       headers.set('x-restaurant-slug', slug);
     }
   } else {
-    const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
-    headers.set('x-restaurant-slug', defaultSlug);
+    // Server-side: derive slug from tenantHost if provided, otherwise use default
+    let slug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
+    if (options.tenantHost) {
+      const host = options.tenantHost.replace(/:\d+$/, '').toLowerCase();
+      const parts = host.split('.');
+      if (parts.length >= 2 && parts[0] && parts[0] !== 'admin') {
+        slug = parts[0];
+      }
+    }
+    headers.set('x-restaurant-slug', slug);
   }
 
   const token = getAuthToken();
@@ -52,12 +60,26 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    credentials: 'include',
-    cache: 'no-store',
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: 'include',
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ApiError('Request timed out. Backend may be unreachable.', 0);
+    }
+    throw error;
+  }
 
   if (response.status === 401) {
     const refreshResult = await attemptSilentRefresh();
