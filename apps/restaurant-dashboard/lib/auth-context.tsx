@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuthMeQuery, useLoginMutation } from "./hooks/use-auth-query";
 
@@ -57,7 +58,9 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const { data: me, isLoading: meLoading } = useAuthMeQuery();
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/login';
+  const { data: me, isLoading: meLoading } = useAuthMeQuery({ enabled: !isLoginPage });
   const { mutateAsync: doLogin } = useLoginMutation();
   const queryClient = useQueryClient();
 
@@ -78,6 +81,7 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
   // Re-verify on window focus in background — never clear persisted auth on failure
   useEffect(() => {
     function onFocus() {
+      if (typeof window !== 'undefined' && window.location.pathname === '/login') return;
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
     }
     window.addEventListener('focus', onFocus);
@@ -100,7 +104,9 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
       setPersistedAuth(false);
       setPersistedUser(null);
       queryClient.clear();
-      window.location.href = '/login';
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
     }
     window.addEventListener('auth:session-invalidated', onSessionInvalidated);
     return () => window.removeEventListener('auth:session-invalidated', onSessionInvalidated);
@@ -116,7 +122,9 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
     setPersistedAuth(false);
     setPersistedUser(null);
     queryClient.clear();
-    window.location.href = '/login';
+    if (!window.location.pathname.startsWith('/login')) {
+      window.location.href = '/login';
+    }
   }, [queryClient]);
 
   return (

@@ -44,11 +44,12 @@ async function login(body: LoginBody): Promise<LoginResponse> {
   });
 }
 
-export function useAuthMeQuery() {
+export function useAuthMeQuery(opts?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['auth', 'me'],
     queryFn: fetchMe,
     retry: false,
+    enabled: opts?.enabled !== false,
   });
 }
 

@@ -154,7 +154,7 @@ export async function apiClient<T>(
     }
     if (refreshResult.reason === 'unauthorized') {
       clearTokens();
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
         window.dispatchEvent(new CustomEvent('auth:session-invalidated'));
       }
       throw new ApiError('Session expired. Please log in again.', 401);
