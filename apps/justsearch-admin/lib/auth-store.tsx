@@ -67,6 +67,12 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, isAuthenticated: saved.isAuthenticated, user: saved.user }));
     }
 
+    // Skip auth verification on public routes (login page doesn't need it)
+    if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+      setState((prev) => ({ ...prev, isLoading: false }));
+      return;
+    }
+
     let cancelled = false;
     async function checkAuth() {
       try {
@@ -92,9 +98,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
-  // Re-verify on window focus in background
+  // Re-verify on window focus in background (skip on login page)
   useEffect(() => {
     function onFocus() {
+      if (typeof window !== 'undefined' && window.location.pathname === '/login') return;
       apiClient<AdminUser>('/auth/me')
         .then((me) => {
           if (me.role === 'super_admin') {
@@ -117,7 +124,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     function onSessionInvalidated() {
       clearStorage();
       setState({ isAuthenticated: false, user: null, isLoading: false });
-      window.location.href = '/login';
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
     }
     window.addEventListener('auth:session-invalidated', onSessionInvalidated);
     return () => window.removeEventListener('auth:session-invalidated', onSessionInvalidated);
@@ -156,7 +165,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     window.sessionStorage.removeItem('justsearch:accessToken');
     window.sessionStorage.removeItem('justsearch:refreshToken');
     setState({ isAuthenticated: false, user: null, isLoading: false });
-    window.location.href = '/login';
+    if (!window.location.pathname.startsWith('/login')) {
+      window.location.href = '/login';
+    }
   }, []);
 
   return (
