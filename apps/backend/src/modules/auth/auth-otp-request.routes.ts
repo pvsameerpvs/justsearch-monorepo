@@ -54,8 +54,8 @@ router.post('/request', otpRequestLimiter, async (req, res, next) => {
       expiresAt,
     });
 
-    const isDev = process.env.NODE_ENV !== 'production';
-    res.json({ requestId, flow, ...(isDev ? { demoOtp: otp } : {}) });
+    const showDemoOtp = process.env.NODE_ENV !== 'production' || process.env.DEBUG_OTP === 'true';
+    res.json({ requestId, flow, ...(showDemoOtp ? { demoOtp: otp } : {}) });
   } catch (error) {
     next(error);
   }
