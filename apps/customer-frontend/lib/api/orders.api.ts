@@ -44,6 +44,9 @@ export type CrossRestaurantOrder = {
   code: string;
   restaurantId: string;
   restaurantName: string;
+  restaurantSlug: string;
+  restaurantSubdomain: string;
+  restaurantLogoUrl: string | null;
   status: string;
   total: string;
   createdAt: string;

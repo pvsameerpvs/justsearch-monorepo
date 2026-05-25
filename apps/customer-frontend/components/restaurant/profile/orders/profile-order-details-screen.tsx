@@ -42,5 +42,11 @@ export function ProfileOrderDetailsScreen({ restaurant, orderId }: Props) {
     restaurant.menu[0]?.items[0]?.currency ?? 'AED'
   );
 
-  return <ProfileOrderDetailsPresenter order={order} restaurant={restaurant} />;
+  return (
+    <ProfileOrderDetailsPresenter
+      order={order}
+      sourceOrder={data.order}
+      currentRestaurant={restaurant}
+    />
+  );
 }

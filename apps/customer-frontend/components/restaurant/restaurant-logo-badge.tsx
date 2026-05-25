@@ -4,7 +4,7 @@ import { getRestaurantInitials } from '@/lib/restaurant-utils';
 import type { Restaurant } from '@/lib/restaurant-types';
 
 type RestaurantLogoBadgeProps = {
-  restaurant: Restaurant;
+  restaurant: Pick<Restaurant, 'name' | 'logoUrl'>;
   size?: 'sm' | 'lg';
   className?: string;
 };

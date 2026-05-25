@@ -3,6 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { restaurants } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
+import { extractLogoUrl } from './order-normalizer';
 
 const router = Router();
 router.use(authMiddleware);
@@ -15,20 +16,18 @@ router.get('/', async (req, res, next) => {
     const customerId = req.auth.id;
 
     const schemas = await db
-      .select({ schemaName: restaurants.schemaName, id: restaurants.id, name: restaurants.name })
+      .select({
+        schemaName: restaurants.schemaName,
+        id: restaurants.id,
+        name: restaurants.name,
+        slug: restaurants.slug,
+        subdomain: restaurants.subdomain,
+        settings: restaurants.settings,
+      })
       .from(restaurants)
       .where(eq(restaurants.status, 'active'));
 
-    const allOrders: Array<{
-      id: string;
-      code: string;
-      restaurantId: string;
-      restaurantName: string;
-      status: string;
-      total: string;
-      createdAt: Date;
-      fulfillmentType: string;
-    }> = [];
+    const allOrders = [];
 
     for (const schema of schemas) {
       const rows = await db.execute<Record<string, unknown>>(
@@ -39,12 +38,17 @@ router.get('/', async (req, res, next) => {
         LIMIT 50`
       );
 
+      const logoUrl = extractLogoUrl(schema.settings);
+
       for (const row of rows) {
         allOrders.push({
           id: row.id as string,
           code: row.code as string,
           restaurantId: schema.id,
           restaurantName: schema.name,
+          restaurantSlug: schema.slug,
+          restaurantSubdomain: schema.subdomain,
+          restaurantLogoUrl: logoUrl || null,
           status: row.status as string,
           total: String(row.total),
           createdAt: new Date(row.created_at as string),

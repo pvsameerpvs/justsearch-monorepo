@@ -1,5 +1,6 @@
 import { Container } from '@/components/shared/container';
 import type { Restaurant } from '@/lib/restaurant-types';
+import type { Order } from '@justsearch/types';
 import type { DeliveryOrder } from '../../use-restaurant-fulfillment';
 import { splitOrderAddress } from './profile-order-utils';
 import { ProfileOrderDetailsAddressCard } from './profile-order-details-address-card';
@@ -11,13 +12,18 @@ import { ProfileOrderDetailsStatusCard } from './profile-order-details-status-ca
 
 type Props = {
   order: DeliveryOrder;
-  restaurant: Restaurant;
+  sourceOrder: Order;
+  currentRestaurant: Restaurant;
 };
 
-export function ProfileOrderDetailsPresenter({ order, restaurant }: Props) {
+export function ProfileOrderDetailsPresenter({
+  order,
+  sourceOrder,
+  currentRestaurant,
+}: Props) {
   const addressLines = splitOrderAddress(order.address);
   const orderCurrency =
-    order.items[0]?.currency ?? restaurant.menu[0]?.items[0]?.currency ?? 'AED';
+    order.items[0]?.currency ?? currentRestaurant.menu[0]?.items[0]?.currency ?? 'AED';
   const isCancelled = order.status === 'cancelled';
 
   return (
@@ -33,7 +39,10 @@ export function ProfileOrderDetailsPresenter({ order, restaurant }: Props) {
           )}
 
           <ProfileOrderDetailsAddressCard addressLines={addressLines} />
-          <ProfileOrderDetailsRestaurantLink restaurant={restaurant} />
+          <ProfileOrderDetailsRestaurantLink
+            sourceOrder={sourceOrder}
+            currentRestaurant={currentRestaurant}
+          />
           <ProfileOrderDetailsInvoice order={order} currency={orderCurrency} />
         </div>
       </Container>

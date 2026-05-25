@@ -44,6 +44,18 @@ export function normalizeRawOrder(row: Record<string, unknown>): Record<string, 
   };
 }
 
+export function extractLogoUrl(settings: unknown): string | null {
+  if (
+    settings &&
+    typeof settings === 'object' &&
+    'logoUrl' in settings
+  ) {
+    const url = String((settings as Record<string, unknown>).logoUrl ?? '');
+    return url || null;
+  }
+  return null;
+}
+
 export function normalizeRawItem(row: Record<string, unknown>): Record<string, unknown> {
   return {
     id: row.id,

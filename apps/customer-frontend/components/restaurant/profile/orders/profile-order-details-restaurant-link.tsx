@@ -1,37 +1,67 @@
-import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
-import { Surface } from '@/components/shared/surface';
-import { RestaurantLogoBadge } from '@/components/restaurant/restaurant-logo-badge';
-import type { Restaurant } from '@/lib/restaurant-types';
+"use client";
+
+import { useState, useCallback } from "react";
+import Link from "next/link";
+import { ProfileOrderDetailsRestaurantCard } from "./profile-order-details-restaurant-card";
+import { ProfileOrderLeaveDialog } from "./profile-order-leave-dialog";
+import { getRestaurantUrl } from "@/lib/restaurant-utils";
+import type { Restaurant } from "@/lib/restaurant-types";
+import type { Order } from "@justsearch/types";
 
 type Props = {
-  restaurant: Restaurant;
+  sourceOrder: Order;
+  currentRestaurant: Restaurant;
 };
 
-export function ProfileOrderDetailsRestaurantLink({ restaurant }: Props) {
+export function ProfileOrderDetailsRestaurantLink({
+  sourceOrder,
+  currentRestaurant,
+}: Props) {
+  const [showDialog, setShowDialog] = useState(false);
+
+  const isSameRestaurant =
+    sourceOrder.restaurantSubdomain === currentRestaurant.subdomain;
+
+  const handleClick = useCallback(() => {
+    if (!isSameRestaurant) setShowDialog(true);
+  }, [isSameRestaurant]);
+
+  const handleCancel = useCallback(() => setShowDialog(false), []);
+
+  const restaurantName =
+    sourceOrder.restaurantName || currentRestaurant.name;
+  const logoUrl = sourceOrder.restaurantLogoUrl ?? undefined;
+  const targetUrl = getRestaurantUrl(
+    sourceOrder.restaurantSubdomain || currentRestaurant.subdomain,
+    "/menu"
+  );
+
   return (
-    <Link
-      href="/menu"
-      className="block rounded-[24px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand))] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-    >
-      <Surface className="rounded-[24px] border-[rgb(var(--border)/0.72)] bg-white/[0.92] p-4 shadow-sm transition-colors hover:bg-white">
-        <div className="flex items-center gap-3">
-          <RestaurantLogoBadge
-            restaurant={restaurant}
-            size="sm"
-            className="h-11"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
-              Restaurant
-            </p>
-            <p className="mt-1 truncate text-sm font-semibold text-[rgb(var(--ink))]">
-              {restaurant.name}
-            </p>
-          </div>
-          <ChevronRight className="h-4 w-4 text-[rgb(var(--muted))]" />
-        </div>
-      </Surface>
-    </Link>
+    <>
+      {isSameRestaurant ? (
+        <Link
+          href="/menu"
+          className="block rounded-[24px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand))] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        >
+          <ProfileOrderDetailsRestaurantCard name={restaurantName} logoUrl={logoUrl} />
+        </Link>
+      ) : (
+        <button
+          type="button"
+          onClick={handleClick}
+          className="block w-full rounded-[24px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand))] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        >
+          <ProfileOrderDetailsRestaurantCard name={restaurantName} logoUrl={logoUrl} />
+        </button>
+      )}
+
+      <ProfileOrderLeaveDialog
+        open={showDialog}
+        currentRestaurantName={currentRestaurant.name}
+        targetRestaurantName={restaurantName}
+        targetUrl={targetUrl}
+        onCancel={handleCancel}
+      />
+    </>
   );
 }

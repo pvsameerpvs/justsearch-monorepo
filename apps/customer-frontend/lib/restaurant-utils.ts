@@ -7,6 +7,10 @@ export function getRestaurantDomain(restaurant: Restaurant): string {
   return `${restaurant.subdomain}.${DEFAULT_PUBLIC_DOMAIN}`;
 }
 
+export function getRestaurantUrl(subdomain: string, path = '/'): string {
+  return `https://${subdomain}.${DEFAULT_PUBLIC_DOMAIN}${path}`;
+}
+
 export function getRestaurantInitials(name: string): string {
   return name
     .split(' ')

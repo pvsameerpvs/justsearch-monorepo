@@ -52,7 +52,7 @@ export function ProfileOrdersScreen({ restaurant }: ProfileOrdersScreenProps) {
             {orders.map((order) => (
               <ProfileOrderListItem
                 key={order.id}
-                restaurant={restaurant}
+                currentRestaurant={restaurant}
                 order={order}
               />
             ))}

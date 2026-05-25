@@ -32,6 +32,9 @@ export interface Order {
   driverId: string | null;
   restaurantId: string;
   restaurantName?: string;
+  restaurantLogoUrl?: string | null;
+  restaurantSlug?: string;
+  restaurantSubdomain?: string;
   deliveryAddress: string | null;
   notes: string | null;
   cancelReason: string | null;

@@ -3,7 +3,7 @@ import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { orders, orderItems, restaurants } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
-import { normalizeRawOrder, normalizeRawItem } from './order-normalizer';
+import { normalizeRawOrder, normalizeRawItem, extractLogoUrl } from './order-normalizer';
 
 const router = Router();
 router.use(authMiddleware);
@@ -17,21 +17,34 @@ router.get('/:id', async (req, res, next) => {
 
     if (isCustomer && customerId) {
       const schemas = await db
-        .select({ schemaName: restaurants.schemaName })
+        .select({
+          schemaName: restaurants.schemaName,
+          name: restaurants.name,
+          slug: restaurants.slug,
+          subdomain: restaurants.subdomain,
+          settings: restaurants.settings,
+        })
         .from(restaurants)
         .where(eq(restaurants.status, 'active'));
 
-      for (const { schemaName } of schemas) {
+      for (const schema of schemas) {
         const orderRows = await db.execute<Record<string, unknown>>(
-          sql`SELECT * FROM ${sql.identifier(schemaName)}."orders" WHERE id = ${orderId} AND customer_id = ${customerId} LIMIT 1`
+          sql`SELECT * FROM ${sql.identifier(schema.schemaName)}."orders" WHERE id = ${orderId} AND customer_id = ${customerId} LIMIT 1`
         );
 
         if (orderRows.length > 0) {
           const items = await db.execute<Record<string, unknown>>(
-            sql`SELECT * FROM ${sql.identifier(schemaName)}."order_items" WHERE order_id = ${orderId}`
+            sql`SELECT * FROM ${sql.identifier(schema.schemaName)}."order_items" WHERE order_id = ${orderId}`
           );
+
+          const normalized = normalizeRawOrder(orderRows[0]);
+          normalized.restaurantName = schema.name;
+          normalized.restaurantSlug = schema.slug;
+          normalized.restaurantSubdomain = schema.subdomain;
+          normalized.restaurantLogoUrl = extractLogoUrl(schema.settings);
+
           return res.json({
-            order: normalizeRawOrder(orderRows[0]),
+            order: normalized,
             items: items.map(normalizeRawItem),
           });
         }
