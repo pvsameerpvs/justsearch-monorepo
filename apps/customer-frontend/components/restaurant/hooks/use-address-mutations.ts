@@ -36,6 +36,8 @@ export function useAddressMutations() {
       address: newAddr.address,
       details: newAddr.details || undefined,
       alternateNumber: newAddr.alternateNumber || undefined,
+      lat: newAddr.lat,
+      lng: newAddr.lng,
     });
     return normalizeAddress(created);
   };
@@ -48,6 +50,8 @@ export function useAddressMutations() {
         address: updates.address,
         details: updates.details || undefined,
         alternateNumber: updates.alternateNumber || undefined,
+        lat: updates.lat,
+        lng: updates.lng,
       },
     });
     return normalizeAddress(updated);

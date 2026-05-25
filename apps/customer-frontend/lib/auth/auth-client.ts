@@ -1,4 +1,4 @@
-import { readRefreshToken, writeAccessToken, writeRefreshToken, clearTokens, setSessionInvalidated } from './token-utils';
+import { readAccessToken, readRefreshToken, writeAccessToken, writeRefreshToken, clearTokens, setSessionInvalidated, isTokenExpired } from './token-utils';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
@@ -27,6 +27,7 @@ async function doRefresh(): Promise<RefreshResult> {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
+      credentials: 'include',
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
@@ -67,6 +68,24 @@ export async function attemptSilentRefresh(): Promise<RefreshResult> {
   return refreshPromise;
 }
 
+/**
+ * Proactively refresh the access token before it expires.
+ * Call this before critical operations (e.g. placing an order)
+ * so the user never hits a 401 mid-flow.
+ */
+export async function ensureFreshToken(minutesBuffer = 3): Promise<boolean> {
+  const token = readAccessToken();
+  if (!token) return false;
+
+  // Token is still valid with a comfortable buffer — no need to refresh
+  if (!isTokenExpired(token, minutesBuffer * 60)) {
+    return true;
+  }
+
+  const result = await attemptSilentRefresh();
+  return result.ok;
+}
+
 export function invalidateAuthSession() {
   clearTokens();
   setSessionInvalidated();
@@ -82,6 +101,7 @@ export async function logoutFromBackend(): Promise<void> {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
+      credentials: 'include',
     });
   } catch {
     // ignore network errors

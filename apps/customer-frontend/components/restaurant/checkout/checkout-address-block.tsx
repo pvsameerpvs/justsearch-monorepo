@@ -33,7 +33,7 @@ interface CheckoutAddressBlockProps {
     addAddress: (address: Omit<SavedAddress, 'id'>) => Promise<SavedAddress>;
     editAddress: (id: string, updates: Omit<SavedAddress, 'id'>) => Promise<SavedAddress>;
     applySavedAddress: (addr: SavedAddress) => void;
-    applyCurrentLocationAddress: (addr: string) => void;
+    applyCurrentLocationAddress: (addr: string, lat?: number, lng?: number) => void;
     applyPinnedLocation: (addr: string, lat: number, lng: number) => void;
     coords: { setLatLng: (lat: number, lng: number) => void };
   };

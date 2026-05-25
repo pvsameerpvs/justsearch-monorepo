@@ -12,6 +12,8 @@ export type SavedAddress = {
   address: string;
   details: string;
   alternateNumber?: string;
+  lat?: number;
+  lng?: number;
 };
 
 export function useAddressBook() {

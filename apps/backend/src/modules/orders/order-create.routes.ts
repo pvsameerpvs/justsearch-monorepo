@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { eq, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { users } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
 import { createOrderSchema } from './order.validators';
 import { validateDeliveryOnCreate } from './order-delivery.utils';
@@ -16,12 +15,6 @@ router.post('/', async (req, res, next) => {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
     if (!req.auth?.id) {
       return res.status(401).json({ error: 'Authentication required' });
-    }
-
-    // Validate user still exists in public.users (stale JWT after migration 0007)
-    const [user] = await db.select().from(users).where(eq(users.id, req.auth.id)).limit(1);
-    if (!user) {
-      return res.status(401).json({ error: 'Session expired. Please sign in again.' });
     }
 
     const body = createOrderSchema.parse(req.body);

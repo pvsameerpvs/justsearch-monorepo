@@ -6,6 +6,8 @@ export type Address = {
   address: string;
   details: string;
   alternateNumber?: string;
+  lat?: number;
+  lng?: number;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;
@@ -17,6 +19,8 @@ export type CreateAddressPayload = {
   details?: string;
   alternateNumber?: string;
   isDefault?: boolean;
+  lat?: number;
+  lng?: number;
 };
 
 export async function fetchAddresses(): Promise<Address[]> {

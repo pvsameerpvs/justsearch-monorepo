@@ -14,6 +14,8 @@ export function useCheckoutAddress() {
   const [alternateNumber, setAlternateNumber] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [locationSource, setLocationSource] = useState<LocationSource>('none');
+  const [lat, setLat] = useState<number | undefined>();
+  const [lng, setLng] = useState<number | undefined>();
   const [isAddressBookOpen, setIsAddressBookOpen] = useState(false);
 
   const applySavedAddress = (savedAddress: SavedAddress) => {
@@ -22,24 +24,30 @@ export function useCheckoutAddress() {
     setAddress(savedAddress.address);
     setAddressDetails(savedAddress.details);
     setAlternateNumber(savedAddress.alternateNumber || '');
+    setLat(savedAddress.lat);
+    setLng(savedAddress.lng);
     setLocationSource('saved');
   };
 
-  const applyCurrentLocationAddress = (resolvedAddress: string) => {
+  const applyCurrentLocationAddress = (resolvedAddress: string, coordsLat?: number, coordsLng?: number) => {
     setSelectedAddressId(null);
     setAddressTitle('Current Location');
     setAddress(resolvedAddress);
     setAddressDetails('');
     setAlternateNumber('');
+    setLat(coordsLat);
+    setLng(coordsLng);
     setLocationSource('gps');
   };
 
-  const applyPinnedLocation = (resolvedAddress: string, _lat: number, _lng: number) => {
+  const applyPinnedLocation = (resolvedAddress: string, coordsLat: number, coordsLng: number) => {
     setSelectedAddressId(null);
     setAddressTitle('Pinned Location');
     setAddress(resolvedAddress);
     setAddressDetails('');
     setAlternateNumber('');
+    setLat(coordsLat);
+    setLng(coordsLng);
     setLocationSource('pinned');
   };
 
@@ -65,6 +73,8 @@ export function useCheckoutAddress() {
     addAddress,
     editAddress,
     locationSource,
+    lat,
+    lng,
     applySavedAddress,
     applyCurrentLocationAddress,
     applyPinnedLocation,

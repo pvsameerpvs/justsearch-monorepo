@@ -8,5 +8,7 @@ export function normalizeAddress(raw: Address): SavedAddress {
     address: raw.address,
     details: raw.details ?? "",
     alternateNumber: raw.alternateNumber ?? undefined,
+    lat: raw.lat ?? undefined,
+    lng: raw.lng ?? undefined,
   };
 }

@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { createOrder } from '@/lib/api/orders.api';
+import { ensureFreshToken } from '@/lib/auth/auth-client';
 import { useRegistration } from '@/components/auth/registration-context';
 import type { StoredState, StoredOrder } from './fulfillment.types';
 import { computeTotal } from './fulfillment.constants';
@@ -19,6 +20,13 @@ export function usePlaceOrder(
     async ({ address, note, promoCode, promoDiscount, paymentMethod, alternateNumber, lat, lng, deliveryFee: dynamicFee }: { address: string; note: string; promoCode?: string; promoDiscount?: number; paymentMethod?: 'cash' | 'card'; alternateNumber?: string; lat?: number; lng?: number; deliveryFee?: number }) => {
       if (!user) throw new Error('Please sign in to place an order');
       if (cartCount === 0) return null;
+
+      // Proactively refresh token before it expires mid-order
+      const tokenFresh = await ensureFreshToken(3);
+      if (!tokenFresh) {
+        throw new Error('Session expired. Please sign in again.');
+      }
+
       const fee = dynamicFee ?? deliveryFee;
       const totalVal = computeTotal(subtotal, fee, 0);
       const res = await createOrder({

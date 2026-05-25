@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db';
-import { addresses, users } from '../../db/schema';
+import { addresses } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -13,12 +13,6 @@ router.get('/', async (req, res, next) => {
   try {
     if (!req.auth) {
       return res.status(401).json({ error: 'Authentication required' });
-    }
-
-    // Validate user still exists (stale JWT after migration 0007)
-    const [user] = await db.select().from(users).where(eq(users.id, req.auth.id)).limit(1);
-    if (!user) {
-      return res.status(401).json({ error: 'Session expired. Please sign in again.' });
     }
 
     const list = await db
@@ -40,18 +34,14 @@ router.post('/', async (req, res, next) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Validate user still exists (stale JWT after migration 0007)
-    const [user] = await db.select().from(users).where(eq(users.id, req.auth.id)).limit(1);
-    if (!user) {
-      return res.status(401).json({ error: 'Session expired. Please sign in again.' });
-    }
-
     const body = req.body as {
       label?: string;
       address?: string;
       details?: string;
       alternateNumber?: string;
       isDefault?: boolean;
+      lat?: number;
+      lng?: number;
     };
 
     if (!body.label || !body.address) {
@@ -67,6 +57,8 @@ router.post('/', async (req, res, next) => {
         details: body.details || null,
         alternateNumber: body.alternateNumber || null,
         isDefault: body.isDefault ?? false,
+        lat: body.lat ?? null,
+        lng: body.lng ?? null,
       })
       .returning();
 
@@ -100,6 +92,8 @@ router.patch('/:id', async (req, res, next) => {
       address?: string;
       details?: string;
       alternateNumber?: string;
+      lat?: number;
+      lng?: number;
     };
 
     if (!body.address) {
@@ -113,6 +107,8 @@ router.patch('/:id', async (req, res, next) => {
         address: body.address,
         details: body.details || null,
         alternateNumber: body.alternateNumber || null,
+        lat: body.lat ?? existing.lat,
+        lng: body.lng ?? existing.lng,
         updatedAt: new Date(),
       })
       .where(eq(addresses.id, id))

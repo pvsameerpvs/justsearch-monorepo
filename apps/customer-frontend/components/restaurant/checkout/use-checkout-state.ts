@@ -42,7 +42,15 @@ export function useCheckoutState(restaurant: Restaurant) {
       return;
     }
 
-    // Saved / manual / fallback: resolve coords from the address text.
+    // Saved address with stored coordinates: use them directly.
+    // This avoids slow/unreliable re-geocoding on every checkout visit.
+    if (address.locationSource === 'saved' && address.lat != null && address.lng != null) {
+      coords.setLatLng(address.lat, address.lng);
+      return;
+    }
+
+    // Legacy saved address without stored coordinates, or manual entry:
+    // fall back to geocoding the address text.
     let cancelled = false;
     geocodeAddress(address.address).then((result) => {
       if (cancelled) return;
@@ -54,7 +62,7 @@ export function useCheckoutState(restaurant: Restaurant) {
     });
 
     return () => { cancelled = true; };
-  }, [address.address, address.locationSource, isDeliveryEnabled]);
+  }, [address.address, address.locationSource, address.lat, address.lng, isDeliveryEnabled]);
 
   const { data: quote, isLoading: quoteLoading } = useDeliveryQuote(
     isDeliveryEnabled,
