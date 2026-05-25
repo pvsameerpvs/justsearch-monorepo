@@ -43,8 +43,8 @@ export function useCheckoutValidation(
       errors.push('Please set your delivery location to calculate the fee');
     }
 
-    if (deliveryAvailable === false && deliveryError) {
-      errors.push(deliveryError);
+    if (deliveryAvailable === false) {
+      errors.push(deliveryError || 'Delivery is not available for this location');
     }
 
     return { isValid: errors.length === 0, errors };

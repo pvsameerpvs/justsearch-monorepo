@@ -45,7 +45,7 @@ export function CheckoutStickyFooter({
           type="button"
           onClick={onPlaceOrder}
           disabled={cartCount === 0 || isPlacing || !isValid}
-          className="inline-flex h-14 shrink-0 items-center justify-center rounded-[20px] bg-[rgb(var(--brand))] px-8 text-lg font-bold text-white shadow-[0_12px_36px_rgb(var(--brand)/0.25)] transition-all hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-14 shrink-0 items-center justify-center rounded-[20px] px-8 text-lg font-bold text-white shadow-[0_12px_36px_rgb(var(--brand)/0.25)] transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none disabled:hover:brightness-100 bg-[rgb(var(--brand))] hover:brightness-110"
         >
           {isPlacing ? 'Placing...' : cartCount === 0 ? 'Cart Empty' : deliveryUnavailable ? 'Unavailable' : !isValid ? 'Add Address' : 'Place Order'}
         </button>

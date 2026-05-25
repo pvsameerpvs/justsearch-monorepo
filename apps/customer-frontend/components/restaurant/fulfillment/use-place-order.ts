@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import { createOrder } from '@/lib/api/orders.api';
-import { ensureFreshToken } from '@/lib/auth/auth-client';
+import { ensureFreshToken, invalidateAuthSession } from '@/lib/auth/auth-client';
 import { useRegistration } from '@/components/auth/registration-context';
 import type { StoredState, StoredOrder } from './fulfillment.types';
 import { computeTotal } from './fulfillment.constants';
@@ -24,6 +24,7 @@ export function usePlaceOrder(
       // Proactively refresh token before it expires mid-order
       const tokenFresh = await ensureFreshToken(3);
       if (!tokenFresh) {
+        invalidateAuthSession();
         throw new Error('Session expired. Please sign in again.');
       }
 

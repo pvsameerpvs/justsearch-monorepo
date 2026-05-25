@@ -1,10 +1,18 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { useRegistration } from '@/components/auth/registration-context';
 import type { AddressLabel } from '../use-address-book';
 import type { PlaceApi, PromoApi, AddressApi } from './checkout-place-action.types';
 
 const PLACE_ORDER_COOLDOWN_MS = 1500;
+const SESSION_EXPIRED_MESSAGES = ['session expired', 'please sign in', 'please log in'];
+
+function isSessionExpiredError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error);
+  const lower = msg.toLowerCase();
+  return SESSION_EXPIRED_MESSAGES.some((phrase) => lower.includes(phrase));
+}
 
 export function useCheckoutPlaceAction(
   validation: { isValid: boolean; errors: string[] },
@@ -22,8 +30,9 @@ export function useCheckoutPlaceAction(
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [warn, setWarn] = useState<string | null>(null);
   const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { openModal, setPendingAction } = useRegistration();
 
-  const onPlaceOrder = async () => {
+  const onPlaceOrder = useCallback(async () => {
     if (place.placingOrder || isSubmitting) return;
     if (!validation.isValid) { place.setPlaceError(validation.errors[0] ?? 'Cannot place order'); return; }
     setIsSubmitting(true);
@@ -52,14 +61,20 @@ export function useCheckoutPlaceAction(
       promo.consumePromo();
       place.startPlacing(orderId);
     } catch (e) {
-      place.setPlaceError(e instanceof Error ? e.message : 'Failed to place order');
+      const message = e instanceof Error ? e.message : 'Failed to place order';
+      if (isSessionExpiredError(e)) {
+        setPendingAction(() => onPlaceOrder());
+        openModal();
+      } else {
+        place.setPlaceError(message);
+      }
       // Keep button disabled briefly so the user cannot spam-click on error
       if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
       cooldownTimer.current = setTimeout(() => setIsSubmitting(false), PLACE_ORDER_COOLDOWN_MS);
       return;
     }
     setIsSubmitting(false);
-  };
+  }, [validation.isValid, validation.errors, place, promo, address, getCombinedAddress, restaurantNote, paymentMethod, lat, lng, deliveryFee, isSubmitting, openModal, setPendingAction]);
 
   return { onPlaceOrder, isSubmitting, warn };
 }

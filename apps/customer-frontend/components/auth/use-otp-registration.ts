@@ -16,7 +16,7 @@ async function postOtp(url: string, body: Record<string, unknown>) {
 }
 
 export function useOtpRegistration() {
-  const { isModalOpen, closeModal, setUser, user } = useRegistration();
+  const { isModalOpen, closeModal, setUser, user, sessionExpiredReason } = useRegistration();
   const [step, setStep] = useState<Step>('details');
   const [mode, setMode] = useState<AuthMode>('login');
   const [requestId, setRequestId] = useState<string | null>(null);
@@ -130,5 +130,6 @@ export function useOtpRegistration() {
     requestOtp,
     verifyOtp,
     switchMode,
+    sessionExpiredReason,
   };
 }

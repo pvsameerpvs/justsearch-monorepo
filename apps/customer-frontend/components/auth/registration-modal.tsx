@@ -1,5 +1,5 @@
 "use client";
-import { X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 import { Surface } from '@/components/shared/surface';
 import { useOtpRegistration } from './use-otp-registration';
 import { DetailsStep } from './registration-modal-details-step';
@@ -13,6 +13,12 @@ export function RegistrationModal() {
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Authentication">
       <Surface className="w-full max-w-[520px] rounded-[28px] border-white/60 bg-white/95 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.25)] sm:p-6">
+        {otr.sessionExpiredReason && (
+          <div className="mb-4 flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            <p className="text-sm font-semibold">{otr.sessionExpiredReason}</p>
+          </div>
+        )}
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[rgb(var(--brand))]">

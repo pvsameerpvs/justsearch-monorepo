@@ -5,9 +5,25 @@ import bcrypt from 'bcryptjs';
 
 const SALT_ROUNDS = 10;
 
+function parseDurationToMs(value: string): number {
+  const match = value.trim().match(/^(\d+)\s*([dhms])$/i);
+  if (!match) return 7 * 24 * 60 * 60 * 1000; // fallback 7 days
+  const num = parseInt(match[1], 10);
+  const unit = match[2].toLowerCase();
+  const multipliers: Record<string, number> = {
+    d: 24 * 60 * 60 * 1000,
+    h: 60 * 60 * 1000,
+    m: 60 * 1000,
+    s: 1000,
+  };
+  return num * (multipliers[unit] ?? multipliers.d);
+}
+
+const REFRESH_TTL_MS = parseDurationToMs(process.env.JWT_REFRESH_EXPIRY || '90d');
+
 export async function createRefreshToken(userId: string, rawToken: string) {
   const tokenHash = await bcrypt.hash(rawToken, SALT_ROUNDS);
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  const expiresAt = new Date(Date.now() + REFRESH_TTL_MS);
 
   const [record] = await db
     .insert(refreshTokens)
