@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, AlertCircle } from "lucide-react";
 import {
   useItemEditorForm,
   useItemEditorSubmit,
@@ -23,7 +23,7 @@ export function ItemEditorModal({
   onClose,
 }: ItemEditorModalProps) {
   const form = useItemEditorForm(item);
-  const { onSubmit, isSaving } = useItemEditorSubmit({
+  const { onSubmit, isSaving, submitError } = useItemEditorSubmit({
     item,
     categoryId,
     menuId,
@@ -40,6 +40,12 @@ export function ItemEditorModal({
         <Header title={item ? "Edit Item" : "Add Item"} onClose={onClose} />
         <form onSubmit={handleSubmit}>
           <ItemFormFields form={form} />
+          {submitError && (
+            <div className="mt-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{submitError}</span>
+            </div>
+          )}
           <Footer
             isSaving={isSaving}
             isEditing={Boolean(item)}

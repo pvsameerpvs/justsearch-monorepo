@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { ZodError } from 'zod';
 
 interface AppError extends Error {
   statusCode?: number;
@@ -14,6 +15,13 @@ function isPostgresError(err: unknown): err is { code: string; message: string }
   );
 }
 
+function formatZodErrors(error: ZodError) {
+  return error.errors.map((e) => ({
+    path: e.path.join('.'),
+    message: e.message,
+  }));
+}
+
 export const errorHandler = (
   err: AppError,
   req: Request,
@@ -22,6 +30,14 @@ export const errorHandler = (
 ) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Internal Server Error';
+  let errors: Array<{ path: string; message: string }> | undefined;
+
+  // Handle Zod validation errors
+  if (err instanceof ZodError) {
+    statusCode = 400;
+    message = 'Validation failed';
+    errors = formatZodErrors(err);
+  }
 
   // Handle Postgres / Drizzle connection errors
   if (isPostgresError(err)) {
@@ -42,6 +58,7 @@ export const errorHandler = (
   res.status(statusCode).json({
     success: false,
     message,
+    ...(errors && { errors }),
     ...(process.env.NODE_ENV === 'development' && {
       stack: err.stack,
       code: isPostgresError(err) ? err.code : undefined,

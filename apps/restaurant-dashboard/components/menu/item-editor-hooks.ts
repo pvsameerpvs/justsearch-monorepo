@@ -39,7 +39,7 @@ export function useItemEditorForm(item?: MenuItem) {
     defaultValues: {
       name: item?.name ?? "",
       description: item?.description ?? "",
-      price: item?.price ?? 0,
+      price: item?.price,
       currency: item?.currency ?? "AED",
       image: item?.image ?? "",
       tags: item?.tags?.join(", ") ?? "",
@@ -64,10 +64,12 @@ export function useItemEditorSubmit({
   const createItem = useCreateMenuItemMutation();
   const updateItem = useUpdateMenuItemMutation();
   const [isSaving, setIsSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const onSubmit = useCallback(
     async (data: ItemEditorFormData) => {
       setIsSaving(true);
+      setSubmitError(null);
       try {
         const imageUrl = data.image
           ? (await uploadImage(data.image, "menu")).url
@@ -81,6 +83,9 @@ export function useItemEditorSubmit({
           );
         }
         onClose();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to save item. Please try again.";
+        setSubmitError(message);
       } finally {
         setIsSaving(false);
       }
@@ -88,7 +93,7 @@ export function useItemEditorSubmit({
     [item, categoryId, menuId, createItem, updateItem, onClose],
   );
 
-  return { onSubmit, isSaving };
+  return { onSubmit, isSaving, submitError };
 }
 
 export function useEscKey(onClose: () => void) {

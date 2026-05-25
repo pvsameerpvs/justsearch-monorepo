@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const menuItemSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  description: z.string().max(200, 'Description too long').optional(),
-  price: z.number().positive('Price must be positive'),
+  name: z.string().min(2, 'Name must be at least 2 characters').max(255, 'Name too long'),
+  description: z.string().max(500, 'Description too long').optional().or(z.literal('')),
+  price: z.number().positive('Price must be positive').max(999_999.99, 'Price too high'),
   categoryId: z.string().uuid('Select a category'),
   isAvailable: z.boolean().default(true),
   tags: z.array(z.string()).max(3, 'Maximum 3 tags'),
