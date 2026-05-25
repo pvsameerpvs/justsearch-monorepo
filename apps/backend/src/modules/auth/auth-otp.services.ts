@@ -1,62 +1,71 @@
-import { eq, and } from 'drizzle-orm';
-import { db } from '../../db';
-import { otpRequests, users, userRestaurants } from '../../db/schema';
+import { eq, and, sql } from 'drizzle-orm';
+import { db, type Database } from '../../db';
+import { users, userRestaurants } from '../../db/schema';
 import { MAX_ATTEMPTS } from './auth.utils';
+import { t } from '../../lib/tenant-sql';
 
 export async function validateOtpRequest(
+  schemaName: string,
   restaurantId: string,
   requestId: string,
   mobile: string,
-  otp: string
+  otp: string,
+  dbInstance: Database = db
 ) {
-  const [record] = await db
-    .select()
-    .from(otpRequests)
-    .where(
-      and(
-        eq(otpRequests.restaurantId, restaurantId),
-        eq(otpRequests.requestId, requestId),
-        eq(otpRequests.mobile, mobile)
-      )
-    )
-    .limit(1);
+  const recordRows = await dbInstance.execute<Record<string, unknown>>(sql`
+    SELECT * FROM ${t(schemaName, 'otp_requests')}
+    WHERE restaurant_id = ${restaurantId} AND request_id = ${requestId} AND mobile = ${mobile}
+    LIMIT 1
+  `);
+  const record = recordRows[0];
 
   if (!record) return { ok: false, error: 'OTP request not found' };
 
-  if (new Date() > record.expiresAt) {
-    await db.delete(otpRequests).where(eq(otpRequests.id, record.id));
+  if (new Date() > (record.expires_at as Date)) {
+    await dbInstance.execute(sql`
+      DELETE FROM ${t(schemaName, 'otp_requests')} WHERE id = ${record.id}
+    `);
     return { ok: false, error: 'OTP expired' };
   }
 
-  if (record.attempts >= MAX_ATTEMPTS) {
-    await db.delete(otpRequests).where(eq(otpRequests.id, record.id));
+  if ((record.attempts as number) >= MAX_ATTEMPTS) {
+    await dbInstance.execute(sql`
+      DELETE FROM ${t(schemaName, 'otp_requests')} WHERE id = ${record.id}
+    `);
     return { ok: false, error: 'Too many attempts' };
   }
 
-  await db
-    .update(otpRequests)
-    .set({ attempts: record.attempts + 1 })
-    .where(eq(otpRequests.id, record.id));
+  await dbInstance.execute(sql`
+    UPDATE ${t(schemaName, 'otp_requests')}
+    SET attempts = ${(record.attempts as number) + 1}
+    WHERE id = ${record.id}
+  `);
 
-  if (record.otp !== otp) {
+  if ((record.otp as string) !== otp) {
     return { ok: false, error: 'Incorrect OTP' };
   }
 
-  await db.delete(otpRequests).where(eq(otpRequests.id, record.id));
+  await dbInstance.execute(sql`
+    DELETE FROM ${t(schemaName, 'otp_requests')} WHERE id = ${record.id}
+  `);
 
-  const [existingUser] = await db
+  const normalizedMobile = mobile.replace(/^\+/, '');
+
+  const [existingUser] = await dbInstance
     .select()
     .from(users)
-    .where(eq(users.phone, mobile))
+    .where(
+      sql`REPLACE(${users.phone}, '+', '') = ${normalizedMobile}`
+    )
     .limit(1);
 
   let user = existingUser;
   let isNewLink = false;
 
   if (!user) {
-    const [newUser] = await db
+    const [newUser] = await dbInstance
       .insert(users)
-      .values({ phone: mobile, name: record.name, role: 'customer', isActive: true })
+      .values({ phone: mobile, name: record.name as string, role: 'customer', isActive: true })
       .returning();
     user = newUser;
     isNewLink = true;
@@ -66,7 +75,7 @@ export async function validateOtpRequest(
     return { ok: false, error: 'User creation failed' };
   }
 
-  const [existingLink] = await db
+  const [existingLink] = await dbInstance
     .select()
     .from(userRestaurants)
     .where(and(eq(userRestaurants.userId, user.id), eq(userRestaurants.restaurantId, restaurantId)))
@@ -74,7 +83,7 @@ export async function validateOtpRequest(
 
   let userRole = user.role;
   if (!existingLink) {
-    await db
+    await dbInstance
       .insert(userRestaurants)
       .values({ userId: user.id, restaurantId, role: user.role, permissions: {} });
     isNewLink = true;

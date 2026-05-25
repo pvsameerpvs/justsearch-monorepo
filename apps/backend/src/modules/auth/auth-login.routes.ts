@@ -38,7 +38,7 @@ router.post('/', async (req, res, next) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      maxAge: 30 * 60 * 1000, // 30 minutes
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours (matches JWT_ACCESS_EXPIRY)
     });
 
     res.json({

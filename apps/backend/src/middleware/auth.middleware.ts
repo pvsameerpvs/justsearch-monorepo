@@ -17,10 +17,8 @@ export function authMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const token =
-    req.cookies?.token ||
-    req.headers.authorization?.replace('Bearer ', '') ||
-    '';
+  const bearer = req.headers.authorization?.replace('Bearer ', '');
+  const token = bearer || req.cookies?.token || '';
 
   if (!token) {
     return res.status(401).json({ message: 'Authentication required' });

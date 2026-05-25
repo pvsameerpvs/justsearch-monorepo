@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
+import { t, mapRow } from '../../lib/tenant-sql';
 
 const router = Router();
 
@@ -20,18 +20,17 @@ router.patch('/:id/payment', requireRole('owner', 'manager', 'cashier', 'driver'
       paymentStatus: z.enum(['unpaid', 'paid']).optional(),
     });
     const { paymentMethod, paymentStatus } = schema.parse(req.body);
+    const schemaName = req.tenant.schemaName;
 
-    const [updated] = await db
-      .update(orders)
-      .set({
-        paymentMethod,
-        paymentStatus: paymentStatus || 'paid',
-        updatedAt: new Date(),
-      })
-      .where(and(eq(orders.id, orderId), eq(orders.restaurantId, req.tenant.id)))
-      .returning();
+    const updatedRows = await db.execute<Record<string, unknown>>(sql`
+      UPDATE ${t(schemaName, 'orders')}
+      SET payment_method = ${paymentMethod}, payment_status = ${paymentStatus || 'paid'}, updated_at = NOW()
+      WHERE id = ${orderId} AND restaurant_id = ${req.tenant.id}
+      RETURNING *
+    `);
 
-    if (!updated) return res.status(404).json({ error: 'Order not found' });
+    if (!updatedRows[0]) return res.status(404).json({ error: 'Order not found' });
+    const updated = mapRow(updatedRows[0]);
     res.json({ order: updated });
   } catch (error) {
     next(error);

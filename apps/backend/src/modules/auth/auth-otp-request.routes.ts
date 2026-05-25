@@ -1,10 +1,11 @@
 import { randomUUID } from 'crypto';
 import { Router } from 'express';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { otpRequests, users } from '../../db/schema';
+import { users } from '../../db/schema';
 import { otpRequestLimiter } from '../../middleware/rate-limit.middleware';
 import { normalizeMobile, isValidMobile, isValidName, randomOtp, OTP_TTL_MS } from './auth.utils';
+import { t } from '../../lib/tenant-sql';
 
 const router = Router();
 
@@ -43,16 +44,13 @@ router.post('/request', otpRequestLimiter, async (req, res, next) => {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + OTP_TTL_MS);
 
-    await db.insert(otpRequests).values({
-      restaurantId: req.tenant.id,
-      requestId,
-      name,
-      mobile,
-      otp,
-      attempts: 0,
-      createdAt: now,
-      expiresAt,
-    });
+    await db.execute(sql`
+      INSERT INTO ${t(req.tenant.schemaName, 'otp_requests')} (
+        restaurant_id, request_id, name, mobile, otp, attempts, created_at, expires_at
+      ) VALUES (
+        ${req.tenant.id}, ${requestId}, ${name}, ${mobile}, ${otp}, 0, ${now.toISOString()}, ${expiresAt.toISOString()}
+      )
+    `);
 
     const showDemoOtp = process.env.NODE_ENV !== 'production' || process.env.DEBUG_OTP === 'true';
     res.json({ requestId, flow, ...(showDemoOtp ? { demoOtp: otp } : {}) });

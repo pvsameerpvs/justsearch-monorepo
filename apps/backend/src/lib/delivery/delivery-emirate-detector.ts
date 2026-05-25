@@ -15,6 +15,8 @@ const EMIRATE_ALIASES: Record<string, UaeEmirate> = {
   uaq: 'Umm Al Quwain',
 };
 
+const HERE_FETCH_TIMEOUT_MS = 2000;
+
 export async function detectEmirateFromCoords(
   lat: number,
   lng: number
@@ -26,7 +28,10 @@ export async function detectEmirateFromCoords(
       `?at=${lat},${lng}` +
       `&lang=en-US` +
       `&apiKey=${HERE_API_KEY}`;
-    const res = await fetch(url);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), HERE_FETCH_TIMEOUT_MS);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (!res.ok) return null;
     const data = (await res.json()) as {
       items?: Array<{ address?: { county?: string; city?: string; state?: string } }>;

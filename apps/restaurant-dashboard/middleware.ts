@@ -7,9 +7,12 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
   const normalizedHost = host.replace(/:\d+$/, '').toLowerCase();
 
-  // Allow localhost for development — no hardcoded slug; frontend api-client sends it via localStorage
+  // Allow localhost for development — default to naples so all data loads immediately
   if (normalizedHost === 'localhost' || normalizedHost.endsWith('.localhost')) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_RESTAURANT_SLUG || 'naples';
+    response.headers.set('x-restaurant-slug', defaultSlug);
+    return response;
   }
 
   // Extract restaurant slug from *.admin.eatygo.com

@@ -31,7 +31,17 @@ export function haversineDistanceKm(
 }
 
 function findMatchingTier(distanceKm: number, tiers: DeliveryTier[]): DeliveryTier | undefined {
-  return tiers.find((t) => distanceKm >= t.minKm && distanceKm < t.maxKm);
+  const sorted = [...tiers].sort((a, b) => a.minKm - b.minKm);
+  for (let i = 0; i < sorted.length; i++) {
+    const t = sorted[i];
+    const isLast = i === sorted.length - 1;
+    // Middle tiers: half-open [min, max) to avoid overlap
+    // Last tier: closed [min, max] so exact maxRadiusKm boundary is covered
+    if (distanceKm >= t.minKm && (isLast ? distanceKm <= t.maxKm : distanceKm < t.maxKm)) {
+      return t;
+    }
+  }
+  return undefined;
 }
 
 export async function getDeliveryConfig(restaurantId: string): Promise<DeliveryConfig | null> {

@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders, deliveryAssignments } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
+import { t, mapRow } from '../../lib/tenant-sql';
 
 const router = Router();
 
@@ -17,46 +17,40 @@ router.patch('/:id/driver', requireRole('owner', 'manager', 'cashier'), async (r
     const orderId = req.params.id;
     const schema = z.object({ driverId: z.string().uuid() });
     const { driverId } = schema.parse(req.body);
+    const schemaName = req.tenant.schemaName;
 
-    const [updated] = await db
-      .update(orders)
-      .set({ driverId, status: 'out_for_delivery', updatedAt: new Date() })
-      .where(and(eq(orders.id, orderId), eq(orders.restaurantId, req.tenant.id)))
-      .returning();
+    const updatedRows = await db.execute<Record<string, unknown>>(sql`
+      UPDATE ${t(schemaName, 'orders')}
+      SET driver_id = ${driverId}, status = 'out_for_delivery', updated_at = NOW()
+      WHERE id = ${orderId} AND restaurant_id = ${req.tenant.id}
+      RETURNING *
+    `);
 
-    if (!updated) return res.status(404).json({ error: 'Order not found' });
+    if (!updatedRows[0]) return res.status(404).json({ error: 'Order not found' });
+    const updated = mapRow(updatedRows[0]);
 
     // Check if an assignment already exists for this order — update instead of duplicating
-    const [existing] = await db
-      .select()
-      .from(deliveryAssignments)
-      .where(
-        and(
-          eq(deliveryAssignments.orderId, updated.id),
-          eq(deliveryAssignments.restaurantId, req.tenant.id)
-        )
-      )
-      .limit(1);
+    const existingRows = await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'delivery_assignments')}
+      WHERE order_id = ${updated.id} AND restaurant_id = ${req.tenant.id}
+      LIMIT 1
+    `);
+    const existing = existingRows[0] ? mapRow(existingRows[0]) : undefined;
 
     if (existing) {
-      await db
-        .update(deliveryAssignments)
-        .set({
-          agentId: driverId,
-          status: 'assigned',
-          assignedAt: new Date(),
-          pickedUpAt: null,
-          deliveredAt: null,
-        })
-        .where(eq(deliveryAssignments.id, existing.id));
+      await db.execute(sql`
+        UPDATE ${t(schemaName, 'delivery_assignments')}
+        SET agent_id = ${driverId}, status = 'assigned', assigned_at = NOW(), picked_up_at = NULL, delivered_at = NULL
+        WHERE id = ${existing.id}
+      `);
     } else {
-      await db.insert(deliveryAssignments).values({
-        restaurantId: req.tenant.id,
-        orderId: updated.id,
-        agentId: driverId,
-        status: 'assigned',
-        assignedAt: new Date(),
-      });
+      await db.execute(sql`
+        INSERT INTO ${t(schemaName, 'delivery_assignments')} (
+          restaurant_id, order_id, agent_id, status, assigned_at
+        ) VALUES (
+          ${req.tenant.id}, ${updated.id}, ${driverId}, 'assigned', NOW()
+        )
+      `);
     }
 
     res.json({ order: updated });

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { dailyCloseouts } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
+import { t, mapRows } from '../../lib/tenant-sql';
 
 const router = Router();
 
@@ -14,17 +14,26 @@ router.get('/', requireRole('owner', 'manager', 'cashier'), async (req, res, nex
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
     const date = req.query.date as string | undefined;
-    let query = db.select().from(dailyCloseouts).where(eq(dailyCloseouts.restaurantId, req.tenant.id));
+    const schemaName = req.tenant.schemaName;
 
+    let rows: Record<string, unknown>[];
     if (date) {
-      query = db
-        .select()
-        .from(dailyCloseouts)
-        .where(and(eq(dailyCloseouts.restaurantId, req.tenant.id), eq(dailyCloseouts.date, date)));
+      rows = await db.execute<Record<string, unknown>>(sql`
+        SELECT * FROM ${t(schemaName, 'daily_closeouts')}
+        WHERE restaurant_id = ${req.tenant.id} AND date = ${date}
+        ORDER BY date DESC
+        LIMIT 30
+      `);
+    } else {
+      rows = await db.execute<Record<string, unknown>>(sql`
+        SELECT * FROM ${t(schemaName, 'daily_closeouts')}
+        WHERE restaurant_id = ${req.tenant.id}
+        ORDER BY date DESC
+        LIMIT 30
+      `);
     }
 
-    const list = await query.orderBy(sql`${dailyCloseouts.date} desc`).limit(30);
-    res.json({ closeouts: list });
+    res.json({ closeouts: mapRows(rows) });
   } catch (error) {
     next(error);
   }

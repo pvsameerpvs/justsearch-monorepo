@@ -22,7 +22,7 @@ router.post('/verify', otpVerifyLimiter, async (req, res, next) => {
     if (!mobile) return res.status(400).json({ error: 'Missing mobile' });
     if (!/^\d{4}$/.test(otp)) return res.status(400).json({ error: 'Invalid OTP format' });
 
-    const result = await validateOtpRequest(req.tenant.id, requestId, mobile, otp);
+    const result = await validateOtpRequest(req.tenant.schemaName, req.tenant.id, requestId, mobile, otp);
 
     if (!result.ok) {
       return res.status(400).json({ error: result.error });
@@ -46,7 +46,7 @@ router.post('/verify', otpVerifyLimiter, async (req, res, next) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 30 * 60 * 1000, // 30 minutes
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours (matches JWT_ACCESS_EXPIRY)
     });
 
     res.json({

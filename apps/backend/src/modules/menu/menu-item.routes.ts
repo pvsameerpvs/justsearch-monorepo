@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql, SQL } from 'drizzle-orm';
 import { db } from '../../db';
-import { menuItems, menus } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
+import { t, mapRow, mapRows } from '../../lib/tenant-sql';
 
 const router = Router();
 
@@ -14,11 +14,13 @@ router.get('/', async (req, res, next) => {
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
-    const items = await db
-      .select()
-      .from(menuItems)
-      .where(eq(menuItems.restaurantId, req.tenant.id))
-      .orderBy(menuItems.sortOrder);
+    const schemaName = req.tenant.schemaName;
+
+    const items = mapRows(await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'menu_items')}
+      WHERE restaurant_id = ${req.tenant.id}
+      ORDER BY sort_order
+    `));
 
     res.json({ items });
   } catch (error) {
@@ -45,36 +47,31 @@ router.post('/', requireRole('owner', 'manager', 'super_admin'), async (req, res
     });
 
     const body = schema.parse(req.body);
+    const schemaName = req.tenant.schemaName;
 
     let menuId = body.menuId;
     if (!menuId) {
-      const [firstMenu] = await db
-        .select({ id: menus.id })
-        .from(menus)
-        .where(eq(menus.restaurantId, req.tenant.id))
-        .limit(1);
-      if (!firstMenu) {
+      const menuRows = await db.execute<Record<string, unknown>>(sql`
+        SELECT id FROM ${t(schemaName, 'menus')}
+        WHERE restaurant_id = ${req.tenant.id}
+        LIMIT 1
+      `);
+      if (!menuRows[0]) {
         return res.status(400).json({ error: 'No menu found for this restaurant. Create a menu first.' });
       }
-      menuId = firstMenu.id;
+      menuId = String(menuRows[0].id);
     }
 
-    const [item] = await db
-      .insert(menuItems)
-      .values({
-        restaurantId: req.tenant.id,
-        menuId,
-        categoryId: body.categoryId,
-        name: body.name,
-        description: body.description,
-        price: String(body.price),
-        imageUrl: body.imageUrl,
-        tags: body.tags ?? [],
-        isVeg: body.isVeg ?? false,
-        isAvailable: body.isAvailable ?? true,
-        sortOrder: body.sortOrder ?? 0,
-      })
-      .returning();
+    const itemRows = await db.execute<Record<string, unknown>>(sql`
+      INSERT INTO ${t(schemaName, 'menu_items')} (
+        restaurant_id, menu_id, category_id, name, description, price, image_url, tags, is_veg, is_available, sort_order
+      ) VALUES (
+        ${req.tenant.id}, ${menuId}, ${body.categoryId || null}, ${body.name}, ${body.description || null},
+        ${String(body.price)}, ${body.imageUrl || null}, ${JSON.stringify(body.tags ?? [])}, ${body.isVeg ?? false},
+        ${body.isAvailable ?? true}, ${body.sortOrder ?? 0}
+      ) RETURNING *
+    `);
+    const item = mapRow(itemRows[0]);
 
     res.status(201).json({ item });
   } catch (error) {
@@ -101,25 +98,28 @@ router.patch('/:id', requireRole('owner', 'manager', 'super_admin'), async (req,
 
     const body = schema.parse(req.body);
     const itemId = req.params.id;
+    const schemaName = req.tenant.schemaName;
 
-    const updateData: Record<string, unknown> = {};
-    if (body.categoryId !== undefined) updateData.categoryId = body.categoryId;
-    if (body.name !== undefined) updateData.name = body.name;
-    if (body.description !== undefined) updateData.description = body.description;
-    if (body.price !== undefined) updateData.price = String(body.price);
-    if (body.imageUrl !== undefined) updateData.imageUrl = body.imageUrl || null;
-    if (body.tags !== undefined) updateData.tags = body.tags;
-    if (body.isVeg !== undefined) updateData.isVeg = body.isVeg;
-    if (body.isAvailable !== undefined) updateData.isAvailable = body.isAvailable;
-    if (body.sortOrder !== undefined) updateData.sortOrder = body.sortOrder;
+    const sets: SQL[] = [];
+    if (body.categoryId !== undefined) sets.push(sql`category_id = ${body.categoryId}`);
+    if (body.name !== undefined) sets.push(sql`name = ${body.name}`);
+    if (body.description !== undefined) sets.push(sql`description = ${body.description}`);
+    if (body.price !== undefined) sets.push(sql`price = ${String(body.price)}`);
+    if (body.imageUrl !== undefined) sets.push(sql`image_url = ${body.imageUrl || null}`);
+    if (body.tags !== undefined) sets.push(sql`tags = ${JSON.stringify(body.tags)}`);
+    if (body.isVeg !== undefined) sets.push(sql`is_veg = ${body.isVeg}`);
+    if (body.isAvailable !== undefined) sets.push(sql`is_available = ${body.isAvailable}`);
+    if (body.sortOrder !== undefined) sets.push(sql`sort_order = ${body.sortOrder}`);
 
-    const [updated] = await db
-      .update(menuItems)
-      .set(updateData)
-      .where(and(eq(menuItems.id, itemId), eq(menuItems.restaurantId, req.tenant.id)))
-      .returning();
+    const updatedRows = await db.execute<Record<string, unknown>>(sql`
+      UPDATE ${t(schemaName, 'menu_items')}
+      SET ${sql.join(sets, sql`, `)}
+      WHERE id = ${itemId} AND restaurant_id = ${req.tenant.id}
+      RETURNING *
+    `);
 
-    if (!updated) return res.status(404).json({ error: 'Item not found' });
+    if (!updatedRows[0]) return res.status(404).json({ error: 'Item not found' });
+    const updated = mapRow(updatedRows[0]);
 
     res.json({ item: updated });
   } catch (error) {
@@ -133,9 +133,11 @@ router.delete('/:id', requireRole('owner', 'manager', 'super_admin'), async (req
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
     const itemId = req.params.id;
-    await db
-      .delete(menuItems)
-      .where(and(eq(menuItems.id, itemId), eq(menuItems.restaurantId, req.tenant.id)));
+    const schemaName = req.tenant.schemaName;
+    await db.execute(sql`
+      DELETE FROM ${t(schemaName, 'menu_items')}
+      WHERE id = ${itemId} AND restaurant_id = ${req.tenant.id}
+    `);
 
     res.status(204).send();
   } catch (error) {

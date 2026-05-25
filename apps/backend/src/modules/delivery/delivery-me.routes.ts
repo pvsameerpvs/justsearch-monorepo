@@ -1,28 +1,18 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { deliveryAgents } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
+import { t, mapRow } from '../../lib/tenant-sql';
 
 const router = Router();
 
 router.use(authMiddleware);
 router.use(requireRole('driver'));
 
-const AGENT_FIELDS = {
-  id: deliveryAgents.id,
-  name: deliveryAgents.name,
-  phone: deliveryAgents.phone,
-  vehicleType: deliveryAgents.vehicleType,
-  status: deliveryAgents.status,
-  rating: deliveryAgents.rating,
-  completedToday: deliveryAgents.completedToday,
-  shiftLabel: deliveryAgents.shiftLabel,
-  isActive: deliveryAgents.isActive,
-  createdAt: deliveryAgents.createdAt,
-  updatedAt: deliveryAgents.updatedAt,
-} as const;
+const AGENT_SELECT_SQL = sql`
+  id, name, phone, vehicle_type, status, rating, completed_today, shift_label, is_active, created_at, updated_at
+`;
 
 // GET /api/v1/delivery-agents/me — current driver's profile
 router.get('/', async (req, res, next) => {
@@ -30,18 +20,15 @@ router.get('/', async (req, res, next) => {
     if (!req.tenant || !req.auth) {
       return res.status(400).json({ error: 'Authentication context required' });
     }
+    const schemaName = req.tenant.schemaName;
 
-    const [agent] = await db
-      .select(AGENT_FIELDS)
-      .from(deliveryAgents)
-      .where(
-        and(
-          eq(deliveryAgents.id, req.auth.id),
-          eq(deliveryAgents.restaurantId, req.tenant.id)
-        )
-      )
-      .limit(1);
+    const rows = await db.execute<Record<string, unknown>>(sql`
+      SELECT ${AGENT_SELECT_SQL} FROM ${t(schemaName, 'delivery_agents')}
+      WHERE id = ${req.auth.id} AND restaurant_id = ${req.tenant.id}
+      LIMIT 1
+    `);
 
+    const agent = rows[0] ? mapRow(rows[0]) : undefined;
     if (!agent) return res.status(404).json({ error: 'Delivery agent not found' });
 
     res.json({ agent });
@@ -56,6 +43,7 @@ router.patch('/status', async (req, res, next) => {
     if (!req.tenant || !req.auth) {
       return res.status(400).json({ error: 'Authentication context required' });
     }
+    const schemaName = req.tenant.schemaName;
 
     const schema = z.object({
       status: z.enum(['online', 'busy', 'offline']),
@@ -63,17 +51,14 @@ router.patch('/status', async (req, res, next) => {
 
     const { status } = schema.parse(req.body);
 
-    const [updated] = await db
-      .update(deliveryAgents)
-      .set({ status, updatedAt: new Date() })
-      .where(
-        and(
-          eq(deliveryAgents.id, req.auth.id),
-          eq(deliveryAgents.restaurantId, req.tenant.id)
-        )
-      )
-      .returning(AGENT_FIELDS);
+    const rows = await db.execute<Record<string, unknown>>(sql`
+      UPDATE ${t(schemaName, 'delivery_agents')}
+      SET status = ${status}, updated_at = NOW()
+      WHERE id = ${req.auth.id} AND restaurant_id = ${req.tenant.id}
+      RETURNING ${AGENT_SELECT_SQL}
+    `);
 
+    const updated = rows[0] ? mapRow(rows[0]) : undefined;
     if (!updated) return res.status(404).json({ error: 'Delivery agent not found' });
 
     res.json({ agent: updated });

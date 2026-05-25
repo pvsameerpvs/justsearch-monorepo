@@ -53,7 +53,12 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
         deliveryUnavailable={state.isDeliveryEnabled && !state.deliveryAvailable && state.coords.hasCoords}
       />
 
-      {state.placingOrder && <CheckoutOrderPlacingOverlay progress={state.placingProgress} />}
+      {(state.isSubmitting || state.placingOrder) && (
+        <CheckoutOrderPlacingOverlay
+          progress={state.placingOrder ? state.placingProgress : 0}
+          isSuccess={Boolean(state.placingOrder)}
+        />
+      )}
     </section>
   );
 }

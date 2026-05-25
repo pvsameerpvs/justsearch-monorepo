@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders, orderItems, restaurants } from '../../db/schema';
+import { restaurants } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
 import { normalizeRawOrder, normalizeRawItem, extractLogoUrl } from './order-normalizer';
+import { t } from '../../lib/tenant-sql';
 
 const router = Router();
 router.use(authMiddleware);
@@ -53,16 +54,22 @@ router.get('/:id', async (req, res, next) => {
     }
 
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
+    const schemaName = req.tenant.schemaName;
 
-    const [order] = await db.select().from(orders).where(
-      and(eq(orders.id, orderId), eq(orders.restaurantId, req.tenant.id))
-    ).limit(1);
+    const orderRows = await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'orders')}
+      WHERE id = ${orderId} AND restaurant_id = ${req.tenant.id}
+      LIMIT 1
+    `);
 
-    if (!order) return res.status(404).json({ error: 'Order not found' });
+    if (!orderRows[0]) return res.status(404).json({ error: 'Order not found' });
+    const order = normalizeRawOrder(orderRows[0]);
 
-    const items = await db.select().from(orderItems).where(
-      and(eq(orderItems.orderId, orderId), eq(orderItems.restaurantId, req.tenant.id))
-    );
+    const itemRows = await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'order_items')}
+      WHERE order_id = ${orderId} AND restaurant_id = ${req.tenant.id}
+    `);
+    const items = itemRows.map(normalizeRawItem);
 
     return res.json({ order, items });
   } catch (error) {

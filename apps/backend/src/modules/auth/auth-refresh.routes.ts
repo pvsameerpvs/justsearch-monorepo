@@ -37,6 +37,15 @@ router.post('/refresh', async (req, res, next) => {
       type: payload.userType,
     });
 
+    // Keep cookie in sync with the new access token so the backend
+    // auth middleware and frontend stay consistent.
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+
     // Re-use the same refresh token (no rotation) to avoid multi-tab logout issues.
     // The refresh token remains valid until its 7-day expiry.
 

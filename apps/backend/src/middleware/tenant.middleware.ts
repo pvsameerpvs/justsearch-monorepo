@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { resolveSubdomain } from './tenant-resolver';
 import { lookupTenant } from './tenant-lookup';
-import { client } from '../db';
 
 export interface TenantContext {
   id: string;
@@ -41,13 +40,12 @@ function setCachedTenant(subdomain: string, tenant: TenantContext | null) {
 
 export async function tenantMiddleware(
   req: Request,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ) {
   const subdomain = resolveSubdomain(req);
 
   if (!subdomain) {
-    await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
     return next();
   }
 
@@ -59,29 +57,24 @@ export async function tenantMiddleware(
     }
 
     if (!tenant) {
-      await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
-      _res.status(404).json({ message: 'Restaurant not found' });
+      res.status(404).json({ message: 'Restaurant not found' });
       return;
     }
 
     if (tenant.status === 'suspended') {
-      await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
-      _res.status(403).json({ message: 'Restaurant is suspended' });
+      res.status(403).json({ message: 'Restaurant is suspended' });
       return;
     }
 
     const isAuthRoute = req.path?.includes('/auth/');
     if (!isAuthRoute && (tenant.status === 'inactive' || tenant.status === 'draft')) {
-      await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
-      _res.status(403).json({ message: 'Restaurant is not active' });
+      res.status(403).json({ message: 'Restaurant is not active' });
       return;
     }
 
     req.tenant = tenant;
-    await client.unsafe(`SET search_path TO "${tenant.schemaName}", ${PUBLIC_SCHEMAS}`);
     next();
   } catch (error) {
-    await client.unsafe(`SET search_path TO ${PUBLIC_SCHEMAS}`);
     next(error);
   }
 }

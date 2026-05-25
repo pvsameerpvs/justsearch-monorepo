@@ -3,7 +3,6 @@
 import { usePathname } from 'next/navigation';
 import { RestaurantMobileHeader } from '@/components/restaurant/restaurant-mobile-header';
 import { RestaurantMobileNav } from '@/components/restaurant/restaurant-mobile-nav';
-import { RegistrationProvider } from '@/components/auth/registration-context';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { RegistrationModal } from '@/components/auth/registration-modal';
 import { ActiveOrderTracker } from '@/components/restaurant/checkout/active-order-tracker';
@@ -11,6 +10,7 @@ import { RewardManager } from '@/components/restaurant/checkout/reward-manager';
 import { FulfillmentProvider } from '@/components/restaurant/use-restaurant-fulfillment';
 import { useRestaurant } from '@/components/restaurant/restaurant-context';
 import { useChromeStore } from '@/lib/stores/chrome-store';
+import { useAuthMe } from '@/hooks/use-auth-me';
 import type { ReactNode } from 'react';
 
 type RestaurantLayoutManagerProps = {
@@ -20,6 +20,7 @@ type RestaurantLayoutManagerProps = {
 export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerProps) {
   const restaurant = useRestaurant();
   const pathname = usePathname();
+  useAuthMe();
   const isGameProfilePage = pathname === '/eat-play/profile';
   const isGameDetailPage =
     pathname.startsWith('/eat-play/') && pathname !== '/eat-play' && !isGameProfilePage;
@@ -39,7 +40,7 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
   const showReward = showRewardManager && !isChromeHidden;
 
   return (
-    <RegistrationProvider>
+    <>
       <AuthGuard />
       <FulfillmentProvider restaurant={restaurant}>
         {showHeader && <RestaurantMobileHeader />}
@@ -49,6 +50,6 @@ export function RestaurantLayoutManager({ children }: RestaurantLayoutManagerPro
         <RegistrationModal />
         {showReward && <RewardManager />}
       </FulfillmentProvider>
-    </RegistrationProvider>
+    </>
   );
 }

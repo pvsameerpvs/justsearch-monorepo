@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { eq, and, sql, gte, lte } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders, orderItems, userRestaurants, advertisements } from '../../db/schema';
+import { userRestaurants, advertisements } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
+import { t, mapRows } from '../../lib/tenant-sql';
 
 const router = Router();
 
@@ -25,18 +26,15 @@ router.get('/summary', requireRole('owner', 'manager'), async (req, res, next) =
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    const schemaName = req.tenant.schemaName;
 
     // ── Order stats ──
-    const todayOrders = await db
-      .select()
-      .from(orders)
-      .where(
-        and(
-          eq(orders.restaurantId, req.tenant.id),
-          gte(orders.createdAt, startOfDay),
-          lte(orders.createdAt, endOfDay)
-        )
-      );
+    const todayOrders = mapRows(await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'orders')}
+      WHERE restaurant_id = ${req.tenant.id}
+        AND created_at >= ${startOfDay}
+        AND created_at <= ${endOfDay}
+    `));
 
     const totalOrders = todayOrders.length;
     const completedOrders = todayOrders.filter((o) => o.status === 'completed');
@@ -83,10 +81,11 @@ router.get('/orders', requireRole('owner', 'manager'), async (req, res, next) =>
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
     const days = typeof req.query.days === 'string' ? parseInt(req.query.days, 10) : 7;
-    const allOrders = await db
-      .select()
-      .from(orders)
-      .where(eq(orders.restaurantId, req.tenant.id));
+    const schemaName = req.tenant.schemaName;
+    const allOrders = mapRows(await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'orders')}
+      WHERE restaurant_id = ${req.tenant.id}
+    `));
 
     const trend = Array.from({ length: days }, (_, i) => {
       const d = new Date();
@@ -94,7 +93,7 @@ router.get('/orders', requireRole('owner', 'manager'), async (req, res, next) =>
       const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
       const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59);
       const dayOrders = allOrders.filter((o) => {
-        const created = new Date(o.createdAt);
+        const created = new Date(String(o.createdAt));
         return created >= dayStart && created <= dayEnd;
       });
       return {
@@ -117,18 +116,21 @@ router.get('/top-items', requireRole('owner', 'manager'), async (req, res, next)
   try {
     if (!req.tenant) return res.status(400).json({ error: 'Tenant context required' });
 
-    const items = await db
-      .select()
-      .from(orderItems)
-      .where(eq(orderItems.restaurantId, req.tenant.id));
+    const schemaName = req.tenant.schemaName;
+    const items = mapRows(await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'order_items')}
+      WHERE restaurant_id = ${req.tenant.id}
+    `));
 
     const counts: Record<string, { name: string; quantity: number; revenue: number }> = {};
     for (const item of items) {
-      if (!counts[item.name]) {
-        counts[item.name] = { name: item.name, quantity: 0, revenue: 0 };
+      const name = String(item.name);
+      const quantity = Number(item.quantity);
+      if (!counts[name]) {
+        counts[name] = { name, quantity: 0, revenue: 0 };
       }
-      counts[item.name].quantity += item.quantity;
-      counts[item.name].revenue += item.quantity * Number(item.price);
+      counts[name].quantity += quantity;
+      counts[name].revenue += quantity * Number(item.price);
     }
 
     const topItems = Object.values(counts)

@@ -5,6 +5,7 @@ import { RestaurantLayoutManager } from '@/components/layout/restaurant-layout-m
 import { getCurrentRestaurant } from '@/lib/restaurant-resolver';
 import { RestaurantProvider } from '@/components/restaurant/restaurant-context';
 import { ReactQueryProvider } from '@/components/providers/react-query-provider';
+import { RegistrationProvider } from '@/components/auth/registration-context';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -21,11 +22,13 @@ export default async function RootLayout({
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className={inter.className}>
         <ReactQueryProvider>
-          <AppShell>
-            <RestaurantProvider restaurant={restaurant}>
-              <RestaurantLayoutManager>{children}</RestaurantLayoutManager>
-            </RestaurantProvider>
-          </AppShell>
+          <RegistrationProvider>
+            <AppShell>
+              <RestaurantProvider restaurant={restaurant}>
+                <RestaurantLayoutManager>{children}</RestaurantLayoutManager>
+              </RestaurantProvider>
+            </AppShell>
+          </RegistrationProvider>
         </ReactQueryProvider>
       </body>
     </html>

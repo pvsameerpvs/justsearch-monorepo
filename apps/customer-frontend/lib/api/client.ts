@@ -5,6 +5,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v
 
 interface FetchOptions extends RequestInit {
   tenantHost?: string;
+  timeout?: number;
 }
 
 export class ApiError extends Error {
@@ -61,7 +62,8 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
+  const timeoutMs = options.timeout ?? 5000;
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   let response: Response;
   try {

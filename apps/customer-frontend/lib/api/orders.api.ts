@@ -31,6 +31,7 @@ export async function createOrder(payload: CreateOrderPayload): Promise<CreateOr
   return apiClient<CreateOrderResponse>('/orders', {
     method: 'POST',
     body: JSON.stringify(payload),
+    timeout: 15000,
   });
 }
 

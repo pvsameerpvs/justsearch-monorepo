@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { menuCategories, menuItems } from '../../db/schema';
-
-type CategoryRow = typeof menuCategories.$inferSelect;
-type ItemRow = typeof menuItems.$inferSelect;
+import { authMiddleware } from '../../middleware/auth.middleware';
+import { t, mapRows } from '../../lib/tenant-sql';
 
 const router = Router();
 
@@ -15,31 +13,23 @@ router.get('/', async (req, res, next) => {
       return res.status(400).json({ error: 'Tenant context required' });
     }
 
-    const categories = await db
-      .select()
-      .from(menuCategories)
-      .where(
-        and(
-          eq(menuCategories.restaurantId, req.tenant.id),
-          eq(menuCategories.status, 'active')
-        )
-      )
-      .orderBy(menuCategories.sortOrder);
+    const schemaName = req.tenant.schemaName;
 
-    const items = await db
-      .select()
-      .from(menuItems)
-      .where(
-        and(
-          eq(menuItems.restaurantId, req.tenant.id),
-          eq(menuItems.isAvailable, true)
-        )
-      )
-      .orderBy(menuItems.sortOrder);
+    const categories = mapRows(await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'menu_categories')}
+      WHERE restaurant_id = ${req.tenant.id} AND status = 'active'
+      ORDER BY sort_order
+    `));
 
-    const menuData = categories.map((category: CategoryRow) => ({
+    const items = mapRows(await db.execute<Record<string, unknown>>(sql`
+      SELECT * FROM ${t(schemaName, 'menu_items')}
+      WHERE restaurant_id = ${req.tenant.id} AND is_available = true
+      ORDER BY sort_order
+    `));
+
+    const menuData = categories.map((category) => ({
       ...category,
-      items: items.filter((item: ItemRow) => item.categoryId === category.id),
+      items: items.filter((item) => item.categoryId === category.id),
     }));
 
     res.json({ categories: menuData });

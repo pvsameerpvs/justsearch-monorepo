@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { AddressLabel } from '../use-address-book';
 import type { PlaceApi, PromoApi, AddressApi } from './checkout-place-action.types';
+
+const PLACE_ORDER_COOLDOWN_MS = 1500;
 
 export function useCheckoutPlaceAction(
   validation: { isValid: boolean; errors: string[] },
@@ -19,9 +21,10 @@ export function useCheckoutPlaceAction(
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [warn, setWarn] = useState<string | null>(null);
+  const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onPlaceOrder = async () => {
-    if (place.placingOrder) return;
+    if (place.placingOrder || isSubmitting) return;
     if (!validation.isValid) { place.setPlaceError(validation.errors[0] ?? 'Cannot place order'); return; }
     setIsSubmitting(true);
     setWarn(null);
@@ -50,9 +53,12 @@ export function useCheckoutPlaceAction(
       place.startPlacing(orderId);
     } catch (e) {
       place.setPlaceError(e instanceof Error ? e.message : 'Failed to place order');
-    } finally {
-      setIsSubmitting(false);
+      // Keep button disabled briefly so the user cannot spam-click on error
+      if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
+      cooldownTimer.current = setTimeout(() => setIsSubmitting(false), PLACE_ORDER_COOLDOWN_MS);
+      return;
     }
+    setIsSubmitting(false);
   };
 
   return { onPlaceOrder, isSubmitting, warn };

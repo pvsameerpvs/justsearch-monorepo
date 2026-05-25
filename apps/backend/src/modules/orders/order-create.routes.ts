@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { eq, sql } from 'drizzle-orm';
 import { db } from '../../db';
-import { orders, orderItems, users } from '../../db/schema';
+import { users } from '../../db/schema';
 import { authMiddleware } from '../../middleware/auth.middleware';
 import { createOrderSchema } from './order.validators';
 import { validateDeliveryOnCreate } from './order-delivery.utils';
+import { t, mapRow } from '../../lib/tenant-sql';
 
 const router = Router();
 router.use(authMiddleware);
@@ -38,43 +39,38 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ message: deliveryCheck.error });
     }
 
-    const [order] = await db.insert(orders).values({
-      restaurantId,
-      code,
-      customerId: req.auth.id,
-      customerName: body.customerName,
-      customerPhone: body.customerPhone,
-      status: 'pending',
-      paymentStatus: 'unpaid',
-      fulfillmentType: body.fulfillmentType,
-      source: body.source || 'direct_web',
-      subtotal: String(body.subtotal),
-      deliveryFee: String(body.deliveryFee),
-      tax: String(body.tax),
-      total: String(body.total),
-      deliveryAddress: body.deliveryAddress || null,
-      lat: body.lat ? String(body.lat) : null,
-      lng: body.lng ? String(body.lng) : null,
-      notes: body.notes || null,
-      tableId: body.tableId || null,
-      paymentMethod: body.paymentMethod || null,
-    }).returning();
+    const schemaName = req.tenant.schemaName;
 
-    const itemValues = body.items.map((item) => ({
-      restaurantId,
-      orderId: order.id,
-      menuItemId: item.menuItemId,
-      name: item.name,
-      quantity: item.quantity,
-      price: String(item.price),
-      currency: 'AED',
-    }));
+    const orderRows = await db.execute<Record<string, unknown>>(sql`
+      INSERT INTO ${t(schemaName, 'orders')} (
+        restaurant_id, code, customer_id, customer_name, customer_phone,
+        status, payment_status, fulfillment_type, source,
+        subtotal, delivery_fee, tax, total,
+        delivery_address, lat, lng, notes, table_id, payment_method
+      ) VALUES (
+        ${restaurantId}, ${code}, ${req.auth.id}, ${body.customerName}, ${body.customerPhone},
+        'pending', 'unpaid', ${body.fulfillmentType}, ${body.source || 'direct_web'},
+        ${String(body.subtotal)}, ${String(body.deliveryFee)}, ${String(body.tax)}, ${String(body.total)},
+        ${body.deliveryAddress || null}, ${body.lat ? String(body.lat) : null}, ${body.lng ? String(body.lng) : null},
+        ${body.notes || null}, ${body.tableId || null}, ${body.paymentMethod || null}
+      ) RETURNING *
+    `);
+    const order = mapRow(orderRows[0]);
 
-    await db.insert(orderItems).values(itemValues);
+    const itemValuesSql = body.items.map((item) => sql`(
+      ${restaurantId}, ${order.id as string}, ${item.menuItemId}, ${item.name},
+      ${item.quantity}, ${String(item.price)}, 'AED'
+    )`);
+
+    await db.execute(sql`
+      INSERT INTO ${t(schemaName, 'order_items')} (
+        restaurant_id, order_id, menu_item_id, name, quantity, price, currency
+      ) VALUES ${sql.join(itemValuesSql, sql`, `)}
+    `);
 
     if (body.alternateNumber) {
       try {
-        await db.execute(sql`UPDATE ${sql.identifier(req.tenant.schemaName)}.${sql.identifier('orders')} SET alternate_number = ${body.alternateNumber} WHERE id = ${order.id}`);
+        await db.execute(sql`UPDATE ${t(schemaName, 'orders')} SET alternate_number = ${body.alternateNumber} WHERE id = ${order.id}`);
       } catch { /* Column may not exist until migration is run */ }
     }
 
