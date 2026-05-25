@@ -25,7 +25,9 @@ export function RestaurantMenuHero({ restaurant }: RestaurantMenuHeroProps) {
         <div className="flex w-full flex-col items-center text-center">
           <div className="space-y-6">
             <div className="flex flex-col items-center gap-4">
-              <RestaurantLogoBadge restaurant={restaurant} size="lg" className="h-20 w-20 shadow-[0_15px_40px_rgba(0,0,0,0.3)]" />
+              <div className="drop-shadow-[0_15px_40px_rgba(0,0,0,0.3)]">
+                <RestaurantLogoBadge restaurant={restaurant} size="lg" className="h-20" />
+              </div>
               <div className="space-y-2">
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[rgb(var(--brand))]">{restaurant.category}</p>
                 <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">{restaurant.name}</h1>

@@ -19,7 +19,7 @@ export function ProfileOrderDetailsRestaurantLink({ restaurant }: Props) {
           <RestaurantLogoBadge
             restaurant={restaurant}
             size="sm"
-            className="h-11 w-11 rounded-[18px] border-[rgb(var(--border)/0.6)] shadow-none ring-0"
+            className="h-11"
           />
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
