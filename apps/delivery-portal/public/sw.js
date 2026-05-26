@@ -1,39 +1,45 @@
 /** JustSearch Delivery Portal Service Worker */
-const STATIC_CACHE = "dp-static-v1";
-const API_CACHE = "dp-api-v1";
+const STATIC_CACHE = "dp-static-v2", API_CACHE = "dp-api-v2";
 const STATIC_ASSETS = ["/","/login","/settings","/earnings","/history","/manifest.json","/icons/icon-192x192.svg","/icons/icon-512x512.svg"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(STATIC_CACHE).then((c) => c.addAll(STATIC_ASSETS)).then(() => self.skipWaiting()));
 });
-
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((x) => x !== STATIC_CACHE && x !== API_CACHE).map((x) => caches.delete(x)))).then(() => self.clients.claim()));
 });
-
 self.addEventListener("fetch", (e) => {
-  const { request } = e;
-  const url = new URL(request.url);
+  const { request } = e, url = new URL(request.url);
+
+  // API: network-first, cache fallback
   if (url.pathname.startsWith("/api/")) {
-    e.respondWith(fetch(request).then((r) => { const c = r.clone(); caches.open(API_CACHE).then((cc) => cc.put(request, c)); return r; }).catch(() => caches.match(request)));
+    e.respondWith(fetch(request).then((r) => { caches.open(API_CACHE).then((cc) => cc.put(request, r.clone())); return r; }).catch(() => caches.match(request)));
     return;
   }
-  if (request.mode === "navigate" || request.destination === "image" || request.destination === "document") {
-    e.respondWith(caches.match(request).then((c) => c || fetch(request).then((r) => { if (r && r.status === 200 && r.type === "basic") { const cl = r.clone(); caches.open(STATIC_CACHE).then((cc) => cc.put(request, cl)); } return r; })));
+
+  // HTML pages: network-first (fresh HTML always)
+  if (request.mode === "navigate" || request.destination === "document") {
+    e.respondWith(fetch(request).then((r) => { if (r?.status === 200 && r.type === "basic") caches.open(STATIC_CACHE).then((cc) => cc.put(request, r.clone())); return r; }).catch(() => caches.match(request)));
     return;
   }
+
+  // Images/fonts: cache-first
+  if (request.destination === "image" || request.destination === "font") {
+    e.respondWith(caches.match(request).then((c) => c || fetch(request).then((r) => { if (r?.status === 200 && r.type === "basic") caches.open(STATIC_CACHE).then((cc) => cc.put(request, r.clone())); return r; })));
+    return;
+  }
+
   e.respondWith(fetch(request));
 });
 
 self.addEventListener("push", (e) => {
   if (!e.data) return;
   let p; try { p = e.data.json(); } catch { p = {}; }
-  const opts = {
+  e.waitUntil(self.registration.showNotification(p.title || "New Delivery", {
     body: p.body || "Tap to view", icon: "/icons/icon-192x192.svg", badge: "/icons/icon-192x192.svg",
     tag: p.tag || "delivery-order", requireInteraction: true, renotify: true,
     vibrate: p.vibrate || [500, 200, 500, 200, 500, 200, 800], data: p.data || { url: "/" },
     actions: p.actions || [{ action: "open", title: "View" }, { action: "dismiss", title: "Dismiss" }],
-  };
-  e.waitUntil(self.registration.showNotification(p.title || "New Delivery", opts));
+  }));
 });
 
 self.addEventListener("notificationclick", (e) => {
@@ -49,19 +55,13 @@ self.addEventListener("notificationclick", (e) => {
   }));
 });
 
-self.addEventListener("sync", (e) => {
-  if (e.tag === "delivery-status-sync") e.waitUntil(syncPending());
-});
+self.addEventListener("sync", (e) => { if (e.tag === "delivery-status-sync") e.waitUntil(syncPending()); });
 
 async function syncPending() {
   try {
-    const db = await openDb();
-    const items = await db.getAll("pendingStatusUpdates");
+    const db = await openDb(), items = await db.getAll("pendingStatusUpdates");
     await Promise.all(items.map(async (item) => {
-      try {
-        const r = await fetch(item.url, { method: item.method || "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(item.body) });
-        if (r.ok) await db.delete("pendingStatusUpdates", item.id);
-      } catch { /* keep for retry */ }
+      try { const r = await fetch(item.url, { method: item.method || "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(item.body) }); if (r.ok) await db.delete("pendingStatusUpdates", item.id); } catch { /* retry next time */ }
     }));
   } catch { /* ignore */ }
 }
