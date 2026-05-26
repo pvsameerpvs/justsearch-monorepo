@@ -21,7 +21,11 @@ const ROLE_META: Record<string, { label: string; color: string; icon: React.Elem
   kitchen_staff: { label: 'Kitchen', color: 'bg-gradient-to-br from-rose-400 to-pink-500 text-white', icon: Crown },
 };
 
-export function SidebarFooter() {
+interface SidebarFooterProps {
+  collapsed?: boolean;
+}
+
+export function SidebarFooter({ collapsed = false }: SidebarFooterProps) {
   const { user, logout } = useDashboardAuth();
   const [mounted, setMounted] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -39,25 +43,40 @@ export function SidebarFooter() {
   return (
     <>
       <div className="border-t border-slate-100/60 p-3">
-        <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 border border-slate-100/60 p-3 shadow-sm">
-          <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${meta.color} shadow-md ring-2 ring-white`}>
-            <span className="text-[10px] font-bold">{mounted ? initials : 'U'}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-slate-800 truncate">{mounted ? name : 'User'}</p>
-            <div className="flex items-center gap-1 mt-0.5">
-              <RoleIcon className="h-2.5 w-2.5 text-slate-400" />
-              <p className="text-[10px] font-semibold text-slate-400 capitalize">{mounted ? meta.label : 'Staff'}</p>
+        {collapsed ? (
+          <div className="flex flex-col items-center gap-2">
+            <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${meta.color} shadow-md ring-2 ring-white`}>
+              <span className="text-[10px] font-bold">{mounted ? initials : 'U'}</span>
             </div>
+            <button
+              onClick={() => setShowConfirm(true)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm border border-slate-100/60 hover:border-red-200/60"
+              title="Logout"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
           </div>
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm border border-slate-100/60 hover:border-red-200/60"
-            title="Logout"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-          </button>
-        </div>
+        ) : (
+          <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 border border-slate-100/60 p-3 shadow-sm">
+            <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${meta.color} shadow-md ring-2 ring-white`}>
+              <span className="text-[10px] font-bold">{mounted ? initials : 'U'}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-slate-800 truncate">{mounted ? name : 'User'}</p>
+              <div className="flex items-center gap-1 mt-0.5">
+                <RoleIcon className="h-2.5 w-2.5 text-slate-400" />
+                <p className="text-[10px] font-semibold text-slate-400 capitalize">{mounted ? meta.label : 'Staff'}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowConfirm(true)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm border border-slate-100/60 hover:border-red-200/60"
+              title="Logout"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
       <LogoutConfirmDialog
