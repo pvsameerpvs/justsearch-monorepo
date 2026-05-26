@@ -5,3 +5,6 @@ export { DriverSettingsProfileCard } from "./driver-settings-profile-card";
 export { DriverSettingsNotifications } from "./driver-settings-notifications";
 export { DriverSettingsAbout } from "./driver-settings-about";
 export { DriverSettingsLogout } from "./driver-settings-logout";
+export { DriverPwaInstallCard } from "./driver-pwa-install-card";
+export { DriverPushSettings } from "./driver-push-settings";
+export { DriverVolumeSlider } from "./driver-volume-slider";

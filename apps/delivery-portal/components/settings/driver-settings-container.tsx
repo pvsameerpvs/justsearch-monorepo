@@ -2,6 +2,8 @@
 
 import { useDriverAuth } from "@/lib/driver-auth-store";
 import { useDriverSettings } from "@/lib/hooks/use-driver-settings";
+import { usePwaInstall } from "@/lib/hooks/use-pwa-install";
+import { usePushNotifications } from "@/lib/hooks/use-push-notifications";
 import { DriverSettingsPresenter } from "./driver-settings-presenter";
 
 interface DriverSettingsContainerProps {
@@ -12,7 +14,9 @@ interface DriverSettingsContainerProps {
 
 export function DriverSettingsContainer({ restaurantName, restaurantZone, restaurantLogoUrl }: DriverSettingsContainerProps) {
   const { driverName, logout } = useDriverAuth();
-  const { settings, hydrated, toggleSound, toggleVibration } = useDriverSettings();
+  const { settings, hydrated, toggleSound, toggleVibration, setVolume } = useDriverSettings();
+  const { canInstall, isInstalled, install } = usePwaInstall();
+  const { supported, permission, pushEnabled, togglePush } = usePushNotifications();
 
   if (!hydrated) {
     return (
@@ -30,9 +34,18 @@ export function DriverSettingsContainer({ restaurantName, restaurantZone, restau
       driverName={driverName ?? "Driver"}
       soundEnabled={settings.soundEnabled}
       vibrationEnabled={settings.vibrationEnabled}
+      volumeLevel={settings.volumeLevel}
       onToggleSound={toggleSound}
       onToggleVibration={toggleVibration}
+      onVolumeChange={setVolume}
       onLogout={logout}
+      canInstall={canInstall}
+      isInstalled={isInstalled}
+      onInstall={install}
+      pushSupported={supported}
+      pushPermission={permission}
+      pushEnabled={pushEnabled}
+      onTogglePush={togglePush}
     />
   );
 }

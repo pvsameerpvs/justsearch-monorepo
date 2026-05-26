@@ -3,32 +3,34 @@
 import { DriverSettingsRestaurantCard } from "./driver-settings-restaurant-card";
 import { DriverSettingsProfileCard } from "./driver-settings-profile-card";
 import { DriverSettingsNotifications } from "./driver-settings-notifications";
+import { DriverVolumeSlider } from "./driver-volume-slider";
+import { DriverPushSettings } from "./driver-push-settings";
+import { DriverPwaInstallCard } from "./driver-pwa-install-card";
 import { DriverSettingsAbout } from "./driver-settings-about";
 import { DriverSettingsLogout } from "./driver-settings-logout";
 
-interface DriverSettingsPresenterProps {
+interface Props {
   restaurantName: string;
   restaurantZone: string;
   restaurantLogoUrl?: string;
   driverName: string;
   soundEnabled: boolean;
   vibrationEnabled: boolean;
+  volumeLevel: number;
   onToggleSound: () => void;
   onToggleVibration: () => void;
+  onVolumeChange: (level: number) => void;
   onLogout: () => void;
+  canInstall: boolean;
+  isInstalled: boolean;
+  onInstall: () => Promise<{ outcome: "accepted" | "dismissed" }>;
+  pushSupported: boolean;
+  pushPermission: NotificationPermission;
+  pushEnabled: boolean;
+  onTogglePush: () => Promise<{ success: boolean; error?: string }>;
 }
 
-export function DriverSettingsPresenter({
-  restaurantName,
-  restaurantZone,
-  restaurantLogoUrl,
-  driverName,
-  soundEnabled,
-  vibrationEnabled,
-  onToggleSound,
-  onToggleVibration,
-  onLogout,
-}: DriverSettingsPresenterProps) {
+export function DriverSettingsPresenter(props: Props) {
   return (
     <div className="space-y-4">
       <div>
@@ -36,16 +38,33 @@ export function DriverSettingsPresenter({
         <p className="text-xs text-slate-500">Manage your preferences</p>
       </div>
 
-      <DriverSettingsRestaurantCard name={restaurantName} zone={restaurantZone} logoUrl={restaurantLogoUrl} />
-      <DriverSettingsProfileCard driverName={driverName} />
-      <DriverSettingsNotifications
-        soundEnabled={soundEnabled}
-        vibrationEnabled={vibrationEnabled}
-        onToggleSound={onToggleSound}
-        onToggleVibration={onToggleVibration}
+      <DriverSettingsRestaurantCard
+        name={props.restaurantName}
+        zone={props.restaurantZone}
+        logoUrl={props.restaurantLogoUrl}
       />
+      <DriverSettingsProfileCard driverName={props.driverName} />
+      <DriverPwaInstallCard
+        canInstall={props.canInstall}
+        isInstalled={props.isInstalled}
+        onInstall={props.onInstall}
+      />
+      <DriverPushSettings
+        supported={props.pushSupported}
+        permission={props.pushPermission}
+        pushEnabled={props.pushEnabled}
+        subscribed={props.pushEnabled}
+        onTogglePush={props.onTogglePush}
+      />
+      <DriverSettingsNotifications
+        soundEnabled={props.soundEnabled}
+        vibrationEnabled={props.vibrationEnabled}
+        onToggleSound={props.onToggleSound}
+        onToggleVibration={props.onToggleVibration}
+      />
+      <DriverVolumeSlider volumeLevel={props.volumeLevel} onChange={props.onVolumeChange} />
       <DriverSettingsAbout />
-      <DriverSettingsLogout onLogout={onLogout} />
+      <DriverSettingsLogout onLogout={props.onLogout} />
     </div>
   );
 }

@@ -7,22 +7,24 @@ const SETTINGS_KEY = "driver-settings-v1";
 export interface DriverSettings {
   soundEnabled: boolean;
   vibrationEnabled: boolean;
+  volumeLevel: number;
 }
 
 function readStorage(): DriverSettings {
   if (typeof window === "undefined") {
-    return { soundEnabled: true, vibrationEnabled: true };
+    return { soundEnabled: true, vibrationEnabled: true, volumeLevel: 100 };
   }
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return { soundEnabled: true, vibrationEnabled: true };
+    if (!raw) return { soundEnabled: true, vibrationEnabled: true, volumeLevel: 100 };
     const parsed = JSON.parse(raw);
     return {
       soundEnabled: parsed.soundEnabled !== false,
       vibrationEnabled: parsed.vibrationEnabled !== false,
+      volumeLevel: typeof parsed.volumeLevel === "number" ? Math.max(0, Math.min(100, parsed.volumeLevel)) : 100,
     };
   } catch {
-    return { soundEnabled: true, vibrationEnabled: true };
+    return { soundEnabled: true, vibrationEnabled: true, volumeLevel: 100 };
   }
 }
 
@@ -36,7 +38,7 @@ function writeStorage(settings: DriverSettings) {
 }
 
 export function useDriverSettings() {
-  const [settings, setSettings] = useState<DriverSettings>({ soundEnabled: true, vibrationEnabled: true });
+  const [settings, setSettings] = useState<DriverSettings>({ soundEnabled: true, vibrationEnabled: true, volumeLevel: 100 });
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -60,10 +62,19 @@ export function useDriverSettings() {
     });
   }, []);
 
+  const setVolume = useCallback((level: number) => {
+    setSettings((prev) => {
+      const next = { ...prev, volumeLevel: Math.max(0, Math.min(100, level)) };
+      writeStorage(next);
+      return next;
+    });
+  }, []);
+
   return {
     settings,
     hydrated,
     toggleSound,
     toggleVibration,
+    setVolume,
   };
 }

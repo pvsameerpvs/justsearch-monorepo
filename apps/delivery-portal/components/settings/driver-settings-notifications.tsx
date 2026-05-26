@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bell, Volume2, VolumeX, Vibrate, Smartphone } from "lucide-react";
+import { Bell, Volume2, VolumeX, Vibrate, Smartphone, Zap } from "lucide-react";
 import { DriverSettingsToggle } from "./driver-settings-toggle";
+import { useEnhancedNotification } from "@/lib/hooks/use-enhanced-notification";
 
 interface DriverSettingsNotificationsProps {
   soundEnabled: boolean;
@@ -17,6 +18,13 @@ export function DriverSettingsNotifications({
   onToggleSound,
   onToggleVibration,
 }: DriverSettingsNotificationsProps) {
+  const { playSirenOnce, doVibrate } = useEnhancedNotification();
+
+  const testAlarm = () => {
+    if (soundEnabled) playSirenOnce();
+    if (vibrationEnabled) doVibrate();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -35,7 +43,7 @@ export function DriverSettingsNotifications({
           icon={<VolumeX className="h-4 w-4 text-slate-500" />}
           activeIcon={<Volume2 className="h-4 w-4 text-emerald-600" />}
           label="Order Sound"
-          description={soundEnabled ? "Dring-dring enabled" : "Silent mode"}
+          description={soundEnabled ? "Loud siren enabled" : "Silent mode"}
           enabled={soundEnabled}
           onToggle={onToggleSound}
         />
@@ -43,10 +51,19 @@ export function DriverSettingsNotifications({
           icon={<Smartphone className="h-4 w-4 text-slate-500" />}
           activeIcon={<Vibrate className="h-4 w-4 text-emerald-600" />}
           label="Vibration"
-          description={vibrationEnabled ? "Buzz on new order" : "No vibration"}
+          description={vibrationEnabled ? "Strong buzz on new order" : "No vibration"}
           enabled={vibrationEnabled}
           onToggle={onToggleVibration}
         />
+
+        <button
+          type="button"
+          onClick={testAlarm}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-50 p-3 text-amber-700 active:bg-amber-100 transition"
+        >
+          <Zap className="h-4 w-4" />
+          <span className="text-sm font-semibold">Test Alarm</span>
+        </button>
       </div>
     </motion.div>
   );

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { readNotificationSettings, playBigBell, doVibrate } from "./use-order-notification.utils";
+import { useEnhancedNotification } from "./use-enhanced-notification";
+import { readNotificationSettings } from "./use-order-notification.utils";
 
 export type IncomingOrder = {
   assignmentId: string;
@@ -14,6 +15,7 @@ export type IncomingOrder = {
 export function useOrderNotification(orders: IncomingOrder[]) {
   const prevIdsRef = useRef<string[]>([]);
   const [incoming, setIncoming] = useState<IncomingOrder[]>([]);
+  const { startPersistentAlarm, stopPersistentAlarm, doVibrate } = useEnhancedNotification();
 
   useEffect(() => {
     const prev = prevIdsRef.current;
@@ -22,17 +24,18 @@ export function useOrderNotification(orders: IncomingOrder[]) {
 
     if (newOrders.length > 0 && prev.length > 0) {
       const settings = readNotificationSettings();
-      if (settings.soundEnabled) playBigBell();
+      if (settings.soundEnabled) startPersistentAlarm();
       if (settings.vibrationEnabled) doVibrate();
       setIncoming(newOrders);
     }
 
     prevIdsRef.current = [...currentIds];
-  }, [orders]);
+  }, [orders, startPersistentAlarm, doVibrate]);
 
   const dismiss = useCallback(() => {
+    stopPersistentAlarm();
     setIncoming([]);
-  }, []);
+  }, [stopPersistentAlarm]);
 
   return { incoming, dismiss };
 }
