@@ -7,8 +7,11 @@ export async function syncPushSubscriptionToBackend(sub: PushSubscription) {
       method: "POST",
       body: JSON.stringify({
         endpoint: payload.endpoint,
-        p256dh: payload.keys?.p256dh,
-        auth: payload.keys?.auth,
+        expirationTime: payload.expirationTime ?? null,
+        keys: {
+          p256dh: payload.keys?.p256dh,
+          auth: payload.keys?.auth,
+        },
       }),
     });
     return { success: true };

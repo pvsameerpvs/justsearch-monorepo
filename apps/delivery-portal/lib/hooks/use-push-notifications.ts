@@ -118,10 +118,18 @@ export function usePushNotifications() {
       if (sub) {
         storePushSubscription(sub);
         const sync = await syncPushSubscriptionToBackend(sub);
-        setSyncStatus(sync.success ? "synced" : "failed");
-        if (!sync.success) {
-          setLastError("Server sync failed: " + (sync.error || "Backend not ready"));
+        if (sync.success) {
+          setSyncStatus("synced");
+          setPushEnabled(true);
+          writePushSettings({ pushEnabled: true });
+          return { success: true };
         }
+        setSyncStatus("failed");
+        const errorMsg = sync.error || "Backend not ready";
+        setLastError("Server sync failed: " + errorMsg);
+        setPushEnabled(false);
+        writePushSettings({ pushEnabled: false });
+        return { success: false, error: errorMsg };
       }
 
       setPushEnabled(true);
