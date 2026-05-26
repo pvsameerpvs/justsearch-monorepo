@@ -13,9 +13,12 @@
     "db:push": "drizzle-kit push:pg",
     "db:migrate": "ts-node --transpile-only src/db/migrate.ts",
     "db:repair": "ts-node --transpile-only src/db/repair-tenant-schemas.ts",
+    "db:migrate-r2": "ts-node --transpile-only src/db/migrate-supabase-to-r2.ts",
+    "db:fix-r2-urls": "ts-node --transpile-only src/db/fix-r2-urls.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1053.0",
     "@supabase/supabase-js": "^2.39.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
