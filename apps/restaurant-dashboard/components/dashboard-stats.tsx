@@ -1,47 +1,31 @@
 "use client";
 
-import { ShoppingBag, DollarSign, Users, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { buildStatConfigs } from './dashboard/build-stat-configs';
+import { StatCard } from './dashboard/stat-card';
+import type { AnalyticsSummary } from '@/lib/hooks/use-analytics-query';
 
-interface Stat {
-  label: string;
-  value: string;
-  change: string;
-  changeUp: boolean;
-  icon: React.ElementType;
-  accent: string;
-  iconColor: string;
-}
+export function DashboardStats({ summary }: { summary: AnalyticsSummary | null }) {
+  const stats = buildStatConfigs(summary);
 
-const STATS: Stat[] = [
-  { label: "Today's Orders", value: '24', change: '+12%', changeUp: true, icon: ShoppingBag, accent: 'bg-amber-50', iconColor: 'text-amber-600' },
-  { label: 'Revenue', value: 'AED 3,840', change: '+8%', changeUp: true, icon: DollarSign, accent: 'bg-emerald-50', iconColor: 'text-emerald-600' },
-  { label: 'New Customers', value: '156', change: '+24%', changeUp: true, icon: Users, accent: 'bg-blue-50', iconColor: 'text-blue-600' },
-  { label: 'Avg Order Value', value: 'AED 160', change: '-3%', changeUp: false, icon: TrendingUp, accent: 'bg-violet-50', iconColor: 'text-violet-600' },
-];
+  if (stats.length === 0) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="rounded-xl border border-slate-100 bg-white p-5 space-y-4">
+            <div className="h-10 w-10 rounded-xl bg-slate-200 animate-pulse" />
+            <div className="h-8 w-24 bg-slate-200 rounded animate-pulse" />
+            <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
-export function DashboardStats() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {STATS.map((s) => {
-        const Icon = s.icon;
-        const TrendIcon = s.changeUp ? ArrowUpRight : ArrowDownRight;
-        const trendColor = s.changeUp ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50';
-
-        return (
-          <div key={s.label} className="elegant-card-hover p-5">
-            <div className="flex items-start justify-between">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${s.accent}`}>
-                <Icon className={`h-5 w-5 ${s.iconColor}`} />
-              </div>
-              <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-bold ${trendColor}`}>
-                <TrendIcon className="h-3 w-3" /> {s.change}
-              </span>
-            </div>
-            <p className="mt-4 text-2xl font-bold tracking-tight text-slate-900">{s.value}</p>
-            <p className="mt-0.5 text-sm text-slate-500">{s.label}</p>
-          </div>
-        );
-      })}
+      {stats.map((s) => (
+        <StatCard key={s.label} stat={s} />
+      ))}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 import { createRestaurantSchema, buildSettings } from './restaurant-create.utils';
 import { createTenantSchema, setupTenantDefaults } from '../../db/tenant-template';
+import { seedTenantDemoData } from '../../db/seed-demo-data';
 
 const router = Router();
 
@@ -31,6 +32,7 @@ router.post('/', authMiddleware, requireRole('super_admin'), async (req, res, ne
       username: body.dashboardUsername,
       password: body.dashboardPassword,
     });
+    await seedTenantDemoData(schemaName, restaurant.id);
 
     // If credentials were auto-generated, persist them in settings so the super admin can retrieve them
     if (!body.dashboardUsername || !body.dashboardPassword) {

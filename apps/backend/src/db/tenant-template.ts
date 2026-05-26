@@ -1,9 +1,6 @@
-import { randomBytes } from 'crypto';
 import bcrypt from 'bcryptjs';
 import { client } from './index';
-
-import fs from 'fs';
-import path from 'path';
+import { generateSecurePassword } from '../lib/password.utils';
 
 // Per-tenant tables cloned into each restaurant schema
 // Global tables (users, user_restaurants, addresses, loyalty_points) stay in public schema only
@@ -21,21 +18,10 @@ export const TENANT_TABLES = [
   'daily_closeouts',
 ];
 
-export function generateSecurePassword(length = 12): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-  const bytes = randomBytes(length);
-  let password = '';
-  for (let i = 0; i < length; i++) {
-    password += chars[bytes[i] % chars.length];
-  }
-  return password;
-}
-
 export async function createTenantSchema(schemaName: string): Promise<void> {
   await client.unsafe(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
 
   // Find an existing active schema that has the orders table to use as template
-  // (public.orders may not exist after schema-per-tenant migration)
   const templateResult = await client.unsafe(
     `SELECT r.schema_name FROM public.restaurants r ` +
     `JOIN information_schema.tables t ON t.table_schema = r.schema_name AND t.table_name = 'orders' ` +
@@ -49,8 +35,7 @@ export async function createTenantSchema(schemaName: string): Promise<void> {
     );
   }
 
-  // Ensure orders table has all columns defined in Drizzle schema,
-  // regardless of whether the source schema was created before migrations
+  // Ensure orders table has all columns defined in Drizzle schema
   await client.unsafe(
     `ALTER TABLE "${schemaName}"."orders" ` +
     `ADD COLUMN IF NOT EXISTS payment_method "payment_method", ` +
@@ -90,48 +75,4 @@ export async function setupTenantDefaults(
   );
 
   return { username: ownerUsername, password: ownerPassword };
-}
-
-export async function backupTenantSchema(
-  schemaName: string,
-  restaurantSlug: string
-): Promise<string> {
-  const backupDir = process.env.BACKUP_DIR || path.join(process.cwd(), 'backups');
-  if (!fs.existsSync(backupDir)) {
-    fs.mkdirSync(backupDir, { recursive: true });
-  }
-
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const filename = `${restaurantSlug}_${timestamp}.json`;
-  const filepath = path.join(backupDir, filename);
-
-  const backup: Record<string, unknown[]> = {};
-
-  for (const table of TENANT_TABLES) {
-    try {
-      const rows = await client.unsafe(`SELECT * FROM "${schemaName}"."${table}"`);
-      backup[table] = rows as unknown[];
-    } catch {
-      // Table may not exist (e.g. partially created restaurant) — skip
-      backup[table] = [];
-    }
-  }
-
-  // Also backup the public.restaurants registry row
-  try {
-    const [registry] = await client.unsafe(
-      `SELECT * FROM public.restaurants WHERE schema_name = $1`,
-      [schemaName]
-    );
-    backup['_registry'] = registry ? [registry] : [];
-  } catch {
-    backup['_registry'] = [];
-  }
-
-  fs.writeFileSync(filepath, JSON.stringify(backup, null, 2));
-  return filepath;
-}
-
-export async function dropTenantSchema(schemaName: string): Promise<void> {
-  await client.unsafe(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`);
 }

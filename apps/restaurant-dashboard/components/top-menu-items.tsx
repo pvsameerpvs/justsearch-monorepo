@@ -2,19 +2,17 @@
 
 import Link from "next/link";
 import { Flame, ArrowUpRight } from "lucide-react";
-import { TopItemRow, type TopItem } from "./dashboard/top-item-row";
+import { TopItemRow } from "./dashboard/top-item-row";
+import type { TopItem } from "@/lib/hooks/use-analytics-query";
 
-const ITEMS: TopItem[] = [
-  { name: "Whipped Hummus", orders: 42, prevOrders: 36, revenue: 588, category: "Starters", emoji: "🥗" },
-  { name: "Citrus Grilled Salmon", orders: 38, prevOrders: 35, revenue: 1140, category: "Mains", emoji: "🐟" },
-  { name: "Charred Halloumi", orders: 35, prevOrders: 28, revenue: 420, category: "Starters", emoji: "🧀" },
-  { name: "Date Cake", orders: 28, prevOrders: 30, revenue: 336, category: "Desserts", emoji: "🍰" },
-  { name: "Truffle Mushroom Risotto", orders: 24, prevOrders: 20, revenue: 720, category: "Mains", emoji: "🍄" },
-];
+interface TopMenuItemsProps {
+  items: TopItem[];
+}
 
-const MAX_ORDERS = Math.max(...ITEMS.map((i) => i.orders));
+export function TopMenuItems({ items }: TopMenuItemsProps) {
+  const topFive = items.slice(0, 5);
+  const maxOrders = topFive.length > 0 ? Math.max(...topFive.map((i) => i.quantity)) : 1;
 
-export function TopMenuItems() {
   return (
     <div className="elegant-card p-0 overflow-hidden">
       <div className="flex items-center justify-between p-5 pb-0">
@@ -32,11 +30,17 @@ export function TopMenuItems() {
         </Link>
       </div>
 
-      <div className="mt-4 space-y-1 p-5 pt-0">
-        {ITEMS.map((item, idx) => (
-          <TopItemRow key={item.name} item={item} idx={idx} maxOrders={MAX_ORDERS} />
-        ))}
-      </div>
+      {topFive.length === 0 ? (
+        <div className="px-5 py-8 text-center text-sm text-slate-400">
+          No sales data yet
+        </div>
+      ) : (
+        <div className="mt-4 space-y-1 p-5 pt-0">
+          {topFive.map((item, idx) => (
+            <TopItemRow key={item.name} item={item} idx={idx} maxOrders={maxOrders} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

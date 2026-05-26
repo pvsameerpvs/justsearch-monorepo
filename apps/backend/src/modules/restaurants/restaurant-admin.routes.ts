@@ -4,7 +4,7 @@ import { db } from '../../db';
 import { restaurants } from '../../db/schema';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 import { updateRestaurantSchema } from './restaurant-create.utils';
-import { dropTenantSchema, backupTenantSchema } from '../../db/tenant-template';
+import { dropTenantSchema, backupTenantSchema } from '../../db/tenant-backup';
 
 const router = Router();
 

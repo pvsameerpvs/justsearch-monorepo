@@ -2,17 +2,33 @@
 
 import Link from "next/link";
 import { ShoppingBag, ChevronRight } from "lucide-react";
-import { OrderRow, type Order } from "./dashboard/order-row";
+import { OrderRow } from "./dashboard/order-row";
+import { getInitials, getAvatarColor } from "@/lib/utils/dashboard.utils";
+import { timeAgo } from "@/lib/utils/time.utils";
+import type { ApiOrder } from "@/lib/hooks/use-orders-query";
 
-const ORDERS: Order[] = [
-  { id: "#1024", customer: "Amina Hassan", items: 3, total: 142, status: "preparing", time: "2 min ago", type: "delivery", avatar: "AH", avatarColor: "bg-rose-100 text-rose-700" },
-  { id: "#1023", customer: "Khalid Al Mansoori", items: 2, total: 78, status: "confirmed", time: "8 min ago", type: "delivery", avatar: "KA", avatarColor: "bg-sky-100 text-sky-700" },
-  { id: "#1022", customer: "Priya Nair", items: 4, total: 210, status: "ready", time: "15 min ago", type: "delivery", avatar: "PN", avatarColor: "bg-amber-100 text-amber-700" },
-  { id: "#1021", customer: "James Thornton", items: 1, total: 110, status: "out_for_delivery", time: "22 min ago", type: "delivery", avatar: "JT", avatarColor: "bg-emerald-100 text-emerald-700" },
-  { id: "#1020", customer: "Sara Al Farsi", items: 2, total: 64, status: "completed", time: "38 min ago", type: "delivery", avatar: "SF", avatarColor: "bg-violet-100 text-violet-700" },
-];
+interface RecentOrdersProps {
+  orders: ApiOrder[];
+}
 
-export function RecentOrders() {
+function mapApiOrderToRow(order: ApiOrder) {
+  const customer = order.customerName || 'Guest';
+  return {
+    id: order.code || `#${order.id.slice(-4)}`,
+    customer,
+    items: order.items ?? 0,
+    total: Math.round(Number(order.total || 0)),
+    status: order.status,
+    time: timeAgo(order.createdAt),
+    type: order.fulfillmentType || 'delivery',
+    avatar: getInitials(customer),
+    avatarColor: getAvatarColor(customer),
+  };
+}
+
+export function RecentOrders({ orders }: RecentOrdersProps) {
+  const recent = orders.slice(0, 5).map(mapApiOrderToRow);
+
   return (
     <div className="elegant-card p-0 overflow-hidden">
       <div className="flex items-center justify-between p-5 pb-0">
@@ -36,9 +52,15 @@ export function RecentOrders() {
         <span className="text-right">Total</span>
       </div>
 
-      <div className="divide-y divide-slate-50">
-        {ORDERS.map((o) => <OrderRow key={o.id} order={o} />)}
-      </div>
+      {recent.length === 0 ? (
+        <div className="px-5 py-8 text-center text-sm text-slate-400">
+          No orders yet today
+        </div>
+      ) : (
+        <div className="divide-y divide-slate-50">
+          {recent.map((o) => <OrderRow key={o.id} order={o} />)}
+        </div>
+      )}
     </div>
   );
 }

@@ -3,25 +3,35 @@ import { apiClient } from '@/lib/api-client';
 
 const STALE_TIME = 60_000;
 
-interface AnalyticsSummary {
-  today: {
-    orders: number;
-    completed: number;
-    revenue: number;
-    avgOrderValue: number;
-  };
+export interface TodayStats {
+  orders: number;
+  completed: number;
+  revenue: number;
+  avgOrderValue: number;
+}
+
+export interface AllTimeStats {
+  orders: number;
+  completed: number;
+  revenue: number;
+  avgOrderValue: number;
+}
+
+export interface AnalyticsSummary {
+  today: TodayStats;
+  allTime: AllTimeStats;
   adRevenue: number;
   adViews: number;
   totalCustomers: number;
 }
 
-interface TrendDay {
+export interface TrendDay {
   date: string;
   orders: number;
   revenue: number;
 }
 
-interface TopItem {
+export interface TopItem {
   name: string;
   quantity: number;
   revenue: number;

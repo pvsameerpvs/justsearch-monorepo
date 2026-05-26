@@ -14,20 +14,24 @@ export interface Order {
   avatarColor: string;
 }
 
+const DEFAULT_STATUS = { label: "Unknown", dot: "bg-slate-400", bg: "bg-slate-100", text: "text-slate-700", border: "border-slate-200", icon: ShoppingBag };
+
 const STATUS_META: Record<string, { label: string; dot: string; bg: string; text: string; border: string; icon: React.ElementType }> = {
   preparing:       { label: "Preparing",        dot: "bg-amber-500",  bg: "bg-amber-50",  text: "text-amber-700",  border: "border-amber-200",  icon: UtensilsCrossed },
   confirmed:       { label: "Confirmed",        dot: "bg-sky-500",    bg: "bg-sky-50",    text: "text-sky-700",    border: "border-sky-200",    icon: ShoppingBag },
   ready:           { label: "Ready",            dot: "bg-emerald-500",bg: "bg-emerald-50",text: "text-emerald-700",border: "border-emerald-200",icon: CheckCircle2 },
   out_for_delivery:{ label: "Out for Delivery", dot: "bg-indigo-500", bg: "bg-indigo-50", text: "text-indigo-700", border: "border-indigo-200", icon: Bike },
   completed:       { label: "Delivered",        dot: "bg-slate-400",  bg: "bg-slate-100", text: "text-slate-700",  border: "border-slate-200",  icon: CheckCircle2 },
+  cancelled:       { label: "Cancelled",        dot: "bg-red-500",    bg: "bg-red-50",    text: "text-red-700",    border: "border-red-200",    icon: ShoppingBag },
+  pending:         { label: "Pending",          dot: "bg-orange-500", bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200", icon: ShoppingBag },
 };
 
-const TYPE_ICON: Record<string, React.ElementType> = { dine: UtensilsCrossed, delivery: Bike };
+const TYPE_ICON: Record<string, React.ElementType> = { dine_in: UtensilsCrossed, delivery: Bike, pickup: ShoppingBag };
 
 export function OrderRow({ order }: { order: Order }) {
-  const s = STATUS_META[order.status];
+  const s = STATUS_META[order.status] ?? DEFAULT_STATUS;
   const StatusIcon = s.icon;
-  const TypeIcon = TYPE_ICON[order.type];
+  const TypeIcon = TYPE_ICON[order.type] ?? ShoppingBag;
 
   return (
     <div className="grid grid-cols-[1fr_auto_auto] gap-3 items-center px-5 py-3.5 hover:bg-slate-50/60 transition-colors">
