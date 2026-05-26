@@ -4,6 +4,7 @@ import { DriverAuthProvider } from "@/lib/driver-auth-store";
 import { AuthGuard } from "@/components/layout/auth-guard";
 import { ReactQueryProvider } from "@/components/providers/react-query-provider";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
+import { PwaMetaInjector } from "@/components/pwa/pwa-meta-injector";
 import { DynamicAppIcon } from "@/components/pwa/dynamic-app-icon";
 import "./globals.css";
 
@@ -13,12 +14,6 @@ export const metadata: Metadata = {
   title: "Delivery Portal | JustSearch",
   description: "Operational delivery portal for restaurant dispatch and delivery agents.",
   manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Delivery Portal",
-  },
-  icons: { apple: "/icons/icon-192x192.svg" },
 };
 
 export const viewport: Viewport = {
@@ -38,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <DriverAuthProvider>
             <AuthGuard>{children}</AuthGuard>
           </DriverAuthProvider>
+          <PwaMetaInjector />
           <DynamicAppIcon />
         </ReactQueryProvider>
         <ServiceWorkerRegister />

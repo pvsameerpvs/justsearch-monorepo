@@ -16,16 +16,16 @@ export function DynamicAppIcon() {
       link.rel = "apple-touch-icon";
       document.head.appendChild(link);
     }
-    link.href = logoUrl;
+    if (link.href !== logoUrl) link.href = logoUrl;
 
-    // Also update shortcut icon if present
+    // Also update shortcut icon
     let shortcut = document.querySelector('link[rel="shortcut icon"]') as HTMLLinkElement | null;
     if (!shortcut) {
       shortcut = document.createElement("link");
       shortcut.rel = "shortcut icon";
       document.head.appendChild(shortcut);
     }
-    shortcut.href = logoUrl;
+    if (shortcut.href !== logoUrl) shortcut.href = logoUrl;
   }, [logoUrl]);
 
   return null;

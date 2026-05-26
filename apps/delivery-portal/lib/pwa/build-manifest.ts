@@ -39,6 +39,7 @@ export function buildDeliveryManifest(restaurant: RestaurantData | null): Metada
     categories: ["food", "business", "navigation"],
     lang: "en",
     dir: "ltr",
+    display_override: ["standalone", "minimal-ui"],
     prefer_related_applications: false,
     shortcuts: [
       {
