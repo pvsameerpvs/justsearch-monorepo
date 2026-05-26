@@ -6,7 +6,7 @@ import { DriverSettingsToggle } from "./driver-settings-toggle";
 
 interface DriverPushSettingsProps {
   supported: boolean;
-  permission: NotificationPermission;
+  permission: string;
   pushEnabled: boolean;
   subscribed: boolean;
   onTogglePush: () => Promise<{ success: boolean; error?: string }>;

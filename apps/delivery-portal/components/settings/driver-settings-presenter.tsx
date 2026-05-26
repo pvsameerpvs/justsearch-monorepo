@@ -25,7 +25,7 @@ interface Props {
   isInstalled: boolean;
   onInstall: () => Promise<{ outcome: "accepted" | "dismissed" }>;
   pushSupported: boolean;
-  pushPermission: NotificationPermission;
+  pushPermission: string;
   pushEnabled: boolean;
   onTogglePush: () => Promise<{ success: boolean; error?: string }>;
 }
