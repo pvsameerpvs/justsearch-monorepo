@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { DriverAnimatedStepper } from "./driver-animated-stepper";
 import { DriverOrderCardCustomer } from "./driver-order-card-customer";
 import { DriverOrderCardMapSection } from "./driver-order-card-map-section";
@@ -16,7 +17,10 @@ type DriverCurrentOrderCardProps = {
 
 export function DriverCurrentOrderCard({ order, onUpdateStatus }: DriverCurrentOrderCardProps) {
   return (
-    <div className="rounded-[24px] border border-slate-200 bg-white shadow-[0_8px_30px_-12px_rgba(15,23,42,0.2)] overflow-hidden">
+    <motion.div
+      layout
+      className="rounded-[24px] border border-slate-200 bg-white shadow-[0_8px_30px_-12px_rgba(15,23,42,0.2)] overflow-hidden"
+    >
       <DriverAnimatedStepper order={order} />
       <DriverOrderCardCustomer name={order.customerName} phone={order.customerPhone} alternateNumber={order.alternateNumber} />
       <DriverOrderCardMapSection address={order.dropoffAddress} lat={order.latitude} lng={order.longitude} />
@@ -24,6 +28,6 @@ export function DriverCurrentOrderCard({ order, onUpdateStatus }: DriverCurrentO
       {order.notes && <DriverOrderNotes notes={order.notes} />}
       <DriverOrderMetaCard orderedAtLabel={order.orderedAtLabel} itemCount={order.itemCount} etaMinutes={order.etaMinutes} />
       {onUpdateStatus && <DriverSlideButton order={order} onUpdateStatus={onUpdateStatus} />}
-    </div>
+    </motion.div>
   );
 }

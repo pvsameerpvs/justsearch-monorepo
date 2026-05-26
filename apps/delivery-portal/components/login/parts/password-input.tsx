@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock } from "lucide-react";
 
 interface PasswordInputProps {
   value: string;
@@ -16,19 +16,20 @@ export function PasswordInput({ value, onChange }: PasswordInputProps) {
       <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
         Password
       </label>
-      <div className="relative mt-1">
+      <div className="relative mt-1.5">
+        <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
           type={showPassword ? "text" : "password"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Enter password"
-          className="elegant-input w-full pr-10"
+          className="elegant-input w-full pl-10 pr-10"
           autoComplete="current-password"
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
         >
           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>

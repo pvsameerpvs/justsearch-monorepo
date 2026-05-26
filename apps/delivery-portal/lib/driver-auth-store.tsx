@@ -2,43 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import { apiClient } from "./api-client";
-import type { AuthState, AuthContextType } from "./driver-auth.types";
-
-const STORAGE_KEY = 'driver-auth-v1';
-
-function readStorage(): Partial<AuthState> | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-
-function writeStorage(state: AuthState) {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      isLoggedIn: state.isLoggedIn,
-      driverId: state.driverId,
-      restaurantSlug: state.restaurantSlug,
-      driverName: state.driverName,
-    }));
-  } catch {
-    // ignore
-  }
-}
-
-function clearStorage() {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // ignore
-  }
-}
+import { readStorage, writeStorage, clearStorage, type AuthState, type AuthContextType } from "./driver-auth.utils";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -62,52 +26,33 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
         driverName: saved.driverName ?? null,
       }));
     }
-
     async function checkAuth() {
       try {
         const me = await apiClient<{ id: string; name: string; restaurantId: string }>('/auth/me');
-        const next: AuthState = {
-          isLoggedIn: true,
-          driverId: me.id,
-          restaurantSlug: me.restaurantId,
-          driverName: me.name,
-          hydrated: true,
-        };
+        const next: AuthState = { isLoggedIn: true, driverId: me.id, restaurantSlug: me.restaurantId, driverName: me.name, hydrated: true };
         setState(next);
         writeStorage(next);
       } catch {
-        // Never auto-logout: if /auth/me fails, keep existing state from localStorage
         setState((prev) => ({ ...prev, hydrated: true }));
       }
     }
     checkAuth();
   }, []);
 
-  // Re-verify on window focus in background
   useEffect(() => {
     function onFocus() {
       apiClient<{ id: string; name: string; restaurantId: string }>('/auth/me')
         .then((me) => {
-          const next: AuthState = {
-            isLoggedIn: true,
-            driverId: me.id,
-            restaurantSlug: me.restaurantId,
-            driverName: me.name,
-            hydrated: true,
-          };
+          const next: AuthState = { isLoggedIn: true, driverId: me.id, restaurantSlug: me.restaurantId, driverName: me.name, hydrated: true };
           setState(next);
           writeStorage(next);
         })
-        .catch(() => {
-          // apiClient handles 401 internally (silent refresh); if it reaches here, refresh failed
-          // The auth:session-invalidated listener below will handle logout
-        });
+        .catch(() => {});
     }
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
   }, []);
 
-  // Listen for global session-invalidated event
   useEffect(() => {
     function onSessionInvalidated() {
       clearStorage();
@@ -131,13 +76,7 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
         window.sessionStorage.setItem('justsearch:accessToken', access);
         window.sessionStorage.setItem('justsearch:refreshToken', res.refreshToken);
       }
-      const next: AuthState = {
-        isLoggedIn: true,
-        driverId: res.user.id,
-        restaurantSlug: res.user.restaurantId,
-        driverName: res.user.name,
-        hydrated: true,
-      };
+      const next: AuthState = { isLoggedIn: true, driverId: res.user.id, restaurantSlug: res.user.restaurantId, driverName: res.user.name, hydrated: true };
       setState(next);
       writeStorage(next);
       return { success: true };
@@ -154,13 +93,7 @@ export function DriverAuthProvider({ children }: { children: ReactNode }) {
     window.localStorage.removeItem('justsearch:refreshToken');
     window.sessionStorage.removeItem('justsearch:accessToken');
     window.sessionStorage.removeItem('justsearch:refreshToken');
-    setState({
-      isLoggedIn: false,
-      driverId: null,
-      restaurantSlug: null,
-      driverName: null,
-      hydrated: true,
-    });
+    setState({ isLoggedIn: false, driverId: null, restaurantSlug: null, driverName: null, hydrated: true });
     window.location.href = '/login';
   }, []);
 

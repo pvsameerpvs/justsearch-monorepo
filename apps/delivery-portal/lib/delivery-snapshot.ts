@@ -5,16 +5,21 @@ import { mapApiAssignmentToDelivery } from './delivery-mappers';
 export function buildSnapshot(
   restaurantSlug: string | null,
   driverName: string | null,
-  assignments: ApiAssignment[]
+  assignments: ApiAssignment[],
+  logoUrl?: string,
 ): DeliveryPortalSnapshot {
   const active = assignments.filter((a) => a.assignment_status !== 'delivered' && a.assignment_status !== 'cancelled');
   const completed = assignments.filter((a) => a.assignment_status === 'delivered' || a.assignment_status === 'cancelled');
 
+  const slug = restaurantSlug || 'restaurant';
+  const name = restaurantSlug || 'Restaurant';
+
   return {
     restaurant: {
-      slug: restaurantSlug || 'restaurant',
-      name: restaurantSlug || 'Restaurant',
-      deliveryDomain: `${restaurantSlug || 'restaurant'}-delivery.localhost`,
+      slug,
+      name,
+      logoUrl,
+      deliveryDomain: `${slug}-delivery.localhost`,
       zoneLabel: 'Zone A',
       supportPhone: '+971 4 000 0000',
     },

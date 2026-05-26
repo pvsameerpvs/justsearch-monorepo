@@ -11,6 +11,7 @@ export type DeliveryOrderStatus =
 export type DeliveryPortalRestaurant = {
   slug: string;
   name: string;
+  logoUrl?: string;
   deliveryDomain: string;
   zoneLabel: string;
   supportPhone: string;

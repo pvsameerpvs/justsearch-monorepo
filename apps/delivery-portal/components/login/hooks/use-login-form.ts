@@ -40,6 +40,14 @@ export function useLoginForm() {
   const username = form.watch("username");
   const password = form.watch("password");
 
+  // Save subdomain to localStorage as user types so logo API can fetch
+  useEffect(() => {
+    const trimmed = subdomain?.trim().toLowerCase();
+    if (trimmed) {
+      localStorage.setItem('restaurant-slug', trimmed);
+    }
+  }, [subdomain]);
+
   const onSubmit = useCallback(
     async (data: LoginFormData) => {
       localStorage.setItem('restaurant-slug', data.subdomain.trim().toLowerCase());

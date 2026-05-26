@@ -14,7 +14,7 @@ export function PortalNav() {
   const pathname = usePathname();
 
   return (
-    <div className="flex gap-1 mb-4">
+    <nav className="flex gap-1.5 mb-5 p-1 bg-slate-100/80 rounded-2xl">
       {NAV.map((item) => {
         const Icon = item.icon;
         const active = pathname === item.href;
@@ -23,17 +23,17 @@ export function PortalNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold transition",
+              "flex-1 flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all select-none",
               active
-                ? "bg-slate-900 text-white shadow-sm"
-                : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
             )}
           >
-            <Icon className="h-3.5 w-3.5" />
+            <Icon className={cn("h-4 w-4", active ? "text-emerald-600" : "text-slate-400")} />
             {item.label}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

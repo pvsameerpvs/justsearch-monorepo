@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { Bike } from 'lucide-react';
 import { PortalNav } from './portal-nav';
-import { DriverLogoutButton } from './driver-logout-button';
+import { RestaurantLogo } from '@/components/ui/restaurant-logo';
 import type { DeliveryAgent, DeliveryPortalRestaurant } from '@/lib/delivery-types';
 
 type DeliveryPortalShellProps = {
@@ -16,33 +15,37 @@ export function DeliveryPortalShell({
   agent,
   children,
 }: DeliveryPortalShellProps) {
+  const initial = agent.name.charAt(0).toUpperCase();
+
   return (
     <main className="min-h-screen bg-slate-50">
-      {/* Simple top bar — uses existing orange brand color */}
-      <div className="sticky top-0 z-40 border-b border-slate-200 bg-white px-4 py-3 shadow-sm">
-        <div className="mx-auto max-w-xl flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <Bike className="h-3.5 w-3.5 text-emerald-500" />
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
+      {/* Elegant top bar — clean, minimal */}
+      <header className="sticky top-0 z-40 bg-white px-4 py-3.5">
+        <div className="mx-auto max-w-xl flex items-center justify-between">
+          {/* Left: Restaurant */}
+          <div className="flex items-center gap-3 min-w-0">
+            <RestaurantLogo name={restaurant.name} logoUrl={restaurant.logoUrl} size="sm" />
+            <div className="min-w-0">
+              <h2 className="text-[15px] font-bold text-slate-900 truncate leading-tight">
                 {restaurant.name}
-              </span>
+              </h2>
+              <p className="text-[11px] text-slate-400 font-medium truncate">{restaurant.zoneLabel}</p>
             </div>
-            <p className="text-[11px] text-slate-500 truncate">{restaurant.zoneLabel}</p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link href="/earnings">
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600 active:bg-emerald-100 transition">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                {agent.name}
-              </span>
-            </Link>
-            <DriverLogoutButton />
-          </div>
-        </div>
-      </div>
 
-      <div className="mx-auto max-w-xl px-3 pb-20 pt-3 sm:px-4">
+          {/* Right: Elegant avatar */}
+          <Link
+            href="/settings"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-sm font-bold ring-2 ring-emerald-100 hover:bg-emerald-700 active:scale-95 transition"
+            title="Settings"
+          >
+            {initial}
+          </Link>
+        </div>
+      </header>
+
+      {/* Elegant nav */}
+      <div className="mx-auto max-w-xl px-4 pb-24 pt-2">
         <PortalNav />
         {children}
       </div>

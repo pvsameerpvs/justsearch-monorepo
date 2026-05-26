@@ -22,7 +22,7 @@ export function DriverOrderCardMapSection({ address, lat, lng }: DriverOrderCard
         <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
         <p className="text-xs text-slate-700 leading-5">{address}</p>
       </div>
-      <div className="relative h-[140px] w-full rounded-[16px] overflow-hidden bg-slate-100">
+      <div className="relative h-[160px] w-full rounded-[16px] overflow-hidden bg-slate-100">
         <iframe
           src={buildMapEmbedUrl(lat, lng)}
           title="Delivery map"
@@ -34,7 +34,7 @@ export function DriverOrderCardMapSection({ address, lat, lng }: DriverOrderCard
           href={buildOpenInMapsUrl(lat, lng)}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-[10px] font-semibold text-slate-900 shadow-md"
+          className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-900 shadow-md active:scale-95 transition"
         >
           <Navigation className="h-3 w-3" />
           Navigate
