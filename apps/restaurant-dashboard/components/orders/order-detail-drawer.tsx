@@ -27,8 +27,8 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign, onReject, isKitc
   if (isLoading || !data) {
     return (
       <div className="fixed inset-0 z-50 flex justify-end">
-        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative w-full max-w-md bg-white shadow-2xl flex flex-col h-full overflow-hidden p-5 space-y-4">
+        <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative w-full max-w-md bg-white/95 backdrop-blur-xl shadow-2xl flex flex-col h-full overflow-hidden p-5 space-y-4">
           <div className="h-6 w-32 bg-slate-200 rounded animate-pulse" />
           {[1,2,3].map((k) => <div key={k} className="h-24 w-full bg-slate-200 rounded animate-pulse" />)}
         </div>
@@ -41,8 +41,8 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign, onReject, isKitc
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-white shadow-2xl flex flex-col h-full overflow-hidden">
+      <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-white/95 backdrop-blur-xl shadow-2xl shadow-slate-900/10 flex flex-col h-full overflow-hidden border-l border-slate-100/60">
         <OrderDetailHeader code={order.code} status={order.status} createdAt={order.createdAt} onClose={onClose} />
 
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
@@ -54,14 +54,14 @@ export function OrderDetailDrawer({ orderId, onClose, onAssign, onReject, isKitc
           <OrderTimeline timeline={order.timeline} />
 
           {assignedAgent && !isKitchenStaff && (
-            <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1">Assigned Driver</p>
+            <div className="rounded-xl border border-indigo-100/60 bg-indigo-50/80 p-4 backdrop-blur-sm">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 mb-1">Assigned Driver</p>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-bold text-indigo-900">{assignedAgent.name}</p>
-                  <p className="text-xs text-indigo-600">{assignedAgent.phone}</p>
+                  <p className="text-xs text-indigo-600 font-medium">{assignedAgent.phone}</p>
                 </div>
-                <button onClick={onAssign} className="text-xs font-semibold text-indigo-600 hover:text-indigo-800">Change</button>
+                <button onClick={onAssign} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors bg-white/80 px-3 py-1.5 rounded-lg border border-indigo-200/60">Change</button>
               </div>
             </div>
           )}

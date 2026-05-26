@@ -1,21 +1,9 @@
 import { ShoppingBag, UtensilsCrossed, Package } from "lucide-react";
 
-const TYPE_ICON: Record<string, React.ReactNode> = {
-  delivery: <ShoppingBag className="h-3 w-3" />,
-  dine_in: <UtensilsCrossed className="h-3 w-3" />,
-  pickup: <Package className="h-3 w-3" />,
-};
-
-const TYPE_LABEL: Record<string, string> = {
-  delivery: "Delivery",
-  dine_in: "Dine In",
-  pickup: "Pickup",
-};
-
-const TYPE_COLOR: Record<string, string> = {
-  delivery: "bg-blue-50 text-blue-700 border-blue-200",
-  dine_in: "bg-rose-50 text-rose-700 border-rose-200",
-  pickup: "bg-teal-50 text-teal-700 border-teal-200",
+const TYPE_CONFIG: Record<string, { label: string; gradient: string; icon: React.ElementType }> = {
+  delivery: { label: "Delivery", gradient: "from-blue-400 to-indigo-500", icon: ShoppingBag },
+  dine_in: { label: "Dine In", gradient: "from-rose-400 to-pink-500", icon: UtensilsCrossed },
+  pickup: { label: "Pickup", gradient: "from-teal-400 to-emerald-500", icon: Package },
 };
 
 interface OrderTypeBadgeProps {
@@ -23,9 +11,16 @@ interface OrderTypeBadgeProps {
 }
 
 export function OrderTypeBadge({ type }: OrderTypeBadgeProps) {
+  const config = TYPE_CONFIG[type];
+  if (!config) return null;
+  const Icon = config.icon;
+
   return (
-    <span className={`status-chip border text-[10px] ${TYPE_COLOR[type] || "bg-slate-50 text-slate-600 border-slate-200"}`}>
-      {TYPE_ICON[type]} {TYPE_LABEL[type] || type}
+    <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/60 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600 shadow-sm">
+      <div className={`flex h-3.5 w-3.5 items-center justify-center rounded-full bg-gradient-to-br ${config.gradient} text-white`}>
+        <Icon className="h-2 w-2" />
+      </div>
+      {config.label}
     </span>
   );
 }

@@ -1,38 +1,29 @@
-import { ChevronRight } from "lucide-react";
 import { OrderCardFooter } from "./order-card-footer";
 import { OrderCardHeader } from "./order-card-header";
 import { OrderCardMeta } from "./order-card-meta";
+import { ORDER_FLOW } from "./order-status-config";
 import type { DashboardOrder } from "@/lib/stores/order-store";
 
-const NEXT_STATUS_LABEL: Record<string, string> = {
-  pending: "Accept",
-  confirmed: "Start Preparing",
-  preparing: "Mark Ready",
-  ready: "Send for Delivery",
-  out_for_delivery: "Complete",
-};
-
-export function OrderCard({ order, onAccept, onReject, onAdvance, onAssign, onView }: {
+interface OrderCardProps {
   order: DashboardOrder;
   onAccept: () => void;
   onReject: () => void;
   onAdvance: () => void;
   onAssign: () => void;
   onView: () => void;
-}) {
-  const nextLabel = NEXT_STATUS_LABEL[order.status];
+}
+
+export function OrderCard({ order, onAccept, onReject, onAdvance, onAssign, onView }: OrderCardProps) {
+  const statusConfig = ORDER_FLOW.find((x) => x.value === order.status);
+  const accentGradient = statusConfig?.gradient ?? "from-slate-400 to-slate-500";
 
   return (
-    <div className="rounded-2xl bg-white border border-slate-100 overflow-hidden transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:border-slate-200/80">
-      <button onClick={onView} className="w-full text-left p-4">
+    <div className="group relative overflow-hidden rounded-2xl bg-white border border-slate-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.1)] hover:border-slate-200/80">
+      <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-full bg-gradient-to-b ${accentGradient} opacity-60`} />
+
+      <button onClick={onView} className="w-full text-left px-5 py-4 pl-6">
         <OrderCardHeader order={order} />
         <OrderCardMeta order={order} />
-
-        {nextLabel && (
-          <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-amber-600">
-            <ChevronRight className="h-3 w-3" /> Next: {nextLabel}
-          </div>
-        )}
       </button>
 
       <OrderCardFooter

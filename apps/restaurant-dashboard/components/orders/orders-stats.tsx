@@ -4,13 +4,13 @@ import { Bell, ShoppingBag, ChefHat, Truck, CheckCircle, XCircle, Package } from
 import type { DashboardOrder } from "@/lib/stores/order-store";
 
 const STAT_CONFIG = [
-  { key: "pending", label: "New", icon: Bell, color: "bg-orange-50 text-orange-600 border-orange-100", activeRing: "ring-2 ring-orange-300" },
-  { key: "confirmed", label: "Confirmed", icon: ShoppingBag, color: "bg-sky-50 text-sky-600 border-sky-100", activeRing: "ring-2 ring-sky-300" },
-  { key: "preparing", label: "Preparing", icon: ChefHat, color: "bg-amber-50 text-amber-600 border-amber-100", activeRing: "ring-2 ring-amber-300" },
-  { key: "ready", label: "Ready", icon: Package, color: "bg-violet-50 text-violet-600 border-violet-100", activeRing: "ring-2 ring-violet-300" },
-  { key: "out_for_delivery", label: "Out", icon: Truck, color: "bg-indigo-50 text-indigo-600 border-indigo-100", activeRing: "ring-2 ring-indigo-300" },
-  { key: "completed", label: "Done", icon: CheckCircle, color: "bg-emerald-50 text-emerald-600 border-emerald-100", activeRing: "ring-2 ring-emerald-300" },
-  { key: "cancelled", label: "Cancelled", icon: XCircle, color: "bg-red-50 text-red-600 border-red-100", activeRing: "ring-2 ring-red-300" },
+  { key: "pending", label: "New", icon: Bell, gradient: "from-orange-400 to-amber-500", shadow: "shadow-orange-500/15" },
+  { key: "confirmed", label: "Confirmed", icon: ShoppingBag, gradient: "from-sky-400 to-blue-500", shadow: "shadow-sky-500/15" },
+  { key: "preparing", label: "Preparing", icon: ChefHat, gradient: "from-amber-400 to-orange-500", shadow: "shadow-amber-500/15" },
+  { key: "ready", label: "Ready", icon: Package, gradient: "from-violet-400 to-purple-500", shadow: "shadow-violet-500/15" },
+  { key: "out_for_delivery", label: "Out", icon: Truck, gradient: "from-indigo-400 to-blue-500", shadow: "shadow-indigo-500/15" },
+  { key: "completed", label: "Done", icon: CheckCircle, gradient: "from-emerald-400 to-teal-500", shadow: "shadow-emerald-500/15" },
+  { key: "cancelled", label: "Cancelled", icon: XCircle, gradient: "from-red-400 to-rose-500", shadow: "shadow-red-500/15" },
 ] as const;
 
 interface OrdersStatsProps {
@@ -35,11 +35,20 @@ export function OrdersStats({ orders: propOrders, activeFilter, onFilterClick }:
             key={s.key}
             disabled={!clickable}
             onClick={() => onFilterClick?.(s.key)}
-            className={`rounded-2xl border p-3 text-center transition-all ${s.color} ${isActive ? s.activeRing : ""} ${clickable ? "cursor-pointer hover:shadow-sm hover:scale-[1.02]" : "cursor-default"}`}
+            className={`group relative overflow-hidden rounded-2xl border p-3 text-center transition-all duration-300 ${
+              isActive
+                ? "bg-white border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)]"
+                : "bg-white/80 border-slate-100/80 hover:bg-white hover:border-slate-200/60 hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
+            } ${clickable ? "cursor-pointer" : "cursor-default"}`}
           >
-            <Icon className="mx-auto h-4 w-4 mb-1.5" strokeWidth={2} />
-            <p className="text-xl font-black">{count}</p>
-            <p className="text-[9px] font-bold uppercase tracking-wider opacity-80">{s.label}</p>
+            {isActive && (
+              <div className={`absolute top-0 left-2 right-2 h-[2px] rounded-full bg-gradient-to-r ${s.gradient} opacity-70`} />
+            )}
+            <div className={`mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${s.gradient} ${s.shadow} shadow-md text-white transition-transform duration-300 group-hover:scale-110`}>
+              <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
+            </div>
+            <p className="text-xl font-black text-slate-900 tabular-nums">{count}</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-slate-400 mt-0.5">{s.label}</p>
           </button>
         );
       })}

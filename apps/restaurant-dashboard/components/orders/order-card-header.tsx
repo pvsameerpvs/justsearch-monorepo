@@ -1,7 +1,7 @@
-import { OrderStatusBadge } from "./order-status-config";
 import { Zap } from "lucide-react";
-import type { DashboardOrder } from "@/lib/stores/order-store";
+import { OrderStatusBadge } from "./order-status-config";
 import { OrderTypeBadge } from "./order-type-badge";
+import type { DashboardOrder } from "@/lib/stores/order-store";
 
 interface OrderCardHeaderProps {
   order: DashboardOrder;
@@ -14,12 +14,23 @@ export function OrderCardHeader({ order }: OrderCardHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="flex items-center gap-3">
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${isPending ? "bg-orange-100 text-orange-700 ring-2 ring-orange-200" : "bg-slate-100 text-slate-600"}`}>
-          {isPending ? <Zap className="h-4 w-4" /> : initials}
+        <div className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-bold overflow-hidden ${
+          isPending
+            ? "bg-gradient-to-br from-orange-400 to-amber-500 text-white shadow-lg shadow-orange-500/20"
+            : "bg-slate-100 text-slate-600 ring-1 ring-slate-200/60"
+        }`}>
+          {isPending ? (
+            <Zap className="h-4 w-4" />
+          ) : (
+            initials
+          )}
+          {isPending && (
+            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-white animate-pulse" />
+          )}
         </div>
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-bold text-slate-900">{order.code}</span>
+            <span className="text-sm font-black text-slate-900 tracking-tight">{order.code}</span>
             <OrderStatusBadge status={order.status} />
             <OrderTypeBadge type={order.type} />
           </div>
@@ -27,8 +38,8 @@ export function OrderCardHeader({ order }: OrderCardHeaderProps) {
         </div>
       </div>
       <div className="text-right shrink-0">
-        <p className="text-lg font-black text-slate-900">AED {order.total}</p>
-        <p className="text-xs text-slate-400">{order.items} items</p>
+        <p className="text-xl font-black text-slate-900 tracking-tight">AED {order.total}</p>
+        <p className="text-xs text-slate-400 font-medium">{order.items} items</p>
       </div>
     </div>
   );
