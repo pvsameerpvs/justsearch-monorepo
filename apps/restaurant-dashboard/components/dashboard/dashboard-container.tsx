@@ -1,6 +1,5 @@
 "use client";
 
-import { PageHeader } from "@justsearch/ui";
 import { useRestaurantProfile } from "@/lib/hooks/use-restaurant-profile";
 import { WelcomeBar } from "./welcome-bar";
 import { QuickActions } from "./quick-actions";
@@ -25,9 +24,8 @@ export function DashboardContainer() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl">
       <WelcomeBar restaurant={restaurant} />
-      <PageHeader title="Dashboard" description={`Overview of ${restaurant.name} today`} />
       <QuickActions />
       <StatsContainer />
       <div className="grid gap-6 lg:grid-cols-2">

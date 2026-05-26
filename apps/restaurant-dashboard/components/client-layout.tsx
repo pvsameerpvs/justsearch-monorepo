@@ -13,7 +13,7 @@ export function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <DashboardAuthProvider>
       <AuthGuard>
-        <div className="min-h-screen overflow-x-hidden bg-[#FAFBFC]">
+        <div className="min-h-screen overflow-x-hidden bg-[#F4F6F9]">
           {!isLoginPage && <DashboardSidebar />}
           <main className={!isLoginPage ? "p-4 pt-16 md:ml-[260px] md:p-8 md:pt-6" : ""}>
             {children}

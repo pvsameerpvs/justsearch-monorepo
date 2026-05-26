@@ -27,7 +27,7 @@
   }
 
   body {
-    @apply bg-[#FAFBFC] text-slate-800 antialiased;
+    @apply bg-[#F4F6F9] text-slate-800 antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -38,11 +38,11 @@
 
 @layer components {
   .elegant-card {
-    @apply rounded-2xl bg-white border border-slate-100 shadow-[0_1px_2px_0_rgba(0,0,0,0.04)] transition-all duration-300;
+    @apply rounded-2xl bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] transition-all duration-300;
   }
 
   .elegant-card-hover {
-    @apply elegant-card hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:border-slate-200/80;
+    @apply elegant-card hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.12)] hover:bg-white hover:border-white/80 hover:-translate-y-0.5;
   }
 
   .elegant-btn {
@@ -50,15 +50,15 @@
   }
 
   .elegant-btn-primary {
-    @apply elegant-btn bg-amber-500 text-white hover:bg-amber-600 shadow-sm shadow-amber-500/20;
+    @apply elegant-btn bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-lg shadow-amber-500/25;
   }
 
   .elegant-btn-secondary {
-    @apply elegant-btn bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300;
+    @apply elegant-btn bg-white/80 text-slate-700 border border-slate-200/80 hover:bg-white hover:border-slate-300/80 hover:shadow-md backdrop-blur-sm;
   }
 
   .elegant-input {
-    @apply rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500/10;
+    @apply rounded-xl border border-slate-200/80 bg-white/80 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500/10 backdrop-blur-sm;
   }
 
   .status-chip {
@@ -66,11 +66,30 @@
   }
 
   .card-premium {
-    @apply rounded-2xl bg-white border border-slate-100 p-5 shadow-[0_1px_2px_0_rgba(0,0,0,0.04)];
+    @apply rounded-2xl bg-white/80 backdrop-blur-xl border border-white/60 p-5 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)];
   }
 
   .card-premium-hover {
-    @apply card-premium transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:border-slate-200/80;
+    @apply card-premium transition-all duration-300 hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.12)] hover:bg-white hover:-translate-y-0.5;
+  }
+
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)];
+  }
+
+  .gradient-border-top {
+    position: relative;
+  }
+  .gradient-border-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 2px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, var(--accent-from, #f59e0b), var(--accent-to, #f97316));
+    opacity: 0.7;
   }
 
   .sidebar-nav-item {
@@ -78,15 +97,34 @@
   }
 
   .sidebar-nav-item-active {
-    @apply sidebar-nav-item bg-amber-50 text-amber-700 shadow-sm shadow-amber-500/10;
+    @apply sidebar-nav-item bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 shadow-sm shadow-amber-500/10 border border-amber-100/50;
   }
 
   .sidebar-nav-item-inactive {
-    @apply sidebar-nav-item text-slate-500 hover:bg-slate-50 hover:text-slate-700;
+    @apply sidebar-nav-item text-slate-500 hover:bg-slate-50/80 hover:text-slate-700;
   }
 
   .page-bg {
-    @apply bg-[#FAFBFC];
+    @apply bg-[#F4F6F9];
+  }
+
+  .icon-glow-amber {
+    @apply bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/20;
+  }
+  .icon-glow-emerald {
+    @apply bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/20;
+  }
+  .icon-glow-blue {
+    @apply bg-gradient-to-br from-blue-400 to-indigo-500 shadow-lg shadow-blue-500/20;
+  }
+  .icon-glow-violet {
+    @apply bg-gradient-to-br from-violet-400 to-purple-500 shadow-lg shadow-violet-500/20;
+  }
+  .icon-glow-rose {
+    @apply bg-gradient-to-br from-rose-400 to-pink-500 shadow-lg shadow-rose-500/20;
+  }
+  .icon-glow-sky {
+    @apply bg-gradient-to-br from-sky-400 to-cyan-500 shadow-lg shadow-sky-500/20;
   }
 }
 
