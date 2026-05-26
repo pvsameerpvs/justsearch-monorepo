@@ -16,7 +16,7 @@ export function DriverSettingsContainer({ restaurantName, restaurantZone, restau
   const { driverName, logout } = useDriverAuth();
   const { settings, hydrated, toggleSound, toggleVibration, setVolume } = useDriverSettings();
   const { canInstall, isInstalled, install } = usePwaInstall();
-  const { supported, permission, pushEnabled, syncStatus, togglePush } = usePushNotifications();
+  const { supported, permission, pushEnabled, syncStatus, isToggling, lastError, togglePush } = usePushNotifications();
 
   if (!hydrated) {
     return (
@@ -46,6 +46,8 @@ export function DriverSettingsContainer({ restaurantName, restaurantZone, restau
       pushPermission={permission}
       pushEnabled={pushEnabled}
       pushSyncStatus={syncStatus}
+      pushIsToggling={isToggling}
+      pushLastError={lastError}
       onTogglePush={togglePush}
     />
   );

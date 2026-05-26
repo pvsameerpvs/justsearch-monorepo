@@ -51,6 +51,8 @@ export function usePushNotifications() {
   const [pushEnabled, setPushEnabled] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "synced" | "failed">("idle");
+  const [isToggling, setIsToggling] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -74,53 +76,65 @@ export function usePushNotifications() {
   }, [checkSub]);
 
   const togglePush = useCallback(async () => {
-    const next = !pushEnabled;
-
-    if (!next) {
-      const sub = await getPushSubscription();
-      if (sub) {
-        await unsubscribeFromPush();
-        await removePushSubscriptionFromBackend(sub.endpoint);
-      }
-      clearStoredPushSubscription();
-      setSubscribed(false);
-      setPushEnabled(false);
-      setSyncStatus("idle");
-      writePushSettings({ pushEnabled: false });
-      return { success: true };
-    }
-
-    const perm =
-      permission === "granted" ? "granted" : await requestNotificationPermission();
-    setPermission(perm);
-    if (perm !== "granted") {
-      setPushEnabled(false);
-      writePushSettings({ pushEnabled: false });
-      return { success: false, error: "Permission denied" };
-    }
+    setIsToggling(true);
+    setLastError(null);
 
     try {
+      const next = !pushEnabled;
+
+      if (!next) {
+        const sub = await getPushSubscription();
+        if (sub) {
+          await unsubscribeFromPush();
+          await removePushSubscriptionFromBackend(sub.endpoint);
+        }
+        clearStoredPushSubscription();
+        setSubscribed(false);
+        setPushEnabled(false);
+        setSyncStatus("idle");
+        writePushSettings({ pushEnabled: false });
+        return { success: true };
+      }
+
+      // Request permission if not already granted
+      const currentPerm = getNotificationPermission();
+      const perm = currentPerm === "granted" ? "granted" : await requestNotificationPermission();
+      setPermission(perm);
+
+      if (perm !== "granted") {
+        setLastError(perm === "denied" ? "Permission denied. Enable in Settings > Safari > Notifications." : "Permission not granted");
+        setPushEnabled(false);
+        writePushSettings({ pushEnabled: false });
+        return { success: false, error: "Permission denied" };
+      }
+
       setSyncStatus("syncing");
       const sub = await subscribeToPush(
         urlBase64ToUint8Array(VAPID_KEY) as unknown as BufferSource
       );
       setSubscribed(!!sub);
+
       if (sub) {
         storePushSubscription(sub);
         const sync = await syncPushSubscriptionToBackend(sub);
         setSyncStatus(sync.success ? "synced" : "failed");
         if (!sync.success) {
-          console.warn("Push subscription sync failed:", sync.error);
+          setLastError("Server sync failed: " + (sync.error || "Backend not ready"));
         }
       }
+
       setPushEnabled(true);
       writePushSettings({ pushEnabled: true });
       return { success: true };
     } catch (err) {
+      const msg = err instanceof Error ? err.message : "Subscribe failed";
+      setLastError(msg);
       setPushEnabled(false);
       setSyncStatus("failed");
       writePushSettings({ pushEnabled: false });
-      return { success: false, error: err instanceof Error ? err.message : "Subscribe failed" };
+      return { success: false, error: msg };
+    } finally {
+      setIsToggling(false);
     }
   }, [pushEnabled, permission, supported]);
 
@@ -130,6 +144,8 @@ export function usePushNotifications() {
     pushEnabled,
     subscribed,
     syncStatus,
+    isToggling,
+    lastError,
     togglePush,
   };
 }

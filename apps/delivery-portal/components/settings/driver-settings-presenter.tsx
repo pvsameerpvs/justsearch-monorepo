@@ -28,6 +28,8 @@ interface Props {
   pushPermission: string;
   pushEnabled: boolean;
   pushSyncStatus: "idle" | "syncing" | "synced" | "failed";
+  pushIsToggling: boolean;
+  pushLastError: string | null;
   onTogglePush: () => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -56,6 +58,8 @@ export function DriverSettingsPresenter(props: Props) {
         pushEnabled={props.pushEnabled}
         subscribed={props.pushEnabled}
         syncStatus={props.pushSyncStatus}
+        isToggling={props.pushIsToggling}
+        lastError={props.pushLastError}
         onTogglePush={props.onTogglePush}
       />
       <DriverSettingsNotifications
