@@ -209,34 +209,6 @@ pushRouter.post('/test', authenticateDriver, async (req, res) => {
   res.json(result);
 });
 
-// ── STEP 10: WEB-PUSH PACKAGE TYPE DEFINITIONS ───────────────
-
-/**
- * web-push types (if using TypeScript backend):
- */
-interface PushSubscription {
-  endpoint: string;
-  expirationTime: number | null;
-  keys: {
-    p256dh: string;
-    auth: string;
-  };
-}
-
-interface NotificationPayload {
-  title: string;
-  body: string;
-  icon?: string;
-  badge?: string;
-  tag?: string;
-  requireInteraction?: boolean;
-  renotify?: boolean;
-  silent?: boolean;
-  vibrate?: number[];
-  data?: Record<string, unknown>;
-  actions?: Array<{ action: string; title: string }>;
-}
-
 // ── SUMMARY CHECKLIST ─────────────────────────────────────────
 
 /**
