@@ -44,6 +44,12 @@ export async function createTenantSchema(schemaName: string): Promise<void> {
     `ADD COLUMN IF NOT EXISTS eta_minutes integer, ` +
     `ADD COLUMN IF NOT EXISTS table_id uuid`
   );
+
+  // Ensure delivery_agents has push subscription column
+  await client.unsafe(
+    `ALTER TABLE "${schemaName}"."delivery_agents" ` +
+    `ADD COLUMN IF NOT EXISTS push_subscription JSONB`
+  );
 }
 
 export async function setupTenantDefaults(

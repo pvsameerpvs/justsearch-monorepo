@@ -4,6 +4,7 @@ import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 import { t, mapRow } from '../../lib/tenant-sql';
+import { notifyDriverOfNewOrder } from '../push/push.service';
 
 const router = Router();
 
@@ -52,6 +53,16 @@ router.patch('/:id/driver', requireRole('owner', 'manager', 'cashier'), async (r
         )
       `);
     }
+
+    // Send push notification to driver (non-blocking)
+    notifyDriverOfNewOrder(
+      schemaName,
+      driverId,
+      updated.code as string,
+      updated.delivery_address as string || 'No address'
+    ).catch(() => {
+      // Push failures should not break the assignment response
+    });
 
     res.json({ order: updated });
   } catch (error) {

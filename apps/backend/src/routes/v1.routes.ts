@@ -13,6 +13,7 @@ import deliveryMeRoutes from '../modules/delivery/delivery-me.routes';
 import staffRoutes from '../modules/staff/staff.routes';
 import deliveryAssignmentRoutes from '../modules/delivery/delivery-assignment.routes';
 import deliveryQuoteRoutes from '../modules/delivery/delivery-quote.routes';
+import pushRoutes from '../modules/push/push.routes';
 import voucherRoutes from '../modules/vouchers/voucher.routes';
 import userRoutes from '../modules/users/user.routes';
 import userAdminRoutes from '../modules/users/user-admin.routes';
@@ -97,5 +98,8 @@ router.use('/close-day', orderCloseoutRoutes);
 
 // Upload routes (authenticated)
 router.use('/upload', uploadRoutes);
+
+// Push notifications (authenticated, driver role)
+router.use('/push', pushRoutes);
 
 export default router;
