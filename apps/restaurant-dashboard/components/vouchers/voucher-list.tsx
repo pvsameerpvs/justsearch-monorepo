@@ -27,9 +27,9 @@ export function VoucherList({ vouchers, onEdit, onDelete, onToggle }: VoucherLis
 
 export function VoucherEmpty({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="elegant-card flex flex-col items-center justify-center py-16 text-center">
+    <div className="rounded-2xl bg-white border border-slate-100 flex flex-col items-center justify-center py-16 text-center shadow-[0_1px_2px_0_rgba(0,0,0,0.04)]">
       <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 mb-4">
-        <Ticket className="h-7 w-7 text-amber-300" />
+        <Ticket className="h-7 w-7 text-amber-400" />
       </div>
       <p className="text-sm font-bold text-slate-900 mb-1">No vouchers yet</p>
       <p className="text-xs text-slate-400 mb-4 max-w-xs">

@@ -36,7 +36,7 @@ export function CustomerDetailDrawer({
   return (
     <>
       <div className="fixed inset-0 z-[100] flex justify-end">
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
         <div className="relative w-full max-w-md bg-white shadow-2xl overflow-y-auto">
           <div className="p-5 space-y-4">
             <CustomerDetailHeader customer={customer} onClose={onClose} />

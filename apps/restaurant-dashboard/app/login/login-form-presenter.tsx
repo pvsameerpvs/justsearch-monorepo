@@ -25,15 +25,15 @@ export function LoginFormPresenter({
   onUsernameChange, onPasswordChange, onSubdomainChange, onTogglePass, onSubmit, onForgot,
 }: LoginFormPresenterProps) {
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-xs font-bold text-red-600">{error}</div>}
+    <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      {error && <div className="rounded-xl bg-red-50 px-3 py-2.5 text-xs font-bold text-red-600 border border-red-100">{error}</div>}
 
       <div className="space-y-1.5">
         <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Restaurant Subdomain</label>
         <div className="relative">
           <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input value={subdomain} onChange={(e) => onSubdomainChange(e.target.value)} placeholder="e.g., naples"
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20" required />
+            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500/10 transition-all" required />
         </div>
         <p className="text-[10px] text-slate-400">The slug from justsearch-admin (e.g., naples)</p>
       </div>
@@ -43,7 +43,7 @@ export function LoginFormPresenter({
         <div className="relative">
           <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input value={username} onChange={(e) => onUsernameChange(e.target.value)} placeholder="Enter username"
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20" required />
+            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500/10 transition-all" required />
         </div>
       </div>
 
@@ -52,14 +52,14 @@ export function LoginFormPresenter({
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input type={showPass ? "text" : "password"} value={password} onChange={(e) => onPasswordChange(e.target.value)} placeholder="Enter password"
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20" required />
-          <button type="button" onClick={onTogglePass} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500/10 transition-all" required />
+          <button type="button" onClick={onTogglePass} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
             {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
       </div>
 
-      <button type="submit" disabled={loading} className="w-full rounded-xl bg-amber-500 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-amber-600 transition-colors disabled:opacity-60">
+      <button type="submit" disabled={loading} className="w-full rounded-xl bg-amber-500 py-2.5 text-sm font-bold text-white shadow-sm shadow-amber-500/20 hover:bg-amber-600 transition-colors disabled:opacity-60">
         {loading ? "Signing in..." : "Sign In"}
       </button>
 

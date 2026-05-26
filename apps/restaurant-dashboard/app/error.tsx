@@ -13,7 +13,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
       <p className="text-sm text-slate-500">{error.message}</p>
       <button
         onClick={reset}
-        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+        className="rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 shadow-sm shadow-amber-500/20"
       >
         Try again
       </button>

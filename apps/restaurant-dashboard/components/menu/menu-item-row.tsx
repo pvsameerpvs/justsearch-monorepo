@@ -35,7 +35,7 @@ export function MenuItemRow({ item, onEdit }: MenuItemRowProps) {
           {item.isVeg && (
             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold text-emerald-700">Veg</span>
           )}
-          {item.tags?.map((tag) => (
+          {Array.isArray(item.tags) && item.tags.map((tag) => (
             <span key={tag} className="hidden sm:inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-[9px] font-bold text-amber-700">{tag}</span>
           ))}
         </div>

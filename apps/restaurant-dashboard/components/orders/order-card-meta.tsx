@@ -8,8 +8,8 @@ interface OrderCardMetaProps {
 
 export function OrderCardMeta({ order }: OrderCardMetaProps) {
   const isDelivery = order.type === "delivery";
-  const itemPreview = order.orderItems?.slice(0, 2).map((i) => i.name).join(", ") || "";
-  const hasMoreItems = (order.orderItems?.length || order.items) > 2;
+  const itemPreview = Array.isArray(order.orderItems) ? order.orderItems.slice(0, 2).map((i) => i.name).join(", ") : "";
+  const hasMoreItems = (Array.isArray(order.orderItems) ? order.orderItems.length : order.items) > 2;
 
   return (
     <>

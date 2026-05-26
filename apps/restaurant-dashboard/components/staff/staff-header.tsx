@@ -21,7 +21,7 @@ export function StaffHeader({ total, onAdd, canManage }: StaffHeaderProps) {
       {canManage && (
         <button
           onClick={onAdd}
-          className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-amber-600 transition-colors shadow-sm shadow-amber-500/20"
         >
           <Plus className="h-4 w-4" /> Add Staff
         </button>

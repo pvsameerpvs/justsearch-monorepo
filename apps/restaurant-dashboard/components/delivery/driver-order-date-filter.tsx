@@ -22,7 +22,7 @@ export function DriverOrderDateFilter({ activeFilter, onFilterChange }: DriverOr
           onClick={() => onFilterChange(f.value)}
           className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
             activeFilter === f.value
-              ? "bg-slate-900 text-white shadow-sm"
+              ? "bg-amber-500 text-white shadow-sm shadow-amber-500/20"
               : "bg-slate-100 text-slate-600 hover:bg-slate-200"
           }`}
         >

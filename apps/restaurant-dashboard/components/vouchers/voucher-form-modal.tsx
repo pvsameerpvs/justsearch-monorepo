@@ -15,7 +15,7 @@ export function VoucherFormModal({ voucher, onSave, onCancel }: VoucherFormModal
   const form = useVoucherForm(voucher);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
       <form
         onSubmit={form.handleSubmit(onSave)}
         className="w-full max-w-lg max-h-[90vh] overflow-y-auto"

@@ -16,7 +16,7 @@ export function CustomerOrderDetailModal({ order, onClose }: CustomerOrderDetail
   if (!order) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="elegant-card p-5 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">

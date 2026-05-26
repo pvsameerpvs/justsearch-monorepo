@@ -23,12 +23,12 @@ export function OrderCardHeader({ order }: OrderCardHeaderProps) {
             <OrderStatusBadge status={order.status} />
             <OrderTypeBadge type={order.type} />
           </div>
-          <p className="text-sm font-semibold text-slate-700 mt-0.5">{order.customerName}</p>
+          <p className="text-sm font-semibold text-slate-600 mt-0.5">{order.customerName}</p>
         </div>
       </div>
       <div className="text-right shrink-0">
-        <p className="text-lg font-bold text-slate-900">AED {order.total}</p>
-        <p className="text-xs text-slate-500">{order.items} items</p>
+        <p className="text-lg font-black text-slate-900">AED {order.total}</p>
+        <p className="text-xs text-slate-400">{order.items} items</p>
       </div>
     </div>
   );

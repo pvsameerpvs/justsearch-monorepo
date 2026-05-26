@@ -21,7 +21,7 @@ export function SidebarBrand() {
   const initials = getInitials(name);
 
   return (
-    <div className="flex items-center gap-3 px-5 py-6">
+    <div className="flex items-center gap-3 px-5 py-5">
       {hasLogo ? (
         <Image
           src={logoUrl}
@@ -33,8 +33,9 @@ export function SidebarBrand() {
           unoptimized={logoUrl?.startsWith('http')}
         />
       ) : (
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500 to-purple-500">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-sm shadow-orange-500/20">
           <span className="text-[10px] font-bold text-white">{initials}</span>
+          
         </div>
       )}
      

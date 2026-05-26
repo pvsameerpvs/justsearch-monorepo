@@ -27,30 +27,30 @@
   }
 
   body {
-    @apply bg-[#F3F4F6] text-slate-900 antialiased;
+    @apply bg-[#FAFBFC] text-slate-800 antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply tracking-tight;
+    @apply tracking-tight text-slate-900;
   }
 }
 
 @layer components {
   .elegant-card {
-    @apply rounded-xl bg-white border border-slate-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] transition-all duration-300;
+    @apply rounded-2xl bg-white border border-slate-100 shadow-[0_1px_2px_0_rgba(0,0,0,0.04)] transition-all duration-300;
   }
 
   .elegant-card-hover {
-    @apply elegant-card hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-slate-300/60;
+    @apply elegant-card hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:border-slate-200/80;
   }
 
   .elegant-btn {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.98];
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.98];
   }
 
   .elegant-btn-primary {
-    @apply elegant-btn bg-slate-900 text-white hover:bg-slate-800 shadow-sm;
+    @apply elegant-btn bg-amber-500 text-white hover:bg-amber-600 shadow-sm shadow-amber-500/20;
   }
 
   .elegant-btn-secondary {
@@ -58,11 +58,35 @@
   }
 
   .elegant-input {
-    @apply rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100;
+    @apply rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500/10;
   }
 
   .status-chip {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide;
+  }
+
+  .card-premium {
+    @apply rounded-2xl bg-white border border-slate-100 p-5 shadow-[0_1px_2px_0_rgba(0,0,0,0.04)];
+  }
+
+  .card-premium-hover {
+    @apply card-premium transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:border-slate-200/80;
+  }
+
+  .sidebar-nav-item {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200;
+  }
+
+  .sidebar-nav-item-active {
+    @apply sidebar-nav-item bg-amber-50 text-amber-700 shadow-sm shadow-amber-500/10;
+  }
+
+  .sidebar-nav-item-inactive {
+    @apply sidebar-nav-item text-slate-500 hover:bg-slate-50 hover:text-slate-700;
+  }
+
+  .page-bg {
+    @apply bg-[#FAFBFC];
   }
 }
 
@@ -73,5 +97,9 @@
 
   .bg-gradient-radial {
     background: radial-gradient(circle at center, var(--tw-gradient-stops));
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-500;
   }
 }

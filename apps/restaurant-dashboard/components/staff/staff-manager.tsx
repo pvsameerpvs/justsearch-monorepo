@@ -26,10 +26,10 @@ export function StaffManager() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 bg-slate-200 rounded animate-pulse" />
+        <div className="h-8 w-48 bg-slate-100 rounded-xl animate-pulse" />
         <div className="grid gap-4 sm:grid-cols-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-slate-200 rounded animate-pulse" />
+            <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -68,7 +68,7 @@ export function StaffManager() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
           <div className="w-full max-w-md">
             <StaffForm
               onSubmit={(data: Record<string, unknown>) => createMutation.mutate(data, { onSuccess: () => setShowForm(false) })}
@@ -81,7 +81,7 @@ export function StaffManager() {
       )}
 
       {editingMember && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
           <div className="w-full max-w-md">
             <StaffEditForm
               member={editingMember}

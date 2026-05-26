@@ -60,7 +60,7 @@ export function SocialCard({ social, isEditing, onUpdate, onRemove }: SocialCard
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-0.5">{social.platform}</p>
             <h2 className="truncate font-bold italic text-xl text-slate-900 leading-tight">{social.handle || "No handle"}</h2>
           </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all">
             <ExternalLink className="h-4 w-4" />
           </div>
         </div>

@@ -3,10 +3,10 @@ import { cn } from "./Button"
 
 export const Badge = ({ className, variant = 'default', ...props }: React.HTMLAttributes<HTMLDivElement> & { variant?: 'default' | 'success' | 'warning' | 'danger' }) => {
   const variants = {
-    default: 'bg-slate-100 text-slate-800 border-slate-200',
-    success: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    warning: 'bg-amber-100 text-amber-800 border-amber-200',
-    danger: 'bg-red-100 text-red-800 border-red-200',
+    default: 'bg-slate-100 text-slate-700 border-slate-200',
+    success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    warning: 'bg-amber-50 text-amber-700 border-amber-200',
+    danger: 'bg-red-50 text-red-700 border-red-200',
   }
   
   return (
@@ -15,7 +15,7 @@ export const Badge = ({ className, variant = 'default', ...props }: React.HTMLAt
 }
 
 export const PageHeader = ({ title, description, children }: { title: string, description?: string, children?: React.ReactNode }) => (
-  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between py-6">
+  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between py-4">
     <div className="space-y-1">
       <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
       {description && <p className="text-sm text-slate-500">{description}</p>}

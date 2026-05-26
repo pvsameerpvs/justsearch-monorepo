@@ -17,7 +17,7 @@ export function DeleteConfirmDialog({ title, description, onConfirm, onCancel }:
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onCancel} />
       <div className="relative mx-4 w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-2xl">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">

@@ -15,7 +15,7 @@ export function EditorActions({ hasChanges, onReset, onSave, isSaving }: EditorA
           <RotateCcw className="h-4 w-4" /> Reset
         </button>
       )}
-      <button onClick={onSave} disabled={!hasChanges || isSaving} className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all flex-1 ${hasChanges && !isSaving ? "bg-slate-900 text-white hover:bg-slate-800 shadow-lg" : "bg-slate-100 text-slate-400 cursor-not-allowed"}`}>
+      <button onClick={onSave} disabled={!hasChanges || isSaving} className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all flex-1 ${hasChanges && !isSaving ? "bg-amber-500 text-white hover:bg-amber-600 shadow-sm shadow-amber-500/20" : "bg-slate-100 text-slate-400 cursor-not-allowed"}`}>
         <Save className="h-4 w-4" /> {isSaving ? "Saving..." : hasChanges ? "Save Changes" : "No Changes"}
       </button>
     </div>

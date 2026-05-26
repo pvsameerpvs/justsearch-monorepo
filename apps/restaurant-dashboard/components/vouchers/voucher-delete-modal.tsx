@@ -11,7 +11,7 @@ export function VoucherDeleteModal({ voucher, onConfirm, onCancel }: VoucherDele
   if (!voucher) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
       <div className="w-full max-w-sm">
         <div className="elegant-card p-5 space-y-4">
           <div className="flex items-center gap-3">

@@ -13,7 +13,7 @@ export function DeliveryError({ error, onRetry }: DeliveryErrorProps) {
       <p className="text-xs text-slate-500">{error.message}</p>
       <button
         onClick={onRetry}
-        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800 transition-colors"
+        className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-white hover:bg-amber-600 transition-colors shadow-sm shadow-amber-500/20"
       >
         <RefreshCw className="h-4 w-4" /> Try Again
       </button>

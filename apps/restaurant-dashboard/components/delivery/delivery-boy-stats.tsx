@@ -6,11 +6,11 @@ interface DeliveryBoyStatsProps {
 }
 
 const STAT_CONFIG = [
-  { key: "total", label: "Total", icon: Users, color: "bg-slate-100 text-slate-600 border-slate-200" },
-  { key: "active", label: "Active", icon: CheckCircle, color: "bg-emerald-50 text-emerald-600 border-emerald-200" },
-  { key: "online", label: "Available", icon: Bike, color: "bg-sky-50 text-sky-600 border-sky-200" },
-  { key: "busy", label: "On Duty", icon: Clock, color: "bg-amber-50 text-amber-600 border-amber-200" },
-  { key: "offline", label: "Offline", icon: XCircle, color: "bg-slate-100 text-slate-500 border-slate-200" },
+  { key: "total", label: "Total", icon: Users, color: "bg-slate-50 text-slate-600 border-slate-100" },
+  { key: "active", label: "Active", icon: CheckCircle, color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
+  { key: "online", label: "Available", icon: Bike, color: "bg-sky-50 text-sky-600 border-sky-100" },
+  { key: "busy", label: "On Duty", icon: Clock, color: "bg-amber-50 text-amber-600 border-amber-100" },
+  { key: "offline", label: "Offline", icon: XCircle, color: "bg-slate-50 text-slate-500 border-slate-100" },
 ] as const;
 
 export function DeliveryBoyStats({ agents }: DeliveryBoyStatsProps) {
@@ -27,10 +27,10 @@ export function DeliveryBoyStats({ agents }: DeliveryBoyStatsProps) {
       {STAT_CONFIG.map((s) => {
         const Icon = s.icon;
         return (
-          <div key={s.key} className={`rounded-xl border p-2.5 text-center ${s.color}`}>
-            <Icon className="mx-auto h-4 w-4 mb-1" />
-            <p className="text-lg font-bold">{counts[s.key as keyof typeof counts]}</p>
-            <p className="text-[9px] font-bold uppercase tracking-wider">{s.label}</p>
+          <div key={s.key} className={`rounded-2xl border p-3 text-center ${s.color}`}>
+            <Icon className="mx-auto h-4 w-4 mb-1.5" strokeWidth={2} />
+            <p className="text-xl font-black">{counts[s.key as keyof typeof counts]}</p>
+            <p className="text-[9px] font-bold uppercase tracking-wider opacity-80">{s.label}</p>
           </div>
         );
       })}

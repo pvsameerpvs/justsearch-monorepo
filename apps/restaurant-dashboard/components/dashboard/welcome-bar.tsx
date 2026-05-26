@@ -18,7 +18,7 @@ export function WelcomeBar({ restaurant }: { restaurant: AdminRestaurant }) {
   const hasLogo = !!logoUrl;
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.04)]">
       <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
         {hasLogo ? (
           <Image
@@ -31,7 +31,7 @@ export function WelcomeBar({ restaurant }: { restaurant: AdminRestaurant }) {
             unoptimized={logoUrl?.startsWith('http')}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm font-bold text-white bg-gradient-to-br from-indigo-500 to-purple-500">
+          <div className="flex h-full w-full items-center justify-center text-sm font-bold text-white bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl">
             {initials}
           </div>
         )}
@@ -40,7 +40,7 @@ export function WelcomeBar({ restaurant }: { restaurant: AdminRestaurant }) {
         <h1 className="text-lg font-bold text-slate-900 truncate">{restaurant.name}</h1>
         <p className="text-sm text-slate-500 truncate">{restaurant.cuisine || "Restaurant"}</p>
       </div>
-      <Link href="/homepage" className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors shrink-0">
+      <Link href="/homepage" className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-600 transition-colors shrink-0 shadow-sm shadow-amber-500/20">
         <Store className="h-4 w-4" /> Edit Site <ArrowUpRight className="h-3.5 w-3.5" />
       </Link>
     </div>

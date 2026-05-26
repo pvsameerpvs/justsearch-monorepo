@@ -65,7 +65,7 @@ export function DeliveryBoyManager() {
         </>
       )}
       {showForm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
           <div className="w-full max-w-md">
             <DeliveryAgentForm
               onSubmit={(data) => createMutation.mutate(data, { onSuccess: () => setShowForm(false) })}
@@ -77,7 +77,7 @@ export function DeliveryBoyManager() {
         </div>
       )}
       {editingAgent && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
           <div className="w-full max-w-md">
             <DriverEditForm
               agent={editingAgent}

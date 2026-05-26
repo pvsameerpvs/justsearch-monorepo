@@ -23,7 +23,7 @@ export function OpeningHoursEditorForm({ hours, onChange, accent }: OpeningHours
             onClick={() => toggleDay(h.day)}
             className={`flex h-8 w-12 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors ${
               h.isOpen
-                ? "bg-slate-900 text-white"
+                ? "bg-amber-500 text-white shadow-sm shadow-amber-500/20"
                 : "bg-slate-100 text-slate-400 line-through"
             }`}
           >

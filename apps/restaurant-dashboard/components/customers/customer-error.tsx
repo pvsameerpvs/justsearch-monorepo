@@ -1,4 +1,4 @@
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 interface CustomerErrorProps {
   error: Error;
@@ -15,9 +15,9 @@ export function CustomerError({ error, onRetry }: CustomerErrorProps) {
       </div>
       <button
         onClick={onRetry}
-        className="px-4 py-2 text-xs font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+        className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-amber-500 rounded-xl hover:bg-amber-600 transition-colors shadow-sm shadow-amber-500/20"
       >
-        Try Again
+        <RefreshCw className="h-3.5 w-3.5" /> Try Again
       </button>
     </div>
   );

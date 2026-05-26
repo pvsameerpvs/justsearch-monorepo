@@ -37,7 +37,7 @@ export function MenuHeroPreview({ heroUrl, logoUrl, name, tagline, description, 
           sizes="(max-width: 768px) 100vw, 400px"
           priority
         />
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/30" />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white">
           <div className="space-y-4">

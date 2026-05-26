@@ -23,7 +23,7 @@ export function OrderCard({ order, onAccept, onReject, onAdvance, onAssign, onVi
   const nextLabel = NEXT_STATUS_LABEL[order.status];
 
   return (
-    <div className="elegant-card p-0 overflow-hidden transition-shadow hover:shadow-md">
+    <div className="rounded-2xl bg-white border border-slate-100 overflow-hidden transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:border-slate-200/80">
       <button onClick={onView} className="w-full text-left p-4">
         <OrderCardHeader order={order} />
         <OrderCardMeta order={order} />

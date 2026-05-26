@@ -21,7 +21,7 @@ export function CancelReasonPicker({ orderCode, onConfirm, onClose }: CancelReas
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

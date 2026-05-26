@@ -14,8 +14,8 @@ export function DeliveryBoyPicker({ orderId, onClose }: DeliveryBoyPickerProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-xl max-h-[80vh] overflow-hidden flex flex-col">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-lg rounded-2xl border border-slate-100 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.08)] max-h-[80vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between p-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50">

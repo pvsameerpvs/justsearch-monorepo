@@ -63,7 +63,7 @@ export function ProfileDriverItem({ agent, portalUrl, copied, onCopy }: ProfileD
             {copied === urlKey ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
             {copied === urlKey ? "Copied" : "Copy"}
           </button>
-          <a href={portalUrl} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-1 rounded-md bg-slate-900 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 transition-colors">
+          <a href={portalUrl} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-1 rounded-md bg-amber-500 py-1.5 text-[11px] font-semibold text-white hover:bg-amber-600 transition-colors">
             <ExternalLink className="h-3 w-3" /> Open Portal
           </a>
         </div>

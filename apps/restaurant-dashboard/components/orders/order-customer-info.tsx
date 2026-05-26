@@ -7,7 +7,7 @@ export function OrderCustomerInfo({ order }: { order: DashboardOrder }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white text-sm font-bold">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500 text-white text-sm font-bold shadow-sm shadow-amber-500/20">
           {initials}
         </div>
         <div>

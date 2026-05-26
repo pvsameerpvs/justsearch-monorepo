@@ -20,7 +20,7 @@ export function OrderItemsList({ items }: { items: OrderItem[] }) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-bold text-slate-900 truncate">{item.name}</p>
-                {item.tags?.map((tag) => (
+                {Array.isArray(item.tags) && item.tags.map((tag) => (
                   <span key={tag} className="rounded-full bg-amber-50 px-2 py-0.5 text-[9px] font-bold text-amber-700">{tag}</span>
                 ))}
               </div>

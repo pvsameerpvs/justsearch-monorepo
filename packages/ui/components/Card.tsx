@@ -2,7 +2,7 @@ import * as React from "react"
 import { cn } from "./Button"
 
 export const Card = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("rounded-lg border border-slate-200 bg-white text-slate-950 shadow-sm transition-all", className)} {...props} />
+  <div className={cn("rounded-2xl border border-slate-100 bg-white text-slate-950 shadow-[0_1px_2px_0_rgba(0,0,0,0.04)] transition-all", className)} {...props} />
 )
 
 export const CardHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

@@ -6,10 +6,10 @@ interface VoucherStatsProps {
 }
 
 const STAT_ITEMS = [
-  { key: "total" as const, label: "Total", icon: Ticket, color: "text-slate-700", bg: "bg-slate-100" },
-  { key: "active" as const, label: "Active", icon: Zap, color: "text-emerald-700", bg: "bg-emerald-50" },
-  { key: "scheduled" as const, label: "Upcoming", icon: Calendar, color: "text-amber-700", bg: "bg-amber-50" },
-  { key: "expired" as const, label: "Expired", icon: Clock, color: "text-red-700", bg: "bg-red-50" },
+  { key: "total" as const, label: "Total", icon: Ticket, color: "text-slate-700", bg: "bg-slate-50 border-slate-100" },
+  { key: "active" as const, label: "Active", icon: Zap, color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-100" },
+  { key: "scheduled" as const, label: "Upcoming", icon: Calendar, color: "text-amber-700", bg: "bg-amber-50 border-amber-100" },
+  { key: "expired" as const, label: "Expired", icon: Clock, color: "text-red-700", bg: "bg-red-50 border-red-100" },
 ];
 
 export function VoucherStatsCards({ stats }: VoucherStatsProps) {
@@ -18,14 +18,14 @@ export function VoucherStatsCards({ stats }: VoucherStatsProps) {
       {STAT_ITEMS.map((item) => {
         const Icon = item.icon;
         return (
-          <div key={item.key} className={`elegant-card p-4 ${item.bg}`}>
+          <div key={item.key} className={`rounded-2xl border p-4 transition-all hover:shadow-sm ${item.bg}`}>
             <div className="flex items-center gap-2 mb-2">
-              <Icon className={`h-4 w-4 ${item.color}`} />
+              <Icon className={`h-4 w-4 ${item.color}`} strokeWidth={2} />
               <span className={`text-[10px] font-bold uppercase tracking-wider ${item.color}`}>
                 {item.label}
               </span>
             </div>
-            <p className={`text-2xl font-bold ${item.color}`}>{stats[item.key]}</p>
+            <p className={`text-2xl font-black ${item.color}`}>{stats[item.key]}</p>
           </div>
         );
       })}

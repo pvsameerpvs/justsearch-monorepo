@@ -28,7 +28,7 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
 
   if (status === "confirmed") {
     return (
-      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
+      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-colors flex items-center justify-center gap-2">
         <ChefHat className="h-4 w-4" />
         Start Preparing
       </button>
@@ -37,7 +37,7 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
 
   if (status === "preparing") {
     return (
-      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-semibold text-white bg-violet-500 hover:bg-violet-600 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
+      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-bold text-white bg-violet-500 hover:bg-violet-600 transition-colors flex items-center justify-center gap-2">
         <CheckCircle className="h-4 w-4" />
         Mark Ready
       </button>
@@ -47,14 +47,14 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
   if (status === "ready") {
     if (type === "delivery") {
       return (
-        <button onClick={(e) => { e.stopPropagation(); onAssign(); }} className="w-full py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
+        <button onClick={(e) => { e.stopPropagation(); onAssign(); }} className="w-full py-3 text-sm font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
           <Package className="h-4 w-4" />
           {hasAgent ? "Reassign Delivery Boy" : "Assign Delivery Boy"}
         </button>
       );
     }
     return (
-      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
+      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
         <CheckCircle className="h-4 w-4" />
         Mark Completed
       </button>
@@ -63,7 +63,7 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
 
   if (status === "out_for_delivery") {
     return (
-      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 border-t border-slate-100">
+      <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} className="w-full py-3 text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
         <Truck className="h-4 w-4" />
         Mark Completed
       </button>
