@@ -4,24 +4,40 @@ import Image from 'next/image';
 import { ChefHat } from 'lucide-react';
 import { useRestaurantProfile } from '@/lib/hooks/use-restaurant-profile';
 
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+}
+
 export function SidebarBrand() {
   const { restaurant } = useRestaurantProfile();
   const name = restaurant?.name ?? 'Restaurant';
-  const logoUrl = restaurant?.photos?.[0];
+  const logoUrl = restaurant?.logoUrl;
+  const hasLogo = !!logoUrl;
+  const initials = getInitials(name);
 
   return (
     <div className="flex items-center gap-3 px-5 py-6">
-      {logoUrl ? (
-        <Image src={logoUrl} alt={name} width={36} height={36} className="h-9 w-9 rounded-lg object-cover" />
+      {hasLogo ? (
+        <Image
+          src={logoUrl}
+          alt={`${name} logo`}
+          width={400}
+          height={400}
+          priority
+          className="h-8 w-auto object-contain"
+          unoptimized={logoUrl?.startsWith('http')}
+        />
       ) : (
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10">
-          <ChefHat className="h-5 w-5 text-amber-500" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500 to-purple-500">
+          <span className="text-[10px] font-bold text-white">{initials}</span>
         </div>
       )}
-      <div>
-        <p className="text-sm font-bold text-white">{name}</p>
-        <p className="text-[10px] text-slate-500">Restaurant Dashboard</p>
-      </div>
+     
     </div>
   );
 }

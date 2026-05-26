@@ -14,13 +14,22 @@ function getInitials(name: string): string {
 
 export function WelcomeBar({ restaurant }: { restaurant: AdminRestaurant }) {
   const initials = getInitials(restaurant.name);
-  const logoUrl = restaurant.photos?.[0];
+  const logoUrl = restaurant.logoUrl;
+  const hasLogo = !!logoUrl;
 
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl overflow-hidden border border-slate-200">
-        {logoUrl ? (
-          <Image src={logoUrl} alt="" fill className="object-cover" sizes="48px" />
+      <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
+        {hasLogo ? (
+          <Image
+            src={logoUrl}
+            alt={`${restaurant.name} logo`}
+            width={400}
+            height={400}
+            priority
+            className="h-full w-auto object-contain"
+            unoptimized={logoUrl?.startsWith('http')}
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-sm font-bold text-white bg-gradient-to-br from-indigo-500 to-purple-500">
             {initials}
