@@ -129,7 +129,10 @@ export async function apiClient<T>(
     cache: 'no-store',
   });
 
-  if (response.status === 401) {
+  // Public auth endpoints should not trigger token refresh on 401
+  const isPublicAuth = path === '/auth/login' || path === '/auth/register' || path === '/auth/refresh';
+
+  if (response.status === 401 && !isPublicAuth) {
     const refreshResult = await attemptRefresh();
     if (refreshResult.ok) {
       return apiClient<T>(path, options);

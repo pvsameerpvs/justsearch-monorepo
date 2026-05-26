@@ -72,7 +72,7 @@ function openDb() {
     req.onerror = () => reject(req.error);
     req.onsuccess = () => resolve(req.result);
     req.onupgradeneeded = (e) => {
-      const db = (e.target as IDBOpenDBRequest).result;
+      const db = /** @type {IDBOpenDBRequest} */ (e.target).result;
       if (!db.objectStoreNames.contains("pendingStatusUpdates")) db.createObjectStore("pendingStatusUpdates", { keyPath: "id", autoIncrement: true });
     };
   });
