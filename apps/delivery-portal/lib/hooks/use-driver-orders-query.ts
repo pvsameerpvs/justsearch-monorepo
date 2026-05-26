@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
@@ -47,7 +49,10 @@ async function fetchAssignments(agentId: string): Promise<AssignmentsResponse> {
 export function useDriverOrdersQuery(driverId: string | null) {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['driverAssignments', driverId],
-    queryFn: () => fetchAssignments(driverId!),
+    queryFn: () => {
+      if (!driverId) return Promise.resolve({ assignments: [] });
+      return fetchAssignments(driverId);
+    },
     enabled: Boolean(driverId),
     refetchInterval: POLL_INTERVAL_MS,
     staleTime: STALE_TIME,

@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
@@ -20,8 +22,12 @@ function getSlug(): string | null {
   return localStorage.getItem('restaurant-slug');
 }
 
-async function fetchCurrentRestaurant(): Promise<RestaurantCurrentResponse> {
-  return apiClient('/restaurants/current');
+async function fetchCurrentRestaurant(): Promise<RestaurantCurrentResponse | null> {
+  try {
+    return await apiClient('/restaurants/current');
+  } catch {
+    return null;
+  }
 }
 
 export function useRestaurantQuery() {

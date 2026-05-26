@@ -8,24 +8,17 @@ export function DynamicAppIcon() {
 
   useEffect(() => {
     if (!logoUrl) return;
-
-    // Update or create apple-touch-icon link
-    let link = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement("link");
-      link.rel = "apple-touch-icon";
-      document.head.appendChild(link);
+    try {
+      let link = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement | null;
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "apple-touch-icon";
+        document.head.appendChild(link);
+      }
+      if (link.href !== logoUrl) link.href = logoUrl;
+    } catch {
+      // ignore
     }
-    if (link.href !== logoUrl) link.href = logoUrl;
-
-    // Also update shortcut icon
-    let shortcut = document.querySelector('link[rel="shortcut icon"]') as HTMLLinkElement | null;
-    if (!shortcut) {
-      shortcut = document.createElement("link");
-      shortcut.rel = "shortcut icon";
-      document.head.appendChild(shortcut);
-    }
-    if (shortcut.href !== logoUrl) shortcut.href = logoUrl;
   }, [logoUrl]);
 
   return null;

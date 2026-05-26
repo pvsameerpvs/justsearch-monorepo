@@ -3,32 +3,38 @@
 import { useEffect } from "react";
 import { useRestaurantQuery } from "@/lib/hooks/use-restaurant-query";
 
-const META_NAMES = [
-  "apple-mobile-web-app-capable",
-  "apple-mobile-web-app-status-bar-style",
-  "apple-mobile-web-app-title",
-  "mobile-web-app-capable",
-  "theme-color",
+const PWA_META = [
+  { name: "apple-mobile-web-app-capable", content: "yes" },
+  { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+  { name: "mobile-web-app-capable", content: "yes" },
 ];
 
-function setMeta(name: string, content: string) {
-  let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
-  if (!el) {
-    el = document.createElement("meta");
-    el.name = name;
-    document.head.appendChild(el);
+function injectMeta(name: string, content: string) {
+  try {
+    let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+    if (!el) {
+      el = document.createElement("meta");
+      el.name = name;
+      document.head.appendChild(el);
+    }
+    el.content = content;
+  } catch {
+    // ignore
   }
-  el.content = content;
 }
 
-function setAppleTouchIcon(href: string) {
-  let el = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement | null;
-  if (!el) {
-    el = document.createElement("link");
-    el.rel = "apple-touch-icon";
-    document.head.appendChild(el);
+function injectAppleIcon(href: string) {
+  try {
+    let el = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement | null;
+    if (!el) {
+      el = document.createElement("link");
+      el.rel = "apple-touch-icon";
+      document.head.appendChild(el);
+    }
+    if (el.href !== href) el.href = href;
+  } catch {
+    // ignore
   }
-  if (el.href !== href) el.href = href;
 }
 
 export function PwaMetaInjector() {
@@ -36,32 +42,14 @@ export function PwaMetaInjector() {
 
   useEffect(() => {
     const name = restaurant?.name || "Delivery";
-    const themeColor = (restaurant?.theme as string | undefined) || "#059669";
     const logoUrl = restaurant?.settings?.logoUrl as string | undefined;
 
-    // iOS standalone mode — critical meta tags
-    setMeta("apple-mobile-web-app-capable", "yes");
-    setMeta("apple-mobile-web-app-status-bar-style", "black-translucent");
-    setMeta("apple-mobile-web-app-title", name);
-
-    // Android legacy + cross-browser
-    setMeta("mobile-web-app-capable", "yes");
-    setMeta("theme-color", themeColor);
-
-    // Apple touch icon — must be PNG, never SVG
-    if (logoUrl) {
-      setAppleTouchIcon(logoUrl);
+    for (const m of PWA_META) {
+      injectMeta(m.name, m.content);
     }
+    injectMeta("apple-mobile-web-app-title", name);
 
-    // Cleanup on unmount: remove tags we created
-    return () => {
-      META_NAMES.forEach((n) => {
-        const el = document.querySelector(`meta[name="${n}"]`);
-        if (el) el.remove();
-      });
-      const icon = document.querySelector('link[rel="apple-touch-icon"]');
-      if (icon) icon.remove();
-    };
+    if (logoUrl) injectAppleIcon(logoUrl);
   }, [restaurant]);
 
   return null;
