@@ -5,10 +5,15 @@ import { usePathname } from "next/navigation";
 import { DashboardAuthProvider } from "@/lib/auth-context";
 import { AuthGuard } from "@/components/auth-guard";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
+import { NewOrderNotification } from "@/components/new-order-notification";
+import { useAudioUnlock } from "@/lib/hooks/use-audio-unlock";
 
 export function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isLoginPage = pathname === "/login";
+
+  // Initialize audio context unlock on first user interaction
+  useAudioUnlock();
 
   return (
     <DashboardAuthProvider>
@@ -18,6 +23,7 @@ export function ClientLayout({ children }: { children: ReactNode }) {
           <main className={!isLoginPage ? "p-4 pt-16 md:ml-[260px] md:p-8 md:pt-6" : ""}>
             {children}
           </main>
+          {!isLoginPage && <NewOrderNotification />}
         </div>
       </AuthGuard>
     </DashboardAuthProvider>

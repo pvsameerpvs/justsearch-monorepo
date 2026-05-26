@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { ChefHat } from 'lucide-react';
 import { useRestaurantProfile } from '@/lib/hooks/use-restaurant-profile';
+import { SoundToggle } from './sound-toggle';
 
 function getInitials(name: string): string {
   return name
@@ -39,10 +40,11 @@ export function SidebarBrand() {
           <ChefHat className="h-4 w-4" />
         </div>
       )}
-      <div className="min-w-0">
+      <div className="flex-1 min-w-0">
         <p className="text-sm font-bold text-slate-900 truncate leading-tight">{name}</p>
         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Dashboard</p>
       </div>
+      <SoundToggle />
     </div>
   );
 }

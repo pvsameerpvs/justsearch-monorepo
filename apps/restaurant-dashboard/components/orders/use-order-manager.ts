@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import { useOrderStore, type DashboardOrder, type OrderStatus } from "@/lib/stores/order-store";
 import { useOrdersQuery, useUpdateOrderStatusMutation } from "@/lib/hooks/use-orders-query";
 import { useDashboardAuth } from "@/lib/auth-context";
-import { useOrderSound } from "./use-order-sound";
 import { useOrderHistory } from "./use-order-history";
 import { mapApiOrderToDashboard } from "./orders.utils";
 
@@ -35,8 +34,6 @@ export function useOrderManager() {
   const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
 
   const orders = useMemo(() => apiOrders.map(mapApiOrderToDashboard), [apiOrders]);
-
-  useOrderSound(orders);
 
   const isActiveTab = isKitchen ? true : tab === "active";
   const filters = isKitchen ? KITCHEN_FILTERS : (isActiveTab ? ACTIVE_FILTERS : HISTORY_FILTERS);

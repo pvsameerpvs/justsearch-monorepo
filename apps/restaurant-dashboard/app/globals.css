@@ -126,6 +126,30 @@
   .icon-glow-sky {
     @apply bg-gradient-to-br from-sky-400 to-cyan-500 shadow-lg shadow-sky-500/20;
   }
+
+  @keyframes notification-progress {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+
+  .notification-progress {
+    animation: notification-progress 15s linear forwards;
+  }
+
+  @keyframes pending-pulse {
+    0%, 100% {
+      box-shadow: 0 2px 12px -4px rgba(0, 0, 0, 0.06), 0 0 0 0 rgba(245, 158, 11, 0.4);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    50% {
+      box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(245, 158, 11, 0);
+      border-color: rgba(245, 158, 11, 0.6);
+    }
+  }
+
+  .pending-blink {
+    animation: pending-pulse 1.5s ease-in-out infinite;
+  }
 }
 
 @layer utilities {
