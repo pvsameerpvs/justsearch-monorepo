@@ -20,8 +20,9 @@ import {
   removePushSubscriptionFromBackend,
 } from "@/lib/push/push-backend-sync";
 
+// Real VAPID public key — pair with backend private key
 const VAPID_KEY =
-  "BEl62iTMgUf-l1KD0RKyG5A3L8p0GJ5K3R8m2Q9P3N4O5L6K7J8I9H0G1F2E3D4C5B6A7S8D9F0G1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5V6W7X8Y9Z0";
+  "BJP8a37Ss19VkXGu_AzHkpDJMs_ZeG8zTXCf3w0YJ5-uuONop2R0GKHVrm5BrOZa8ENEpWwTIEOdagMEFIDM0RQ";
 
 function hasNotificationApi(): boolean {
   return typeof window !== "undefined" && "Notification" in window;

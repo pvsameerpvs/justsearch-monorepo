@@ -22,12 +22,12 @@
 
 // ── STEP 3: ENVIRONMENT VARIABLES (.env) ──────────────────────
 /*
-VAPID_PUBLIC_KEY=BEl62iTMgUf-l1KD0RKyG5A3L8p0GJ5K3R8m2Q9P3N4O5L6K7J8I9H0G1F2E3D4C5B6A7S8D9F0G1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5V6W7X8Y9Z0
-VAPID_PRIVATE_KEY=YOUR_PRIVATE_KEY_HERE
+VAPID_PUBLIC_KEY=BJP8a37Ss19VkXGu_AzHkpDJMs_ZeG8zTXCf3w0YJ5-uuONop2R0GKHVrm5BrOZa8ENEpWwTIEOdagMEFIDM0RQ
+VAPID_PRIVATE_KEY=fE_rJcM2svEn9UEVbP86jJnlWqAvIlc907QTzJyNoCg
 VAPID_SUBJECT=mailto:admin@yourdomain.com
 
-// Generate keys once:
-// npx web-push generate-vapid-keys
+// These keys were generated once with: npx web-push generate-vapid-keys
+// NEVER regenerate — both frontend + backend must use the same pair
 */
 
 // ── STEP 4: INITIALIZE WEB-PUSH ───────────────────────────────
