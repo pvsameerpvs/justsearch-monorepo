@@ -4,6 +4,7 @@ import { DriverAuthProvider } from "@/lib/driver-auth-store";
 import { AuthGuard } from "@/components/layout/auth-guard";
 import { ReactQueryProvider } from "@/components/providers/react-query-provider";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
+import { DynamicAppIcon } from "@/components/pwa/dynamic-app-icon";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <DriverAuthProvider>
             <AuthGuard>{children}</AuthGuard>
           </DriverAuthProvider>
+          <DynamicAppIcon />
         </ReactQueryProvider>
         <ServiceWorkerRegister />
       </body>
