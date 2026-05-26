@@ -41,4 +41,10 @@ a {
   .elegant-input {
     @apply rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition;
   }
+  .safe-header {
+    padding-top: max(14px, env(safe-area-inset-top));
+  }
+  .safe-bottom {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
 }

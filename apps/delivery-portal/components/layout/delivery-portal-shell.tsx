@@ -20,7 +20,7 @@ export function DeliveryPortalShell({
   return (
     <main className="min-h-screen bg-slate-50">
       {/* Elegant top bar — clean, minimal */}
-      <header className="sticky top-0 z-40 bg-white px-4 py-3.5">
+      <header className="sticky top-0 z-40 bg-white px-4 pb-3.5 safe-header">
         <div className="mx-auto max-w-xl flex items-center justify-between">
           {/* Left: Restaurant */}
           <div className="flex items-center gap-3 min-w-0">
@@ -45,7 +45,7 @@ export function DeliveryPortalShell({
       </header>
 
       {/* Elegant nav */}
-      <div className="mx-auto max-w-xl px-4 pb-24 pt-2">
+      <div className="mx-auto max-w-xl px-4 pt-2 safe-bottom">
         <PortalNav />
         {children}
       </div>
