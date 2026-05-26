@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { LogOut, Crown } from "lucide-react";
 import { useDashboardAuth } from "@/lib/auth-context";
+import { LogoutConfirmDialog } from "./dashboard/logout-confirm-dialog";
 
 function getInitials(name: string): string {
   return name
@@ -23,6 +24,7 @@ const ROLE_META: Record<string, { label: string; color: string; icon: React.Elem
 export function SidebarFooter() {
   const { user, logout } = useDashboardAuth();
   const [mounted, setMounted] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -35,26 +37,34 @@ export function SidebarFooter() {
   const RoleIcon = meta.icon;
 
   return (
-    <div className="border-t border-slate-100/60 p-3">
-      <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 border border-slate-100/60 p-3 shadow-sm">
-        <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${meta.color} shadow-md ring-2 ring-white`}>
-          <span className="text-[10px] font-bold">{mounted ? initials : 'U'}</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold text-slate-800 truncate">{mounted ? name : 'User'}</p>
-          <div className="flex items-center gap-1 mt-0.5">
-            <RoleIcon className="h-2.5 w-2.5 text-slate-400" />
-            <p className="text-[10px] font-semibold text-slate-400 capitalize">{mounted ? meta.label : 'Staff'}</p>
+    <>
+      <div className="border-t border-slate-100/60 p-3">
+        <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 border border-slate-100/60 p-3 shadow-sm">
+          <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${meta.color} shadow-md ring-2 ring-white`}>
+            <span className="text-[10px] font-bold">{mounted ? initials : 'U'}</span>
           </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-slate-800 truncate">{mounted ? name : 'User'}</p>
+            <div className="flex items-center gap-1 mt-0.5">
+              <RoleIcon className="h-2.5 w-2.5 text-slate-400" />
+              <p className="text-[10px] font-semibold text-slate-400 capitalize">{mounted ? meta.label : 'Staff'}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm border border-slate-100/60 hover:border-red-200/60"
+            title="Logout"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
         </div>
-        <button
-          onClick={logout}
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm border border-slate-100/60 hover:border-red-200/60"
-          title="Logout"
-        >
-          <LogOut className="h-3.5 w-3.5" />
-        </button>
       </div>
-    </div>
+
+      <LogoutConfirmDialog
+        open={showConfirm}
+        onConfirm={() => { setShowConfirm(false); logout(); }}
+        onCancel={() => setShowConfirm(false)}
+      />
+    </>
   );
 }
