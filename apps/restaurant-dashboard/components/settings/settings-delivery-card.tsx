@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Truck } from "lucide-react";
+import { useState, useEffect } from "react";
 import type { AdminRestaurant } from "@/lib/types/admin-restaurant";
 import { UAE_EMIRATES } from "@justsearch/types";
 import type { DeliveryConfig } from "@justsearch/types";
 import { SettingsDeliveryForm } from "./settings-delivery-form";
 import { SettingsDeliveryCardView } from "./settings-delivery-card-view";
+import { SettingsDeliveryCardHeader } from "./settings-delivery-card-header";
 
 interface Props {
   restaurant: AdminRestaurant;
@@ -27,33 +27,43 @@ function buildDefaultConfig(): DeliveryConfig {
 export function SettingsDeliveryCard({ restaurant, onUpdate }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [config, setConfig] = useState<DeliveryConfig>(restaurant.delivery ?? buildDefaultConfig());
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleSave = () => {
-    onUpdate?.({ delivery: config });
-    setIsEditing(false);
+  // Sync local config when restaurant data updates after a successful save
+  useEffect(() => {
+    if (!isEditing) {
+      setConfig(restaurant.delivery ?? buildDefaultConfig());
+    }
+  }, [restaurant.delivery, isEditing]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await onUpdate?.({ delivery: config });
+      setIsEditing(false);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save delivery settings");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div className="elegant-card p-5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50">
-            <Truck className="h-5 w-5 text-amber-600" />
-          </div>
-          <div>
-            <h3 className="text-base font-bold text-slate-900">Delivery Settings</h3>
-            <p className="text-[11px] text-slate-500">Configure radius, pricing tiers & location</p>
-          </div>
+      <SettingsDeliveryCardHeader
+        isEditing={isEditing}
+        isSaving={isSaving}
+        onEdit={() => { setSaveError(null); setIsEditing(true); }}
+        onCancel={() => setIsEditing(false)}
+        onSave={handleSave}
+      />
+      {saveError && (
+        <div className="mb-4 rounded-xl bg-red-50 p-3 text-xs font-semibold text-red-600">
+          {saveError}
         </div>
-        {isEditing ? (
-          <div className="flex gap-1">
-            <button onClick={() => setIsEditing(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100">Cancel</button>
-            <button onClick={handleSave} className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white hover:bg-emerald-600">Save</button>
-          </div>
-        ) : (
-          <button onClick={() => setIsEditing(true)} className="flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors">Edit</button>
-        )}
-      </div>
+      )}
       {isEditing ? (
         <SettingsDeliveryForm config={config} onChange={setConfig} />
       ) : (

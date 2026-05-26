@@ -5,3 +5,6 @@ export { SettingsSocialsCard } from './settings-socials-card';
 export { SettingsQrCard } from './settings-qr-card';
 export { SettingsDomainCard } from './settings-domain-card';
 export { SettingsLicenseCard } from './settings-license-card';
+export { SettingsTabsNav } from './settings-tabs-nav';
+export { SettingsQrHero } from './settings-qr-hero';
+export { SettingsTablesCard } from './settings-tables-card';

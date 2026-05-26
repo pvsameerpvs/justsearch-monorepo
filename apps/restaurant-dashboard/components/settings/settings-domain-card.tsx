@@ -13,6 +13,7 @@ export function SettingsDomainCard({ subdomain }: SettingsDomainCardProps) {
   const urls = [
     { label: "Customer Site", url: `https://${subdomain}.${BASE_DOMAIN}` },
     { label: "Dashboard", url: `https://${subdomain}.admin.${BASE_DOMAIN}` },
+    { label: "Delivery Boy", url: `https://${subdomain}.delivery.${BASE_DOMAIN}` },
   ];
 
   return (

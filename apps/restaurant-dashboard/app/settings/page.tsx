@@ -4,7 +4,7 @@ import { SettingsContainer } from "@/components/settings/settings-container";
 export default function SettingsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Settings" description="Restaurant profile, contact details, and links" />
+      <PageHeader title="Settings" description="Manage your restaurant profile, QR codes, delivery, and social links" />
       <SettingsContainer />
     </div>
   );

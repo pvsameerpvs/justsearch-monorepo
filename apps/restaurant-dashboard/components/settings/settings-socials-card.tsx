@@ -1,23 +1,38 @@
 "use client";
 
-import { useState } from 'react';
-import { Camera, Plus, Check, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Camera, Plus } from 'lucide-react';
 import { SocialCard } from './social-card';
 import { SocialsHeader } from './socials-header';
+import { SettingsSocialsToolbar } from './settings-socials-toolbar';
 import type { AdminRestaurant, SocialLink } from '@/lib/types/admin-restaurant';
 
-interface SettingsSocialsCardProps {
+interface Props {
   restaurant: AdminRestaurant;
   onUpdate?: (updates: Partial<AdminRestaurant>) => void;
 }
 
-export function SettingsSocialsCard({ restaurant, onUpdate }: SettingsSocialsCardProps) {
+export function SettingsSocialsCard({ restaurant, onUpdate }: Props) {
   const [socials, setSocials] = useState<SocialLink[]>(restaurant.socials);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSave = () => {
-    onUpdate?.({ socials });
-    setIsEditing(false);
+  useEffect(() => {
+    if (!isEditing) setSocials(restaurant.socials);
+  }, [restaurant.socials, isEditing]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setError(null);
+    try {
+      await onUpdate?.({ socials });
+      setIsEditing(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save social links");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const updateSocial = (index: number, field: 'platform' | 'url' | 'handle', value: string) => {
@@ -32,24 +47,18 @@ export function SettingsSocialsCard({ restaurant, onUpdate }: SettingsSocialsCar
   return (
     <div className="space-y-6">
       <SocialsHeader restaurant={restaurant} />
-      <div className="flex justify-end">
-        {isEditing ? (
-          <div className="flex gap-2">
-            <button onClick={() => setIsEditing(false)} className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100">
-              <X className="h-4 w-4" /> Cancel
-            </button>
-            <button onClick={handleSave} className="flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-600">
-              <Check className="h-4 w-4" /> Save
-            </button>
-          </div>
-        ) : (
-          <button onClick={() => setIsEditing(true)} className="elegant-btn-secondary text-xs">
-            Edit Social Links
-          </button>
-        )}
-      </div>
-
-      {/* Social Cards - Same format as customer-frontend */}
+      <SettingsSocialsToolbar
+        isEditing={isEditing}
+        isSaving={isSaving}
+        onEdit={() => { setError(null); setIsEditing(true); }}
+        onCancel={() => setIsEditing(false)}
+        onSave={handleSave}
+      />
+      {error && (
+        <div className="rounded-xl bg-red-50 p-3 text-xs font-semibold text-red-600">
+          {error}
+        </div>
+      )}
       {socials.length === 0 && !isEditing ? (
         <div className="text-center py-12 text-slate-400">
           <Camera className="mx-auto h-10 w-10 mb-3 opacity-50" />
@@ -59,7 +68,7 @@ export function SettingsSocialsCard({ restaurant, onUpdate }: SettingsSocialsCar
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {socials.map((social, i) => (
             <SocialCard
-              key={i}
+              key={`${social.platform}-${i}`}
               social={social}
               isEditing={isEditing}
               onUpdate={(field, value) => updateSocial(i, field, value)}
@@ -67,7 +76,7 @@ export function SettingsSocialsCard({ restaurant, onUpdate }: SettingsSocialsCar
             />
           ))}
           {isEditing && (
-            <button onClick={addSocial} className="flex flex-col items-center justify-center gap-2 rounded-[40px] border-2 border-dashed border-slate-200 p-5 text-slate-400 hover:border-slate-300 hover:text-slate-600 transition-all min-h-[120px]">
+            <button onClick={addSocial} className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-5 text-slate-400 hover:border-slate-300 hover:text-slate-600 transition-all min-h-[120px]">
               <Plus className="h-6 w-6" />
               <span className="text-sm font-semibold">Add Link</span>
             </button>
