@@ -4,11 +4,15 @@ import { DeliveryPortalShell } from '@/components/layout/delivery-portal-shell';
 import { DriverHomeView } from '@/components/orders/driver-home-view';
 import { DriverOrderIncomingAlert } from '@/components/orders/driver-order-incoming-alert';
 import { useOrderNotification } from '@/lib/hooks/use-order-notification';
+import { usePageVisibilityPoll } from '@/lib/hooks/use-page-visibility-poll';
 import { useHomePage } from './page.hooks';
 
 export default function DeliveryPortalPage() {
   const { isLoading, refresh, isRefreshing, snapshot, allOrders, activeOrders } = useHomePage();
   const { incoming, dismiss } = useOrderNotification(activeOrders);
+
+  // Instant refresh when app returns from background
+  usePageVisibilityPoll(refresh);
 
   if (isLoading) {
     return (

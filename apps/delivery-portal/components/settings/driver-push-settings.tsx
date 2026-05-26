@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Radio, BellOff, BellRing, AlertTriangle } from "lucide-react";
+import { Radio, BellOff, BellRing, AlertTriangle, CheckCircle, Loader2, XCircle } from "lucide-react";
 import { DriverSettingsToggle } from "./driver-settings-toggle";
 
 interface DriverPushSettingsProps {
@@ -9,10 +9,11 @@ interface DriverPushSettingsProps {
   permission: string;
   pushEnabled: boolean;
   subscribed: boolean;
+  syncStatus: "idle" | "syncing" | "synced" | "failed";
   onTogglePush: () => Promise<{ success: boolean; error?: string }>;
 }
 
-export function DriverPushSettings({ supported, permission, pushEnabled, onTogglePush }: DriverPushSettingsProps) {
+export function DriverPushSettings({ supported, permission, pushEnabled, syncStatus, onTogglePush }: DriverPushSettingsProps) {
   const handleToggle = async () => {
     await onTogglePush();
   };
@@ -22,8 +23,14 @@ export function DriverPushSettings({ supported, permission, pushEnabled, onToggl
     : permission === "denied"
     ? "Blocked in browser settings"
     : pushEnabled
-    ? "Push alerts active"
-    : "Receive push notifications";
+    ? syncStatus === "syncing"
+      ? "Syncing with server..."
+      : syncStatus === "failed"
+      ? "Subscribed — backend sync pending"
+      : "Push alerts active"
+    : "Receive push notifications when closed";
+
+  const SyncIcon = syncStatus === "syncing" ? Loader2 : syncStatus === "synced" ? CheckCircle : syncStatus === "failed" ? XCircle : null;
 
   return (
     <motion.div
@@ -47,6 +54,17 @@ export function DriverPushSettings({ supported, permission, pushEnabled, onToggl
           enabled={pushEnabled && supported && permission === "granted"}
           onToggle={handleToggle}
         />
+
+        {SyncIcon && pushEnabled && (
+          <div className={`flex items-center gap-2 rounded-lg ${syncStatus === "failed" ? "bg-amber-50" : "bg-emerald-50"} p-2.5`}>
+            <SyncIcon className={`h-4 w-4 shrink-0 ${syncStatus === "failed" ? "text-amber-600" : "text-emerald-600"} ${syncStatus === "syncing" ? "animate-spin" : ""}`} />
+            <p className={`text-[11px] leading-relaxed ${syncStatus === "failed" ? "text-amber-700" : "text-emerald-700"}`}>
+              {syncStatus === "syncing" && "Sending subscription to server..."}
+              {syncStatus === "synced" && "Server will notify you of new orders"}
+              {syncStatus === "failed" && "Server connection pending — notifications may not work until backend is ready"}
+            </p>
+          </div>
+        )}
 
         {permission === "denied" && (
           <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-2.5">
