@@ -1,61 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { LogIn, ChefHat } from "lucide-react";
-import { useDashboardAuth } from "@/lib/auth-context";
+import { useEffect } from "react";
+import { useLoginForm } from "./hooks/use-login-form";
 import { LoginFormPresenter } from "./login-form-presenter";
 import { LoginForgotPresenter } from "./login-forgot-presenter";
+import { LoginLogo } from "./login-logo";
 
-export function LoginContainer() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [subdomain, setSubdomain] = useState("");
+export function LoginContainer({
+  restaurantName,
+  logoUrl,
+  subdomain: serverSubdomain,
+}: {
+  restaurantName?: string;
+  logoUrl?: string;
+  subdomain?: string;
+}) {
+  const form = useLoginForm();
 
   useEffect(() => {
-    setSubdomain(localStorage.getItem('restaurant-slug') || "");
-  }, []);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showForgot, setShowForgot] = useState(false);
-  const [showPass, setShowPass] = useState(false);
-  const { login } = useDashboardAuth();
-  const router = useRouter();
+    const saved = localStorage.getItem("restaurant-slug") || "";
+    form.setSubdomain(serverSubdomain || saved);
+  }, [serverSubdomain]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    if (subdomain) {
-      localStorage.setItem('restaurant-slug', subdomain.trim().toLowerCase());
-    }
-    setLoading(true);
-    const success = await login(username, password);
-    if (success) router.push("/");
-    else setError("Invalid username or password");
-    setLoading(false);
-  };
+  const displayName = restaurantName || "Restaurant";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-amber-50/30 p-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm shadow-amber-500/10 border border-amber-100">
-            <ChefHat className="h-8 w-8 text-amber-500" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Restaurant Dashboard</h1>
-          <p className="mt-1.5 text-sm text-slate-500">
-            {showForgot ? "Recover your login credentials" : "Sign in to manage your restaurant"}
-          </p>
-        </div>
+      <div className="w-full max-w-sm space-y-6">
+        <LoginLogo name={displayName} logoUrl={logoUrl} />
 
-        {!showForgot ? (
+        {!form.showForgot ? (
           <LoginFormPresenter
-            username={username} password={password} subdomain={subdomain} error={error} loading={loading} showPass={showPass}
-            onUsernameChange={setUsername} onPasswordChange={setPassword} onSubdomainChange={setSubdomain} onTogglePass={() => setShowPass(!showPass)}
-            onSubmit={handleSubmit} onForgot={() => { setShowForgot(true); setError(""); }}
+            username={form.username}
+            password={form.password}
+            subdomain={form.subdomain}
+            error={form.error}
+            loading={form.loading}
+            showPass={form.showPass}
+            onUsernameChange={form.setUsername}
+            onPasswordChange={form.setPassword}
+            onSubdomainChange={form.setSubdomain}
+            onTogglePass={() => form.setShowPass(!form.showPass)}
+            onSubmit={form.handleSubmit}
+            onForgot={() => { form.setShowForgot(true); form.setError(""); }}
           />
         ) : (
-          <LoginForgotPresenter onBack={() => setShowForgot(false)} />
+          <LoginForgotPresenter onBack={() => form.setShowForgot(false)} />
         )}
       </div>
     </div>
