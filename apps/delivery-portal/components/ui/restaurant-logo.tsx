@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getRestaurantColor, getRestaurantInitial } from "@/lib/restaurant-avatar";
 
 interface RestaurantLogoProps {
@@ -19,8 +19,10 @@ const SIZE_MAP = {
 
 export function RestaurantLogo({ name, logoUrl, size = "md", className = "" }: RestaurantLogoProps) {
   const [error, setError] = useState(false);
-  const initial = getRestaurantInitial(name);
-  const color = getRestaurantColor(name);
+  const [mounted, setMounted] = useState(false);
+  const displayName = mounted ? name : "Restaurant";
+  const initial = getRestaurantInitial(displayName);
+  const color = getRestaurantColor(displayName);
   const sizeClass = SIZE_MAP[size];
   const isNavLogo = size === "nav";
   const fallbackSizeClass = isNavLogo ? "h-11 w-11 text-xl" : sizeClass;
@@ -32,6 +34,10 @@ export function RestaurantLogo({ name, logoUrl, size = "md", className = "" }: R
   const frameClass = size === "nav"
     ? "bg-transparent rounded-none"
     : "rounded-xl bg-white overflow-hidden";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!logoUrl || error) {
     return (

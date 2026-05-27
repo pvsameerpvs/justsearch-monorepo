@@ -2,40 +2,20 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { buildDeliveryManifest } from "@/lib/pwa/build-manifest";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
-
-interface RestaurantCurrentResponse {
-  id: string;
-  slug: string;
-  name: string;
-  settings?: {
-    logoUrl?: string;
-    themeColor?: string;
-    [key: string]: unknown;
-  };
-}
-
-async function fetchRestaurant(slug: string): Promise<RestaurantCurrentResponse | null> {
-  try {
-    const res = await fetch(`${API_BASE}/restaurants/current`, {
-      headers: { "x-restaurant-slug": slug },
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
+function formatSlugName(slug: string) {
+  return slug
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 export async function GET(): Promise<NextResponse> {
   const slug = (await headers()).get("x-restaurant-slug") || "default";
-  const data = await fetchRestaurant(slug);
+  const name = slug === "default" ? "Delivery Portal" : formatSlugName(slug);
 
   const manifest = buildDeliveryManifest({
-    name: data?.name || "",
-    logoUrl: data?.settings?.logoUrl,
-    themeColor: data?.settings?.themeColor,
+    name,
   });
 
   return NextResponse.json(manifest, {
