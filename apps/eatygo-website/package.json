@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3006",
-    "build": "next build",
-    "start": "next start -p 3006",
+    "build": "next build && node scripts/copy-standalone-assets.mjs",
+    "start": "HOSTNAME=0.0.0.0 PORT=${PORT:-3006} node .next/standalone/apps/eatygo-website/server.js",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit"
   },
