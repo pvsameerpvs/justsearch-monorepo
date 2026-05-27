@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import app from './app';
+import { attachDeliveryRealtimeServer } from './modules/realtime/delivery-realtime.server';
 
 const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -13,6 +14,7 @@ const startServer = () => {
     const server = app.listen(PORT, () => {
       console.log(`[server] Running on port ${PORT} in ${NODE_ENV} mode`);
     });
+    attachDeliveryRealtimeServer(server);
 
     // Graceful shutdown for Railway
     const gracefulShutdown = (signal: string) => {

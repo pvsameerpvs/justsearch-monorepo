@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useEnhancedNotification } from "@/lib/hooks/use-enhanced-notification";
-import { readNotificationSettings } from "@/lib/hooks/use-order-notification.utils";
 import type { IncomingOrder } from "@/lib/hooks/use-order-notification";
 
 type DriverOrderIncomingAlertProps = {
@@ -11,22 +8,6 @@ type DriverOrderIncomingAlertProps = {
 };
 
 export function DriverOrderIncomingAlert({ orders, onDismiss }: DriverOrderIncomingAlertProps) {
-  const { startPersistentAlarm, stopPersistentAlarm, doVibrate } = useEnhancedNotification();
-
-  useEffect(() => {
-    if (orders.length > 0) {
-      const settings = readNotificationSettings();
-      if (settings.soundEnabled) startPersistentAlarm();
-      if (settings.vibrationEnabled) doVibrate();
-    } else {
-      stopPersistentAlarm();
-    }
-
-    return () => {
-      stopPersistentAlarm();
-    };
-  }, [orders.length, startPersistentAlarm, stopPersistentAlarm, doVibrate]);
-
   if (orders.length === 0) return null;
 
   return (

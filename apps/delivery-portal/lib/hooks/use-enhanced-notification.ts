@@ -21,10 +21,13 @@ export function useEnhancedNotification() {
   }, []);
 
   const startPersistentAlarm = useCallback(() => {
+    if (alarmIntervalRef.current) return;
+    const settings = readNotificationSettings();
+    if (!settings.soundEnabled) return;
     playSirenOnce();
     alarmIntervalRef.current = setInterval(() => {
-      const settings = readNotificationSettings();
-      if (settings.soundEnabled) playSirenOnce();
+      const latest = readNotificationSettings();
+      if (latest.soundEnabled) playSirenOnce();
     }, 1500);
   }, [playSirenOnce]);
 

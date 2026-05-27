@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
-const POLL_INTERVAL_MS = 5000;
 const STALE_TIME = 30000;
 
 export interface ApiAssignment {
@@ -54,7 +53,6 @@ export function useDriverOrdersQuery(driverId: string | null) {
       return fetchAssignments(driverId);
     },
     enabled: Boolean(driverId),
-    refetchInterval: POLL_INTERVAL_MS,
     staleTime: STALE_TIME,
   });
 

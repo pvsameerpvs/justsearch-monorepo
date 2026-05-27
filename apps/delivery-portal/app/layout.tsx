@@ -7,6 +7,7 @@ import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register"
 import { PwaMetaInjector } from "@/components/pwa/pwa-meta-injector";
 import { DynamicAppIcon } from "@/components/pwa/dynamic-app-icon";
 import { ForegroundPushListener } from "@/components/pwa/foreground-push-listener";
+import { RealtimeOrderAlertListener } from "@/components/pwa/realtime-order-alert-listener";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ReactQueryProvider>
           <DriverAuthProvider>
             <AuthGuard>{children}</AuthGuard>
+            <RealtimeOrderAlertListener />
           </DriverAuthProvider>
           <PwaMetaInjector />
           <DynamicAppIcon />

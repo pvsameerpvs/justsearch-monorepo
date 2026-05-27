@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, and, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { db } from '../../db';
 import { authMiddleware, requireRole } from '../../middleware/auth.middleware';
 import { t, mapRow } from '../../lib/tenant-sql';
 import { notifyDriverOfNewOrder } from '../push/push.service';
+import { broadcastAssignedOrder } from './order-driver-realtime';
 
 const router = Router();
 
@@ -53,6 +54,8 @@ router.patch('/:id/driver', requireRole('owner', 'manager', 'cashier'), async (r
         )
       `);
     }
+
+    broadcastAssignedOrder(schemaName, driverId, updated);
 
     // Send push notification to driver (non-blocking)
     // mapRow() converts snake_case → camelCase, so delivery_address becomes deliveryAddress
