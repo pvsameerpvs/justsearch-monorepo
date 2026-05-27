@@ -30,7 +30,7 @@ export function EatygoPresenter({
       <RestaurantKitSection />
       <PlatformSection features={platformFeatures} />
       <KitchenSection kitchens={kitchens} />
-      {/* <MobileShowcaseSection /> */}
+      <MobileShowcaseSection />
       <StatsSection />
       <OrderFlow highlights={highlights} steps={steps} />
     </div>
