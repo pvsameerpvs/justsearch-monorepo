@@ -6,7 +6,7 @@ import { getRestaurantColor, getRestaurantInitial } from "@/lib/restaurant-avata
 interface RestaurantLogoProps {
   name: string;
   logoUrl?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "nav";
   className?: string;
 }
 
@@ -14,6 +14,7 @@ const SIZE_MAP = {
   sm: "h-10 w-10 text-base",
   md: "h-14 w-14 text-xl",
   lg: "h-20 w-20 text-3xl",
+  nav: "h-11 w-28 text-lg",
 };
 
 export function RestaurantLogo({ name, logoUrl, size = "md", className = "" }: RestaurantLogoProps) {
@@ -21,21 +22,31 @@ export function RestaurantLogo({ name, logoUrl, size = "md", className = "" }: R
   const initial = getRestaurantInitial(name);
   const color = getRestaurantColor(name);
   const sizeClass = SIZE_MAP[size];
+  const isNavLogo = size === "nav";
+  const fallbackSizeClass = isNavLogo ? "h-11 w-11 text-xl" : sizeClass;
+  const fallbackFrameClass = isNavLogo ? "bg-transparent rounded-none" : `rounded-xl ${color.bg}`;
+  const fallbackTextClass = isNavLogo ? "text-emerald-700" : color.text;
+  const imageClass = size === "nav"
+    ? "max-h-11 max-w-[6.5rem] object-contain"
+    : "h-full w-full object-contain p-0.5";
+  const frameClass = size === "nav"
+    ? "bg-transparent rounded-none"
+    : "rounded-xl bg-white overflow-hidden";
 
   if (!logoUrl || error) {
     return (
-      <div className={`flex shrink-0 items-center justify-center rounded-xl ${color.bg} ${sizeClass} ${className}`}>
-        <span className={`font-bold ${color.text}`}>{initial}</span>
+      <div className={`flex shrink-0 items-center justify-center ${fallbackFrameClass} ${fallbackSizeClass} ${className}`}>
+        <span className={`font-bold ${fallbackTextClass}`}>{initial}</span>
       </div>
     );
   }
 
   return (
-    <div className={`flex shrink-0 items-center justify-center rounded-xl bg-white overflow-hidden ${sizeClass} ${className}`}>
+    <div className={`flex shrink-0 items-center justify-center ${frameClass} ${sizeClass} ${className}`}>
       <img
         src={logoUrl}
         alt={name}
-        className="h-full w-full object-contain p-0.5"
+        className={imageClass}
         onError={() => setError(true)}
       />
     </div>

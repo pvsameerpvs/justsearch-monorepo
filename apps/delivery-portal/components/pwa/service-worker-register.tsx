@@ -1,28 +1,32 @@
 "use client";
 
+import { useEffect } from "react";
+
 export function ServiceWorkerRegister() {
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(function(reg) {
-                reg.addEventListener('updatefound', function() {
-                  var w = reg.installing;
-                  if (w) {
-                    w.addEventListener('statechange', function() {
-                      if (w.state === 'installed' && navigator.serviceWorker.controller) {
-                        window.dispatchEvent(new CustomEvent('sw:update-available'));
-                      }
-                    });
-                  }
-                });
-              }).catch(function() {});
-            });
-          }
-        `,
-      }}
-    />
-  );
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+
+    const register = () => {
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).then((reg) => {
+        reg.addEventListener("updatefound", () => {
+          const worker = reg.installing;
+          worker?.addEventListener("statechange", () => {
+            if (worker.state === "installed" && navigator.serviceWorker.controller) {
+              window.dispatchEvent(new CustomEvent("sw:update-available"));
+            }
+          });
+        });
+      }).catch(() => {});
+    };
+
+    if (document.readyState === "complete") {
+      register();
+      return;
+    }
+
+    window.addEventListener("load", register);
+    return () => window.removeEventListener("load", register);
+  }, []);
+
+  return null;
 }

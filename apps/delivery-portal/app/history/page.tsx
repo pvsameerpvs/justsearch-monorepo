@@ -10,8 +10,8 @@ import { buildSnapshot } from '@/lib/delivery-snapshot';
 export default function HistoryPage() {
   const { driverName, restaurantSlug, driverId } = useDriverAuth();
   const { assignments } = useDriverOrdersQuery(driverId);
-  const { logoUrl } = useRestaurantQuery();
-  const snapshot = buildSnapshot(restaurantSlug, driverName, assignments, logoUrl);
+  const { restaurant, restaurantSlug: currentRestaurantSlug } = useRestaurantQuery();
+  const snapshot = buildSnapshot(currentRestaurantSlug ?? restaurantSlug, driverName, assignments, restaurant);
   const allOrders = [...snapshot.activeOrders, ...snapshot.completedOrders];
 
   return (

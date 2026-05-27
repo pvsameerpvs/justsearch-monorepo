@@ -9,7 +9,7 @@ import { buildSnapshot } from '@/lib/delivery-snapshot';
 export function useHomePage() {
   const { driverName, restaurantSlug, driverId } = useDriverAuth();
   const { assignments, isLoading, refetch } = useDriverOrdersQuery(driverId);
-  const { logoUrl } = useRestaurantQuery();
+  const { restaurant, restaurantSlug: currentRestaurantSlug } = useRestaurantQuery();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -29,7 +29,12 @@ export function useHomePage() {
       etaMinutes: a.eta_minutes ?? 15,
     }));
 
-  const snapshot = buildSnapshot(restaurantSlug, driverName, assignments, logoUrl);
+  const snapshot = buildSnapshot(
+    currentRestaurantSlug ?? restaurantSlug,
+    driverName,
+    assignments,
+    restaurant
+  );
 
   const allOrders = Array.from(
     new Map([...snapshot.activeOrders, ...snapshot.completedOrders].map((o) => [o.assignmentId, o])).values()

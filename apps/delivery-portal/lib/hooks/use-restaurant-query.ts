@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
@@ -31,7 +32,11 @@ async function fetchCurrentRestaurant(): Promise<RestaurantCurrentResponse | nul
 }
 
 export function useRestaurantQuery() {
-  const slug = getSlug();
+  const [slug, setSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSlug(getSlug());
+  }, []);
 
   const { data, isLoading } = useQuery({
     queryKey: ['currentRestaurant', slug],
@@ -42,6 +47,7 @@ export function useRestaurantQuery() {
 
   return {
     restaurant: data ?? null,
+    restaurantSlug: slug,
     logoUrl: data?.settings?.logoUrl || undefined,
     isLoading,
   };

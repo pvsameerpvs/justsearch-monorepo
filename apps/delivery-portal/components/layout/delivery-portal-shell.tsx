@@ -19,24 +19,28 @@ export function DeliveryPortalShell({
 
   return (
     <main className="min-h-screen bg-slate-50">
-      {/* Elegant top bar — clean, minimal */}
-      <header className="sticky top-0 z-40 bg-white px-4 pb-3.5 safe-header">
-        <div className="mx-auto max-w-xl flex items-center justify-between">
-          {/* Left: Restaurant */}
-          <div className="flex items-center gap-3 min-w-0">
-            <RestaurantLogo name={restaurant.name} logoUrl={restaurant.logoUrl} size="sm" />
-            <div className="min-w-0">
-              <h2 className="text-[15px] font-bold text-slate-900 truncate leading-tight">
+      <header className="safe-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 px-3 pb-2.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl">
+        <div className="mx-auto flex max-w-xl items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5 rounded-2xl border border-slate-200/70 bg-slate-50/80 px-2.5 py-1 shadow-inner shadow-white/60">
+            <RestaurantLogo
+              name={restaurant.name}
+              logoUrl={restaurant.logoUrl}
+              size="nav"
+            />
+            {/* <div className="min-w-0">
+              <h2 className="truncate text-[14px] font-semibold leading-tight text-slate-950">
                 {restaurant.name}
               </h2>
-              <p className="text-[11px] text-slate-400 font-medium truncate">{restaurant.zoneLabel}</p>
-            </div>
+              <p className="mt-0.5 truncate text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400">
+                {restaurant.zoneLabel}
+              </p>
+            </div> */}
           </div>
 
-          {/* Right: Elegant avatar */}
           <Link
             href="/settings"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-sm font-bold ring-2 ring-emerald-100 hover:bg-emerald-700 active:scale-95 transition"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-sm font-bold text-emerald-700 shadow-sm shadow-emerald-900/5 transition hover:border-emerald-200 hover:bg-emerald-100 active:scale-95"
+            aria-label="Open driver settings"
             title="Settings"
           >
             {initial}
@@ -44,8 +48,7 @@ export function DeliveryPortalShell({
         </div>
       </header>
 
-      {/* Elegant nav */}
-      <div className="mx-auto max-w-xl px-4 pt-2 safe-bottom">
+      <div className="safe-bottom mx-auto max-w-xl px-3 pt-2.5">
         <PortalNav />
         {children}
       </div>
