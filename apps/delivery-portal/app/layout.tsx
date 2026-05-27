@@ -6,6 +6,7 @@ import { ReactQueryProvider } from "@/components/providers/react-query-provider"
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 import { PwaMetaInjector } from "@/components/pwa/pwa-meta-injector";
 import { DynamicAppIcon } from "@/components/pwa/dynamic-app-icon";
+import { ForegroundPushListener } from "@/components/pwa/foreground-push-listener";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </DriverAuthProvider>
           <PwaMetaInjector />
           <DynamicAppIcon />
+          <ForegroundPushListener />
         </ReactQueryProvider>
         <ServiceWorkerRegister />
       </body>

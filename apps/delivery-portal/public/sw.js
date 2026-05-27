@@ -1,6 +1,6 @@
 /** JustSearch Delivery Portal Service Worker */
-const STATIC_CACHE = "dp-static-v3";
-const API_CACHE = "dp-api-v3";
+const STATIC_CACHE = "dp-static-v4";
+const API_CACHE = "dp-api-v4";
 
 const STATIC_ASSETS = [
   "/",
@@ -37,7 +37,6 @@ self.addEventListener("fetch", (e) => {
   const { request } = e;
   const url = new URL(request.url);
 
-  // API calls
   if (url.pathname.startsWith("/api/")) {
     e.respondWith(
       fetch(request)
@@ -50,7 +49,6 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // HTML pages (network-first so updates are instant)
   if (request.mode === "navigate" || request.destination === "document") {
     e.respondWith(
       fetch(request)
@@ -65,7 +63,6 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // Images & fonts (cache-first)
   if (request.destination === "image" || request.destination === "font") {
     e.respondWith(
       caches.match(request).then(
@@ -85,7 +82,7 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(fetch(request));
 });
 
-/* ── PUSH: notification with vibration (Android) ── */
+/* ── PUSH: notify ALL clients (foreground + background) ── */
 self.addEventListener("push", (e) => {
   if (!e.data) return;
 
@@ -97,7 +94,10 @@ self.addEventListener("push", (e) => {
   }
 
   const title = payload.title || "New Delivery";
-  const options = {
+  const orderId = payload.orderId || payload.data?.orderId;
+  const orderCode = payload.orderCode || payload.data?.orderCode;
+
+  const notificationOptions = {
     body: payload.body || "You have a new order assignment",
     icon: payload.icon || "/icons/icon-192x192.svg",
     badge: "/icons/icon-192x192.svg",
@@ -105,16 +105,34 @@ self.addEventListener("push", (e) => {
     requireInteraction: true,
     renotify: true,
     silent: false,
-    // Android: custom vibration pattern. iOS: ignores this, uses system vibration.
     vibrate: payload.vibrate || [800, 200, 800, 200, 800, 400, 1200, 200, 600, 200, 600],
-    data: payload.data || { url: "/", orderId: payload.orderId },
+    data: { url: "/", orderId, orderCode, ...(payload.data || {}) },
     actions: payload.actions || [
       { action: "open", title: "View Order" },
       { action: "dismiss", title: "Dismiss" },
     ],
   };
 
-  e.waitUntil(self.registration.showNotification(title, options));
+  e.waitUntil(
+    Promise.all([
+      // 1. Show system notification (works when app is closed/background)
+      self.registration.showNotification(title, notificationOptions),
+
+      // 2. Send message to ALL open app windows (works when app is foreground)
+      self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+        const message = {
+          type: "PUSH_RECEIVED",
+          title,
+          body: notificationOptions.body,
+          orderId,
+          orderCode,
+          vibrate: notificationOptions.vibrate,
+          timestamp: Date.now(),
+        };
+        clients.forEach((client) => client.postMessage(message));
+      }),
+    ])
+  );
 });
 
 /* ── NOTIFICATION CLICK ── */
@@ -123,17 +141,15 @@ self.addEventListener("notificationclick", (e) => {
   if (e.action === "dismiss") return;
 
   const url = e.notification.data?.url || "/";
+  const orderId = e.notification.data?.orderId;
+
   e.waitUntil(
     self.clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((clients) => {
         const focused = clients.find((c) => c.focused);
         if (focused) {
-          focused.postMessage({
-            type: "PUSH_CLICK",
-            orderId: e.notification.data?.orderId,
-            url,
-          });
+          focused.postMessage({ type: "PUSH_CLICK", orderId, url });
           return focused.navigate(url);
         }
         const existing = clients.find((c) => c.url.includes(url));
@@ -145,9 +161,7 @@ self.addEventListener("notificationclick", (e) => {
 
 /* ── BACKGROUND SYNC ── */
 self.addEventListener("sync", (e) => {
-  if (e.tag === "delivery-status-sync") {
-    e.waitUntil(syncPending());
-  }
+  if (e.tag === "delivery-status-sync") e.waitUntil(syncPending());
 });
 
 async function syncPending() {

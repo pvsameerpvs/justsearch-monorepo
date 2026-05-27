@@ -19,6 +19,12 @@ async function repairTenantSchemas(): Promise<void> {
       `ADD COLUMN IF NOT EXISTS eta_minutes integer, ` +
       `ADD COLUMN IF NOT EXISTS table_id uuid`
     );
+
+    // Add push_subscription to delivery_agents for push notifications
+    await client.unsafe(
+      `ALTER TABLE "${schema}"."delivery_agents" ` +
+      `ADD COLUMN IF NOT EXISTS push_subscription JSONB`
+    );
   }
 }
 

@@ -55,11 +55,12 @@ router.patch('/:id/driver', requireRole('owner', 'manager', 'cashier'), async (r
     }
 
     // Send push notification to driver (non-blocking)
+    // mapRow() converts snake_case → camelCase, so delivery_address becomes deliveryAddress
     notifyDriverOfNewOrder(
       schemaName,
       driverId,
       updated.code as string,
-      updated.delivery_address as string || 'No address'
+      (updated.deliveryAddress as string) || 'No address'
     ).catch(() => {
       // Push failures should not break the assignment response
     });

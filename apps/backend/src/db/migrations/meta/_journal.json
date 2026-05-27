@@ -176,6 +176,13 @@
       "when": 1780656000000,
       "tag": "0024_add_alternate_number_to_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1788268800000,
+      "tag": "0025_add_push_subscription_to_delivery_agents",
+      "breakpoints": true
     }
   ]
 }
