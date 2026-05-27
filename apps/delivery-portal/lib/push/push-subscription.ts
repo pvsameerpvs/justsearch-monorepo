@@ -8,7 +8,7 @@ export async function subscribeToPush(vapidKey: Uint8Array): Promise<PushSubscri
   if (!("serviceWorker" in navigator)) return null;
   const reg = await navigator.serviceWorker.ready;
   const existing = await reg.pushManager.getSubscription();
-  if (existing) return existing;
+  if (existing) await existing.unsubscribe();
   const applicationServerKey = new ArrayBuffer(vapidKey.byteLength);
   new Uint8Array(applicationServerKey).set(vapidKey);
   return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });

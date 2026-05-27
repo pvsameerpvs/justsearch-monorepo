@@ -10,10 +10,6 @@ export function isPushConfigured(): boolean {
   return Boolean(VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY);
 }
 
-export function getVapidPublicKey(): string {
-  return VAPID_PUBLIC_KEY;
-}
-
 export function ensurePushInitialized() {
   if (initialized) return;
 

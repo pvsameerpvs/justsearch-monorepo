@@ -1,6 +1,6 @@
 /** JustSearch Delivery Portal Service Worker */
-const STATIC_CACHE = "dp-static-v4";
-const API_CACHE = "dp-api-v4";
+const STATIC_CACHE = "dp-static-v5";
+const API_CACHE = "dp-api-v5";
 
 const STATIC_ASSETS = [
   "/",
@@ -82,7 +82,7 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(fetch(request));
 });
 
-/* ── PUSH: notify ALL clients (foreground + background) ── */
+/* ── PUSH: system notification for closed/background app ── */
 self.addEventListener("push", (e) => {
   if (!e.data) return;
 
@@ -114,24 +114,11 @@ self.addEventListener("push", (e) => {
   };
 
   e.waitUntil(
-    Promise.all([
-      // 1. Show system notification (works when app is closed/background)
-      self.registration.showNotification(title, notificationOptions),
-
-      // 2. Send message to ALL open app windows (works when app is foreground)
-      self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
-        const message = {
-          type: "PUSH_RECEIVED",
-          title,
-          body: notificationOptions.body,
-          orderId,
-          orderCode,
-          vibrate: notificationOptions.vibrate,
-          timestamp: Date.now(),
-        };
-        clients.forEach((client) => client.postMessage(message));
-      }),
-    ])
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      const hasVisibleClient = clients.some((client) => client.visibilityState === "visible");
+      if (hasVisibleClient) return undefined;
+      return self.registration.showNotification(title, notificationOptions);
+    })
   );
 });
 

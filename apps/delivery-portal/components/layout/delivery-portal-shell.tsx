@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { PortalNav } from './portal-nav';
 import { RestaurantLogo } from '@/components/ui/restaurant-logo';
-import { PushToastBanner } from '@/components/pwa/push-toast-banner';
 import type { DeliveryAgent, DeliveryPortalRestaurant } from '@/lib/delivery-types';
 
 type DeliveryPortalShellProps = {
@@ -44,9 +43,6 @@ export function DeliveryPortalShell({
           </Link>
         </div>
       </header>
-
-      {/* In-app push toast (shows when app is open and push arrives) */}
-      <PushToastBanner />
 
       {/* Elegant nav */}
       <div className="mx-auto max-w-xl px-4 pt-2 safe-bottom">
