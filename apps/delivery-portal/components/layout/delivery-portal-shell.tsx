@@ -21,7 +21,7 @@ export function DeliveryPortalShell({
     <main className="min-h-screen bg-slate-50">
       <header className="safe-header sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 px-3 pb-2.5 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-xl items-center gap-2">
-          <div className="flex min-w-0 flex-1 items-center gap-2.5 rounded-2xl border border-slate-200/70 bg-slate-50/80 px-2.5 py-1 shadow-inner shadow-white/60">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5 rounded-2xl border border-slate-200/70 bg-slate-50/80 py-1 pl-1.5 pr-2.5 shadow-inner shadow-white/60">
             <RestaurantLogo
               name={restaurant.name}
               logoUrl={restaurant.logoUrl}

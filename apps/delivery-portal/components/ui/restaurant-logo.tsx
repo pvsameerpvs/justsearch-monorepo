@@ -29,11 +29,12 @@ export function RestaurantLogo({ name, logoUrl, size = "md", className = "" }: R
   const fallbackFrameClass = isNavLogo ? "bg-transparent rounded-none" : `rounded-xl ${color.bg}`;
   const fallbackTextClass = isNavLogo ? "text-emerald-700" : color.text;
   const imageClass = size === "nav"
-    ? "max-h-11 max-w-[6.5rem] object-contain"
+    ? "max-h-11 max-w-[6.5rem] object-contain object-left"
     : "h-full w-full object-contain p-0.5";
   const frameClass = size === "nav"
     ? "bg-transparent rounded-none"
     : "rounded-xl bg-white overflow-hidden";
+  const imageFrameAlign = isNavLogo ? "justify-start" : "justify-center";
 
   useEffect(() => {
     setMounted(true);
@@ -48,7 +49,7 @@ export function RestaurantLogo({ name, logoUrl, size = "md", className = "" }: R
   }
 
   return (
-    <div className={`flex shrink-0 items-center justify-center ${frameClass} ${sizeClass} ${className}`}>
+    <div className={`flex shrink-0 items-center ${imageFrameAlign} ${frameClass} ${sizeClass} ${className}`}>
       <img
         src={logoUrl}
         alt={name}
