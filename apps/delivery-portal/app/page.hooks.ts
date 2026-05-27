@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useDriverAuth } from '@/lib/driver-auth-store';
 import { useDriverOrdersQuery } from '@/lib/hooks/use-driver-orders-query';
 import { useRestaurantQuery } from '@/lib/hooks/use-restaurant-query';
+import { useIntervalWhileVisible } from '@/lib/hooks/use-interval-while-visible';
 import { buildSnapshot } from '@/lib/delivery-snapshot';
 
 export function useHomePage() {
@@ -11,6 +12,12 @@ export function useHomePage() {
   const { assignments, isLoading, refetch } = useDriverOrdersQuery(driverId);
   const { logoUrl } = useRestaurantQuery();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Poll every 10 seconds while app is open — iOS suppresses foreground push,
+  // so this is the only reliable way to alert drivers when a new order is assigned.
+  useIntervalWhileVisible(() => {
+    refetch();
+  }, 10000);
 
   const refresh = useCallback(async () => {
     setIsRefreshing(true);
