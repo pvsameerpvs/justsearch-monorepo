@@ -5,7 +5,7 @@ export function MobileToggle({ isOpen, onToggle }: { isOpen: boolean; onToggle: 
     <button
       type="button"
       onClick={onToggle}
-      className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-xl bg-white/80 backdrop-blur-xl text-slate-700 shadow-lg shadow-black/5 border border-slate-200/60 md:hidden hover:bg-white transition-all"
+      className="fixed left-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/80 bg-white/90 text-slate-800 shadow-xl shadow-slate-900/10 backdrop-blur-xl transition-all hover:bg-amber-50 hover:text-amber-600 md:hidden"
       aria-label="Toggle"
     >
       {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

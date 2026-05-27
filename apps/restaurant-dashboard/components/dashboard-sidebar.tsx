@@ -28,9 +28,9 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
         />
       )}
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-full flex-col bg-white/90 backdrop-blur-xl border-r border-slate-200/40 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out w-[260px] ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 ${isCollapsed ? 'md:w-[72px]' : 'md:w-[260px]'}`}
+        className={`fixed left-0 top-0 z-40 flex h-full w-[280px] max-w-[calc(100vw-1.5rem)] flex-col border border-white/80 bg-[linear-gradient(180deg,#ffffff_0%,#fffaf4_45%,#f8fafc_100%)] shadow-[18px_0_45px_-30px_rgba(15,23,42,0.55)] backdrop-blur-2xl transition-all duration-300 ease-out md:left-3 md:top-3 md:h-[calc(100%-1.5rem)] md:rounded-3xl md:shadow-[0_24px_70px_-42px_rgba(15,23,42,0.55)] ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 ${isCollapsed ? 'md:w-[80px]' : 'md:w-[280px]'}`}
       >
-        <div className={`flex items-center justify-between border-b border-slate-100/60 ${isCollapsed ? 'px-2 py-3' : 'px-4 py-3'}`}>
+        <div className={`border-b border-amber-100/70 ${isCollapsed ? 'flex flex-col items-center gap-3 px-3 py-4' : 'flex items-center justify-between gap-3 px-4 py-4'}`}>
           <SidebarBrand collapsed={isCollapsed} />
           <SidebarToggle />
         </div>

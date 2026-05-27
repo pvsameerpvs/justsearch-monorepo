@@ -104,6 +104,15 @@
     @apply sidebar-nav-item text-slate-500 hover:bg-slate-50/80 hover:text-slate-700;
   }
 
+  .sidebar-scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .sidebar-scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
   .page-bg {
     @apply bg-[#F4F6F9];
   }

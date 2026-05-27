@@ -9,7 +9,7 @@ export function SidebarToggle() {
   return (
     <button
       onClick={toggle}
-      className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all border border-slate-100/60"
+      className="hidden h-9 w-9 items-center justify-center rounded-xl border border-slate-200/70 bg-white/85 text-slate-400 shadow-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600 md:flex"
       title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
     >
       {isCollapsed ? (

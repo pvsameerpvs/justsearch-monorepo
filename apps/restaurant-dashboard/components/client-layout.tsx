@@ -22,7 +22,7 @@ export function ClientLayout({ children }: { children: ReactNode }) {
       <AuthGuard>
         <div className="min-h-screen overflow-x-hidden bg-[#F4F6F9]">
           {!isLoginPage && <DashboardSidebar />}
-          <main className={!isLoginPage ? `p-4 pt-16 md:p-8 md:pt-6 transition-all duration-300 ${isCollapsed ? 'md:ml-[72px]' : 'md:ml-[260px]'}` : ""}>
+          <main className={!isLoginPage ? `p-4 pt-16 transition-all duration-300 md:p-8 md:pt-6 ${isCollapsed ? 'md:ml-[96px]' : 'md:ml-[296px]'}` : ""}>
             {children}
           </main>
           {!isLoginPage && <NewOrderNotification />}
