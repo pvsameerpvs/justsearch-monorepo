@@ -11,6 +11,7 @@ interface OrderManagerContentProps {
   isActiveTab: boolean;
   isLoading: boolean;
   error: string | null;
+  pendingOrderIds: Set<string>;
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
   onAdvance: (id: string, status: string, type: string) => void;
@@ -21,7 +22,7 @@ interface OrderManagerContentProps {
 }
 
 export function OrderManagerContent({
-  orders, isActiveTab, isLoading, error,
+  orders, isActiveTab, isLoading, error, pendingOrderIds,
   onAccept, onReject, onAdvance, onAssign, onView, onRetry, getNextStatus,
 }: OrderManagerContentProps) {
   if (isLoading) return <OrderSkeleton />;
@@ -31,6 +32,7 @@ export function OrderManagerContent({
     <OrderManagerGrid
       orders={orders}
       isActiveTab={isActiveTab}
+      pendingOrderIds={pendingOrderIds}
       onAccept={onAccept}
       onReject={onReject}
       onAdvance={(id, status, type) => {

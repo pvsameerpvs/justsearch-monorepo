@@ -6,6 +6,7 @@ import type { DashboardOrder } from "@/lib/stores/order-store";
 interface OrderManagerGridProps {
   orders: DashboardOrder[];
   isActiveTab: boolean;
+  pendingOrderIds: Set<string>;
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
   onAdvance: (id: string, status: string, type: string) => void;
@@ -13,7 +14,7 @@ interface OrderManagerGridProps {
   onView: (id: string) => void;
 }
 
-export function OrderManagerGrid({ orders, isActiveTab, onAccept, onReject, onAdvance, onAssign, onView }: OrderManagerGridProps) {
+export function OrderManagerGrid({ orders, isActiveTab, pendingOrderIds, onAccept, onReject, onAdvance, onAssign, onView }: OrderManagerGridProps) {
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-200/80 bg-slate-50/50 py-16">
@@ -39,6 +40,7 @@ export function OrderManagerGrid({ orders, isActiveTab, onAccept, onReject, onAd
             <OrderCard
               key={order.id}
               order={order}
+              isPending={pendingOrderIds.has(order.id)}
               onAccept={() => onAccept(order.id)}
               onReject={() => onReject(order.id)}
               onAdvance={() => onAdvance(order.id, order.status, order.type)}

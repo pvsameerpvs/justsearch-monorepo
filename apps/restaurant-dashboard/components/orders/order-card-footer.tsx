@@ -6,25 +6,27 @@ interface OrderCardFooterProps {
   status: string;
   type: string;
   hasAgent: boolean;
+  isPending: boolean;
   onAccept: () => void;
   onReject: () => void;
   onAdvance: () => void;
   onAssign: () => void;
 }
 
-export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, onAdvance, onAssign }: OrderCardFooterProps) {
+export function OrderCardFooter({ status, type, hasAgent, isPending, onAccept, onReject, onAdvance, onAssign }: OrderCardFooterProps) {
   const stopPropagation = (fn: () => void) => (e: React.MouseEvent) => {
     e.stopPropagation();
     fn();
   };
 
   if (status === "pending") {
-    return <OrderSplitActions onReject={stopPropagation(onReject)} onAccept={stopPropagation(onAccept)} />;
+    return <OrderSplitActions disabled={isPending} onReject={stopPropagation(onReject)} onAccept={stopPropagation(onAccept)} />;
   }
 
   if (status === "confirmed") {
     return (
       <OrderActionButton
+        disabled={isPending}
         onClick={stopPropagation(onAdvance)}
         icon={<ChefHat className="h-4 w-4" />}
         label="Start Preparing"
@@ -36,6 +38,7 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
   if (status === "preparing") {
     return (
       <OrderActionButton
+        disabled={isPending}
         onClick={stopPropagation(onAdvance)}
         icon={<CheckCircle className="h-4 w-4" />}
         label="Mark Ready"
@@ -48,6 +51,7 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
     if (type === "delivery") {
       return (
         <OrderActionButton
+          disabled={isPending}
           onClick={stopPropagation(onAssign)}
           icon={<Package className="h-4 w-4" />}
           label={hasAgent ? "Reassign Delivery Boy" : "Assign Delivery Boy"}
@@ -57,6 +61,7 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
     }
     return (
       <OrderActionButton
+        disabled={isPending}
         onClick={stopPropagation(onAdvance)}
         icon={<CheckCircle className="h-4 w-4" />}
         label="Mark Completed"
@@ -68,6 +73,7 @@ export function OrderCardFooter({ status, type, hasAgent, onAccept, onReject, on
   if (status === "out_for_delivery") {
     return (
       <OrderActionButton
+        disabled={isPending}
         onClick={stopPropagation(onAdvance)}
         icon={<Truck className="h-4 w-4" />}
         label="Mark Completed"

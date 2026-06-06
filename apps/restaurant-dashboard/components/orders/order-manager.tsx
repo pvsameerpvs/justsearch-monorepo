@@ -19,6 +19,7 @@ export function OrderManager() {
     assigningOrderId, setAssigningOrderId,
     viewingOrderId, setViewingOrderId,
     updateStatus,
+    pendingOrderIds,
     isActiveTab, filters, visibleOrders, statsOrders,
     isLoading, error, refetch,
   } = useOrderManager();
@@ -54,6 +55,7 @@ export function OrderManager() {
         <OrderManagerGrid
           orders={visibleOrders}
           isActiveTab={isActiveTab}
+          pendingOrderIds={pendingOrderIds}
           onAccept={(id) => updateStatus(id, "confirmed")}
           onReject={handleReject}
           onAdvance={(id, status, type) => {

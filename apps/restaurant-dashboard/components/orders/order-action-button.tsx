@@ -7,17 +7,19 @@ interface OrderActionButtonProps {
   gradient?: string;
   textColor?: string;
   borderTop?: boolean;
+  disabled?: boolean;
 }
 
-export function OrderActionButton({ onClick, icon, label, gradient, textColor, borderTop }: OrderActionButtonProps) {
+export function OrderActionButton({ onClick, icon, label, gradient, textColor, borderTop, disabled }: OrderActionButtonProps) {
   return (
     <button
+      disabled={disabled}
       onClick={onClick}
       className={`group w-full py-3 text-sm font-bold transition-all flex items-center justify-center gap-2 ${
         gradient
           ? `text-white ${gradient} shadow-sm`
           : `${textColor || "text-slate-700"} bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200`
-      } ${borderTop ? "border-t border-slate-100/80" : ""}`}
+      } ${borderTop ? "border-t border-slate-100/80" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
     >
       {icon}
       {label}

@@ -32,6 +32,7 @@ export function useOrderManager() {
   const [historyDate, setHistoryDate] = useState<Date>(getTodayUtc);
   const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
   const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
+  const [pendingOrderIds, setPendingOrderIds] = useState<Set<string>>(new Set());
 
   const orders = useMemo(() => apiOrders.map(mapApiOrderToDashboard), [apiOrders]);
 
@@ -51,7 +52,20 @@ export function useOrderManager() {
   const statsOrders = isKitchen ? kitchenOrders : (isActiveTab ? activeOrders : historyOrders);
 
   const updateStatus = (id: string, status: OrderStatus, cancelReason?: string) => {
-    updateStatusApi({ orderId: id, status, cancelReason }, { onError: () => updateStoreStatus(id, status) });
+    setPendingOrderIds((prev) => new Set(prev).add(id));
+    updateStatusApi(
+      { orderId: id, status, cancelReason },
+      {
+        onError: () => updateStoreStatus(id, status),
+        onSettled: () => {
+          setPendingOrderIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        },
+      }
+    );
   };
 
   return {
@@ -68,6 +82,7 @@ export function useOrderManager() {
     viewingOrderId,
     setViewingOrderId,
     updateStatus,
+    pendingOrderIds,
     isActiveTab,
     filters,
     visibleOrders,
