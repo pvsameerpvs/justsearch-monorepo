@@ -36,6 +36,9 @@ export const orders = pgTable('orders', {
   tableId: uuid('table_id'),
   cancelReason: text('cancel_reason'),
   alternateNumber: varchar('alternate_number', { length: 20 }),
+  promoCodeId: uuid('promo_code_id'),
+  promoCode: varchar('promo_code', { length: 50 }),
+  discountAmount: decimal('discount_amount', { precision: 10, scale: 2 }).default('0'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

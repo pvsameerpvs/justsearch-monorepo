@@ -6,9 +6,11 @@ export type PlaceApi = {
   startPlacing: (orderId: string) => void;
 };
 
+import type { VoucherWalletEntry } from './reward-types';
+
 export type PromoApi = {
   consumePromo: () => void;
-  appliedVoucher?: { code: string } | null;
+  appliedVoucher?: VoucherWalletEntry | null;
   discount: number;
 };
 

@@ -23,6 +23,8 @@ import adRoutes, { publicAdRoutes } from '../modules/ads/ad.routes';
 import revenueRoutes from '../modules/revenue/revenue.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
 import analyticsAdminRoutes from '../modules/analytics/analytics-admin.routes';
+import scratchCampaignRoutes from '../modules/scratch/scratch-campaign.routes';
+import scratchRewardRoutes from '../modules/scratch/scratch-reward.routes';
 import addressRoutes from '../modules/addresses/address.routes';
 import uploadRoutes from '../modules/upload/upload.routes';
 
@@ -96,10 +98,16 @@ router.use('/analytics', analyticsAdminRoutes);
 // Close-of-day routes (authenticated inside closeout router)
 router.use('/close-day', orderCloseoutRoutes);
 
-// Upload routes (authenticated)
-router.use('/upload', uploadRoutes);
+  // Upload routes (authenticated)
+  router.use('/upload', uploadRoutes);
 
-// Push notifications (authenticated, driver role)
-router.use('/push', pushRoutes);
+  // Push notifications (authenticated, driver role)
+  router.use('/push', pushRoutes);
 
-export default router;
+  // Scratch campaigns (authenticated, owner/manager)
+  router.use('/scratch-campaigns', scratchCampaignRoutes);
+
+  // Scratch rewards (authenticated customer)
+  router.use('/scratch-rewards', scratchRewardRoutes);
+
+  export default router;

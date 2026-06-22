@@ -29,7 +29,7 @@ export function usePlaceOrder(
       }
 
       const fee = dynamicFee ?? deliveryFee;
-      const totalVal = computeTotal(subtotal, fee, 0);
+      const totalVal = computeTotal(subtotal, fee, promoDiscount ?? 0);
       const res = await createOrder({
         customerName: user.name,
         customerPhone: user.mobile,

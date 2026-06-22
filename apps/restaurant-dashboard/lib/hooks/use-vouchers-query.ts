@@ -41,7 +41,10 @@ export function useCreateVoucherMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: VoucherFormData) => apiClient('/vouchers', { method: 'POST', body: JSON.stringify(mapVoucherToApi(data)) }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['vouchers'] }); },
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['vouchers'] });
+      await queryClient.refetchQueries({ queryKey: ['vouchers'] });
+    },
   });
 }
 
@@ -59,5 +62,6 @@ export function useDeleteVoucherMutation() {
   return useMutation({
     mutationFn: (id: string) => apiClient(`/vouchers/${id}`, { method: 'DELETE' }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['vouchers'] }); },
+    onError: (error: any) => { alert('Delete failed: ' + (error?.message || 'Unknown error')); },
   });
 }

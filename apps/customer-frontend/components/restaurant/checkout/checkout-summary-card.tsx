@@ -14,6 +14,8 @@ interface Props {
   currency: string;
   onApplyPromo: (code: string) => void;
   promoDiscount: number;
+  promoError: string | null;
+  isValidating: boolean;
   appliedPromoCode: string | null;
   subtotal: number;
   deliveryFee: number;
@@ -22,7 +24,7 @@ interface Props {
   deliveryDistanceKm?: number;
 }
 
-export function CheckoutSummaryCard({ restaurantName, displayItems, currency, onApplyPromo, promoDiscount, appliedPromoCode, subtotal, deliveryFee, total, isDeliveryEnabled, deliveryDistanceKm }: Props) {
+export function CheckoutSummaryCard({ restaurantName, displayItems, currency, onApplyPromo, promoDiscount, promoError, isValidating, appliedPromoCode, subtotal, deliveryFee, total, isDeliveryEnabled, deliveryDistanceKm }: Props) {
   const { register, watch, setValue } = useForm({ defaultValues: { note: '', promoCode: '' } });
   const promoValue = watch('promoCode');
 
@@ -84,7 +86,7 @@ export function CheckoutSummaryCard({ restaurantName, displayItems, currency, on
       </div>
 
       <div className="mt-5">
-        <CheckoutPromoInput promoValue={promoValue} setPromoValue={(val) => setValue('promoCode', val)} promoDiscount={promoDiscount} currency={currency} appliedPromoCode={appliedPromoCode} onApplyPromo={onApplyPromo} handleApply={handleApply} />
+        <CheckoutPromoInput promoValue={promoValue} setPromoValue={(val) => setValue('promoCode', val)} promoDiscount={promoDiscount} currency={currency} appliedPromoCode={appliedPromoCode} promoError={promoError} isValidating={isValidating} onApplyPromo={onApplyPromo} handleApply={handleApply} />
       </div>
     </div>
   );

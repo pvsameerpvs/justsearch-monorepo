@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useRegistration } from '@/components/auth/registration-context';
 import type { AddressLabel } from '../use-address-book';
 import type { PlaceApi, PromoApi, AddressApi } from './checkout-place-action.types';
+import { useMarkScratchRewardUsedMutation } from './use-scratch-rewards';
 
 const PLACE_ORDER_COOLDOWN_MS = 1500;
 const SESSION_EXPIRED_MESSAGES = ['session expired', 'please sign in', 'please log in'];
@@ -31,6 +32,7 @@ export function useCheckoutPlaceAction(
   const [warn, setWarn] = useState<string | null>(null);
   const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { openModal, setPendingAction } = useRegistration();
+  const markUsed = useMarkScratchRewardUsedMutation();
 
   const onPlaceOrder = useCallback(async () => {
     if (place.placingOrder || isSubmitting) return;
@@ -59,6 +61,10 @@ export function useCheckoutPlaceAction(
       const orderId = await placeOrder({ address: getCombinedAddress(), note: restaurantNote, promoCode: promo.appliedVoucher?.code, promoDiscount: promo.discount || undefined, paymentMethod, alternateNumber: address.alternateNumber || undefined, lat, lng, deliveryFee });
       if (!orderId) { place.setPlaceError('Failed to create order. Please try again.'); return; }
       promo.consumePromo();
+      // Mark scratch reward as used on backend so it can never be reused
+      if (promo.appliedVoucher?.source) {
+        markUsed.mutate({ trigger: promo.appliedVoucher.source });
+      }
       place.startPlacing(orderId);
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Failed to place order';
@@ -74,7 +80,7 @@ export function useCheckoutPlaceAction(
       return;
     }
     setIsSubmitting(false);
-  }, [validation.isValid, validation.errors, place, promo, address, getCombinedAddress, restaurantNote, paymentMethod, lat, lng, deliveryFee, isSubmitting, openModal, setPendingAction]);
+  }, [validation.isValid, validation.errors, place, promo, address, getCombinedAddress, restaurantNote, paymentMethod, lat, lng, deliveryFee, isSubmitting, openModal, setPendingAction, markUsed]);
 
   return { onPlaceOrder, isSubmitting, warn };
 }

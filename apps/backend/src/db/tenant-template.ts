@@ -16,6 +16,8 @@ export const TENANT_TABLES = [
   'staff',
   'otp_requests',
   'daily_closeouts',
+  'scratch_campaigns',
+  'customer_scratch_rewards',
 ];
 
 export async function createTenantSchema(schemaName: string): Promise<void> {
@@ -42,13 +44,30 @@ export async function createTenantSchema(schemaName: string): Promise<void> {
     `ADD COLUMN IF NOT EXISTS cancel_reason text, ` +
     `ADD COLUMN IF NOT EXISTS alternate_number varchar(20), ` +
     `ADD COLUMN IF NOT EXISTS eta_minutes integer, ` +
-    `ADD COLUMN IF NOT EXISTS table_id uuid`
+    `ADD COLUMN IF NOT EXISTS table_id uuid, ` +
+    `ADD COLUMN IF NOT EXISTS promo_code_id uuid, ` +
+    `ADD COLUMN IF NOT EXISTS promo_code varchar(50), ` +
+    `ADD COLUMN IF NOT EXISTS discount_amount numeric(10, 2) DEFAULT '0'`
+  );
+
+  // Ensure promo_codes has title and description columns
+  await client.unsafe(
+    `ALTER TABLE "${schemaName}"."promo_codes" ` +
+    `ADD COLUMN IF NOT EXISTS title varchar(100), ` +
+    `ADD COLUMN IF NOT EXISTS description text`
   );
 
   // Ensure delivery_agents has push subscription column
   await client.unsafe(
     `ALTER TABLE "${schemaName}"."delivery_agents" ` +
     `ADD COLUMN IF NOT EXISTS push_subscription JSONB`
+  );
+
+  // Ensure scratch_campaigns has behavior and config columns
+  await client.unsafe(
+    `ALTER TABLE "${schemaName}"."scratch_campaigns" ` +
+    `ADD COLUMN IF NOT EXISTS behavior varchar(20) DEFAULT 'scratch_card', ` +
+    `ADD COLUMN IF NOT EXISTS config JSONB`
   );
 }
 

@@ -15,6 +15,7 @@ export function useVoucherManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState("all");
+  const [justCreatedCode, setJustCreatedCode] = useState<string | null>(null);
   const vouchers = data?.vouchers ?? [];
   const stats: VoucherStats = useMemo(() => ({
     total: vouchers.length,
@@ -33,7 +34,7 @@ export function useVoucherManager() {
     if (editingId) {
       updateMutation.mutate({ id: editingId, data }, { onSuccess: () => setEditingId(null) });
     } else {
-      createMutation.mutate(data, { onSuccess: () => setShowForm(false) });
+      createMutation.mutate(data, { onSuccess: () => { setShowForm(false); setJustCreatedCode(data.code); }, onError: (error: any) => { alert(error?.message || 'Failed to create voucher'); } });
     }
   }, [editingId, updateMutation, createMutation]);
   const onDelete = useCallback(() => {
@@ -54,5 +55,6 @@ export function useVoucherManager() {
     filterStatus, setFilterStatus, showForm, setShowForm,
     editingId, setEditingId, deletingId, setDeletingId,
     editingVoucher, deletingVoucher, onSave, onDelete, toggleActive,
+    justCreatedCode, setJustCreatedCode,
   };
 }

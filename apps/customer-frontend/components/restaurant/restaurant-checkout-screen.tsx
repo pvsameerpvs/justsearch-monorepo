@@ -31,6 +31,8 @@ export function RestaurantCheckoutScreen({ restaurant }: { restaurant: Restauran
             currency={state.currency}
             onApplyPromo={state.onApplyPromo}
             promoDiscount={state.promoDiscount}
+            promoError={state.promoError}
+            isValidating={state.isValidating}
             appliedPromoCode={state.appliedPromoCode}
             subtotal={state.subtotal}
             deliveryFee={state.deliveryFee}

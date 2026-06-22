@@ -24,6 +24,8 @@ export const createOrderSchema = z.object({
   tableId: z.string().uuid().optional(),
   paymentMethod: z.enum(['cash', 'card']).optional(),
   alternateNumber: z.string().max(20).optional(),
+  promoCode: z.string().max(50).optional(),
+  promoDiscount: z.number().nonnegative().optional(),
 });
 
 export const updateStatusSchema = z.object({

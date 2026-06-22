@@ -14,7 +14,6 @@ import {
   readStoredUser,
   writeStoredUser,
   writeStoredAuth,
-  saveFreshRegistration,
   syncTokenCookie,
   clearSessionInvalidated,
 } from './registration-storage';
@@ -123,7 +122,6 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
     } else {
       writeStoredUser(nextUser);
     }
-    saveFreshRegistration(nextUser);
     clearSessionInvalidated();
 
     // If there was a pending action (e.g. place order), run it after login

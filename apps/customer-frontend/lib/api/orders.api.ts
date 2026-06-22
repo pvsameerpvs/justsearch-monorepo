@@ -21,6 +21,8 @@ export type CreateOrderPayload = {
   alternateNumber?: string;
   lat?: number;
   lng?: number;
+  promoCode?: string;
+  promoDiscount?: number;
 };
 
 export type CreateOrderResponse = {

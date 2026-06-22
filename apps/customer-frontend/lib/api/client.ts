@@ -107,5 +107,10 @@ export async function apiClient<T>(path: string, options: FetchOptions = {}): Pr
     );
   }
 
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return response.json() as Promise<T>;
 }

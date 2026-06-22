@@ -16,9 +16,14 @@ import { geocodeAddress } from './use-address-geocode';
 
 export function useCheckoutState(restaurant: Restaurant) {
   const { cart, cartCount, deliverySavings, placeOrder } = useRestaurantFulfillment();
+
+  // Compute subtotal BEFORE useCheckoutPromo so it receives the real subtotal
+  const displayItems = useMemo(() => cart.map((item) => ({ ...item, lineTotal: getCheckoutLineTotal(item) })), [cart]);
+  const subtotal = useMemo(() => displayItems.reduce((sum, item) => sum + item.lineTotal, 0), [displayItems]);
+
   const address = useCheckoutAddress();
   const coords = useCheckoutCoords();
-  const promo = useCheckoutPromo(0);
+  const promo = useCheckoutPromo(subtotal);
   const place = useCheckoutPlace();
   const { isRegistered, user } = useRegistration();
 
@@ -74,8 +79,6 @@ export function useCheckoutState(restaurant: Restaurant) {
   const deliveryAvailable = !isDeliveryEnabled || (quote?.available ?? false);
   const deliveryReason = quote?.available === false ? (quote.reason ?? 'Delivery not available') : '';
 
-  const displayItems = useMemo(() => cart.map((item) => ({ ...item, lineTotal: getCheckoutLineTotal(item) })), [cart]);
-  const subtotal = useMemo(() => displayItems.reduce((sum, item) => sum + item.lineTotal, 0), [displayItems]);
   const promoDiscount = promo.discount;
   const displayTotal = Math.max(0, subtotal + dynamicFee - promoDiscount);
   const displaySavings = deliverySavings + promoDiscount;
@@ -83,7 +86,6 @@ export function useCheckoutState(restaurant: Restaurant) {
   const [restaurantNote, setRestaurantNote] = useState('');
   const [riderNote, setRiderNote] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
-  const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
 
   const validation = useCheckoutValidation(
     address.address,
@@ -97,10 +99,13 @@ export function useCheckoutState(restaurant: Restaurant) {
   );
 
   const onApplyPromo = (code: string) => {
-    if (!code) { setAppliedPromoCode(null); promo.setPromoCode(''); return; }
+    if (!code) {
+      promo.setPromoCode('');
+      promo.applyPromoCode('');
+      return;
+    }
     promo.setPromoCode(code);
-    promo.applyPromoCode();
-    setAppliedPromoCode(code);
+    promo.applyPromoCode(code);
   };
 
   const getCombinedAddress = () => [
@@ -141,7 +146,9 @@ export function useCheckoutState(restaurant: Restaurant) {
     displaySavings,
     displayTotal,
     promoDiscount,
-    appliedPromoCode,
+    promoError: promo.promoError,
+    isValidating: promo.isValidating,
+    appliedPromoCode: promo.appliedPromoCode,
     onApplyPromo,
     deliveryFee: dynamicFee,
     deliveryAvailable,

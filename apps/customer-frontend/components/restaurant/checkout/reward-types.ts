@@ -3,7 +3,7 @@ export type VoucherDiscount =
   | { kind: 'flat'; value: number }
   | { kind: 'free_delivery' };
 
-export type RewardTrigger = 'welcome' | 'order';
+export type RewardTrigger = 'welcome' | 'order' | 'auto_voucher';
 
 export type ScratchRewardBase = {
   id: string;
@@ -49,4 +49,3 @@ export type VoucherWalletInput = Omit<VoucherWalletEntry, 'id' | 'createdAt' | '
   createdAt?: number;
   isUsed?: boolean;
 };
-

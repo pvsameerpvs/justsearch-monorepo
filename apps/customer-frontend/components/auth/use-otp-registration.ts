@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRegistration } from './registration-context';
+import { saveFreshRegistration } from './registration-storage';
 import { normalizeUaeLocalDigits, isValidName, isValidUaeLocalDigits, isValidOtp, type OtpRequestResponse, type OtpVerifyResponse } from './registration-modal-utils';
 
 export type Step = 'details' | 'otp';
@@ -92,6 +93,7 @@ export function useOtpRegistration() {
       } else {
         setUser(user);
       }
+      saveFreshRegistration(user);
       closeModal();
     } catch (e) { setError(e instanceof Error ? e.message : 'Failed to verify OTP'); }
     setBusy(false);

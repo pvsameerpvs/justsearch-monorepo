@@ -16,12 +16,12 @@ export function normalizePhoneKey(mobile: string) {
   return mobile.replace(/\D/g, '');
 }
 
-export function getWelcomeRewardSeenKey(mobile: string) {
-  return `${REWARD_SEEN_PREFIX}:welcome:${normalizePhoneKey(mobile)}`;
+export function getWelcomeRewardSeenKey(restaurantId: string, mobile: string) {
+  return `${REWARD_SEEN_PREFIX}:welcome:${normalizeRewardKey(restaurantId)}:${normalizePhoneKey(mobile)}`;
 }
 
-export function getOrderRewardSeenKey(orderId: string) {
-  return `${REWARD_SEEN_PREFIX}:order:${normalizeRewardKey(orderId)}`;
+export function getOrderRewardSeenKey(restaurantId: string, orderId: string) {
+  return `${REWARD_SEEN_PREFIX}:order:${normalizeRewardKey(restaurantId)}:${normalizeRewardKey(orderId)}`;
 }
 
 export function getRewardSeenKey(rewardId: string) {

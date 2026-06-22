@@ -180,6 +180,18 @@ export function useVoucherWallet() {
     [wallet],
   );
 
+  const syncVoucherDiscount = useCallback(
+    (code: string, discount: VoucherDiscount) => {
+      const normalized = normalizeCode(code);
+      commit((current) =>
+        current.map((entry) =>
+          entry.code === normalized ? { ...entry, discount } : entry,
+        ),
+      );
+    },
+    [commit],
+  );
+
   return {
     wallet,
     activeVouchers,
@@ -187,5 +199,6 @@ export function useVoucherWallet() {
     markVoucherUsed,
     findVoucherByCode,
     getVoucherDiscountAmount,
+    syncVoucherDiscount,
   };
 }

@@ -80,7 +80,12 @@ function getRestaurantSlug(): string | null {
   const host = window.location.host.replace(/:\d+$/, '').toLowerCase();
   const isLocalhost = host === 'localhost' || host.endsWith('.localhost');
   if (isLocalhost) {
-    return localStorage.getItem('restaurant-slug');
+    const saved = localStorage.getItem('restaurant-slug');
+    if (saved) return saved;
+    // On localhost fallback to naples (matches middleware default)
+    const fallback = 'naples';
+    localStorage.setItem('restaurant-slug', fallback);
+    return fallback;
   }
   const saved = localStorage.getItem('restaurant-slug');
   if (saved) return saved;
@@ -166,6 +171,11 @@ export async function apiClient<T>(
     const error = await response.json().catch(() => ({ message: 'Unknown error' }));
     const msg = error.message || error.error || `API error: ${response.status}`;
     throw new Error(msg);
+  }
+
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   const raw = await response.json();
